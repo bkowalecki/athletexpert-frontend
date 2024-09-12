@@ -4,11 +4,20 @@ import '../styles/HeroSection.css';
 const HeroSection: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  // Ensure the video is programmatically muted for Safari
   useEffect(() => {
-    if (videoRef.current) {
-      videoRef.current.muted = true; // Force mute for Safari autoplay
-      videoRef.current.play(); // Try to programmatically play the video
+    const videoElement = videoRef.current;
+
+    if (videoElement) {
+      // Mute the video explicitly
+      videoElement.muted = true;
+
+      // Force play for mobile browsers
+      const playPromise = videoElement.play();
+      if (playPromise !== undefined) {
+        playPromise.catch((error) => {
+          console.error('Autoplay was blocked:', error);
+        });
+      }
     }
   }, []);
 
@@ -20,11 +29,12 @@ const HeroSection: React.FC = () => {
         loop
         muted
         playsInline
-        preload="auto" // Preload for faster load times
-        poster="/images/hero-poster.png" // Fallback image
+        preload="auto"
+        poster="/images/hero-poster.png" // Poster image fallback
         className="hero-video"
       >
         <source src="/video/athletexpertheadervideo.mp4" type="video/mp4" />
+        <source src="/video/athletexpertheadervideo.webm" type="video/webm" />
         Your browser does not support the video tag.
       </video>
 
