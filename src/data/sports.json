@@ -1,0 +1,210 @@
+[
+    {
+      "title": "Badminton",
+      "logo": "/icons/badminton_icon.png",
+      "extra_data": {
+        "category": "Racquet Sport",
+        "type": "Indoor/Outdoor",
+        "popularity": "Moderate"
+      }
+    },
+    {
+      "title": "Baseball",
+      "logo": "/icons/baseball_icon.png",
+      "extra_data": {
+        "category": "Team Sport",
+        "type": "Outdoor",
+        "popularity": "High"
+      }
+    },
+    {
+      "title": "Basketball",
+      "logo": "/icons/basketball_icon.png",
+      "extra_data": {
+        "category": "Team Sport",
+        "type": "Indoor/Outdoor",
+        "popularity": "Very High"
+      }
+    },
+    {
+      "title": "Boxing",
+      "logo": "/icons/boxing_icon.png",
+      "extra_data": {
+        "category": "Combat Sport",
+        "type": "Indoor",
+        "popularity": "High"
+      }
+    },
+    {
+      "title": "Cricket",
+      "logo": "/icons/cricket_icon.png",
+      "extra_data": {
+        "category": "Team Sport",
+        "type": "Outdoor",
+        "popularity": "High"
+      }
+    },
+    {
+      "title": "Cycling",
+      "logo": "/icons/cycling_icon.png",
+      "extra_data": {
+        "category": "Individual Sport",
+        "type": "Outdoor",
+        "popularity": "High"
+      }
+    },
+    {
+      "title": "Football",
+      "logo": "/icons/football_icon.png",
+      "extra_data": {
+        "category": "Team Sport",
+        "type": "Outdoor",
+        "popularity": "Very High"
+      }
+    },
+    {
+      "title": "Golf",
+      "logo": "/icons/golf_icon.png",
+      "extra_data": {
+        "category": "Individual Sport",
+        "type": "Outdoor",
+        "popularity": "Moderate"
+      }
+    },
+    {
+      "title": "Hockey",
+      "logo": "/icons/hockey_icon.png",
+      "extra_data": {
+        "category": "Team Sport",
+        "type": "Indoor/Outdoor",
+        "popularity": "High"
+      }
+    },
+    {
+      "title": "Ice Skating",
+      "logo": "/icons/ice_skating_icon.png",
+      "extra_data": {
+        "category": "Winter Sport",
+        "type": "Indoor",
+        "popularity": "Moderate"
+      }
+    },
+    {
+      "title": "Martial Arts",
+      "logo": "/icons/martial_arts_icon.png",
+      "extra_data": {
+        "category": "Combat Sport",
+        "type": "Indoor",
+        "popularity": "Moderate"
+      }
+    },
+    {
+      "title": "Rugby",
+      "logo": "/icons/rugby_icon.png",
+      "extra_data": {
+        "category": "Team Sport",
+        "type": "Outdoor",
+        "popularity": "Moderate"
+      }
+    },
+    {
+      "title": "Running",
+      "logo": "/icons/running_icon.png",
+      "extra_data": {
+        "category": "Individual Sport",
+        "type": "Outdoor",
+        "popularity": "High"
+      }
+    },
+    {
+      "title": "Skateboarding",
+      "logo": "/icons/skateboarding_icon.png",
+      "extra_data": {
+        "category": "Extreme Sport",
+        "type": "Outdoor",
+        "popularity": "High"
+      }
+    },
+    {
+      "title": "Skiing",
+      "logo": "/icons/skiing_icon.png",
+      "extra_data": {
+        "category": "Individual Sport",
+        "type": "Outdoor",
+        "popularity": "Moderate"
+      }
+    },
+    {
+      "title": "Snowboarding",
+      "logo": "/icons/snowboarding_icon.png",
+      "extra_data": {
+        "category": "Winter Sport",
+        "type": "Outdoor",
+        "popularity": "Moderate"
+      }
+    },
+    {
+      "title": "Soccer",
+      "logo": "/icons/soccer_icon.png",
+      "extra_data": {
+        "category": "Team Sport",
+        "type": "Outdoor",
+        "popularity": "Very High"
+      }
+    },
+    {
+      "title": "Surfing",
+      "logo": "/icons/surfing_icon.png",
+      "extra_data": {
+        "category": "Water Sport",
+        "type": "Outdoor",
+        "popularity": "Moderate"
+      }
+    },
+    {
+      "title": "Swimming",
+      "logo": "/icons/swimming_icon.png",
+      "extra_data": {
+        "category": "Individual Sport",
+        "type": "Indoor/Outdoor",
+        "popularity": "High"
+      }
+    },
+    {
+      "title": "Table Tennis",
+      "logo": "/icons/table_tennis_icon.png",
+      "extra_data": {
+        "category": "Racquet Sport",
+        "type": "Indoor",
+        "popularity": "Moderate"
+      }
+    },
+    {
+      "title": "Tennis",
+      "logo": "/icons/tennis_icon.png",
+      "extra_data": {
+        "category": "Racquet Sport",
+        "type": "Outdoor",
+        "popularity": "High"
+      }
+    },
+    {
+      "title": "Volleyball",
+      "logo": "/icons/volleyball_icon.png",
+      "extra_data": {
+        "category": "Team Sport",
+        "type": "Indoor/Outdoor",
+        "popularity": "High"
+      }
+    },
+    {
+      "title": "Yoga",
+      "logo": "/icons/yoga_icon.png",
+      "extra_data": {
+        "category": "Mind & Body",
+        "type": "Indoor/Outdoor",
+        "popularity": "Very High"
+      }
+    }
+  ]
+  

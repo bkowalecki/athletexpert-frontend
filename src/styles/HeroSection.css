@@ -1,0 +1,81 @@
+/* Hero Section styling */
+.hero-section {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  text-align: center;
+}
+
+.hero-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -1;
+}
+
+.hero-content {
+  z-index: 1;
+  /* background-color: rgba(0, 0, 0, 0.6); Adds a subtle dark overlay */
+  padding: 50px;
+  border-radius: 10px;
+  max-width: 600px;
+  margin: 0 auto;
+  /* box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); Adds depth to the content */
+}
+
+.hero-content h1 {
+  font-size: 48px;
+  margin-bottom: 20px;
+  font-family: 'Arial', sans-serif;
+  letter-spacing: 1px;
+}
+
+.hero-content p {
+  font-size: 20px;
+  margin-bottom: 30px;
+  font-family: 'Arial', sans-serif;
+  color: rgba(255, 255, 255, 0.8); /* Lightens the subtext color for contrast */
+  line-height: 1.5;
+}
+
+/* CTA Button Styling */
+.cta-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.cta-btn {
+  padding: 15px 30px;
+  font-size: 18px;
+  font-family: 'Arial', sans-serif;
+  color: white;
+  background-color: #0077cc;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 5px 15px rgba(0, 119, 204, 0.3); /* Adds depth to the buttons */
+}
+
+.cta-btn:hover {
+  background-color: #005fa3;
+  transform: scale(1.05); /* Adds a subtle scale effect on hover */
+}
+
+.cta-btn-secondary {
+  background-color: rgba(255, 255, 255, 0.8); /* Lighten the secondary button */
+  color: #0077cc;
+}
+
+.cta-btn-secondary:hover {
+  background-color: rgba(255, 255, 255, 1);
+}
