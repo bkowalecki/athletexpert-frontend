@@ -1,0 +1,16 @@
+{
+    "rewrites": [
+      { "source": "/video/:path*", "destination": "/public/video/:path*" }
+    ],
+    "headers": [
+      {
+        "source": "/video/:path*",
+        "headers": [
+          {
+            "key": "Content-Type",
+            "value": "video/mp4"
+          }
+        ]
+      }
+    ]
+  }
