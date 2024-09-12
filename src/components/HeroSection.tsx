@@ -1,10 +1,26 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import '../styles/HeroSection.css';
 
 const HeroSection: React.FC = () => {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  // Ensure the video is programmatically muted for Safari
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.muted = true; // Force mute for Safari autoplay
+    }
+  }, []);
+
   return (
     <div className="hero-section">
-      <video autoPlay loop muted className="hero-video">
+      <video
+        ref={videoRef}
+        autoPlay
+        loop
+        muted
+        playsInline // Added for mobile browsers
+        className="hero-video"
+      >
         <source src="/video/athletexpertheadervideo.mp4" type="video/mp4" />
         Your browser does not support the video tag.
       </video>

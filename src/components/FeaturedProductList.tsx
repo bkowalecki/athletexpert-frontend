@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import '../styles/ProductList.css';
+import '../styles/FeaturedProductList.css';
 
 interface Product {
   id: number;
@@ -10,7 +10,7 @@ interface Product {
   price: number;
 }
 
-const ProductList: React.FC = () => {
+const FeaturedProductList: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
 
   useEffect(() => {
@@ -41,4 +41,4 @@ const ProductList: React.FC = () => {
   );
 };
 
-export default ProductList;
+export default FeaturedProductList;

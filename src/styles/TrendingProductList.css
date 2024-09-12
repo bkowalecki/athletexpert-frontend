@@ -1,0 +1,41 @@
+.product-list-container {
+    padding: 20px;
+  }
+  
+  h2 {
+    font-family: 'Arial', sans-serif;
+    color: #333;
+    font-size: 28px;
+  }
+  
+  .product-list {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .product-item {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    margin-bottom: 15px;
+    padding: 20px;
+    border-radius: 8px;
+    transition: box-shadow 0.3s ease;
+  }
+  
+  .product-item:hover {
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  h3 {
+    margin-top: 0;
+    font-size: 22px;
+    color: #0077cc;
+  }
+  
+  p {
+    margin: 5px 0;
+    font-family: 'Arial', sans-serif;
+    font-size: 16px;
+    color: #555;
+  }
+  

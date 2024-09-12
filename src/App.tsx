@@ -3,7 +3,8 @@ import './styles/App.css';  // Main app styles
 import Header from './components/Header';
 import HeroSection from './components/HeroSection';
 import Quiz from './components/Quiz';
-import ProductList from './components/ProductList';
+import FeaturedProductList from './components/FeaturedProductList';
+import TrendingProductList from './components/TrendingProductList';
 
 const App: React.FC = () => {
   return (
@@ -12,7 +13,8 @@ const App: React.FC = () => {
       <HeroSection/>
       <main>
         <Quiz/>
-        <ProductList />
+        <FeaturedProductList />
+        <TrendingProductList/>
       </main>
     </div>
   );
