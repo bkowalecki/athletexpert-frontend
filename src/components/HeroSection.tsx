@@ -8,6 +8,7 @@ const HeroSection: React.FC = () => {
   useEffect(() => {
     if (videoRef.current) {
       videoRef.current.muted = true; // Force mute for Safari autoplay
+      videoRef.current.play(); // Try to programmatically play the video
     }
   }, []);
 
@@ -18,7 +19,9 @@ const HeroSection: React.FC = () => {
         autoPlay
         loop
         muted
-        playsInline // Added for mobile browsers
+        playsInline
+        preload="auto" // Preload for faster load times
+        poster="/images/hero-poster.png" // Fallback image
         className="hero-video"
       >
         <source src="/video/athletexpertheadervideo.mp4" type="video/mp4" />
