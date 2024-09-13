@@ -8,14 +8,18 @@ const HeroSection: React.FC = () => {
     const videoElement = videoRef.current;
 
     if (videoElement) {
-      // Mute the video explicitly
+      // Set muted programmatically
       videoElement.muted = true;
-
-      // Force play for mobile browsers
+      videoElement.setAttribute("playsinline", "true");
+      
+      // Try to play the video programmatically for mobile browsers
       const playPromise = videoElement.play();
+
       if (playPromise !== undefined) {
-        playPromise.catch((error) => {
-          console.error('Autoplay was blocked:', error);
+        playPromise.then(() => {
+          console.log('Video playing successfully');
+        }).catch((error) => {
+          console.error('Autoplay blocked, manual play required:', error);
         });
       }
     }
