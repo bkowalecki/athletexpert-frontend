@@ -33,7 +33,7 @@ const HeroSection: React.FC = () => {
         loop
         muted
         playsInline
-        preload="auto"
+        // preload="auto"
         poster="/images/hero-poster.png" // Poster image fallback
         className="hero-video"
       >
