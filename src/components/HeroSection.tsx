@@ -1,26 +1,30 @@
-import React, { useEffect, useRef } from 'react';
-import '../styles/HeroSection.css';
+import React, { useEffect, useRef } from "react";
+import "../styles/HeroSection.css";
 
-const HeroSection: React.FC = () => {
+interface HeroSectionProps {
+  openModal: () => void; // Define openModal prop
+}
+
+const HeroSection: React.FC<HeroSectionProps> = ({ openModal }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
     const videoElement = videoRef.current;
 
     if (videoElement) {
-      // Set muted programmatically
       videoElement.muted = true;
       videoElement.setAttribute("playsinline", "true");
-      
-      // Try to play the video programmatically for mobile browsers
+
       const playPromise = videoElement.play();
 
       if (playPromise !== undefined) {
-        playPromise.then(() => {
-          console.log('Video playing successfully');
-        }).catch((error) => {
-          console.error('Autoplay blocked, manual play required:', error);
-        });
+        playPromise
+          .then(() => {
+            console.log("Video playing successfully");
+          })
+          .catch((error) => {
+            console.error("Autoplay blocked, manual play required:", error);
+          });
       }
     }
   }, []);
@@ -32,9 +36,10 @@ const HeroSection: React.FC = () => {
         autoPlay
         loop
         muted
+        controls
         playsInline
-        // preload="auto"
-        poster="/images/hero-poster.png" // Poster image fallback
+        preload="auto"
+        poster="/images/hero-poster.png"
         className="hero-video"
       >
         <source src="/video/athletexpertheadervideo.mp4" type="video/mp4" />
@@ -46,8 +51,12 @@ const HeroSection: React.FC = () => {
         <h1>Gear Tailored to You</h1>
         <p>Don't sweat the search, we've got you covered.</p>
         <div className="cta-buttons">
-          <button className="cta-btn">Quiz</button>
-          <button className="cta-btn cta-btn-secondary">Learn More</button>
+          <button className="cta-btn" onClick={openModal}>
+            {" "}
+            {/* Wire up openModal to button click */}
+            Get Your Gear
+          </button>
+          <button className="cta-btn cta-btn-secondary">Profile</button>
         </div>
       </div>
     </div>

@@ -10,16 +10,16 @@
   top: 0;
   z-index: 1000;
   box-sizing: border-box;
-  transition: background-color 0.3s ease; /* Smooth transition for background */
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Adds a shadow for subtle depth */
+  transition: background-color 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .app-header:hover {
-  background-color: rgba(0, 0, 0, 0.8); /* Adds a background on hover for contrast */
+  background-color: rgba(0, 0, 0, 0.8);
 }
 
 .logo {
-  flex-shrink: 0; /* Prevents the logo from shrinking */
+  flex-shrink: 0;
 }
 
 .logo h1 {
@@ -36,10 +36,10 @@
   justify-content: flex-end;
   align-items: center;
   gap: 20px;
-  flex-grow: 1; /* Makes nav links take available space */
-  max-width: 50%; /* Limits how much space the nav items can take up */
-  white-space: nowrap; /* Prevents the links from breaking onto new lines */
-  overflow: hidden; /* Prevents content from overflowing */
+  flex-grow: 1;
+  max-width: 70%; /* Adjusted to give nav links more room */
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .nav-links a {
@@ -52,8 +52,13 @@
 }
 
 .nav-links a:hover {
-  background-color: rgba(255, 255, 255, 0.2); /* Adds a soft background on hover */
+  background-color: rgba(255, 255, 255, 0.2);
   color: #0077cc;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
 }
 
 /* Hamburger menu styling */
@@ -61,6 +66,7 @@
   display: none;
   flex-direction: column;
   cursor: pointer;
+  z-index: 1001; /* Ensures it stays on top */
 }
 
 .hamburger-menu .bar {
@@ -72,7 +78,7 @@
 }
 
 /* Mobile menu styles */
-@media (max-width: 768px) {
+@media (max-width: 875px) {
   .nav-links {
     display: none;
     position: absolute;
@@ -82,6 +88,9 @@
     flex-direction: column;
     width: 200px;
     padding: 10px 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    border-radius: 8px;
+    z-index: 1001; /* Ensure nav is on top */
   }
 
   .nav-links.mobile-menu-open {
@@ -91,4 +100,17 @@
   .hamburger-menu {
     display: flex;
   }
+
+  .app-header {
+    padding: 10px 20px;
+  }
+
+  .logo h1 {
+    font-size: 24px;
+  }
+}
+
+/* Ensure no horizontal scrolling */
+body, html {
+  overflow-x: hidden;
 }

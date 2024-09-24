@@ -1,30 +1,87 @@
-import React, { useState } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import "../styles/Quiz.css";
 import sportsData from "../data/sports.json";
+// import axios from "axios"; // Comment this out if not needed for now
+import { QuizContext } from "./QuizContext"; // Context for global values like favoriteColor
 
-// Define the structure for answers
-type Answers = {
-  sport?: string;
-  skillLevel?: string;
-  fitnessGoal?: string;
-  trainingFrequency?: string;
-  budget?: string;
-  favoriteColor?: string; // Added favorite color
-};
+interface Product {
+  id: number;
+  name: string;
+  brand: string;
+  price: number;
+  imageUrl: string;
+  link: string;
+}
 
-const Quiz: React.FC = () => {
-  const [carouselIndex, setCarouselIndex] = useState(0); // Track carousel index for sports
-  const [touchStart, setTouchStart] = useState<number | null>(null); // For handling touch swipe
-  const [answers, setAnswers] = useState<Answers>({}); // Store quiz answers
-  const [step, setStep] = useState(0); // Track the current step
+interface QuizProps {
+  closeModal: () => void; // Prop to close the modal
+}
 
-  // Move to the next question (e.g., sport selection)
-  const handleNext = (field: keyof Answers, value: string) => {
+const Quiz: React.FC<QuizProps> = ({ closeModal }) => {
+  // Local state for quiz steps and answers
+  const [step, setStep] = useState(0);
+  const totalSteps = 6;
+  const [carouselIndex, setCarouselIndex] = useState(0); // Track carousel index
+  const [recommendedProducts, setRecommendedProducts] = useState<Product[]>([]); // Products
+  const [isLoading, setIsLoading] = useState(false);
+  const [answers, setAnswers] = useState({
+    sport: "",
+    skillLevel: "",
+    fitnessGoal: "",
+    trainingFrequency: "",
+    budget: "",
+    favoriteColor: "",
+  });
+
+  const { dispatch } = useContext(QuizContext); // Use context for specific state
+
+  useEffect(() => {
+    if (step === 6) {
+      setIsLoading(true); // Start loading
+      fetch("http://localhost:8080/api/recommendations", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(answers), // Sending answers from quiz
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then((data) => {
+          console.log("Recommended products:", data);
+          setRecommendedProducts(data); // Set the recommendations
+          setIsLoading(false); // Stop loading
+        })
+        .catch((error) => {
+          console.error("Error fetching recommendations:", error);
+          setIsLoading(false); // Stop loading in case of an error
+        });
+    }
+  }, [step, answers]);
+
+  const handleNext = (field: string, value: string) => {
     setAnswers((prevAnswers) => ({
       ...prevAnswers,
       [field]: value,
     }));
-    setStep(step + 1); // Move to the next step
+
+    if (step === 5) {
+      // For step 5 (favorite color), dispatch the selected color and finish the quiz
+      dispatch({ type: "SET_FAVORITE_COLOR", color: value });
+      setStep(step + 1); // Move to the "Thank You" step (step 6)
+    } else {
+      setStep(step + 1); // Move to the next step
+    }
+  };
+
+  const handleSubmitQuiz = () => {
+    // Simulate a successful submission and log the data
+    console.log("Quiz submitted successfully with answers: ", answers);
+    closeModal(); // Close modal when quiz finishes
   };
 
   // Move carousel left or right with loop-around functionality
@@ -40,48 +97,24 @@ const Quiz: React.FC = () => {
     }
   };
 
-  // Handle swipe events for touch screens
-  const handleTouchStart = (e: React.TouchEvent) => {
-    setTouchStart(e.touches[0].clientX);
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (!touchStart) return;
-    const touchEnd = e.touches[0].clientX;
-    const difference = touchStart - touchEnd;
-
-    if (difference > 50) {
-      handleCarousel("right");
-    }
-
-    if (difference < -50) {
-      handleCarousel("left");
-    }
-
-    setTouchStart(null); // Reset after swipe
-  };
-
   return (
     <div className="quiz-container">
-      {/* Step 1: Sport Selection with Carousel */}
+      <div className="progress-bar">
+        <div style={{ width: `${(step / totalSteps) * 100}%` }}></div>
+      </div>
+
       {step === 0 && (
         <>
           <h2>Which sport are you shopping for?</h2>
 
-          <div
-            className="carousel-container"
-            onTouchStart={handleTouchStart}
-            onTouchMove={handleTouchMove}
-          >
-            {/* Left arrow */}
+          <div className="carousel-container">
             <button
               className="carousel-button left"
               onClick={() => handleCarousel("left")}
             >
-              &#x25C0; {/* Left arrow */}
+              &#x25C0;
             </button>
 
-            {/* Carousel items */}
             <div
               className="carousel-item-container"
               style={{ transform: `translateX(-${carouselIndex * 100}%)` }}
@@ -98,127 +131,120 @@ const Quiz: React.FC = () => {
               ))}
             </div>
 
-            {/* Right arrow */}
             <button
               className="carousel-button right"
               onClick={() => handleCarousel("right")}
             >
-              &#x25B6; {/* Right arrow */}
+              &#x25B6;
             </button>
           </div>
 
-          <button
-            className="next-button"
-            onClick={() => handleNext("sport", sportsData[carouselIndex].title)}
-          >
-            Next
-          </button>
-        </>
-      )}
-
-      {/* Step 2: Skill Level */}
-      {step === 1 && (
-        <>
-          <h2>What is your skill level?</h2>
-          <div className="quiz-options">
-            {["Beginner", "Intermediate", "Advanced", "Professional"].map(
-              (option) => (
-                <button
-                  key={option}
-                  className={`quiz-option ${
-                    answers.skillLevel === option ? "selected" : ""
-                  }`}
-                  onClick={() => handleNext("skillLevel", option)}
-                >
-                  {option}
-                </button>
-              )
-            )}
+          <div className="quiz-navigation">
+            <button
+              className="nav-button"
+              onClick={() =>
+                handleNext("sport", sportsData[carouselIndex].title)
+              }
+            >
+              Next
+            </button>
           </div>
         </>
       )}
 
-      {/* Step 3: Fitness Goal */}
-      {step === 2 && (
+      {step > 0 && step <= 4 && (
         <>
-          <h2>What is your fitness goal?</h2>
+          <h2>
+            {step === 1
+              ? "What is your skill level?"
+              : step === 2
+              ? "What is your fitness goal?"
+              : step === 3
+              ? "How often do you play/train?"
+              : "What is your budget?"}
+          </h2>
           <div className="quiz-options">
-            {["Build Muscle", "Lose Weight", "Increase Endurance", "Improve Flexibility"].map(
-              (option) => (
-                <button
-                  key={option}
-                  className={`quiz-option ${
-                    answers.fitnessGoal === option ? "selected" : ""
-                  }`}
-                  onClick={() => handleNext("fitnessGoal", option)}
-                >
-                  {option}
-                </button>
-              )
-            )}
+            {step === 1
+              ? ["Beginner", "Intermediate", "Advanced", "Professional"].map(
+                  (option) => (
+                    <button
+                      key={option}
+                      className={`quiz-option ${
+                        answers.skillLevel === option ? "selected" : ""
+                      }`}
+                      onClick={() => handleNext("skillLevel", option)}
+                    >
+                      {option}
+                    </button>
+                  )
+                )
+              : step === 2
+              ? [
+                  "Build Muscle",
+                  "Lose Weight",
+                  "Increase Endurance",
+                  "Improve Flexibility",
+                ].map((option) => (
+                  <button
+                    key={option}
+                    className={`quiz-option ${
+                      answers.fitnessGoal === option ? "selected" : ""
+                    }`}
+                    onClick={() => handleNext("fitnessGoal", option)}
+                  >
+                    {option}
+                  </button>
+                ))
+              : step === 3
+              ? [
+                  "1-2 times per week",
+                  "3-4 times per week",
+                  "5-6 times per week",
+                  "Daily",
+                ].map((option) => (
+                  <button
+                    key={option}
+                    className={`quiz-option ${
+                      answers.trainingFrequency === option ? "selected" : ""
+                    }`}
+                    onClick={() => handleNext("trainingFrequency", option)}
+                  >
+                    {option}
+                  </button>
+                ))
+              : ["Under $50", "$50-$100", "$100-$200", "Over $200"].map(
+                  (option) => (
+                    <button
+                      key={option}
+                      className={`quiz-option ${
+                        answers.budget === option ? "selected" : ""
+                      }`}
+                      onClick={() => handleNext("budget", option)}
+                    >
+                      {option}
+                    </button>
+                  )
+                )}
           </div>
         </>
       )}
 
-      {/* Step 4: Training Frequency */}
-      {step === 3 && (
-        <>
-          <h2>How often do you play/train?</h2>
-          <div className="quiz-options">
-            {["1-2 times per week", "3-4 times per week", "5-6 times per week", "Daily"].map(
-              (option) => (
-                <button
-                  key={option}
-                  className={`quiz-option ${
-                    answers.trainingFrequency === option ? "selected" : ""
-                  }`}
-                  onClick={() => handleNext("trainingFrequency", option)}
-                >
-                  {option}
-                </button>
-              )
-            )}
-          </div>
-        </>
-      )}
-
-      {/* Step 5: Budget */}
-      {step === 4 && (
-        <>
-          <h2>What is your budget?</h2>
-          <div className="quiz-options">
-            {["Under $50", "$50-$100", "$100-$200", "Over $200"].map(
-              (option) => (
-                <button
-                  key={option}
-                  className={`quiz-option ${
-                    answers.budget === option ? "selected" : ""
-                  }`}
-                  onClick={() => handleNext("budget", option)}
-                >
-                  {option}
-                </button>
-              )
-            )}
-          </div>
-        </>
-      )}
-
-        {/* Bonus Step: Favorite Color */}
-        {step === 5 && (
+      {/* Step 5: Favorite Color */}
+      {/* Step 5: Choose favorite color */}
+      {step === 5 && (
         <>
           <h2>What is your favorite color?</h2>
           <div className="quiz-options">
             {["Red", "Blue", "Green", "Yellow", "Purple", "Black", "White"].map(
-              (option) => (
+              (color) => (
                 <button
-                  key={option}
+                  key={color}
                   className={`quiz-option ${
-                    answers.favoriteColor === option ? "selected" : ""
+                    answers.favoriteColor === color ? "selected" : ""
                   }`}
-                  onClick={() => handleNext("favoriteColor", option)}
+                  onClick={() => handleNext("favoriteColor", color)} // Store color and proceed
                 >
-                  {option}
+                  {color}
                 </button>
               )
             )}
@@ -226,21 +252,64 @@ const Quiz: React.FC = () => {
         </>
       )}
 
-      
-
-      {/* Final Step: Thank you or Results */}
+      {/* Step 6: Thank you screen */}
       {step === 6 && (
         <>
           <h2>Thank you for completing the quiz!</h2>
           <p>Here are your selections:</p>
           <ul>
-            <li><strong>Sport:</strong> {answers.sport}</li>
-            <li><strong>Skill Level:</strong> {answers.skillLevel}</li>
-            <li><strong>Fitness Goal:</strong> {answers.fitnessGoal}</li>
-            <li><strong>Training Frequency:</strong> {answers.trainingFrequency}</li>
-            <li><strong>Budget:</strong> {answers.budget}</li>
-            <li><strong>Favorite Color:</strong> {answers.favoriteColor}</li>
+            <li>
+              <strong>Sport:</strong> {answers.sport}
+            </li>
+            <li>
+              <strong>Skill Level:</strong> {answers.skillLevel}
+            </li>
+            <li>
+              <strong>Fitness Goal:</strong> {answers.fitnessGoal}
+            </li>
+            <li>
+              <strong>Training Frequency:</strong> {answers.trainingFrequency}
+            </li>
+            <li>
+              <strong>Budget:</strong> {answers.budget}
+            </li>
+            <li>
+              <strong>Favorite Color:</strong> {answers.favoriteColor}
+            </li>
           </ul>
+
+          {/* Display recommended products */}
+          <div className="recommended-products">
+            <h3>Recommended Products</h3>
+            <div className="product-grid">
+              {recommendedProducts.map((product) => (
+                <div key={product.id} className="product-card">
+                  <img
+                    src={product.imageUrl}
+                    alt={product.name}
+                    className="product-image"
+                  />
+                  <h4>{product.name}</h4>
+                  <p>by {product.brand}</p>
+                  <p>${product.price.toFixed(2)}</p>
+                  <a
+                    href={product.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="buy-button"
+                  >
+                    Buy Now
+                  </a>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="quiz-navigation">
+            <button className="nav-button" onClick={handleSubmitQuiz}>
+              Finish
+            </button>
+          </div>
         </>
       )}
     </div>
@@ -248,9 +317,3 @@ const Quiz: React.FC = () => {
 };
 
 export default Quiz;
-
-
-
-
-
-

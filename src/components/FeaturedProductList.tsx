@@ -1,39 +1,48 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import '../styles/FeaturedProductList.css';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import "../styles/FeaturedProductList.css";  // Same CSS for Trending Product List
 
 interface Product {
   id: number;
   name: string;
   brand: string;
   category: string;
-  price: number;
+  price: number | null;
+  imgUrl: string;
+  affiliateLink: string;  // Add the affiliate link for "View on Amazon"
 }
 
 const FeaturedProductList: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
 
   useEffect(() => {
-    // Fetch products from the backend
-    axios.get('http://localhost:8080/api/products')
-      .then(response => {
+    axios
+      .get("http://localhost:8080/api/featured-products/featured")
+      .then((response) => {
         setProducts(response.data);
       })
-      .catch(error => {
-        console.error('There was an error fetching the products!', error);
+      .catch((error) => {
+        console.error("There was an error fetching the products!", error);
       });
   }, []);
 
   return (
     <div className="product-list-container">
-      <h2>Featured Products</h2>
+      <h2 className="heading">Featured Products</h2>
       <ul className="product-list">
         {products.map((product) => (
-          <li key={product.id} className="product-item">
+          <li 
+            key={product.id} 
+            className="product-item" 
+            style={{ backgroundImage: `url(${product.imgUrl})`, backgroundSize:'cover' }}  // Dynamic background image
+          >
             <h3>{product.name}</h3>
-            <p>Brand: {product.brand}</p>
-            <p>Category: {product.category}</p>
-            <p>Price: ${product.price}</p>
+            <p>{product.brand}</p>
+            <p>${product.price ? product.price.toFixed(2) : "N/A"}</p>
+            {/* Add the CTA button */}
+            <a href={product.affiliateLink} target="_blank" rel="noopener noreferrer" className="cta-button">
+              View on Amazon
+            </a>
           </li>
         ))}
       </ul>

@@ -1,79 +1,37 @@
-/* styles/Quiz.css */
-
+/* Main Quiz Container */
 .quiz-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
-  margin: 20px;
+  margin: 0 auto;
   padding: 20px;
-  border-radius: 10px;
-  width: 100%;
-  max-width: 500px;
-  position: relative;
-  /* Removed background color */
-}
-
-h2 {
-  font-size: 24px;
-  margin-bottom: 20px;
-  color: #333;
-}
-
-.quiz-options {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  margin-bottom: 20px;
-}
-
-.quiz-option {
-  padding: 12px 20px;
-  margin: 10px 0;
-  font-size: 18px;
-  font-family: 'Helvetica Neue', sans-serif;
-  background-color: #f0f0f0;
-  border: 2px solid #ddd;
-  border-radius: 8px;
   width: 90%;
-  max-width: 350px;
-  cursor: pointer;
-  text-align: center;
-  transition: background-color 0.3s ease, transform 0.2s ease, border-color 0.3s ease;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  max-width: 100%;
+  overflow-y: auto;
+  max-height: 80vh;
 }
 
-.quiz-option:hover {
-  background-color: #007bff;
-  color: white;
-  border-color: #0056b3;
-  transform: translateY(-3px);
-}
-
-.quiz-option.selected {
-  background-color: #007bff;
-  color: white;
-  border-color: #0056b3;
-}
-
+/* Carousel Container */
 .carousel-container {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
-  position: relative; /* Enable absolute positioning for arrows */
-  overflow: hidden; /* Ensure carousel doesn't overflow */
+  position: relative;
+  overflow: hidden; /* Prevent overflow */
+  margin-bottom: 20px;
 }
 
 .carousel-item-container {
   display: flex;
-  transition: transform 0.3s ease;
+  width: 100%; /* Take full width */
+  transition: transform 0.5s ease-in-out; /* Smooth transitions */
 }
 
 .carousel-item {
-  min-width: 100%; /* Each item takes full width */
+  min-width: 100%; /* Show only one item at a time */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -85,17 +43,15 @@ h2 {
   margin-bottom: 10px;
 }
 
-/* Updated elegant text styling */
 .carousel-text {
-  font-size: 18px;
+  font-size: 1.1rem;
   color: #555;
-  font-weight: 600; /* Slightly bolder for emphasis */
-  font-family: 'Helvetica Neue', sans-serif; /* Elegant font */
-  letter-spacing: 0.5px; /* Small spacing for better readability */
-  margin-top: 5px;
-  text-transform: capitalize; /* Capitalizes first letter of each word */
+  font-weight: 600;
+  margin-top: 10px;
+  text-transform: capitalize;
 }
 
+/* Carousel Arrows */
 .carousel-button {
   position: absolute;
   top: 50%;
@@ -103,51 +59,170 @@ h2 {
   background: none;
   border: none;
   font-size: 2rem;
-  color: #333;
+  color: #007bff;
   cursor: pointer;
-  transition: color 0.3s ease;
   z-index: 1;
+  transition: color 0.3s ease;
 }
 
 .carousel-button.left {
-  left: 10px;
+  left: 15px;
 }
 
 .carousel-button.right {
-  right: 10px;
+  right: 15px;
 }
 
 .carousel-button:hover {
-  color: #007bff;
+  color: #0056b3;
 }
 
-.next-button {
+/* Quiz Options */
+.quiz-options {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.quiz-option {
+  padding: 12px 20px;
+  margin: 10px 0;
+  font-size: 1.1rem;
+  background-color: #f0f0f0;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 350px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease, border-color 0.3s ease;
+}
+
+.quiz-option:hover {
+  background-color: #007bff;
+  color: white;
+  border-color: #0056b3;
+}
+
+.quiz-option.selected {
+  background-color: #007bff;
+  color: white;
+  border-color: #0056b3;
+}
+
+/* Next and Previous Buttons */
+.quiz-navigation {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 400px;
   margin-top: 20px;
-  padding: 10px 20px;
-  font-size: 16px;
+}
+
+.nav-button {
+  padding: 12px 25px;
+  font-size: 1rem;
   color: white;
   background-color: #007bff;
   border: none;
-  border-radius: 5px;
+  border-radius: 8px;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  flex: 1;
+  margin: 0 10px;
 }
 
-.next-button:hover {
+.nav-button:hover {
   background-color: #0056b3;
 }
 
+.nav-button.disabled {
+  background-color: #e0e0e0;
+  cursor: not-allowed;
+}
+
+/* Progress Bar */
 .progress-bar {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  height: 5px;
+  width: 100%;
+  height: 10px;
+  background-color: #e0e0e0;
+  border-radius: 5px;
+  margin-bottom: 20px;
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-bar div {
+  height: 100%;
   background-color: #007bff;
   transition: width 0.5s ease;
 }
 
-/* Mobile-specific adjustments */
-@media (max-width: 768px) {
+/* Recommended Products Section */
+.recommended-products {
+  margin-top: 40px;
+}
+
+.recommended-products h3 {
+  font-size: 1.8rem;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+/* Product Grid */
+.product-grid {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.product-card {
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.product-image {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  margin-bottom: 15px;
+}
+
+.buy-button {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border-radius: 5px;
+  text-decoration: none;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.buy-button:hover {
+  background-color: #0056b3;
+}
+
+
+/* Mobile Adjustments */
+@media (max-width: 1024px ) {
+  .quiz-container {
+    padding: 10px;
+    width: 90%;
+  }
+
   .quiz-icon {
     width: 60px;
     height: 60px;
@@ -157,11 +232,11 @@ h2 {
     font-size: 1.5rem;
   }
 
-  .carousel-item {
-    min-width: 100%;
-  }
-
   .quiz-option {
     width: 95%;
+  }
+
+  .nav-button {
+    font-size: 0.9rem;
   }
 }

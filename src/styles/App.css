@@ -2,10 +2,12 @@ body {
   margin: 0;
   font-family: 'Arial', sans-serif;
   background-color: #f4f4f4;
+  /* background-color: #014421; */
 }
 
 .App {
   text-align: center;
+  
 }
 
 main {
@@ -15,4 +17,5 @@ main {
   margin: 20px auto;
   width: 80%;
   max-width: 1200px;
+  
 }
