@@ -36,7 +36,6 @@ const HeroSection: React.FC<HeroSectionProps> = ({ openModal }) => {
         autoPlay
         loop
         muted
-        controls
         playsInline
         preload="auto"
         poster="/images/hero-poster.png"

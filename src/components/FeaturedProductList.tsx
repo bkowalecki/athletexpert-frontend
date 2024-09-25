@@ -9,7 +9,7 @@ interface Product {
   category: string;
   price: number | null;
   imgUrl: string;
-  affiliateLink: string;  // Add the affiliate link for "View on Amazon"
+  amazonUrl: string;  // Add the affiliate link for "View on Amazon"
 }
 
 const FeaturedProductList: React.FC = () => {
@@ -20,6 +20,7 @@ const FeaturedProductList: React.FC = () => {
       .get("http://localhost:8080/api/featured-products/featured")
       .then((response) => {
         setProducts(response.data);
+        console.log(response.data);
       })
       .catch((error) => {
         console.error("There was an error fetching the products!", error);
@@ -40,7 +41,7 @@ const FeaturedProductList: React.FC = () => {
             <p>{product.brand}</p>
             <p>${product.price ? product.price.toFixed(2) : "N/A"}</p>
             {/* Add the CTA button */}
-            <a href={product.affiliateLink} target="_blank" rel="noopener noreferrer" className="cta-button">
+            <a href={product.amazonUrl} target="_blank" rel="noopener noreferrer" className="cta-button">
               View on Amazon
             </a>
           </li>
