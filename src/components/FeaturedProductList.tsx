@@ -17,7 +17,7 @@ const FeaturedProductList: React.FC = () => {
 
   useEffect(() => {
     axios
-      .get("http://192.168.1.209:8080/api/featured-products/featured")
+      .get("http://localhost:8080/api/featured-products/featured")
       .then((response) => {
         setProducts(response.data);
         console.log(response.data);
