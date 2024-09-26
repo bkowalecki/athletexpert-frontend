@@ -7,10 +7,28 @@
   text-align: center;
   margin: 0 auto;
   padding: 20px;
-  width: 90%;
+  width: 100%;
   max-width: 100%;
-  overflow-y: auto;
+  overflow-y: hidden; /* Hide the scrollbar while still allowing vertical space */
   max-height: 80vh;
+  box-sizing: border-box;
+}
+
+/* Progress Bar */
+.progress-bar {
+  width: 100%;
+  height: 10px;
+  background-color: #e0e0e0;
+  border-radius: 5px;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.progress-bar div {
+  height: 100%;
+  background-color: #007bff;
+  transition: width 0.5s ease;
+  border-radius: 5px;
 }
 
 /* Carousel Container */
@@ -26,12 +44,12 @@
 
 .carousel-item-container {
   display: flex;
-  width: 100%; /* Take full width */
-  transition: transform 0.5s ease-in-out; /* Smooth transitions */
+  width: 100%;
+  transition: transform 0.5s ease-in-out;
 }
 
 .carousel-item {
-  min-width: 100%; /* Show only one item at a time */
+  min-width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -84,6 +102,8 @@
   align-items: center;
   width: 100%;
   margin-bottom: 20px;
+  overflow-y: visible;
+  max-height: none;
 }
 
 .quiz-option {
@@ -111,10 +131,10 @@
   border-color: #0056b3;
 }
 
-/* Next and Previous Buttons */
+/* Quiz Navigation */
 .quiz-navigation {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   width: 100%;
   max-width: 400px;
   margin-top: 20px;
@@ -142,40 +162,26 @@
   cursor: not-allowed;
 }
 
-/* Progress Bar */
-.progress-bar {
-  width: 100%;
-  height: 10px;
-  background-color: #e0e0e0;
-  border-radius: 5px;
-  margin-bottom: 20px;
-  overflow: hidden;
-  position: relative;
-}
-
-.progress-bar div {
-  height: 100%;
-  background-color: #007bff;
-  transition: width 0.5s ease;
-}
-
 /* Recommended Products Section */
 .recommended-products {
-  margin-top: 40px;
+  overflow-x: hidden;
+  text-align: center;
 }
 
 .recommended-products h3 {
-  font-size: 1.8rem;
+  font-size: 2rem;
   margin-bottom: 20px;
   color: #333;
+  font-weight: bold;
 }
 
 /* Product Grid */
 .product-grid {
   display: flex;
+  flex-wrap: wrap;
   gap: 20px;
   justify-content: center;
-  flex-wrap: wrap;
+  align-items: stretch;
 }
 
 .product-card {
@@ -183,25 +189,46 @@
   border-radius: 10px;
   padding: 20px;
   text-align: center;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex: 1 1 250px;
+  max-width: 250px;
+  min-height: 350px;
 }
 
 .product-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+}
+
+.product-card h4 {
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+  color: #333;
+  font-weight: 600;
+}
+
+.product-card p {
+  font-size: 1rem;
+  color: #555;
+  margin-bottom: 10px;
 }
 
 .product-image {
-  width: 100px;
-  height: 100px;
-  object-fit: cover;
+  width: 100%;
+  height: auto;
+  max-height: 150px;
+  object-fit: contain;
   margin-bottom: 15px;
+  border-radius: 8px;
 }
 
 .buy-button {
   display: inline-block;
-  margin-top: 10px;
+  margin-top: auto;
   padding: 10px 20px;
   background-color: #007bff;
   color: white;
@@ -215,12 +242,13 @@
   background-color: #0056b3;
 }
 
-
 /* Mobile Adjustments */
-@media (max-width: 1024px ) {
+@media (max-width: 768px) {
   .quiz-container {
     padding: 10px;
-    width: 90%;
+    width: 100%;
+    max-width: 100%;
+    max-height: 80vh;
   }
 
   .quiz-icon {
@@ -238,5 +266,34 @@
 
   .nav-button {
     font-size: 0.9rem;
+  }
+
+  /* Product Grid - Mobile-Friendly Adjustments */
+  .product-grid {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .product-card {
+    width: 100%; /* Full width on mobile */
+    max-width: 300px; /* Limit the max width */
+    margin-bottom: 20px;
+  }
+
+  .product-card h4 {
+    font-size: 1rem; /* Reduce font size on mobile */
+  }
+
+  .product-card p {
+    font-size: 0.9rem;
+  }
+
+  .product-image {
+    max-height: 120px; /* Reduce image size on mobile */
+  }
+
+  .buy-button {
+    font-size: 0.9rem; /* Smaller button text for mobile */
+    padding: 8px 15px; /* Adjust button padding */
   }
 }

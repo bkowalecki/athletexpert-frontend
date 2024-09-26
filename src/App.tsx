@@ -5,6 +5,7 @@ import HeroSection from './components/HeroSection';
 import FeaturedProductList from './components/FeaturedProductList';
 import TrendingProductList from './components/TrendingProductList';
 import QuizModal from './components/QuizModal';
+import Quiz from './components/Quiz';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';  // Correct import
 
 const App: React.FC = () => {

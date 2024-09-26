@@ -1,129 +1,101 @@
+
+body{
+  overflow-x: hidden;
+}
 /* Main Modal Container */
 .quiz-modal {
-    position: fixed;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 60%;
+  background-color: rgba(255, 255, 255, 0.98);
+  padding-top: 50px;
+  padding-bottom: 50px;
+  border-radius: 20px;
+  z-index: 50000;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+  font-family: 'Poppins', sans-serif;
+  text-align: center;
+  overflow-y: auto;
+  max-height: 90vh;
+  overflow-x: hidden;
+  box-sizing: border-box; /* Ensures padding/border are inside the modal dimensions */
+}
+
+.quiz-modal-content {
+  /* position: relative; */
+}
+
+/* Close Button */
+.close-button {
+  position: absolute;
+  top: 5px; /* Move the close button to the very top */
+  right: 5px; /* Move the close button to the very right */
+  background: none;
+  border: none;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+  border-radius: 50%;
+  background-color: transparent;
+  box-sizing: border-box; /* Prevent size changes on hover */
+}
+
+.close-button svg {
+  width: 32px;
+  height: 32px;
+  fill: #ff4b4b;  /* Close button color */
+}
+
+/* Fix for hover: No layout shift */
+.close-button:hover {
+  transform: rotate(90deg);  /* Rotate on hover */
+  background-color: rgba(255, 0, 0, 0.1);  /* Slight background on hover */
+  outline: none; /* Remove any outline on hover */
+  box-sizing: border-box; /* Ensure no size changes on hover */
+}
+
+/* Progress Bar */
+/* .progress-bar-container {
+  width: 100%;
+  background-color: #e0e0e0;
+  height: 10px;
+  border-radius: 5px;
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background-color: #007bff;
+  transition: width 0.5s ease;
+} */
+
+/* Mobile Adjustments */
+@media (max-width: 768px) {
+  .quiz-modal {
+    width: 95%; /* Margin on the sides */
+    max-width: 95%;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 90%;
-    max-width: 60%;
-    background-color: rgba(255, 255, 255, 0.98);
-    padding: 30px;
-    border-radius: 20px;
-    z-index: 50000;
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
-    font-family: 'Poppins', sans-serif;
-    text-align: center;
-    animation: pop-up 0.5s ease-out;
-    overflow-y: auto;
+    padding-top: 25px; /* Slightly reduce padding on mobile */
+    padding-bottom: 25px;
     max-height: 90vh;
-    overflow-x: hidden;
+    border-radius: 15px; /* Slightly smaller border radius */
   }
-  
+
   .quiz-modal-content {
-    position: relative;
+    max-height: calc(100vh - 50px); /* Reduce height for close button */
+    overflow-y: auto; /* Scroll inside the modal */
+    padding: 10px; /* Reduce padding inside */
   }
-  
-  /* Close Button */
-  .close-button {
-    position: absolute;
-    top: 15px;
-    right: 20px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 5px;
-    transition: transform 0.3s ease, background-color 0.3s ease;
-    border-radius: 50%;
-    background-color: transparent;
-  }
-  
-  .close-button svg {
-    width: 32px;
-    height: 32px;
-    fill: #ff4b4b;  /* Close button color */
-  }
-  
-  .close-button:hover {
-    transform: rotate(90deg);  /* Rotate on hover */
-    background-color: rgba(255, 0, 0, 0.1);  /* Slight background on hover */
-  }
-  
-  /* Progress Bar Styles */
-  .progress-bar-container {
-    width: 100%;
-    background-color: #e0e0e0;
-    height: 10px;
-    border-radius: 5px;
-    margin-bottom: 20px;
-    overflow: hidden;
-  }
-  
-  .progress-bar {
-    height: 100%;
-    background-color: #007bff;
-    transition: width 0.5s ease;
-  }
-  
-  /* Carousel Arrows */
-  .carousel-button {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    font-size: 2rem;
-    color: #007bff;
-    cursor: pointer;
-    z-index: 1;
-    transition: color 0.3s ease;
-  }
-  
-  .carousel-button.left {
-    left: 15px;
-  }
-  
-  .carousel-button.right {
-    right: 15px;
-  }
-  
-  .carousel-button:hover {
-    color: #0056b3;
-  }
-  
-  /* Carousel Arrow Styles */
-  .carousel-item-container {
-    display: flex;
-    transition: transform 0.3s ease;
-  }
-  
-  .carousel-item {
-    min-width: 100%;  /* Ensure each item takes full width */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .carousel-item img {
-    width: 80px;
-    height: 80px;
-    margin-bottom: 10px;
-  }
-  
-  .quiz-icon {
-    width: 80px;
-    height: 80px;
-  }
-  
-  .carousel-text {
-    font-size: 1.1rem;
-    color: #555;
-    font-weight: 600;
-    margin-top: 10px;
-    text-transform: capitalize;
-  }
-  
+
+}

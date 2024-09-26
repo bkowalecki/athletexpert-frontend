@@ -27,11 +27,9 @@ h2.heading {
 .product-item {
   position: relative;
   background-color: #f5f5f5;
-  cursor:default;
-  background-size: cover;    /* Ensures image covers entire block */
-  background-position: center; /* Center the background image */
+  background-size: cover;
+  background-position: center;
   border-radius: 15px;
-  overflow: hidden;
   width: calc(33.333% - 20px); /* 3 columns */
   margin-bottom: 30px;
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
@@ -39,6 +37,7 @@ h2.heading {
   padding: 20px;
   margin: 20px;
   text-align: center;
+  overflow: hidden; /* Hide overflow for cleaner look */
 }
 
 /* Remove unnecessary before selector */
@@ -83,6 +82,8 @@ h2.heading {
   line-height: 1.4;  /* Improve text readability */
 }
 
+
+
 /* Call to Action (CTA) Button */
 .product-item .cta-button {
   position: relative;
@@ -90,10 +91,10 @@ h2.heading {
   z-index: 3;
   margin-top: 20px;  /* Add more space between the text and button */
   display: inline-block;
-  background-color: #0077cc;
-  color: #fff;
+  background-color: #ff9900;
+  color: #005999;
   text-decoration: none;
-  padding: 12px 30px;  /* Add more padding around the button */
+  padding: 15px 30px;  /* Add more padding around the button */
   border-radius: 8px;
   font-size: 16px;
   font-weight: bold;
@@ -102,25 +103,25 @@ h2.heading {
 
 .product-item .cta-button:hover {
   background-color: #005999;
+  color: #ff9900;
   transform: translateY(-2px);  /* Adds a small lift on hover */
 }
 
 /* Hover effect */
 .product-item:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  transform: scale(1.05); /* Slight zoom-in effect */
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); /* Elevated shadow on hover */
 }
-
-/* Responsive Design */
+/* Mobile adjustments */
 @media (max-width: 768px) {
   .product-item {
-      width: calc(50% - 20px); /* 2 columns on tablet */
+    width: calc(50% - 20px); /* 2 columns for tablets */
   }
 }
 
 @media (max-width: 480px) {
   .product-item {
-      width: 90%; /* Ensure product takes up most of the width on mobile */
-      margin: 0 auto 30px auto; /* Center the product on mobile with auto margins */
+    width: 90%;
+    margin: 0 auto 30px;
   }
 }
