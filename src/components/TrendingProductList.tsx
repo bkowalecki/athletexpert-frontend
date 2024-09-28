@@ -16,7 +16,7 @@ const TrendingProductList: React.FC = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:8080/api/products/trending")
+      .get(`${process.env.REACT_APP_API_URL}/products/trending`)
       .then((response) => {
         setProducts(response.data);
         console.log(response.data);

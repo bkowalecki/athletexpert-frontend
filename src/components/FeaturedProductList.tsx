@@ -16,8 +16,9 @@ const FeaturedProductList: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
 
   useEffect(() => {
+    // Use process.env to access the environment variable
     axios
-      .get("http://192.168.1.209:8080/api/featured-products/featured")
+      .get(`${process.env.REACT_APP_API_URL}/featured-products/featured`) // Adjust your endpoint accordingly
       .then((response) => {
         setProducts(response.data);
         console.log(response.data);

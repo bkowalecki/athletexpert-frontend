@@ -65,7 +65,7 @@ const Quiz: React.FC<QuizProps> = ({ closeModal }) => {
   useEffect(() => {
     if (step === totalSteps) {
       setIsLoading(true);
-      fetch("http://localhost:8080/api/recommendations", {
+      fetch(`${process.env.REACT_APP_API_URL}/recommendations`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(answers),
