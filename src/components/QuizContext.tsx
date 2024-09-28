@@ -8,6 +8,7 @@ interface QuizState {
 interface QuizAction {
   type: 'SET_FAVORITE_COLOR';
   color: string;
+  
 }
 
 const initialState: QuizState = {
