@@ -14,7 +14,14 @@ interface Product {
   affiliateLink: string;
 }
 
+interface QuizQuestion {
+  question: string;
+  field: keyof typeof initialAnswers;
+  options: string[];
+}
+
 interface QuizProps {
+  isOpen: boolean;
   closeModal: () => void;
 }
 
@@ -52,7 +59,7 @@ const QuizStep: React.FC<{
   </>
 );
 
-const Quiz: React.FC<QuizProps> = ({ closeModal }) => {
+const Quiz: React.FC<QuizProps> = ({ isOpen, closeModal }) => {
   const { dispatch } = useContext(QuizContext);
   const [step, setStep] = useState(0);
   const [carouselIndex, setCarouselIndex] = useState(0);
@@ -61,6 +68,47 @@ const Quiz: React.FC<QuizProps> = ({ closeModal }) => {
   const totalSteps = 6;
 
   const [answers, setAnswers] = useState(initialAnswers);
+
+  // Define quizQuestions with proper typing
+  const quizQuestions: QuizQuestion[] = [
+    {
+      question: "What's your skill level?",
+      field: "skillLevel",
+      options: ["Beginner", "Intermediate", "Advanced", "Professional"],
+    },
+    {
+      question: "What's your fitness goal?",
+      field: "fitnessGoal",
+      options: [
+        "Build Strength",
+        "Lose Weight",
+        "Gain Weight",
+        "Increase Stamina",
+        "Improve Flexibility",
+        "Boost Mobility",
+      ],
+    },
+    {
+      question: "How often do you play/train?",
+      field: "trainingFrequency",
+      options: [
+        "1-2 times per week",
+        "3-4 times per week",
+        "5-6 times per week",
+        "Daily",
+      ],
+    },
+    {
+      question: "What's your budget?",
+      field: "budget",
+      options: ["Under $50", "$50-$100", "$100-$200", "Over $200"],
+    },
+    {
+      question: "What's your favorite color?",
+      field: "favoriteColor",
+      options: ["Red", "Blue", "Green", "Yellow", "Purple", "Black", "White"],
+    },
+  ];
 
   useEffect(() => {
     if (step === totalSteps) {
@@ -95,126 +143,139 @@ const Quiz: React.FC<QuizProps> = ({ closeModal }) => {
       );
     }
   };
-  
-  // Ensure the carousel-item-container moves based on carouselIndex
-  const carouselStyle = {
-    transform: `translateX(-${carouselIndex * 100}%)`,
-  };
 
-  const quizQuestions = [
-    {
-      question: "What's your skill level?",
-      field: "skillLevel" as AnswerKey,
-      options: ["Beginner", "Intermediate", "Advanced", "Professional"],
-    },
-    {
-      question: "What's your fitness goal?",
-      field: "fitnessGoal" as AnswerKey,
-      options: [
-        "Build Strength",
-        "Lose Weight",
-        "Gain Weight",
-        "Increase Stamina",
-        "Improve Flexibility",
-        "Boost Mobility",
-      ],
-    },
-    {
-      question: "How often do you play/train?",
-      field: "trainingFrequency" as AnswerKey,
-      options: [
-        "1-2 times per week",
-        "3-4 times per week",
-        "5-6 times per week",
-        "Daily",
-      ],
-    },
-    {
-      question: "What's your budget?",
-      field: "budget" as AnswerKey,
-      options: ["Under $50", "$50-$100", "$100-$200", "Over $200"],
-    },
-  ];
+  if (!isOpen) return null;
 
   return (
-    <div className="quiz-container">
-      <div className="progress-bar">
-        <div style={{ width: `${(step / totalSteps) * 100}%` }}></div>
-      </div>
+    <div className="quiz-modal" onClick={closeModal}>
+      <div className="quiz-modal-content" onClick={(e) => e.stopPropagation()}>
+        <button className="close-button" onClick={closeModal}>
+          <svg viewBox="0 0 24 24">
+            <path d="M18.3 5.71a1 1 0 0 0-1.42-1.42L12 9.17 7.11 4.29A1 1 0 0 0 5.7 5.71L10.58 10.6 5.7 15.48a1 1 0 0 0 1.41 1.41L12 11.99l4.89 4.89a1 1 0 0 0 1.42-1.41l-4.88-4.89 4.88-4.89Z" />
+          </svg>
+        </button>
 
-      {isLoading ? (
-        <LoadingSpinner />
-      ) : (
-        <>
-          {step === 0 && (
+        <div className="quiz-container">
+          <div className="progress-bar">
+            <div style={{ width: `${(step / totalSteps) * 100}%` }}></div>
+          </div>
+
+          {isLoading ? (
+            <LoadingSpinner />
+          ) : (
             <>
-              <h2>What sport are you looking for?</h2>
-              <div className="carousel-container">
-                <button className="carousel-button left" onClick={() => handleCarousel("left")}>
-                  &#x25C0;
-                </button>
-                <div className="carousel-item-container" style={carouselStyle}>
-                  {sportsData.map((sport, index) => (
-                    <div key={index} className="carousel-item">
-                      <img src={sport.logo} alt={sport.title} className="quiz-icon" />
-                      <p className="carousel-text">{sport.title}</p>
+              {step === 0 && (
+                <>
+                  <h2>What sport are you looking for?</h2>
+                  <div className="carousel-container">
+                    <button
+                      className="carousel-button left"
+                      onClick={() => handleCarousel("left")}
+                    >
+                      &#x25C0;
+                    </button>
+                    <div
+                      className="carousel-item-container"
+                      style={{ transform: `translateX(-${carouselIndex * 100}%)` }}
+                    >
+                      {sportsData.map((sport, index) => (
+                        <div key={index} className="carousel-item">
+                          <img
+                            src={sport.logo}
+                            alt={sport.title}
+                            className="quiz-icon"
+                          />
+                          <p className="carousel-text">{sport.title}</p>
+                        </div>
+                      ))}
                     </div>
-                  ))}
+                    <button
+                      className="carousel-button right"
+                      onClick={() => handleCarousel("right")}
+                    >
+                      &#x25B6;
+                    </button>
+                  </div>
+                  <div className="quiz-navigation">
+                    <button
+                      className="nav-button"
+                      onClick={() =>
+                        handleNext("sport", sportsData[carouselIndex].title)
+                      }
+                    >
+                      Next
+                    </button>
+                  </div>
+                </>
+              )}
+
+              {step > 0 && step <= 4 && (
+                <QuizStep
+                  question={quizQuestions[step - 1].question}
+                  options={quizQuestions[step - 1].options}
+                  selectedOption={answers[quizQuestions[step - 1].field]}
+                  onNext={(option) =>
+                    handleNext(quizQuestions[step - 1].field, option)
+                  }
+                />
+              )}
+
+              {step === 5 && (
+                <QuizStep
+                  question="What's your favorite color?"
+                  options={[
+                    "Red",
+                    "Blue",
+                    "Green",
+                    "Yellow",
+                    "Purple",
+                    "Black",
+                    "White",
+                  ]}
+                  selectedOption={answers.favoriteColor}
+                  onNext={(option) => {
+                    dispatch({ type: "SET_FAVORITE_COLOR", color: option });
+                    handleNext("favoriteColor", option);
+                  }}
+                />
+              )}
+
+              {step === totalSteps && (
+                <div className="recommended-products">
+                  <h3>Recommended Products</h3>
+                  <div className="product-grid">
+                    {recommendedProducts.map((product, index) => (
+                      <div key={index} className="product-card animate-product">
+                        <a
+                          href={product.affiliateLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <img
+                            src={product.imgUrl}
+                            alt={product.name}
+                            className="quiz-product-image"
+                          />
+                        </a>
+                        <h4>{product.name}</h4>
+                        <p>${product.price.toFixed(2)}</p>
+                        <a
+                          href={product.affiliateLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="buy-button"
+                        >
+                          View on Amazon
+                        </a>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <button className="carousel-button right" onClick={() => handleCarousel("right")}>
-                  &#x25B6;
-                </button>
-              </div>
-              <div className="quiz-navigation">
-                <button className="nav-button" onClick={() => handleNext("sport", sportsData[carouselIndex].title)}>
-                  Next
-                </button>
-              </div>
+              )}
             </>
           )}
-
-          {step > 0 && step <= 4 && (
-            <QuizStep
-              question={quizQuestions[step - 1].question}
-              options={quizQuestions[step - 1].options}
-              selectedOption={answers[quizQuestions[step - 1].field]}
-              onNext={(option) => handleNext(quizQuestions[step - 1].field, option)}
-            />
-          )}
-
-          {step === 5 && (
-            <QuizStep
-              question="What's your favorite color?"
-              options={["Red", "Blue", "Green", "Yellow", "Purple", "Black", "White"]}
-              selectedOption={answers.favoriteColor}
-              onNext={(option) => {
-                dispatch({ type: "SET_FAVORITE_COLOR", color: option });
-                handleNext("favoriteColor", option);
-              }}
-            />
-          )}
-
-          {step === totalSteps && (
-            <div className="recommended-products">
-              <h3>Recommended Products</h3>
-              <div className="product-grid">
-                {recommendedProducts.map((product, index) => (
-                  <div key={index} className="product-card animate-product">
-                    <a href={product.affiliateLink} target="_blank" rel="noopener noreferrer">
-                      <img src={product.imgUrl} alt={product.name} className="product-image" />
-                    </a>
-                    <h4>{product.name}</h4>
-                    <p>${product.price.toFixed(2)}</p>
-                    <a href={product.affiliateLink} target="_blank" rel="noopener noreferrer" className="buy-button">
-                      View on Amazon
-                    </a>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </>
-      )}
+        </div>
+      </div>
     </div>
   );
 };

@@ -1,51 +1,68 @@
+body{
+  background-color: #A23C20;
+}
+
 .product-list-container {
-  padding: 40px 20px;
-  max-width: 1200px;
-  margin: 0 auto;
+  padding: 50px 20px;
+  max-width: 1800px;
+  margin: 0;
   text-align: center;
+  background-color: #A23C20;  /* Light background to make products stand out */
 }
 
 h2.heading {
-  font-size: 34px;
-  color: #333;
-  margin-bottom: 40px;
-  letter-spacing: 1.5px;
-  display: inline-block;
-  border-bottom: 2px solid #0077cc;
-  padding-bottom: 5px;
+  font-size: 70px;  /* Increased heading size */
+  color: #F2F2F2;
+  margin-bottom: 60px;
+  letter-spacing: 2.5px;
+  padding-bottom: 8px;
 }
+
 
 .product-list {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center; /* Center the product items */
+  justify-content: center;
+  gap: 20px;  /* Increased gap for better spacing */
   list-style-type: none;
   padding: 0;
 }
 
+
 /* Product Card Styling */
 .product-item {
   position: relative;
-  background-color: #f5f5f5;
+  background-color: #fff;
   background-size: cover;
   background-position: center;
-  border-radius: 15px;
-  width: calc(33.333% - 20px); /* 3 columns */
-  margin-bottom: 30px;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  padding: 20px;
-  margin: 20px;
+  border-radius: 25px; /* Softer, rounded corners */
+  width: calc(30% - 20px); /* Maintain 3 columns */
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+  padding: 28px;  /* Larger padding for more space around the text */
   text-align: center;
-  overflow: hidden; /* Hide overflow for cleaner look */
+  overflow: hidden;
+  cursor: default;
 }
 
-/* Remove unnecessary before selector */
-.product-item::before {
-  display: none;
+.product-image-container {
+  position: relative;
+  width: 100%;
+  padding-top: 75%; /* Aspect ratio for image */
+  overflow: hidden;
+  border-radius: 15px;
 }
 
-/* Dark overlay for readability */
+.product-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* Cover the entire area */
+  transition: transform 0.3s ease;
+}
+
 .product-item::after {
   content: '';
   position: absolute;
@@ -53,8 +70,14 @@ h2.heading {
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.7));
+  background: rgba(0, 0, 0, 0.4);  /* Dark overlay for better contrast */
   z-index: 2;
+  transition: background 0.4s ease; /* Smooth transition for hover */
+}
+
+.product-item:hover::after {
+  background: rgba(0, 0, 0, 0.2); /* Lighten on hover */
+  
 }
 
 /* Product info text */
@@ -65,63 +88,63 @@ h2.heading {
   color: #fff;
   margin: 0;
   padding: 0;
-  text-shadow: 0 2px 5px rgba(0, 0, 0, 0.8);
+  text-shadow: 0 3px 6px rgba(0, 0, 0, 0.7); /* More prominent shadow */
 }
 
 .product-item h3 {
-  font-size: 22px;
-  font-weight: bold;
-  margin-bottom: 15px;
-  letter-spacing: 1.2px;
+  font-size: 30px;  /* Bigger product name */
+  font-weight: 800; /* Bolder font */
+  letter-spacing: 2px; /* Slightly larger letter spacing for a modern feel */
 }
 
 .product-item p {
-  font-size: 16px;
-  font-weight: 300;
-  margin-bottom: 5px;
-  line-height: 1.4;  /* Improve text readability */
+  font-size: 22px;  /* Bigger for price/brand info */
+  font-weight: 400;
+  
+  line-height: 1.6;  /* Improve readability */
 }
 
-
-
-/* Call to Action (CTA) Button */
 .product-item .cta-button {
   position: relative;
   cursor: pointer;
   z-index: 3;
-  margin-top: 20px;  /* Add more space between the text and button */
+  margin-top: 30px;
   display: inline-block;
-  background-color: #ff9900;
-  color: #005999;
+  background-color: #005999;  /* Stronger contrasting color */
+  color: #FDF3E7;  /* Soft, readable text color */
   text-decoration: none;
-  padding: 15px 30px;  /* Add more padding around the button */
-  border-radius: 8px;
-  font-size: 16px;
+  padding: 20px 60px;  /* Larger padding for a bigger button */
+  border-radius: 12px;  /* Softer rounded corners */
+  font-size: 20px;  /* Larger font size */
   font-weight: bold;
-  transition: background-color 0.3s ease, transform 0.3s ease;
+  transition: background-color 0.4s ease, transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .product-item .cta-button:hover {
-  background-color: #005999;
-  color: #ff9900;
-  transform: translateY(-2px);  /* Adds a small lift on hover */
+  background-color: #003f73;  /* Darker blue for hover state */
+  transform: translateY(-6px) scale(1.05);  /* Lift and enlarge the button slightly */
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);  /* Add a soft shadow on hover */
+  color: #ffcc00;  /* Bright contrasting text on hover */
 }
 
-/* Hover effect */
+/* Hover effect for product */
+/* Hover effect for product */
 .product-item:hover {
-  transform: scale(1.05); /* Slight zoom-in effect */
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); /* Elevated shadow on hover */
+  transform: scale(1.1); /* More noticeable scale on hover */
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.35); /* Deeper shadow on hover */
+  z-index: 50;
 }
-/* Mobile adjustments */
+
+/* Update Mobile Adjustments */
 @media (max-width: 768px) {
   .product-item {
-    width: calc(50% - 20px); /* 2 columns for tablets */
+    width: 50vw; /* Maintain spacing between items on smaller screens */
   }
 }
 
 @media (max-width: 480px) {
   .product-item {
-    width: 90%;
-    margin: 0 auto 30px;
+    width: 72vw; /* Full width with margins for mobile */
+   
   }
 }

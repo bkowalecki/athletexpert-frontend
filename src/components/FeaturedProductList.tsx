@@ -9,19 +9,17 @@ interface Product {
   category: string;
   price: number | null;
   imgUrl: string;
-  amazonUrl: string;  // Add the affiliate link for "View on Amazon"
+  amazonUrl: string;
 }
 
 const FeaturedProductList: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
 
   useEffect(() => {
-    // Use process.env to access the environment variable
     axios
-      .get(`${process.env.REACT_APP_API_URL}/featured-products/featured`) // Adjust your endpoint accordingly
+      .get(`${process.env.REACT_APP_API_URL}/featured-products/featured`)
       .then((response) => {
         setProducts(response.data);
-        console.log(response.data);
       })
       .catch((error) => {
         console.error("There was an error fetching the products!", error);
@@ -30,23 +28,31 @@ const FeaturedProductList: React.FC = () => {
 
   return (
     <div className="product-list-container">
-      <h2 className="heading">Featured Products</h2>
+      <h2 className="heading">Featured</h2>
       <ul className="product-list">
-        {products.map((product) => (
-          <li 
-            key={product.id} 
-            className="product-item" 
-            style={{ backgroundImage: `url(${product.imgUrl})`, backgroundSize:'cover' }}  // Dynamic background image
-          >
-            <h3>{product.name}</h3>
-            <p>{product.brand}</p>
-            <p>${product.price ? product.price.toFixed(2) : "N/A"}</p>
-            {/* Add the CTA button */}
-            <a href={product.amazonUrl} target="_blank" rel="noopener noreferrer" className="cta-button">
-              View on Amazon
-            </a>
-          </li>
-        ))}
+      {products.map((product) => (
+  <li key={product.id} className="product-item">
+    <div className="product-image-container">
+      <img src={product.imgUrl} alt={product.name} className="product-image" />
+    </div>
+    <div className="product-info">
+      <h3 className="product-name">{product.name}</h3>
+      <p className="product-brand">{product.brand}</p>
+      <p className="product-price">
+        {product.price ? `$${product.price.toFixed(2)}` : "N/A"}
+      </p>
+    </div>
+    <a
+      href={product.amazonUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="cta-button"
+    >
+      View on Amazon
+    </a>
+  </li>
+))}
+
       </ul>
     </div>
   );

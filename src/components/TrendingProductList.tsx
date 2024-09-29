@@ -8,7 +8,7 @@ interface Product {
   brand: string;
   category: string;
   price: number | null;
-  imgUrl: string;
+  imgurl: string;
 }
 
 const TrendingProductList: React.FC = () => {
@@ -28,20 +28,32 @@ const TrendingProductList: React.FC = () => {
 
   return (
     <div className="product-list-container">
-      <h2 className="heading">Trending Products</h2>
+      <h2 className="heading">Trending</h2>
       <ul className="product-list">
-        {products.map((product) => (
-          <li key={product.id} className="product-item">  {/* Ensure unique key */}
-            <img src={product.imgUrl} alt={product.name} className="product-image" />
-            <h3>{product.name}</h3>
-            <p>Brand: {product.brand}</p>
-            <p>Category: {product.category}</p>
-            <p>
-              Price: $
-              {product.price !== null && product.price !== undefined
-                ? product.price.toFixed(2)
-                : "N/A"}
-            </p>
+      {products.map((product) => (
+          <li key={product.id} className="product-item">
+            <div className="product-image-container">
+              <img
+                src={product.imgurl}
+                alt={product.name}
+                className="product-image"
+              />
+            </div>
+            <div className="product-info">
+              <h3 className="product-name">{product.name}</h3>
+              <p className="product-brand">{product.brand}</p>
+              <p className="product-price">
+                {product.price ? `$${product.price.toFixed(2)}` : "N/A"}
+              </p>
+            </div>
+            <a
+              // href={product.amazonUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="cta-button"
+            >
+              View on Amazon
+            </a>
           </li>
         ))}
       </ul>

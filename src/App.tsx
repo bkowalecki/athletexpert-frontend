@@ -4,7 +4,6 @@ import Header from './components/Header';
 import HeroSection from './components/HeroSection';
 import FeaturedProductList from './components/FeaturedProductList';
 import TrendingProductList from './components/TrendingProductList';
-import QuizModal from './components/QuizModal';
 import Quiz from './components/Quiz';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';  // Correct import
 
@@ -22,12 +21,12 @@ const App: React.FC = () => {
         <Routes>
           <Route path="/" element={
             <>
-              <HeroSection openModal={openModal} /> {/* Pass openModal to HeroSection */}
+              <HeroSection openQuiz={openModal} /> {/* Pass openModal to HeroSection */}
               <main>
                 <FeaturedProductList />
-                {/* <TrendingProductList /> */}
+                <TrendingProductList />
               </main>
-              <QuizModal
+              <Quiz
                 isOpen={isQuizModalOpen}
                 closeModal={closeModal}
               />

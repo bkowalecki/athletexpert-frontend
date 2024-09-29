@@ -2,10 +2,10 @@ import React, { useEffect, useRef } from "react";
 import "../styles/HeroSection.css";
 
 interface HeroSectionProps {
-  openModal: () => void; // Define openModal prop
+  openQuiz: () => void; // Define openModal prop
 }
 
-const HeroSection: React.FC<HeroSectionProps> = ({ openModal }) => {
+const HeroSection: React.FC<HeroSectionProps> = ({ openQuiz }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -50,7 +50,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ openModal }) => {
         <h1>Gear Tailored to You</h1>
         <p>Don't sweat the search, we've got you covered.</p>
         <div className="cta-buttons">
-          <button className="cta-btn" onClick={openModal}>
+          <button className="cta-btn" onClick={openQuiz}>
             {" "}
             {/* Wire up openModal to button click */}
             Get Your Gear

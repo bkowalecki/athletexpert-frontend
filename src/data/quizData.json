@@ -1,11 +1,34 @@
 {
-    "steps": [
-      { "question": "Which sport are you shopping for?", "options": [], "type": "sport" },
-      { "question": "What is your skill level?", "options": ["Beginner", "Intermediate", "Advanced", "Professional"], "type": "skillLevel" },
-      { "question": "What is your fitness goal?", "options": ["Build Muscle", "Lose Weight", "Increase Endurance", "Improve Flexibility"], "type": "fitnessGoal" },
-      { "question": "How often do you play/train?", "options": ["1-2 times per week", "3-4 times per week", "5-6 times per week", "Daily"], "type": "trainingFrequency" },
-      { "question": "What is your budget?", "options": ["Under $50", "$50-$100", "$100-$200", "Over $200"], "type": "budget" },
-      { "question": "What is your favorite color?", "options": ["Red", "Blue", "Green", "Yellow", "Purple", "Black", "White"], "type": "favoriteColor" }
-    ]
-  }
-  
+  "questions": [
+    {
+      "id": 1,
+      "question": "What's your skill level?",
+      "field": "skillLevel",
+      "options": ["Beginner", "Intermediate", "Advanced", "Professional"]
+    },
+    {
+      "id": 2,
+      "question": "What's your fitness goal?",
+      "field": "fitnessGoal",
+      "options": ["Build Strength", "Lose Weight", "Gain Weight", "Increase Stamina", "Improve Flexibility", "Boost Mobility"]
+    },
+    {
+      "id": 3,
+      "question": "How often do you play/train?",
+      "field": "trainingFrequency",
+      "options": ["1-2 times per week", "3-4 times per week", "5-6 times per week", "Daily"]
+    },
+    {
+      "id": 4,
+      "question": "What's your budget?",
+      "field": "budget",
+      "options": ["Under $50", "$50-$100", "$100-$200", "Over $200"]
+    },
+    {
+      "id": 5,
+      "question": "What's your favorite color?",
+      "field": "favoriteColor",
+      "options": ["Red", "Blue", "Green", "Yellow", "Purple", "Black", "White"]
+    }
+  ]
+}
