@@ -51,20 +51,20 @@ const QuizStep: React.FC<{
   selectedOption: string;
   onNext: (option: string) => void;
 }> = ({ question, options, selectedOption, onNext }) => (
-  <>
-    <h2>{question}</h2>
-    <div className="quiz-options">
-      {options.map((option) => (
-        <button
-          key={option}
-          className={`quiz-option ${selectedOption === option ? "selected" : ""}`}
-          onClick={() => onNext(option)}
-        >
-          {option}
-        </button>
-      ))}
-    </div>
-  </>
+<>
+  <h2>{question}</h2>
+  <div className="quiz-options">
+    {options.map((option) => (
+      <button
+        key={option}
+        className={`quiz-option ${selectedOption === option ? "selected" : ""}`}
+        onClick={() => onNext(option)}
+      >
+        {option}
+      </button>
+    ))}
+  </div>
+</>
 );
 
 const Quiz: React.FC<QuizProps> = ({ isOpen, closeModal }) => {
@@ -168,12 +168,7 @@ const Quiz: React.FC<QuizProps> = ({ isOpen, closeModal }) => {
         </button>
 
         <div className="quiz-container">
-          {/* Progress bar is shown only if step < totalSteps */}
-          {step < totalSteps && (
-            <div className="progress-bar">
-              <div style={{ width: `${(step / totalSteps) * 100}%` }}></div>
-            </div>
-          )}
+      
 
           {isLoading ? (
             <LoadingSpinner />

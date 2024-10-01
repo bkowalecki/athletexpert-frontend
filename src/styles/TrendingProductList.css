@@ -120,7 +120,7 @@ h2.heading {
   justify-content: center;
   cursor: pointer;
   z-index: 3;
-  margin-top: 30px;
+  margin-top: 2vh;
   display: inline-block;
   background-color: #005999;  /* Stronger contrasting color */
   color: #FDF3E7;  /* Soft, readable text color */
@@ -163,14 +163,14 @@ h2.heading {
 
 @media (max-width: 480px) {
   .product-item {
-    width: 55vw; /* Full width with margins for mobile */
+    width: 60vw; /* Full width with margins for mobile */
    
   }
 
   .product-item h3 {
     font-size: 5.5vw;          /* Adjust size for small mobile devices */
     line-height: 1.4;          /* Increase line height for easier reading */
-    margin-bottom: 2vh;        /* Increase margin for touch-friendliness */
+    margin-bottom: 1vh;        /* Increase margin for touch-friendliness */
   }
 
   
