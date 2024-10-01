@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import "../styles/FeaturedProductList.css";  // Same CSS for Trending Product List
+import "../styles/FeaturedProductList.css"; // Same CSS for Trending Product List
 
 interface Product {
   id: number;
@@ -30,29 +30,32 @@ const FeaturedProductList: React.FC = () => {
     <div className="product-list-container">
       <h2 className="heading">Featured</h2>
       <ul className="product-list">
-      {products.map((product) => (
-  <li key={product.id} className="product-item">
-    <div className="product-image-container">
-      <img src={product.imgUrl} alt={product.name} className="product-image" />
-    </div>
-    <div className="product-info">
-      <h3 className="product-name">{product.name}</h3>
-      <p className="product-brand">{product.brand}</p>
-      <p className="product-price">
-        {product.price ? `$${product.price.toFixed(2)}` : "N/A"}
-      </p>
-    </div>
-    <a
-      href={product.amazonUrl}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="cta-button"
-    >
-      View on Amazon
-    </a>
-  </li>
-))}
-
+        {products.map((product) => (
+          <li key={product.id} className="product-item">
+            <div className="product-image-container">
+              <img
+                src={product.imgUrl}
+                alt={product.name}
+                className="product-image"
+              />
+            </div>
+            <div className="product-info">
+              <h3 className="product-name">{product.name}</h3>
+              <p className="product-brand">{product.brand}</p>
+              <p className="product-price">
+                {product.price ? `$${product.price.toFixed(2)}` : "N/A"}
+              </p>
+            </div>
+            <a
+              href={product.amazonUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="cta-button"
+            >
+              View on Amazon
+            </a>
+          </li>
+        ))}
       </ul>
     </div>
   );

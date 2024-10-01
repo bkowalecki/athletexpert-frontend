@@ -26,6 +26,7 @@ h2.heading {
   gap: 20px;  /* Increased gap for better spacing */
   list-style-type: none;
   padding: 0;
+  /* width:90vw; */
 }
 
 
@@ -104,21 +105,7 @@ h2.heading {
   line-height: 1.6;  /* Improve readability */
 }
 
-.product-item .cta-button {
-  position: relative;
-  cursor: pointer;
-  z-index: 3;
-  margin-top: 30px;
-  display: inline-block;
-  background-color: #005999;  /* Stronger contrasting color */
-  color: #FDF3E7;  /* Soft, readable text color */
-  text-decoration: none;
-  padding: 20px 60px;  /* Larger padding for a bigger button */
-  border-radius: 12px;  /* Softer rounded corners */
-  font-size: 20px;  /* Larger font size */
-  font-weight: bold;
-  transition: background-color 0.4s ease, transform 0.3s ease, box-shadow 0.3s ease;
-}
+
 
 .product-item .cta-button:hover {
   background-color: #003f73;  /* Darker blue for hover state */
@@ -138,7 +125,7 @@ h2.heading {
 /* Update Mobile Adjustments */
 @media (max-width: 768px) {
   .product-item {
-    width: 50vw; /* Maintain spacing between items on smaller screens */
+    width: 55vw; /* Maintain spacing between items on smaller screens */
   }
 }
 

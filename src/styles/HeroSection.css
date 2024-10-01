@@ -73,33 +73,93 @@
   display: flex;
   justify-content: center;
   gap: 20px;
+  flex-wrap: wrap; /* Ensure buttons wrap on smaller screens */
+  margin-top: 20px;
 }
 
 .cta-btn {
-  padding: 15px 30px;
+  padding: 14px 32px;
   font-size: 18px;
-  font-family: 'Arial', sans-serif;
+  font-weight: 600;
+  font-family: 'Roboto', sans-serif; /* Use a cleaner, modern font */
   color: white;
-  background-color: #0077cc;
+  background-color: #A23C20; /* Burnt orange */
   border: none;
-  border-radius: 30px;
+  border-radius: 6px; /* Subtle rounding for a more modern look */
   cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-  box-shadow: 0 5px 15px rgba(0, 119, 204, 0.3); /* Adds depth to the buttons */
+  position: relative;
+  transition: all 0.3s ease;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); /* Adds depth */
+  text-transform: uppercase;
+  letter-spacing: 1.5px; /* Subtle letter-spacing */
+  overflow: hidden; /* Prevents overflow during hover effects */
+  z-index: 1;
 }
 
 .cta-btn:hover {
-  background-color: #005fa3;
-  transform: scale(1.05); /* Slightly larger on hover */
-  transition: transform 0.2s ease, background-color 0.3s ease;
+  transform: scale(1.05); /* Slight zoom on hover */
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); /* Shadow increases on hover */
+  background-color: #872d1a; /* Darker burnt orange on hover */
+  transition: transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
+.cta-btn:active {
+  transform: scale(0.98); /* Slight compression on click */
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
+}
+
+/* Secondary CTA Button Styling */
 .cta-btn-secondary {
-  background-color: rgba(255, 255, 255, 0.8); /* Lighten the secondary button */
-  color: #0077cc;
+  background-color: rgba(255, 255, 255, 0.9); /* Lighter background */
+  color: #A23C20; /* Burnt orange text for better contrast */
+  border: 2px solid #A23C20;
+  transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+  font-weight: 500;
 }
 
 .cta-btn-secondary:hover {
-  background-color: rgba(255, 255, 255, 1);
+  background-color: #A23C20; /* Change to burnt orange on hover */
+  color: white; /* White text on hover for contrast */
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); /* Shadow effect on hover */
 }
 
+.cta-btn-secondary:active {
+  transform: scale(0.98); /* Slight compression on click */
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
+}
+
+/* Responsive Text and Button Size */
+@media (max-width: 1024px) {
+  .cta-btn {
+    font-size: 16px;
+    padding: 20px 16px;
+  }
+
+  .cta-buttons {
+    gap: 15px;
+  }
+}
+
+@media (max-width: 768px) {
+  .cta-btn {
+    font-size: 16px;
+    padding: 20px 16px;
+  }
+
+  .cta-buttons {
+    flex-direction: column;
+    gap: 10px; /* Stack the buttons on smaller screens */
+  }
+}
+
+@media (max-width: 480px) {
+  .cta-btn {
+    font-size: 14px;
+    padding: 20px 12px;
+    width: 100%; /* Make buttons full width */
+  }
+
+  .cta-buttons {
+    gap: 10px;
+  }
+}

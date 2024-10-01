@@ -36,6 +36,14 @@ const initialAnswers = {
   favoriteColor: "",
 };
 
+const AMAZON_ASSOCIATE_TAG = "athletexpert-20";
+
+const appendAffiliateTag = (url: string, tag: string) => {
+  const urlObj = new URL(url);
+  urlObj.searchParams.set('tag', tag); // Add or replace the 'tag' query param
+  return urlObj.toString(); // Return the updated URL as a string
+};
+
 // Component for a quiz step with multiple options
 const QuizStep: React.FC<{
   question: string;
@@ -144,21 +152,28 @@ const Quiz: React.FC<QuizProps> = ({ isOpen, closeModal }) => {
     }
   };
 
+  const handleClose = () => {
+    closeModal(); // Closes the modal
+  };
+
   if (!isOpen) return null;
 
   return (
-    <div className="quiz-modal" onClick={closeModal}>
+    <div className="quiz-modal" onClick={handleClose}>
       <div className="quiz-modal-content" onClick={(e) => e.stopPropagation()}>
-        <button className="close-button" onClick={closeModal}>
+        <button className="close-button" onClick={handleClose}>
           <svg viewBox="0 0 24 24">
             <path d="M18.3 5.71a1 1 0 0 0-1.42-1.42L12 9.17 7.11 4.29A1 1 0 0 0 5.7 5.71L10.58 10.6 5.7 15.48a1 1 0 0 0 1.41 1.41L12 11.99l4.89 4.89a1 1 0 0 0 1.42-1.41l-4.88-4.89 4.88-4.89Z" />
           </svg>
         </button>
 
         <div className="quiz-container">
-          <div className="progress-bar">
-            <div style={{ width: `${(step / totalSteps) * 100}%` }}></div>
-          </div>
+          {/* Progress bar is shown only if step < totalSteps */}
+          {step < totalSteps && (
+            <div className="progress-bar">
+              <div style={{ width: `${(step / totalSteps) * 100}%` }}></div>
+            </div>
+          )}
 
           {isLoading ? (
             <LoadingSpinner />
@@ -260,7 +275,7 @@ const Quiz: React.FC<QuizProps> = ({ isOpen, closeModal }) => {
                         <h4>{product.name}</h4>
                         <p>${product.price.toFixed(2)}</p>
                         <a
-                          href={product.affiliateLink}
+                          href={appendAffiliateTag(product.affiliateLink, AMAZON_ASSOCIATE_TAG)}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="buy-button"

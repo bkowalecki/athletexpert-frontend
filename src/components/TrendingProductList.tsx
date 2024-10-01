@@ -9,6 +9,7 @@ interface Product {
   category: string;
   price: number | null;
   imgurl: string;
+  amazon_url: string;
 }
 
 const TrendingProductList: React.FC = () => {
@@ -19,7 +20,6 @@ const TrendingProductList: React.FC = () => {
       .get(`${process.env.REACT_APP_API_URL}/products/trending`)
       .then((response) => {
         setProducts(response.data);
-        console.log(response.data);
       })
       .catch((error) => {
         console.error("There was an error fetching the products!", error);
@@ -47,7 +47,7 @@ const TrendingProductList: React.FC = () => {
               </p>
             </div>
             <a
-              // href={product.amazonUrl}
+              href={product.amazon_url}
               target="_blank"
               rel="noopener noreferrer"
               className="cta-button"

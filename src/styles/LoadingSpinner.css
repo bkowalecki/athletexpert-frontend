@@ -1,62 +1,44 @@
-/* Overlay to darken the background and center the spinner */
+/* Full-screen overlay */
 .loading-spinner-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    background-color: rgba(255, 255, 255, 0.8); /* Light translucent background */
-    z-index: 1000;
+  position: fixed; /* Covers the whole screen */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.9); /* Soft translucent background */
+  z-index: 1000;
+}
+
+/* Simple and modern spinner */
+.new-spinner {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 6px solid transparent;
+  border-top-color: #A23C20; /* Burnt orange for a unique feel */
+  border-right-color: #A23C20;
+  animation: spin 1s ease infinite;
+}
+
+/* Spinner animation */
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
   }
-  
-  /* Sleek and modern spinner */
-  .spinner {
-    width: 60px;
-    height: 60px;
-    border: 6px solid rgba(0, 123, 255, 0.2); /* Faint border for the outer ring */
-    border-top: 6px solid #007bff; /* Solid blue for the spinning part */
-    border-radius: 50%;
-    animation: spin 1s ease infinite;
-    background: conic-gradient(
-      rgba(0, 123, 255, 0.2),
-      #007bff
-    ); /* Gradient for a modern look */
-    position: relative;
+  100% {
+    transform: rotate(360deg);
   }
-  
-  /* Adding a glowing effect to the spinner */
-  .spinner:before {
-    content: "";
-    position: absolute;
-    top: -12px;
-    left: -12px;
-    right: -12px;
-    bottom: -12px;
-    border-radius: 50%;
-    border: 6px solid transparent;
-    border-top-color: rgba(0, 123, 255, 0.5); /* Faint blue glow around spinner */
-    animation: spin 1.5s linear infinite; /* Slower spin for the glow */
-  }
-  
-  /* Spinner animation */
-  @keyframes spin {
-    0% {
-      transform: rotate(0deg);
-    }
-    100% {
-      transform: rotate(360deg);
-    }
-  }
-  
-  /* Loading message below the spinner */
-  .loading-spinner-overlay p {
-    margin-top: 15px;
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: #333;
-  }
-  
+}
+
+/* Loading text styling */
+.loading-spinner-overlay p {
+  margin-top: 15px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #333;
+  font-family: 'Arial', sans-serif;
+}
