@@ -1,0 +1,289 @@
+/* About container */
+.about-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    min-height: 100vh;
+    padding: 50px 0;
+    background-color: #fdf7f4;
+    color: #333;
+  }
+  
+  /* Hero Section */
+  .hero-section-about {
+    width: 100%;
+    background: linear-gradient(135deg, #A23C20, #d45330);
+    padding: 100px 0;
+    color: white;
+    display: flex;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .hero-content {
+    max-width: 1200px;
+    text-align: center;
+    z-index: 2;
+  }
+  
+  .hero-title {
+    font-size: 4.5rem;
+    font-weight: bold;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  
+  .hero-description {
+    font-size: 1.6rem;
+    line-height: 1.8;
+    margin-bottom: 40px;
+    font-style: italic;
+  }
+  
+  .hero-button {
+    background-color: white;
+    color: #A23C20;
+    font-size: 1.3rem;
+    padding: 15px 40px;
+    border: 2px solid #fff;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+  }
+  
+  .hero-button:hover {
+    transform: translateY(-5px);
+    background-color: #ffdab9;
+  }
+  
+  .hero-section-about::before {
+    content: '';
+    position: absolute;
+    top: -150px;
+    right: -150px;
+    height: 400px;
+    width: 400px;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    z-index: 1;
+  }
+  
+  .hero-section-about::after {
+    content: '';
+    position: absolute;
+    bottom: -150px;
+    left: -150px;
+    height: 400px;
+    width: 400px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    z-index: 1;
+  }
+  
+  .about-sections {
+    display: flex;
+    justify-content: space-between; /* Add space between the cards */
+    gap: 30px; /* Adjust gap between cards */
+    max-width: 1200px;
+    margin: 50px 0;
+    flex-wrap: wrap; /* Allow the cards to wrap on smaller screens */
+  }
+  
+  /* About Card Styling */
+  .about-card {
+    background-color: white;
+    padding: 40px;
+    border-radius: 20px;
+    flex: 1; /* Make cards flexible */
+    min-width: 250px; /* Minimum width for each card */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  /* Hover effect for cards */
+  .about-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  }
+  
+  /* Highlighted Card Styling */
+  .highlight-card {
+    background: linear-gradient(135deg, #A23C20, #d45330);
+    color: white;
+  }
+  
+  .highlight-card .card-title {
+    color: white;
+  }
+  
+  /* Team Section */
+  .team-section {
+    text-align: center;
+    margin: 80px 0;
+  }
+  
+  .section-title {
+    font-size: 3rem;
+    margin-bottom: 20px;
+    color: #333;
+  }
+  
+  .team-description {
+    font-size: 1.4rem;
+    color: #666;
+    margin-bottom: 50px;
+  }
+  
+  .team-members {
+    display: flex;
+    justify-content: space-around;
+    gap: 20px;
+  }
+  
+  .team-member {
+    text-align: center;
+  }
+  
+  .team-image {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 15px;
+  }
+  
+  .team-member h3 {
+    font-size: 1.6rem;
+    color: #A23C20;
+    margin-bottom: 5px;
+  }
+  
+  /* Core Values Section */
+  .values-section {
+    max-width: 1200px;
+    margin: 80px auto;
+    text-align: center;
+  }
+  
+  .values-list {
+    display: flex;
+    justify-content: space-around;
+    gap: 40px;
+  }
+  
+  .value-item {
+    width: calc(33% - 20px);
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+  }
+  
+  .value-item:hover {
+    transform: translateY(-5px);
+  }
+  
+  .value-item h3 {
+    font-size: 1.8rem;
+    color: #A23C20;
+    margin-bottom: 10px;
+  }
+  
+  /* Testimonial Section */
+  .testimonial-section {
+    max-width: 1200px;
+    margin: 80px auto;
+    text-align: center;
+  }
+  
+  .testimonials {
+    display: flex;
+    justify-content: space-around;
+    gap: 30px;
+  }
+  
+  .testimonial-card {
+    background-color: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    width: calc(50% - 30px);
+  }
+  
+  .testimonial-text {
+    font-size: 1.2rem;
+    color: #555;
+    margin-bottom: 15px;
+    font-style: italic;
+  }
+  
+  .testimonial-author {
+    font-size: 1.1rem;
+    color: #A23C20;
+  }
+  
+  /* Call to Action */
+  .call-to-action-section {
+    text-align: center;
+    margin-top: 80px;
+  }
+  
+  .cta-text {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+  }
+  
+  .cta-button {
+    background-color: #228B22;
+    color: white;
+    font-size: 1.4rem;
+    padding: 15px 40px;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+  }
+  
+  .cta-button:hover {
+    transform: translateY(-5px);
+    background-color: #196f19;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 1024px) {
+    .about-card {
+        flex: 1 1 calc(50% - 20px); /* 2 cards per row for tablet screens */
+      }
+  
+    .hero-title {
+      font-size: 3.5rem;
+    }
+  
+    .team-members,
+    .values-list {
+      flex-direction: column;
+      gap: 20px;
+    }
+  
+    .value-item, .team-member {
+      width: 85vw;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .about-card {
+        flex: 1 1 100%; /* Full width on mobile screens */
+      }
+  
+    .hero-title {
+      font-size: 3rem;
+    }
+  
+    .hero-description {
+      font-size: 1.3rem;
+    }
+  }
+  

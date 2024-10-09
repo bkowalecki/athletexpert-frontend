@@ -3,6 +3,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  height: 4.5rem;
   padding: 15px 30px;
   background-color: rgba(0, 0, 0, 0.9);
   position: fixed;
@@ -14,10 +15,7 @@
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-.app-header:hover {
-  /* background-color: rgba(0, 0, 0, 0.9); */
-}
-
+/* Logo Styling */
 .logo {
   flex-shrink: 0;
 }
@@ -30,6 +28,34 @@
   margin: 0;
 }
 
+a:-webkit-any-link  {
+  text-decoration: none;
+}
+
+/* Search Bar */
+.search-bar {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  padding: 0;
+  border: none;
+}
+
+.search-bar input {
+  width: 100%;
+  /* max-width: 400px; */
+  padding: 8px 15px;
+  font-size: 16px;
+  /* border-radius: 20px; */
+  border: none;
+  outline: none;
+  transition: box-shadow 0.3s ease;
+}
+
+.search-bar input:focus {
+  box-shadow: 0 0 5px 2px rgba(255, 255, 255, 0.5);
+}
+
 /* Nav links styling */
 .nav-links {
   display: flex;
@@ -37,7 +63,7 @@
   align-items: center;
   gap: 20px;
   flex-grow: 1;
-  max-width: 70%; /* Adjusted to give nav links more room */
+  max-width: 40%; /* Adjusted to give nav links and search bar room */
   white-space: nowrap;
   overflow: hidden;
 }
@@ -56,17 +82,12 @@
   color: #C1440E;
 }
 
-a {
-  text-decoration: none;
-  color: inherit;
-}
-
 /* Hamburger menu styling */
 .hamburger-menu {
   display: none;
   flex-direction: column;
   cursor: pointer;
-  z-index: 1001; /* Ensures it stays on top */
+  z-index: 1001;
 }
 
 .hamburger-menu .bar {
@@ -90,7 +111,7 @@ a {
     padding: 10px 20px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
     border-radius: 8px;
-    z-index: 1001; /* Ensure nav is on top */
+    z-index: 1001;
   }
 
   .nav-links.mobile-menu-open {
@@ -107,6 +128,10 @@ a {
 
   .logo h1 {
     font-size: 24px;
+  }
+
+  .search-bar {
+    display: none; /* Hide search bar on small screens */
   }
 }
 

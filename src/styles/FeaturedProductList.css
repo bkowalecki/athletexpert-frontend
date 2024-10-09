@@ -16,6 +16,7 @@ h2.heading {
   margin-bottom: 60px;
   letter-spacing: 2.5px;
   padding-bottom: 8px;
+  cursor: default;
 }
 
 

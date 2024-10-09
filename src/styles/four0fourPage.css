@@ -1,0 +1,46 @@
+/* Main container for the 404 page */
+.not-found-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #A23C20;
+    color: #fff;
+    font-family: 'Roboto', sans-serif;
+    text-align: center;
+  }
+  
+  .not-found-title {
+    font-size: 8rem;
+    margin: 0;
+  }
+  
+  .not-found-message {
+    font-size: 1.5rem;
+    margin: 20px 0;
+    color: #fff;
+    font-style: italic;
+  }
+  
+  .home-link {
+    text-decoration: none;
+  }
+  
+  .go-home-button {
+    background-color: #fff;
+    color: #A23C20;
+    padding: 15px 25px;
+    font-size: 1.2rem;
+    border: 2px solid #fff;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .go-home-button:hover {
+    background-color: #fff;
+    color: #228B22; /* Green on hover */
+    border-color: #228B22;
+  }
+  

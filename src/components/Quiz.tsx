@@ -30,7 +30,6 @@ type AnswerKey = keyof typeof initialAnswers;
 const initialAnswers = {
   sport: "",
   skillLevel: "",
-  fitnessGoal: "",
   trainingFrequency: "",
   budget: "",
   favoriteColor: "",
@@ -40,7 +39,7 @@ const AMAZON_ASSOCIATE_TAG = "athletexpert-20";
 
 const appendAffiliateTag = (url: string, tag: string) => {
   const urlObj = new URL(url);
-  urlObj.searchParams.set('tag', tag); // Add or replace the 'tag' query param
+  urlObj.searchParams.set("tag", tag); // Add or replace the 'tag' query param
   return urlObj.toString(); // Return the updated URL as a string
 };
 
@@ -51,20 +50,22 @@ const QuizStep: React.FC<{
   selectedOption: string;
   onNext: (option: string) => void;
 }> = ({ question, options, selectedOption, onNext }) => (
-<>
-  <h2>{question}</h2>
-  <div className="quiz-options">
-    {options.map((option) => (
-      <button
-        key={option}
-        className={`quiz-option ${selectedOption === option ? "selected" : ""}`}
-        onClick={() => onNext(option)}
-      >
-        {option}
-      </button>
-    ))}
-  </div>
-</>
+  <>
+    <h2>{question}</h2>
+    <div className="quiz-options">
+      {options.map((option) => (
+        <button
+          key={option}
+          className={`quiz-option ${
+            selectedOption === option ? "selected" : ""
+          }`}
+          onClick={() => onNext(option)}
+        >
+          {option}
+        </button>
+      ))}
+    </div>
+  </>
 );
 
 const Quiz: React.FC<QuizProps> = ({ isOpen, closeModal }) => {
@@ -80,21 +81,9 @@ const Quiz: React.FC<QuizProps> = ({ isOpen, closeModal }) => {
   // Define quizQuestions with proper typing
   const quizQuestions: QuizQuestion[] = [
     {
-      question: "What's your skill level?",
+      question: `What's your skill level in ${initialAnswers.sport} ?`,
       field: "skillLevel",
       options: ["Beginner", "Intermediate", "Advanced", "Professional"],
-    },
-    {
-      question: "What's your fitness goal?",
-      field: "fitnessGoal",
-      options: [
-        "Build Strength",
-        "Lose Weight",
-        "Gain Weight",
-        "Increase Stamina",
-        "Improve Flexibility",
-        "Boost Mobility",
-      ],
     },
     {
       question: "How often do you play/train?",
@@ -160,33 +149,49 @@ const Quiz: React.FC<QuizProps> = ({ isOpen, closeModal }) => {
 
   return (
     <div className="quiz-modal" onClick={handleClose}>
-      <div className="quiz-modal-content" onClick={(e) => e.stopPropagation()}>
-        <button className="close-button" onClick={handleClose}>
+
+<button className="close-button" onClick={handleClose}>
           <svg viewBox="0 0 24 24">
             <path d="M18.3 5.71a1 1 0 0 0-1.42-1.42L12 9.17 7.11 4.29A1 1 0 0 0 5.7 5.71L10.58 10.6 5.7 15.48a1 1 0 0 0 1.41 1.41L12 11.99l4.89 4.89a1 1 0 0 0 1.42-1.41l-4.88-4.89 4.88-4.89Z" />
           </svg>
         </button>
 
-        <div className="quiz-container">
-      
+      <div className="quiz-modal-content" onClick={(e) => e.stopPropagation()}>
 
+        <div className="quiz-container">
           {isLoading ? (
             <LoadingSpinner />
           ) : (
             <>
               {step === 0 && (
                 <>
-                  <h2>What sport are you looking for?</h2>
+                  <h2>What sport are you shopping for?</h2>
                   <div className="carousel-container">
                     <button
                       className="carousel-button left"
                       onClick={() => handleCarousel("left")}
                     >
-                      &#x25C0;
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 50 100"
+                        fill="currentColor"
+                        width="24px"
+                        height="80px"
+                      >
+                        <path
+                          d="M40 5 L10 50 L40 95"
+                          stroke="currentColor"
+                          strokeWidth="5"
+                          fill="none"
+                        />
+                      </svg>
                     </button>
+
                     <div
                       className="carousel-item-container"
-                      style={{ transform: `translateX(-${carouselIndex * 100}%)` }}
+                      style={{
+                        transform: `translateX(-${carouselIndex * 100}%)`,
+                      }}
                     >
                       {sportsData.map((sport, index) => (
                         <div key={index} className="carousel-item">
@@ -199,11 +204,25 @@ const Quiz: React.FC<QuizProps> = ({ isOpen, closeModal }) => {
                         </div>
                       ))}
                     </div>
+
                     <button
                       className="carousel-button right"
                       onClick={() => handleCarousel("right")}
                     >
-                      &#x25B6;
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 50 100"
+                        fill="currentColor"
+                        width="24px"
+                        height="80px"
+                      >
+                        <path
+                          d="M10 5 L40 50 L10 95"
+                          stroke="currentColor"
+                          strokeWidth="5"
+                          fill="none"
+                        />
+                      </svg>
                     </button>
                   </div>
                   <div className="quiz-navigation">
@@ -221,7 +240,11 @@ const Quiz: React.FC<QuizProps> = ({ isOpen, closeModal }) => {
 
               {step > 0 && step <= 4 && (
                 <QuizStep
-                  question={quizQuestions[step - 1].question}
+                question={
+                  step === 1
+                    ? `What's your skill level in ${answers.sport}?`
+                    : quizQuestions[step - 1].question
+                }
                   options={quizQuestions[step - 1].options}
                   selectedOption={answers[quizQuestions[step - 1].field]}
                   onNext={(option) =>
@@ -268,9 +291,12 @@ const Quiz: React.FC<QuizProps> = ({ isOpen, closeModal }) => {
                           />
                         </a>
                         <h4>{product.name}</h4>
-                        <p>${product.price.toFixed(2)}</p>
+                        {/* <p>${product.price.toFixed(2)}</p> */}
                         <a
-                          href={appendAffiliateTag(product.affiliateLink, AMAZON_ASSOCIATE_TAG)}
+                          href={appendAffiliateTag(
+                            product.affiliateLink,
+                            AMAZON_ASSOCIATE_TAG
+                          )}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="buy-button"
