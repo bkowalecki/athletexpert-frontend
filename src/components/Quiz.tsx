@@ -270,7 +270,7 @@ const Quiz: React.FC<QuizProps> = ({ isOpen, closeModal }) => {
                   onNext={(option) => {
                     dispatch({ type: "SET_FAVORITE_COLOR", color: option });
                     handleNext("favoriteColor", option);
-                    step++;
+                  
                   }}
                 />
               )}
