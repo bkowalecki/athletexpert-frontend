@@ -31,7 +31,7 @@ const BlogSection: React.FC = () => {
 
   return (
     <div className="blog-list-container">
-      <h2 className="heading">Latest Blogs</h2>
+      <h2 className="heading">Blogs</h2>
       <ul className="blog-section-list">
         {posts.map((post) => (
           <li key={post.id} className="blog-item">

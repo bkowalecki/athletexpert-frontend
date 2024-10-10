@@ -125,6 +125,7 @@ h2.heading {
   background-color: #005999;  /* Stronger contrasting color */
   color: #FDF3E7;  /* Soft, readable text color */
   text-decoration: none;
+  letter-spacing: 0.05rem;
   padding: 16px 14px;  /* Larger padding for a bigger button */
   border-radius: 12px;  /* Softer rounded corners */
   font-size: 20px;  /* Larger font size */
@@ -163,7 +164,7 @@ h2.heading {
 
 @media (max-width: 480px) {
   .product-item {
-    width: 60vw; /* Full width with margins for mobile */
+    width: 68vw; /* Full width with margins for mobile */
    
   }
 
