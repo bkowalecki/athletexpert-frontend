@@ -16,7 +16,8 @@ main {
   flex-direction: column;
   align-items: center;
   margin: 0 auto;
-  width: 9%;
+  width: 100vw;
+  background-color: #A23C20;
   /* max-width: 1200px; */
   
 }

@@ -81,7 +81,7 @@ const Quiz: React.FC<QuizProps> = ({ isOpen, closeModal }) => {
   // Define quizQuestions with proper typing
   const quizQuestions: QuizQuestion[] = [
     {
-      question: `What's your skill level in ${initialAnswers.sport} ?`,
+      question: `What's your skill level in ${initialAnswers.sport ? initialAnswers.sport : 'your sport'} ?`,
       field: "skillLevel",
       options: ["Beginner", "Intermediate", "Advanced", "Professional"],
     },
@@ -229,7 +229,7 @@ const Quiz: React.FC<QuizProps> = ({ isOpen, closeModal }) => {
                     <button
                       className="nav-button"
                       onClick={() =>
-                        handleNext("sport", sportsData[carouselIndex].title)
+                        handleNext("sport", sportsData[carouselIndex].title.toLowerCase())
                       }
                     >
                       Next
