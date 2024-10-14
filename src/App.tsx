@@ -13,11 +13,14 @@ import ProfilePage from "./components/ProfilePage";
 import AboutPage from "./components/AboutPage";
 import NotFoundPage from "./components/four0fourPage";
 import RegisterPage from "./components/RegisterPage";
+import Login from "./components/Login";
 import TermsAndConditionsPage from "./components/TermsAndConditions";
 import BlogPage from "./components/BlogPage";
 import SearchResults from "./components/SearchResults";
 import Footer from "./components/Footer";
 import BlogPostPage from "./components/BlogPostPage";
+import AuthPage from "./components/AuthPage";
+import { UserProvider } from "./context/UserContext";
 
 const App: React.FC = () => {
   // State for quiz modal visibility and favorite color (if needed elsewhere)
@@ -28,6 +31,7 @@ const App: React.FC = () => {
   const closeModal = () => setQuizModalOpen(false);
 
   return (
+    <UserProvider>
     <Router>
       <div className="App">
         <Header />
@@ -53,6 +57,8 @@ const App: React.FC = () => {
           <Route path="/blog" element={<BlogPage />} />
           <Route path="/404" element={<NotFoundPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/auth" element={<AuthPage />} />
           <Route path="/search" element={<SearchResults />} />
           <Route path="/terms-and-conditions" element={<TermsAndConditionsPage />} />
           <Route path="/blog/:slug" element={<BlogPostPage />} />
@@ -61,6 +67,7 @@ const App: React.FC = () => {
         <Footer/>
       </div>
     </Router>
+    </UserProvider>
   );
 };
 

@@ -74,7 +74,7 @@ const Quiz: React.FC<QuizProps> = ({ isOpen, closeModal }) => {
   const [carouselIndex, setCarouselIndex] = useState(0);
   const [recommendedProducts, setRecommendedProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const totalSteps = 6;
+  const totalSteps = 5;
 
   const [answers, setAnswers] = useState(initialAnswers);
 
@@ -145,7 +145,27 @@ const Quiz: React.FC<QuizProps> = ({ isOpen, closeModal }) => {
     closeModal(); // Closes the modal
   };
 
-  if (!isOpen) return null;
+    // Use useEffect to control overflow based on modal visibility
+    useEffect(() => {
+      if (isOpen) {
+        // Prevent scrolling when modal is open
+        document.body.style.overflow = "hidden";
+      } else {
+        // Re-enable scrolling when modal is closed
+        document.body.style.overflow = "auto";
+      }
+  
+      // Cleanup when the component unmounts or modal closes
+      return () => {
+        document.body.style.overflow = "auto";
+      };
+    }, [isOpen]);
+
+
+
+  if (!isOpen){
+    
+    return null;}
 
   return (
     <div className="quiz-modal" onClick={handleClose}>
@@ -254,7 +274,7 @@ const Quiz: React.FC<QuizProps> = ({ isOpen, closeModal }) => {
                 />
               )}
 
-              {step === 5 && (
+              {/* {step === 5 && (
                 <QuizStep
                   question="What's your favorite color?"
                   options={[
@@ -273,7 +293,7 @@ const Quiz: React.FC<QuizProps> = ({ isOpen, closeModal }) => {
                   
                   }}
                 />
-              )}
+              )} */}
 
               {step === totalSteps && (
                 <div className="recommended-products">

@@ -34,18 +34,19 @@ const BlogPostPage: React.FC = () => {
 
   return (
     <div className="blog-post-page">
-      <div className="blog-post-header">
-        <h1 className="blog-post-title">{post.title}</h1>
-        <p className="blog-post-meta">
-          By {post.author} on {new Date(post.publishedDate).toLocaleDateString()}
-        </p>
-      </div>
       
       {post.imageUrl && (
         <div className="blog-post-image-container">
           <img src={post.imageUrl} alt={post.title} className="blog-post-image" />
         </div>
       )}
+
+<div className="blog-post-header">
+        <h1 className="blog-post-title">{post.title}</h1>
+        <p className="blog-post-meta">
+          By {post.author} on {new Date(post.publishedDate).toLocaleDateString()}
+        </p>
+      </div>
       
       <div className="blog-post-content" dangerouslySetInnerHTML={{ __html: post.content }} />
 

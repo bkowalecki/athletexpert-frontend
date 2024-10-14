@@ -138,7 +138,7 @@ cursor: default;
   background-color: #003f73;
   transform: translateY(-6px) scale(1.05);
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
-  color: #ffcc00;
+  color: #fff;
 }
 
 .blog-section-item:hover {
@@ -157,9 +157,10 @@ cursor: default;
 
 @media (max-width: 725px) {
   .blog-section-item {
-    width: 80vw;
+    width: 90vw;
   }
 
   .blog-section-list {
+    /* width: 90vw; */
   }
 }

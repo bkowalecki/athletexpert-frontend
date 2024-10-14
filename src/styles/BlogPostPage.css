@@ -1,92 +1,157 @@
+/* General styles for body to reset defaults and set base font */
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: #f4f4f4;
+  color: #333;
+  margin: 0;
+  padding: 0;
+  line-height: 1.75;
+}
+
 /* Main container for the blog post page */
 .blog-post-page {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 40px 20px;
-    background-color: #ffffff;
-    color: #333;
-    font-family: 'Arial', sans-serif;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-  }
-  
-  /* Blog post header */
-  .blog-post-header {
-    text-align: center;
-    margin-bottom: 30px;
-  }
-  
-  .blog-post-title {
-    font-size: 2.5rem;
-    color: #5C2413;
-    margin-bottom: 10px;
-    font-weight: bold;
-    letter-spacing: 1px;
-  }
-  
-  .blog-post-meta {
-    font-size: 0.95rem;
-    color: #777;
-  }
-  
-  /* Blog post image */
-  .blog-post-image-container {
-    text-align: center;
-    margin-bottom: 30px;
-  }
-  
+  max-width: 800px; /* Set a max-width for readability */
+  margin: 0 auto; /* Center the content */
+  padding: 6.5rem 20px; /* Top and bottom spacing with padding on the sides */
+  background-color: #ffffff;
+  color: #333;
+  font-family: 'Arial', sans-serif;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Soft shadow for a modern look */
+  border-radius: 8px; /* Rounded corners for modern feel */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Blog post header */
+.blog-post-header {
+  text-align: center;
+  margin-bottom: 0px; /* Add more space between header and content */
+}
+
+.blog-post-title {
+  font-size: 2.5rem;
+  color: #333; /* Darker color for better contrast */
+  margin-bottom: 10px;
+  font-weight: bold;
+  letter-spacing: 1px; /* Slightly increase letter spacing for readability */
+}
+
+.blog-post-meta {
+  font-size: 1rem;
+  color: #777;
+  margin-bottom: 20px;
+}
+
+/* Blog post content */
+.blog-post-content {
+  flex: 1;
+  font-size: 1.15rem;
+  line-height: 1.8; /* Increase line height for better readability */
+  color: #444;
+  padding: 12px 0; /* Vertical padding, no horizontal padding to fit content width */
+}
+
+/* Paragraph styling */
+.blog-post-content p {
+  margin-bottom: 24px; /* Increase spacing between paragraphs */
+  text-align: justify; /* Justify text for a professional look */
+}
+
+/* Headings within the content */
+.blog-post-content h2 {
+  color: #333;
+  margin-top: 40px;
+  margin-bottom: 20px;
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+/* Lists within the content */
+.blog-post-content ul, .blog-post-content ol {
+  margin: 20px 0;
+  padding-left: 40px; /* Space the lists appropriately from the edge */
+}
+
+.blog-post-content ul li, .blog-post-content ol li {
+  margin-bottom: 10px;
+}
+
+/* Links */
+.blog-post-content a {
+  color: #A23C20; /* Accent color for links */
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.blog-post-content a:hover {
+  color: #5C2413; /* Darker hover color */
+  text-decoration: underline; /* Add underline for hover effect */
+}
+
+/* Blockquote styling */
+.blog-post-content blockquote {
+  font-style: italic;
+  background-color: #f9f9f9;
+  padding: 20px;
+  margin: 20px 0;
+  border-left: 5px solid #ccc; /* Classic blockquote style */
+}
+
+.blog-post-image-container {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.blog-post-image {
+  max-width: 100%; /* Ensures the image never exceeds its container width */
+  height: auto; /* Maintain aspect ratio */
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add subtle shadow for emphasis */
+}
+
+
+/* For larger screens */
+@media (min-width: 1024px) {
   .blog-post-image {
-    max-width: 100%;
-    height: auto;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-width: 70%; /* Limit width to 70% of the container on large screens */
   }
-  
-  /* Blog post content */
+}
+
+/* Responsive design for mobile and tablet */
+@media (max-width: 768px) {
+  .blog-post-page {
+    padding: 6.5rem 15px; /* Reduce padding for smaller screens */
+    box-shadow: none; /* Remove shadow for smaller screens */
+  }
+
+  .blog-post-title {
+    font-size: 2rem;
+  }
+
   .blog-post-content {
     font-size: 1.1rem;
-    line-height: 1.75;
-    color: #444;
   }
-  
-  .blog-post-content p {
-    margin-bottom: 20px;
+
+  .blog-post-image {
+    max-width: 90%; /* Increase image size slightly on tablets */
   }
-  
-  .blog-post-content h2 {
-    color: #5C2413;
-    margin-top: 40px;
-    font-size: 1.8rem;
-    font-weight: bold;
+}
+
+@media (max-width: 576px) {
+  .blog-post-page {
+    padding: 6.5rem 10px; /* Further reduce padding for small devices */
   }
-  
-  .blog-post-content ul, .blog-post-content ol {
-    margin: 20px 0;
-    padding-left: 20px;
+
+  .blog-post-title {
+    font-size: 1.8rem; /* Slightly smaller for smaller screens */
   }
-  
-  .blog-post-content a {
-    color: #A23C20;
-    text-decoration: none;
-    font-weight: bold;
+
+  .blog-post-content {
+    font-size: 1rem;
+    line-height: 1.7; /* Adjust line height to fit smaller screens */
   }
-  
-  .blog-post-content a:hover {
-    color: #5C2413;
+
+  .blog-post-image {
+    max-width: 100%; /* Ensure full width on smaller devices like phones */
   }
-  
-  /* Responsive design */
-  @media (max-width: 768px) {
-    .blog-post-page {
-      padding: 20px 15px;
-    }
-  
-    .blog-post-title {
-      font-size: 2rem;
-    }
-  
-    .blog-post-content {
-      font-size: 1rem;
-    }
-  }
-  
+}

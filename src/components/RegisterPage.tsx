@@ -1,156 +1,105 @@
 import React, { useState } from "react";
-import "../styles/RegisterPage.css";
+import { useNavigate } from "react-router-dom";
 
 const RegisterPage: React.FC = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    fullName: "",
+    username: "",
     email: "",
     password: "",
     confirmPassword: "",
-    favoriteSport: "",
-    age: "",
-    agreeToTerms: false,
   });
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value, type } = e.target;
-  
-    // Check if the input type is a checkbox
-    if (type === "checkbox") {
-      const { checked } = e.target as HTMLInputElement; // Type assertion for checkboxes
-      setFormData({
-        ...formData,
-        [name]: checked, // Handle checkbox values
-      });
-    } else {
-      setFormData({
-        ...formData,
-        [name]: value, // Handle input/select values
-      });
-    }
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("Form Submitted: ", formData);
+
+    if (formData.password !== formData.confirmPassword) {
+      alert("Passwords do not match!");
+      return;
+    }
+
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/users/register`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        username: formData.username,
+        email: formData.email,
+        password: formData.password,
+      }),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      alert("Registration successful!");
+      navigate("/login"); // Redirect to login after successful registration
+    } else {
+      const error = await response.text();
+      alert("Registration failed: " + error);
+    }
   };
 
   return (
     <div className="register-page">
-      <div className="register-header">
-        <h1>Join AthleteXpert</h1>
-        <p>Unlock your potential with the best gear, resources, and community for athletes.</p>
-      </div>
-      <form className="register-form" onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label htmlFor="fullName">Full Name</label>
+      <h2>Register</h2>
+      <form onSubmit={handleSubmit}>
+        <div>
+          <label>Username</label>
           <input
             type="text"
-            id="fullName"
-            name="fullName"
-            value={formData.fullName}
+            name="username"
+            value={formData.username}
             onChange={handleInputChange}
-            placeholder="Enter your full name"
             required
           />
         </div>
 
-        <div className="form-group">
-          <label htmlFor="email">Email Address</label>
+        <div>
+          <label>Email</label>
           <input
             type="email"
-            id="email"
             name="email"
             value={formData.email}
             onChange={handleInputChange}
-            placeholder="example@email.com"
             required
           />
         </div>
 
-        <div className="form-group">
-          <label htmlFor="password">Password</label>
+        <div>
+          <label>Password</label>
           <input
             type="password"
-            id="password"
             name="password"
             value={formData.password}
             onChange={handleInputChange}
-            placeholder="Enter your password"
             required
           />
         </div>
 
-        <div className="form-group">
-          <label htmlFor="confirmPassword">Confirm Password</label>
+        <div>
+          <label>Confirm Password</label>
           <input
             type="password"
-            id="confirmPassword"
             name="confirmPassword"
             value={formData.confirmPassword}
             onChange={handleInputChange}
-            placeholder="Confirm your password"
             required
           />
         </div>
 
-        <div className="form-group">
-          <label htmlFor="favoriteSport">Favorite Sport</label>
-          <select
-            id="favoriteSport"
-            name="favoriteSport"
-            value={formData.favoriteSport}
-            onChange={handleInputChange}
-            required
-          >
-            <option value="">Choose a sport</option>
-            <option value="Basketball">Basketball</option>
-            <option value="Soccer">Soccer</option>
-            <option value="Tennis">Tennis</option>
-            <option value="Running">Running</option>
-            <option value="Swimming">Swimming</option>
-          </select>
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="age">Age (optional)</label>
-          <input
-            type="number"
-            id="age"
-            name="age"
-            value={formData.age}
-            onChange={handleInputChange}
-            placeholder="Your age"
-          />
-        </div>
-
-        <div className="form-group form-checkbox">
-          <input
-            type="checkbox"
-            id="agreeToTerms"
-            name="agreeToTerms"
-            checked={formData.agreeToTerms}
-            onChange={handleInputChange}
-            required
-          />
-          <label htmlFor="agreeToTerms">
-            I agree to the <a href="/terms-and-conditions" target="_blank">Terms and Conditions</a>
-          </label>
-        </div>
-
-        <button type="submit" className="submit-button">
-          Register
-        </button>
+        <button type="submit">Register</button>
       </form>
-      <p className="register-footer">
-        Already have an account? <a href="/login">Log in here</a>
-      </p>
     </div>
   );
 };
 
 export default RegisterPage;
-
-
-
-

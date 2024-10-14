@@ -15,20 +15,13 @@
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-/* Logo Styling */
-.logo {
-  flex-shrink: 0;
-}
-
 .logo h1 {
   font-size: 28px;
   color: white;
-  font-family: 'Arial', sans-serif;
   letter-spacing: 1.2px;
-  margin: 0;
 }
 
-a:-webkit-any-link  {
+a:-webkit-any-link {
   text-decoration: none;
 }
 
@@ -43,10 +36,8 @@ a:-webkit-any-link  {
 
 .search-bar input {
   width: 100%;
-  /* max-width: 400px; */
   padding: 8px 15px;
   font-size: 16px;
-  /* border-radius: 20px; */
   border: none;
   outline: none;
   transition: box-shadow 0.3s ease;
@@ -63,9 +54,7 @@ a:-webkit-any-link  {
   align-items: center;
   gap: 20px;
   flex-grow: 1;
-  max-width: 40%; /* Adjusted to give nav links and search bar room */
-  white-space: nowrap;
-  overflow: hidden;
+  max-width: 40%;
 }
 
 .nav-links a {
@@ -87,15 +76,26 @@ a:-webkit-any-link  {
   display: none;
   flex-direction: column;
   cursor: pointer;
-  z-index: 1001;
 }
 
 .hamburger-menu .bar {
-  width: 25px;
+  width: 40px;
   height: 3px;
   background-color: white;
-  margin: 4px;
+  margin: 2px;
   transition: all 0.3s ease;
+}
+
+.hamburger-menu .bar.open:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+
+.hamburger-menu .bar.open:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger-menu .bar.open:nth-child(3) {
+  transform: rotate(-45deg) translate(6px, -6px);
 }
 
 /* Mobile menu styles */
@@ -116,6 +116,16 @@ a:-webkit-any-link  {
 
   .nav-links.mobile-menu-open {
     display: flex;
+    animation: slideIn 0.3s ease-out forwards;
+  }
+
+  @keyframes slideIn {
+    from {
+      transform: translateX(100%);
+    }
+    to {
+      transform: translateX(0);
+    }
   }
 
   .hamburger-menu {

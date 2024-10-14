@@ -1,7 +1,7 @@
 /* Blog Page Container */
 .blog-page-container {
     margin-top: 7.5rem;
-    padding: 50px 30px;
+    padding-top: 6.5rem;
     /* max-width: 1300px; */
     height: 100%;
     margin: 0 auto;
@@ -97,6 +97,7 @@ h2.heading {
 /* Blog Card */
 .blog-page-item {
     display: flex;
+    padding-bottom: 1%;
     flex-direction: column;
     justify-content: space-between;
     background-color: #fff;

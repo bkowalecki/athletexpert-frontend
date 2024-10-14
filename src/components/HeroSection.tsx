@@ -55,7 +55,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ openQuiz }) => {
             {/* Wire up openModal to button click */}
             Get Your Gear
           </button>
-          <a href="/profile">
+          <a href="/auth">
           <button className="cta-btn cta-btn-secondary">Profile</button>
           </a>
         </div>
