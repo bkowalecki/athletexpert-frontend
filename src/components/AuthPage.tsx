@@ -1,7 +1,7 @@
-import React, { useState, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { UserContext } from './UserContext';
-import '../styles/AuthPage.css';
+import React, { useState, useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import { UserContext } from "./UserContext";
+import "../styles/AuthPage.css";
 
 const AuthPage: React.FC = () => {
   const { setUser } = useContext(UserContext);
@@ -9,10 +9,10 @@ const AuthPage: React.FC = () => {
 
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
-    username: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
+    username: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -20,7 +20,7 @@ const AuthPage: React.FC = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prevState => ({
+    setFormData((prevState) => ({
       ...prevState,
       [name]: value,
     }));
@@ -32,40 +32,47 @@ const AuthPage: React.FC = () => {
     setError(null);
 
     if (!isLogin && formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match!');
+      setError("Passwords do not match!");
       setLoading(false);
       return;
     }
 
-    const endpoint = isLogin ? 'login' : 'register';
+    const endpoint = isLogin ? "login" : "register";
     const requestBody = isLogin
       ? { email: formData.email, password: formData.password }
-      : { username: formData.username, email: formData.email, password: formData.password };
+      : {
+          username: formData.username,
+          email: formData.email,
+          password: formData.password,
+        };
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/users/${endpoint}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestBody),
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/users/${endpoint}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(requestBody),
+        }
+      );
 
       const data = await response.json();
 
       if (response.ok) {
         if (isLogin) {
-          localStorage.setItem('authToken', data.token);
+          localStorage.setItem("authToken", data.token);
           setUser(data.user);
-          navigate('/profile');
+          navigate("/profile");
         } else {
           setIsLogin(true); // Switch to login after registration
         }
       } else {
-        setError(data.message || 'An error occurred. Please try again.');
+        setError(data.message || "An error occurred. Please try again.");
       }
     } catch (err) {
-      setError('An error occurred. Please try again later.');
+      setError("An error occurred. Please try again later.");
     } finally {
       setLoading(false);
     }
@@ -74,7 +81,7 @@ const AuthPage: React.FC = () => {
   return (
     <div className="page-container">
       <div className="auth-container">
-        <h2>{isLogin ? 'Login' : 'Register'}</h2>
+        <h2>{isLogin ? "Login" : "Register"}</h2>
 
         {error && <p className="error-message">{error}</p>}
 
@@ -132,24 +139,36 @@ const AuthPage: React.FC = () => {
           )}
 
           <button type="submit" className="submit-button" disabled={loading}>
-            {loading ? (isLogin ? 'Logging in...' : 'Registering...') : isLogin ? 'Login' : 'Register'}
+            {loading
+              ? isLogin
+                ? "Logging in..."
+                : "Registering..."
+              : isLogin
+              ? "Login"
+              : "Register"}
           </button>
+          <div className="strava-img-container">
+                {" "}
+                <img src="/images/connect_With_strava.png"></img>
+              </div>
         </form>
 
         <div className="toggle-link">
           {isLogin ? (
             <p>
-              Don't have an account?{' '}
+              Don't have an account?{" "}
               <button onClick={() => setIsLogin(false)} disabled={loading}>
                 Register
               </button>
+
             </p>
           ) : (
             <p>
-              Already have an account?{' '}
+              Already have an account?{" "}
               <button onClick={() => setIsLogin(true)} disabled={loading}>
                 Login
               </button>
+
             </p>
           )}
         </div>
