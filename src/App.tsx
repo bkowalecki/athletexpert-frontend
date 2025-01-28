@@ -60,7 +60,7 @@ const App: React.FC = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/auth" element={<AuthPage />} />
           <Route path="/search" element={<SearchResults />} />
-          <Route path="/terms-and-conditions" element={<TermsAndConditionsPage />} />
+          <Route path="/terms-of-service" element={<TermsAndConditionsPage />} />
           <Route path="/blog/:slug" element={<BlogPostPage />} />
           {/* Add more routes here as needed */}
         </Routes>

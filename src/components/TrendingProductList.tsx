@@ -8,8 +8,8 @@ interface Product {
   brand: string;
   category: string;
   price: number | null;
-  imgurl: string;
-  amazon_url: string;
+  imgurl: string;  // Changed from imgurl for consistency
+  amazon_url: string; // Changed from amazon_url for consistency
 }
 
 const TrendingProductList: React.FC = () => {
@@ -20,6 +20,8 @@ const TrendingProductList: React.FC = () => {
       .get(`${process.env.REACT_APP_API_URL}/products/trending`)
       .then((response) => {
         setProducts(response.data);
+        console.log(response.data);
+        
       })
       .catch((error) => {
         console.error("There was an error fetching the products!", error);
@@ -27,22 +29,23 @@ const TrendingProductList: React.FC = () => {
   }, []);
 
   return (
-    <div className="product-list-container">
-      <h2 className="heading">Trending</h2>
-      <ul className="product-list">
-      {products.map((product) => (
-          <li key={product.id} className="product-item">
-            <div className="product-image-container">
+    <section className="trending-products-section">
+      <h2 className="trending-products-heading">Trending</h2>
+      <div className="trending-products-grid">
+        {products.map((product) => (
+          
+          <div key={product.id} className="trending-products-item">
+            <div className="trending-products-image-container">
               <img
                 src={product.imgurl}
                 alt={product.name}
-                className="product-image"
+                className="trending-products-image"
               />
             </div>
-            <div className="product-info">
-              <h3 className="product-name">{product.name}</h3>
-              <p className="product-brand">{product.brand}</p>
-              <p className="product-price">
+            <div className="trending-products-info">
+              <h3 className="trending-products-name">{product.name}</h3>
+              <p className="trending-products-brand">{product.brand}</p>
+              <p className="trending-products-price">
                 {product.price ? `$${product.price.toFixed(2)}` : "N/A"}
               </p>
             </div>
@@ -50,14 +53,14 @@ const TrendingProductList: React.FC = () => {
               href={product.amazon_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="cta-button"
+              className="trending-products-cta-button"
             >
               View on Amazon
             </a>
-          </li>
+          </div>
         ))}
-      </ul>
-    </div>
+      </div>
+    </section>
   );
 };
 

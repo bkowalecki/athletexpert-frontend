@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import axios from "axios";
-import "../styles/BlogSection.css";
+import "../styles/BlogSection.css"; // Updated CSS file name
 
 interface BlogPost {
   id: number;
@@ -10,11 +10,10 @@ interface BlogPost {
   publishedDate: string;
   summary: string;
   imageUrl: string;
-  link: string;
   slug: string;
 }
 
-const BlogSection: React.FC = () => {
+const LatestBlogsSection: React.FC = () => {
   const [posts, setPosts] = useState<BlogPost[]>([]);
 
   useEffect(() => {
@@ -22,7 +21,7 @@ const BlogSection: React.FC = () => {
     axios
       .get(`${process.env.REACT_APP_API_URL}/blogs/latest?limit=3`)
       .then((response) => {
-        setPosts(response.data.slice(0, 4)); // Limit the displayed posts to 4
+        setPosts(response.data.slice(0, 3)); // Limit the displayed posts to 3
       })
       .catch((error) => {
         console.error("Error fetching the latest blog posts!", error);
@@ -30,36 +29,36 @@ const BlogSection: React.FC = () => {
   }, []);
 
   return (
-    <div className="blog-list-container">
-      <h2 className="heading">Blogs</h2>
-      <ul className="blog-section-list">
+    <div className="latest-blog-list-container">
+      <h2 className="latest-heading">Latest Blogs</h2>
+      <div className="latest-blog-section-list">
         {posts.map((post) => (
-          <li key={post.id} className="blog-section-item">
-            <div className="blog-image-container">
+          <div key={post.id} className="latest-blog-section-item">
+            <div className="latest-blog-image-container">
               <img
                 src={post.imageUrl}
                 alt={post.title}
-                className="blog-section-image"
+                className="latest-blog-section-image"
               />
             </div>
-            <div className="blog-section-info">
-              <h3 className="blog-section-title">{post.title}</h3>
-              <p className="blog-section-author">By {post.author}</p>
-              <p className="blog-section-date">
-              <i className="fas fa-calendar-alt"></i> 
-            
+            <div className="latest-blog-section-info">
+              <h3 className="latest-blog-section-title">{post.title}</h3>
+              <p className="latest-blog-section-author">By {post.author}</p>
+              <p className="latest-blog-section-date">
                 {new Date(post.publishedDate).toLocaleDateString()}
               </p>
-              <p className="blog-summary">{post.summary}</p>
+              <p className="latest-blog-summary">{post.summary}</p>
             </div>
-            <Link to={`/blog/${post.slug}`} className="blog-section-cta-button">
-              Read More
-            </Link>
-          </li>
+            <div className="latest-blog-cta-container">
+              <Link to={`/blog/${post.slug}`} className="latest-blog-section-cta-button">
+                Read More
+              </Link>
+            </div>
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   );
 };
 
-export default BlogSection;
+export default LatestBlogsSection;

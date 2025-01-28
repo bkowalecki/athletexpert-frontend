@@ -1,138 +1,148 @@
-body{
-  background-color: #A23C20;
-}
-
-.product-list-container {
-  padding: 20px 20px;
-  /* max-width: 1800px; */
-  margin: 0;
+/* 🌟 Featured Products Section */
+.featured-products-section {
+  padding: 20px 5vw;
+  background: linear-gradient(120deg, #A23C20, #842D14); /* Warm, smooth gradient */
   text-align: center;
-  background-color: #A23C20;  /* Light background to make products stand out */
 }
 
-h2.heading {
-  font-size: 70px;  /* Increased heading size */
-  color: #F2F2F2;
-  margin-bottom: 60px;
-  letter-spacing: 2.5px;
+/* 🔹 Featured Products Title */
+.featured-products-heading {
+  font-size: 2.8rem;
+  color: #ffffff;
+  margin-bottom: 20px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  font-weight: 800;
+  font-family: 'Arial', sans-serif;
+  border-bottom: 3px solid rgba(255, 255, 255, 0.2);
   padding-bottom: 8px;
+  display: inline-block;
   cursor: default;
 }
 
-
-.product-list {
-  display: flex;
-  flex-wrap: wrap;
+/* 🔹 Product Grid */
+.featured-products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(275px, 1fr));
+  gap: 20px;
   justify-content: center;
-  gap: 20px;  /* Increased gap for better spacing */
-  list-style-type: none;
-  padding: 0;
-  /* width:90vw; */
+  padding-top: 20px;
 }
 
-
-/* Product Card Styling */
-.product-item {
+/* 🌟 Individual Product Card */
+.featured-products-item {
   position: relative;
-  background-color: #fff;
-  background-size: cover;
-  background-position: center;
-  border-radius: 25px; /* Softer, rounded corners */
-  width: calc(30% - 20px); /* Maintain 3 columns */
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
-  transition: transform 0.4s ease, box-shadow 0.4s ease;
-  padding: 28px;  /* Larger padding for more space around the text */
+  background: #1e1e1e; /* Dark neutral card */
+  border-radius: 14px;
+  padding: 20px;
   text-align: center;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3); /* Subtle shadow */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
   overflow: hidden;
-  cursor: default;
+  cursor: pointer;
 }
 
-.product-image-container {
-  position: relative;
+/* 🌟 Hover Effect */
+.featured-products-item:hover {
+  transform: scale(1.02);
+  box-shadow: 0 12px 25px rgba(255, 180, 0, 0.3);
+}
+
+/* 🔹 Product Image Container */
+.featured-products-image-container {
   width: 100%;
-  padding-top: 75%; /* Aspect ratio for image */
+  height: 250px; /* Fixed height */
   overflow: hidden;
-  border-radius: 15px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.1);
 }
 
-.product-image {
-  position: absolute;
-  top: 0;
-  left: 0;
+/* 🔹 Product Image */
+.featured-products-image {
   width: 100%;
   height: 100%;
-  object-fit: contain; /* Cover the entire area */
+  object-fit: cover; /* 🔥 Ensures full coverage */
   transition: transform 0.3s ease;
 }
 
-.product-item::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.4);  /* Dark overlay for better contrast */
-  z-index: 2;
-  transition: background 0.4s ease; /* Smooth transition for hover */
+.featured-products-item:hover .featured-products-image {
+  transform: scale(1.05);
 }
 
-.product-item:hover::after {
-  background: rgba(0, 0, 0, 0.2); /* Lighten on hover */
-  
+/* 🔹 Product Info */
+.featured-products-info {
+  margin-top: 15px;
 }
 
-/* Product info text */
-.product-item h3, 
-.product-item p {
-  position: relative;
-  z-index: 3;
-  color: #fff;
-  margin: 0;
-  padding: 0;
-  text-shadow: 0 3px 6px rgba(0, 0, 0, 0.7); /* More prominent shadow */
+.featured-products-name {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #f5f5f5; /* Neutral white */
+  letter-spacing: 1px;
 }
 
-.product-item h3 {
-  font-size: 30px;  /* Bigger product name */
-  font-weight: 800; /* Bolder font */
-  letter-spacing: 2px; /* Slightly larger letter spacing for a modern feel */
+.featured-products-brand {
+  font-size: 1.4rem;
+  color: #bbb; /* Softer, neutral text */
+  font-weight: 500;
+  margin-top: 4px;
 }
 
-.product-item p {
-  font-size: 22px;  /* Bigger for price/brand info */
-  font-weight: 400;
-  
-  line-height: 1.6;  /* Improve readability */
+/* 🔥 Price Color Updated to #1DB954 (Spotify Green) */
+.featured-products-price {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #cccccc; /* 🔥 High-contrast, premium green */
+  margin-top: 10px;
 }
 
-
-
-.product-item .cta-button:hover {
-  background-color: #003f73;  /* Darker blue for hover state */
-  transform: translateY(-6px) scale(1.05);  /* Lift and enlarge the button slightly */
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);  /* Add a soft shadow on hover */
-  color: #ffcc00;  /* Bright contrasting text on hover */
+/* 🌟 CTA Button (Now Blue for Amazon Branding) */
+.featured-products-cta-button {
+  display: inline-block;
+  background: linear-gradient(45deg, #0077FF, #005FCC);
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: bold;
+  text-decoration: none;
+  padding: 12px 18px;
+  border-radius: 10px;
+  margin-top: 15px;
+  transition: background 0.3s ease-in-out, transform 0.2s ease-in-out;
 }
 
-/* Hover effect for product */
-/* Hover effect for product */
-.product-item:hover {
-  transform: scale(1.1); /* More noticeable scale on hover */
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.35); /* Deeper shadow on hover */
-  z-index: 50;
+.featured-products-cta-button:hover {
+  background: linear-gradient(45deg, #005FCC, #004BB8);
+  transform: scale(1.05);
+  color: #ffffff;
 }
 
-/* Update Mobile Adjustments */
+/* 📱 Mobile Responsive Design */
+@media (max-width: 1024px) {
+  .featured-products-grid {
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  }
+}
+
 @media (max-width: 768px) {
-  .product-item {
-    width: 55vw; /* Maintain spacing between items on smaller screens */
+  .featured-products-heading {
+    font-size: 2.5rem;
+  }
+  
+  .featured-products-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (max-width: 480px) {
-  .product-item {
-    width: 72vw; /* Full width with margins for mobile */
-   
+  .featured-products-grid {
+    grid-template-columns: repeat(1, 1fr);
+  }
+
+  .featured-products-heading {
+    font-size: 2rem;
+  }
+
+  .featured-products-item {
+    padding: 18px;
   }
 }

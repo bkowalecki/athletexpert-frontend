@@ -1,115 +1,195 @@
-/* General Container */
-.search-results-container {
-    padding: 2rem;
-    max-width: 1200px;
-    margin: 0 auto;
-    font-family: 'Montserrat', sans-serif;
-    color: #333;
+/* Full Page Container */
+.search-results-page-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding: 2rem;
+  max-width: 1300px;
+  margin: 0 auto;
+  font-family: 'Montserrat', sans-serif;
+  color: #ffffff;
+  background: #121212; /* Dark background for a sporty look */
+}
+
+/* Search Title */
+.search-results-page-title {
+  font-size: 2.5rem;
+  text-align: center;
+  color: #ffffff;
+  margin-bottom: 2rem;
+  letter-spacing: 1.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  border-bottom: 2px solid #A23C20;
+  padding-bottom: 1rem;
+}
+
+/* Loading & Error Messages */
+.search-results-page-loading,
+.search-results-page-error {
+  text-align: center;
+  font-size: 1.3rem;
+  margin-top: 2rem;
+  color: #d34f2c;
+}
+
+/* No Results Styling */
+.search-results-page-no-results {
+  text-align: center;
+  padding: 3rem;
+  font-size: 1.4rem;
+  color: #bbb;
+}
+
+.search-results-page-no-results-img {
+  width: 250px;
+  margin-bottom: 1rem;
+  opacity: 0.9;
+}
+
+.search-results-page-no-results-text {
+  font-size: 1.8rem;
+  color: #ffffff;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+}
+
+.search-results-page-no-results-suggestion {
+  font-size: 1rem;
+  color: #ccc;
+  margin-bottom: 1.5rem;
+}
+
+.search-results-page-back-home {
+  display: inline-block;
+  padding: 12px 24px;
+  color: white;
+  background: #A23C20;
+  text-decoration: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: bold;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.search-results-page-back-home:hover {
+  background: #d34f2c;
+  transform: scale(1.05);
+}
+
+/* Results Grid */
+.search-results-page-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+/* Search Section */
+.search-results-page-section {
+  background: #1E1E1E;
+  border-radius: 15px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.search-results-page-section:hover {
+  transform: translateY(-5px);
+}
+
+/* Section Title */
+.search-results-page-section-title {
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+  color: #A23C20;
+  text-transform: uppercase;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+/* Results List */
+.search-results-page-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  list-style: none;
+  padding: 0;
+}
+
+/* Individual Result Items */
+.search-results-page-item {
+  background: #222;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+}
+
+.search-results-page-item:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 20px rgba(255, 255, 255, 0.2);
+}
+
+/* Image Container */
+.search-results-page-image {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  transition: opacity 0.3s ease;
+}
+
+/* Product & Blog Titles */
+.search-results-page-item-title {
+  font-size: 1.3rem;
+  margin: 1rem;
+  font-weight: bold;
+  color: #ffffff;
+}
+
+/* Prices */
+.search-results-page-item-price {
+  font-size: 1.1rem;
+  color: #A23C20;
+  font-weight: bold;
+  margin: 0.5rem 1rem 1rem;
+}
+
+/* Blog Meta Info */
+.search-results-page-item-meta {
+  font-size: 0.9rem;
+  color: #bbb;
+  margin: 0.5rem 1rem;
+}
+
+/* Blog Summary */
+.search-results-page-item-summary {
+  font-size: 1rem;
+  color: #ddd;
+  margin: 0.5rem 1rem 1rem;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .search-results-page-list {
+    grid-template-columns: repeat(1, 1fr);
   }
-  
-  /* Search Title */
-  .search-results-title {
-    font-size: 2.2rem;
-    text-align: center;
-    color: #1f3d1d; /* Dark forest green */
-    margin-bottom: 2.5rem;
-    letter-spacing: 1.5px;
+
+  .search-results-page-title {
+    font-size: 2rem;
   }
-  
-  /* Section Title */
-  .section-title {
-    font-size: 1.8rem;
-    margin-bottom: 1.5rem;
-    color: #a23c20; /* Accent color */
-    text-transform: uppercase;
-    letter-spacing: 1px;
+
+  .search-results-page-section-title {
+    font-size: 1.6rem;
   }
-  
-  /* Results List */
-  .results-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1.5rem;
-    list-style: none;
-    padding: 0;
-  }
-  
-  /* Results Item */
-  .results-item {
-    background-color: #fff;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-  }
-  
-  .results-item:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-  }
-  
-  .results-image {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
-    transition: opacity 0.3s ease;
-  }
-  
-  .results-item-title {
-    font-size: 1.25rem;
-    margin: 0.75rem 1rem;
-    font-weight: bold;
-  }
-  
-  .results-item-price {
-    font-size: 1rem;
-    color: #555;
-    margin: 0.5rem 1rem 1rem;
-  }
-  
-  /* Blog Specific Styling */
-  .results-item-meta {
-    font-size: 0.9rem;
-    color: #777;
-    margin: 0.5rem 1rem;
-  }
-  
-  .results-item-summary {
-    font-size: 1rem;
-    color: #444;
-    margin: 0.5rem 1rem 1rem;
-  }
-  
-  /* Message for No Results */
-  .no-results-message {
+
+  .search-results-page-item-title {
     font-size: 1.2rem;
-    color: #888;
-    text-align: center;
-    margin-top: 2rem;
   }
-  
-  /* Responsive Adjustments */
-  @media (max-width: 768px) {
-    .results-list {
-      grid-template-columns: repeat(1, 1fr);
-    }
-  
-    .search-results-title {
-      font-size: 1.8rem;
-    }
-  
-    .section-title {
-      font-size: 1.6rem;
-    }
-  
-    .results-item-title {
-      font-size: 1.15rem;
-    }
+}
+
+@media (max-width: 1024px) {
+  .search-results-page-list {
+    grid-template-columns: repeat(2, 1fr);
   }
-  
-  @media (max-width: 1024px) {
-    .results-list {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-  
+}

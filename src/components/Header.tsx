@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import '../styles/Header.css';
+import HeaderSearchBar from './HeaderSearchBar';
 
 const Header: React.FC = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
@@ -32,6 +34,11 @@ const Header: React.FC = () => {
     };
   }, [isMobileMenuOpen]);
 
+  useEffect(() => {
+    const authToken = localStorage.getItem("authToken"); // Check if a token exists
+    setIsAuthenticated(!authToken); // Convert token existence to boolean
+  }, []);
+
   return (
     <header className="app-header">
       <div className="logo">
@@ -41,18 +48,22 @@ const Header: React.FC = () => {
       </div>
 
       {/* Updated Search Bar */}
-      <form className="search-bar" onSubmit={handleSearchSubmit}>
-        <input
-          type="text"
-          placeholder="Search for products, blogs..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          aria-label="Search"
-        />
-      </form>
+      {/* <form className="header-search-bar" onSubmit={handleSearchSubmit}>
+  <input
+    type="text"
+    placeholder="Search for products, blogs..."
+    value={searchQuery}
+    onChange={(e) => setSearchQuery(e.target.value)}
+    aria-label="Search"
+    className="search-input"
+  />
+  <button type="submit" className="search-button">🔍</button>
+</form> */}
+<HeaderSearchBar/>
+    
 
       <nav className={`nav-links ${isMobileMenuOpen ? 'mobile-menu-open' : ''}`}>
-        <Link to="/profile">Profile</Link>
+        <Link to={isAuthenticated ? "/profile" : "/auth"}>Profile</Link>
         <Link to="/blog">Blog</Link>
         <Link to="/about">About</Link>
       </nav>

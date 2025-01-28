@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import "../styles/FeaturedProductList.css"; // Same CSS for Trending Product List
+import "../styles/FeaturedProductList.css";
 
 interface Product {
   id: number;
@@ -27,22 +27,22 @@ const FeaturedProductList: React.FC = () => {
   }, []);
 
   return (
-    <div className="product-list-container">
-      <h2 className="heading">Featured</h2>
-      <ul className="product-list">
+    <section className="featured-products-section">
+      <h2 className="featured-products-heading">Featured</h2>
+      <div className="featured-products-grid">
         {products.map((product) => (
-          <li key={product.id} className="product-item">
-            <div className="product-image-container">
+          <div key={product.id} className="featured-products-item">
+            <div className="featured-products-image-container">
               <img
                 src={product.imgUrl}
                 alt={product.name}
-                className="product-image"
+                className="featured-products-image"
               />
             </div>
-            <div className="product-info">
-              <h3 className="product-name">{product.name}</h3>
-              <p className="product-brand">{product.brand}</p>
-              <p className="product-price">
+            <div className="featured-products-info">
+              <h3 className="featured-products-name">{product.name}</h3>
+              <p className="featured-products-brand">{product.brand}</p>
+              <p className="featured-products-price">
                 {product.price ? `$${product.price.toFixed(2)}` : "N/A"}
               </p>
             </div>
@@ -50,14 +50,14 @@ const FeaturedProductList: React.FC = () => {
               href={product.amazonUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="cta-button"
+              className="featured-products-cta-button"
             >
               View on Amazon
             </a>
-          </li>
+          </div>
         ))}
-      </ul>
-    </div>
+      </div>
+    </section>
   );
 };
 

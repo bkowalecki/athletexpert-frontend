@@ -61,11 +61,11 @@
   }
   
   /* Responsive Styling */
-  @media (min-width: 768px) {
+  /* @media (min-width: 768px) {
     .footer-content {
       flex-direction: row;
       justify-content: space-between;
       padding: 0 40px;
     }
   }
-  
+   */

@@ -31,6 +31,7 @@ const AuthPage: React.FC = () => {
     setLoading(true);
     setError(null);
 
+    // Frontend password match validation for signup
     if (!isLogin && formData.password !== formData.confirmPassword) {
       setError("Passwords do not match!");
       setLoading(false);
@@ -55,14 +56,15 @@ const AuthPage: React.FC = () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(requestBody),
+          credentials: "include", // Sends the cookie along with the request
         }
       );
 
       const data = await response.json();
 
       if (response.ok) {
+        // Fetch user data if login is successful
         if (isLogin) {
-          localStorage.setItem("authToken", data.token);
           setUser(data.user);
           navigate("/profile");
         } else {
@@ -148,9 +150,8 @@ const AuthPage: React.FC = () => {
               : "Register"}
           </button>
           <div className="strava-img-container">
-                {" "}
-                <img src="/images/connect_With_strava.png"></img>
-              </div>
+                <img src="/images/connect_With_strava.png" alt="Connect with Strava" />
+          </div>
         </form>
 
         <div className="toggle-link">
@@ -160,7 +161,6 @@ const AuthPage: React.FC = () => {
               <button onClick={() => setIsLogin(false)} disabled={loading}>
                 Register
               </button>
-
             </p>
           ) : (
             <p>
@@ -168,16 +168,10 @@ const AuthPage: React.FC = () => {
               <button onClick={() => setIsLogin(true)} disabled={loading}>
                 Login
               </button>
-
             </p>
           )}
         </div>
       </div>
-
-      {/* Footer */}
-      {/* <footer className="footer">
-        <p>&copy; 2024 AthleteXpert. All rights reserved.</p>
-      </footer> */}
     </div>
   );
 };

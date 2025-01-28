@@ -25,28 +25,6 @@ a:-webkit-any-link {
   text-decoration: none;
 }
 
-/* Search Bar */
-.search-bar {
-  flex-grow: 1;
-  display: flex;
-  justify-content: center;
-  padding: 0;
-  border: none;
-}
-
-.search-bar input {
-  width: 100%;
-  padding: 8px 15px;
-  font-size: 16px;
-  border: none;
-  outline: none;
-  transition: box-shadow 0.3s ease;
-}
-
-.search-bar input:focus {
-  box-shadow: 0 0 5px 2px rgba(255, 255, 255, 0.5);
-}
-
 /* Nav links styling */
 .nav-links {
   display: flex;

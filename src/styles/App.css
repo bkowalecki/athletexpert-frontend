@@ -3,6 +3,8 @@ body {
   width: 100vw;
   font-family: 'Arial', sans-serif;
   background-color: #A23C20;
+  overflow-y: hidden; /* 🔥 Removes vertical scroll */
+  overflow-x: hidden; /* 🔥 Removes horizontal scroll */
 }
 
 .App {
@@ -11,6 +13,8 @@ body {
   min-height: 100vh; /* Ensure the entire viewport height is filled */
   background-color: #A23C20;
   width: 100vw;
+  overflow-y: hidden; /* 🔥 Removes vertical scroll */
+  overflow-x: hidden; /* 🔥 Removes horizontal scroll */
 }
 
 main {
@@ -28,4 +32,8 @@ footer {
   color: #fff;
   text-align: center;
   width: 100vw;
+}
+/* Hide Scrollbars Without Disabling Scrolling */
+::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
 }

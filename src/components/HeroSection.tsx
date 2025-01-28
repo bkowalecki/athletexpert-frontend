@@ -48,7 +48,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ openQuiz }) => {
 
       <div className="hero-content">
         <h1>Gear Tailored to You</h1>
-        <p>Don't sweat the search, we've got you covered.</p>
+        {/* <p>Don't sweat the search, we've got you covered.</p> */}
         <div className="cta-buttons">
           <button className="cta-btn" onClick={openQuiz}>
             {" "}

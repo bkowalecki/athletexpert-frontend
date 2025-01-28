@@ -10,114 +10,105 @@ interface BlogPost {
   publishedDate: string;
   summary: string;
   imageUrl: string;
-  link: string;
-  sport: string;
   slug: string;
 }
 
 const BlogPage: React.FC = () => {
   const [posts, setPosts] = useState<BlogPost[]>([]);
-  const [filteredPosts, setFilteredPosts] = useState<BlogPost[]>([]);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedSport, setSelectedSport] = useState("All");
+  const [blogSearchQuery, setBlogSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasMorePosts, setHasMorePosts] = useState(true);
 
-  // Fetch the latest 9 blogs on component mount
-  useEffect(() => {
-    axios
-      .get(`${process.env.REACT_APP_API_URL}/blogs?limit=9`)
-      .then((response) => {
-        console.log("API response:", response.data); // Log the response to inspect it
-        if (Array.isArray(response.data.content)) {
-          setPosts(response.data.content); // Access the 'content' field
-          setFilteredPosts(response.data.content);
-        } else {
-          console.error("Unexpected API response, expected an array in the 'content' field");
-          setPosts([]);
-          setFilteredPosts([]);
+  const fetchPosts = async (page: number) => {
+    setIsLoading(true);
+    try {
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_URL}/blogs`,
+        {
+          params: {
+            searchQuery: blogSearchQuery,
+            page: page,
+            size: 9, // Ensures consistent page size for pagination
+          },
         }
-      })
-      .catch((error) => {
-        console.error("Error fetching blog posts!", error);
-      });
-  }, []);
-  
+      );
+      const newPosts = response.data.content;
 
-  // Available sports for filtering
-  const sports = ["All", "Football", "Basketball", "Tennis", "Running", "Swimming"];
+      // If fewer items than the page size are returned, there are no more posts.
+      const noMorePosts = newPosts.length < 9;
 
-  // Filter blogs based on sport and search query
+      setPosts((prevPosts) =>
+        page === 0 ? newPosts : [...prevPosts, ...newPosts]
+      );
+      setHasMorePosts(!noMorePosts);
+    } catch (error) {
+      console.error("Error fetching blog posts!", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const lowerCaseSearchQuery = searchQuery.toLowerCase();
-    const filtered = posts.filter((post) => {
-      const matchesSport = selectedSport === "All" || post.sport === selectedSport;
-      const matchesSearch = post.title.toLowerCase().includes(lowerCaseSearchQuery) || 
-                            post.summary.toLowerCase().includes(lowerCaseSearchQuery);
-      return matchesSport && matchesSearch;
-    });
-    setFilteredPosts(filtered);
-  }, [searchQuery, selectedSport, posts]);
+    fetchPosts(0); // Fetch initial posts
+    setCurrentPage(0); // Reset page number
+  }, [blogSearchQuery]); // Refetch when the search query changes
+
+  const loadMorePosts = () => {
+    if (!isLoading && hasMorePosts) {
+      const nextPage = currentPage + 1;
+      fetchPosts(nextPage);
+      setCurrentPage(nextPage);
+    }
+  };
 
   return (
     <div className="blog-page-container">
-      <h2 className="heading">Blog</h2>
+      <h2 className="blog-heading">Blog</h2>
 
-      {/* Filter and Search Options */}
-      <div className="filter-container">
-        {/* Sport Filter */}
-        <label htmlFor="sport-filter" className="filter-label">Filter by Sport:</label>
-        <select
-          id="sport-filter"
-          value={selectedSport}
-          onChange={(e) => setSelectedSport(e.target.value)}
-          className="filter-dropdown"
-        >
-          {sports.map((sport) => (
-            <option key={sport} value={sport}>
-              {sport}
-            </option>
-          ))}
-        </select>
-
-        {/* Search Bar */}
-        <label htmlFor="search-bar" className="filter-label">Search by Keyword:</label>
+      {/* Search Input */}
+      <div className="blog-search-container">
         <input
-          id="search-bar"
           type="text"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Search blog posts..."
-          className="search-bar"
+          value={blogSearchQuery}
+          onChange={(e) => setBlogSearchQuery(e.target.value)}
+          placeholder="Search blog posts"
+          className="blog-search-input"
         />
       </div>
 
-      {/* Blog List */}
-      <ul className="blog-list">
-        {filteredPosts.map((post) => (
-          <li key={post.id} className="blog-page-item">
-            <div className="blog-image-container">
-              <img
-                src={post.imageUrl}
-                alt={post.title}
-                className="blog-image"
-              />
-            </div>
+      {/* Blog Posts */}
+      <div className="blog-post-list">
+        {posts.map((post) => (
+          <div key={post.id} className="blog-post-item">
+            <img src={post.imageUrl} alt={post.title} className="blog-image" />
             <div className="blog-info">
-              <h3 className="blog-title">{post.title}</h3>
-              <p className="blog-author">By {post.author}</p>
-              <p className="blog-date">
-                {new Date(post.publishedDate).toLocaleDateString()}
-              </p>
-              <p className="blog-summary">{post.summary}</p>
+              <h3>{post.title}</h3>
+              <p>By {post.author}</p>
+              <p>{new Date(post.publishedDate).toLocaleDateString()}</p>
+              <p>{post.summary}</p>
+              <Link to={`/blog/${post.slug}`} className="cta-button">
+                Read More
+              </Link>
             </div>
-            <Link to={`/blog/${post.slug}`} className="cta-button">
-              Read More
-            </Link>
-          </li>
+          </div>
         ))}
-      </ul>
+      </div>
 
-      {/* Show message if no posts match the filter */}
-      {filteredPosts.length === 0 && <p>No blog posts match your criteria.</p>}
+      {/* Load More Button */}
+      {hasMorePosts && !isLoading && (
+        <button onClick={loadMorePosts} className="load-more-button">
+          Load More
+        </button>
+      )}
+
+      {/* Loading Indicator */}
+      {isLoading && <div className="loading-indicator">Loading...</div>}
+
+      {/* No Posts Found */}
+      {!isLoading && posts.length === 0 && (
+        <div className="no-results">No blog posts found. Try a different search.</div>
+      )}
     </div>
   );
 };

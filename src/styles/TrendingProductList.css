@@ -1,178 +1,147 @@
-body{
-  background-color: #A23C20;
-}
-
-.product-list-container {
-  padding: 20px 20px;
-  /* max-width: 1800px; */
-  /* width: 100vw; */
-  margin: 0;
+/* 🌟 Trending Products Section */
+.trending-products-section {
+  padding: 20px 5vw;
+  background: linear-gradient(120deg, #1a1a1a, #333333); /* Darker, cool-toned gradient */
   text-align: center;
-  background-color: #A23C20;  /* Light background to make products stand out */
 }
 
-h2.heading {
-  font-size: 4rem;  /* Increased heading size */
-  color: #F2F2F2;
-  margin-bottom: 60px;
-  letter-spacing: 2.5px;
+/* 🔹 Trending Products Title */
+.trending-products-heading {
+  font-size: 2.8rem;
+  color: #cccccc; /* Yellow contrast */
+  margin-bottom: 20px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  font-weight: 800;
+  font-family: 'Arial', sans-serif;
+  border-bottom: 3px solid rgba(255, 255, 255, 0.2);
   padding-bottom: 8px;
+  display: inline-block;
 }
 
-
-.product-list {
-  display: flex;
-  flex-wrap: wrap;
+/* 🔹 Product Grid */
+.trending-products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(275px, 1fr));
+  gap: 20px;
   justify-content: center;
-  gap: 20px;  /* Increased gap for better spacing */
-  list-style-type: none;
-  padding: 0;
+  padding-top: 20px;
 }
 
-
-/* Product Card Styling */
-.product-item {
+/* 🌟 Individual Product Card */
+.trending-products-item {
   position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  background-color: #fff;
-  background-size: cover;
-  background-position: center;
-  border-radius: 25px; /* Softer, rounded corners */
-  width: calc(25% - 20px); /* Maintain 3 columns */
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
-  transition: transform 0.4s ease, box-shadow 0.4s ease;
-  padding: 28px;  /* Larger padding for more space around the text */
+  background: #1a1a1a; /* Opposite of dark neutral */
+  border-radius: 14px;
+  padding: 20px;
   text-align: center;
+  box-shadow: 0 6px 15px rgba(255, 255, 255, 0.2); /* Inverse shadow */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
   overflow: hidden;
-  cursor: default;
+  cursor: pointer;
 }
 
-.product-image-container {
-  position: relative;
+/* 🌟 Hover Effect */
+.trending-products-item:hover {
+  transform: scale(1.02);
+  box-shadow: 0 12px 25px rgba(255, 255, 255, 0.3);
+}
+
+/* 🔹 Product Image Container */
+.trending-products-image-container {
   width: 100%;
-  padding-top: 75%; /* Aspect ratio for image */
+  height: 250px; /* Fixed height */
   overflow: hidden;
-  border-radius: 15px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.1);
 }
 
-.product-image {
-  position: absolute;
-  top: 0;
-  left: 0;
+/* 🔹 Product Image */
+.trending-products-image {
   width: 100%;
   height: 100%;
-  object-fit: contain; /* Cover the entire area */
+  object-fit: cover; /* 🔥 Ensures full coverage */
   transition: transform 0.3s ease;
 }
 
-.product-item::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.4);  /* Dark overlay for better contrast */
-  z-index: 2;
-  transition: background 0.4s ease; /* Smooth transition for hover */
+.trending-products-item:hover .trending-products-image {
+  transform: scale(1.05);
 }
 
-.product-item:hover::after {
-  background: rgba(0, 0, 0, 0.2); /* Lighten on hover */
-  
+/* 🔹 Product Info */
+.trending-products-info {
+  margin-top: 15px;
 }
 
-/* Product info text */
-.product-item h3, 
-.product-item p {
-  position: relative;
-  z-index: 3;
-  color: #fff;
-  margin: 0;
-  padding: 0;
-  text-shadow: 0 3px 6px rgba(0, 0, 0, 0.7); /* More prominent shadow */
+.trending-products-name {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #cccccc; /* Opposite of white */
+  letter-spacing: 1px;
 }
 
-.product-item h3 {
-  font-size: 2rem;            /* Slightly smaller, sleek size based on viewport */
-  font-weight: 600;            /* Medium weight for a more refined, modern feel */
-  letter-spacing: 0.05vw;      /* Minimal letter spacing to keep it tight but sharp */
-  line-height: 1.3;            /* A bit more breathing room for readability */
-  margin-bottom: 1.2vh;        /* Slight vertical margin to maintain balance */
-  color: #f1f1f1;              /* Soft off-white for good contrast on dark overlay */
-  text-transform: none;        /* Keep natural casing for sophistication */
-  transition: color 0.3s ease; /* Smooth color transition for interactivity */
+.trending-products-brand {
+  font-size: 1.4rem;
+  color: #ccc; /* Darker shade */
+  font-weight: 500;
+  margin-top: 4px;
 }
 
-.product-item p {
-  font-size: 1.4rem;  /* Bigger for price/brand info */
-  font-weight: 400;
-  
-  line-height: 1.6;  /* Improve readability */
-}
-
-.product-item .cta-button {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  cursor: pointer;
-  z-index: 3;
-  margin-top: 2vh;
-  display: inline-block;
-  background-color: #005999;  /* Stronger contrasting color */
-  color: #FDF3E7;  /* Soft, readable text color */
-  text-decoration: none;
-  letter-spacing: 0.05rem;
-  padding: 16px 14px;  /* Larger padding for a bigger button */
-  border-radius: 12px;  /* Softer rounded corners */
-  font-size: 20px;  /* Larger font size */
+/* 🔥 Price Color Updated to Opposite */
+.trending-products-price {
+  font-size: 1.4rem;
   font-weight: bold;
-  transition: background-color 0.4s ease, transform 0.3s ease, box-shadow 0.3s ease;
+  color: #cccccc; /* Green as contrast */
+  margin-top: 10px;
 }
 
-.product-item .cta-button:hover {
-  background-color: #003f73;  /* Darker blue for hover state */
-  transform: translateY(-6px) scale(1.05);  /* Lift and enlarge the button slightly */
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);  /* Add a soft shadow on hover */
-  color: #ffcc00;  /* Bright contrasting text on hover */
+/* 🌟 CTA Button (Opposite Cool Blue Gradient) */
+.trending-products-cta-button {
+  display: inline-block;
+  background: linear-gradient(45deg, #0077FF, #005FCC);
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: bold;
+  text-decoration: none;
+  padding: 12px 18px;
+  border-radius: 10px;
+  margin-top: 15px;
+  transition: background 0.3s ease-in-out, transform 0.2s ease-in-out;
 }
 
-
-
-/* Hover effect for product */
-/* Hover effect for product */
-.product-item:hover {
-  transform: scale(1.1); /* More noticeable scale on hover */
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.35); /* Deeper shadow on hover */
-  z-index: 50;
+.trending-products-cta-button:hover {
+  background: linear-gradient(45deg, #005FCC, #004BB8);
+  transform: scale(1.05);
+  color: #ffffff;
 }
 
-/* Update Mobile Adjustments */
+/* 📱 Mobile Responsive Design */
 @media (max-width: 1024px) {
-  .product-item {
-    width: 35vw; /* Maintain spacing between items on smaller screens */
+  .trending-products-grid {
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   }
+}
 
-  .product-item h3 {
-    font-size: 4vw;            /* Scale up a bit for smaller screens */
-    letter-spacing: 0.1vw;     /* Slightly increase spacing for readability */
+@media (max-width: 768px) {
+  .trending-products-heading {
+    font-size: 2.5rem;
+  }
+  
+  .trending-products-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (max-width: 480px) {
-  .product-item {
-    width: 68vw; /* Full width with margins for mobile */
-   
+  .trending-products-grid {
+    grid-template-columns: repeat(1, 1fr);
   }
 
-  .product-item h3 {
-    font-size: 5.5vw;          /* Adjust size for small mobile devices */
-    line-height: 1.4;          /* Increase line height for easier reading */
-    margin-bottom: 1vh;        /* Increase margin for touch-friendliness */
+  .trending-products-heading {
+    font-size: 2rem;
   }
 
-  
+  .trending-products-item {
+    padding: 18px;
+  }
 }
