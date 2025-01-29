@@ -48,7 +48,7 @@ const HeaderSearchBar: React.FC = () => {
           onChange={handleInputChange}
           aria-label="Search"
         />
-        <button type="submit" className="search-button">🔍</button>
+         <div className="search-button" onClick={handleSearchSubmit}></div>
       </form>
 
       {/* 🔥 Live Search Suggestions Dropdown */}

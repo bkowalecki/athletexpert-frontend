@@ -1,6 +1,8 @@
-import React, { useEffect, useState } from "react";
-import "../styles/ProfilePage.css";
+import React, { useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth0 } from "@auth0/auth0-react";
+import { UserContext } from "../context/UserContext";
+import "../styles/ProfilePage.css";
 
 interface Profile {
   name: string;
@@ -15,6 +17,14 @@ const ProfilePage: React.FC = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { logout } = useAuth0(); // ✅ Get logout function from Auth0
+  const userContext = useContext(UserContext);
+
+  if (!userContext) {
+    throw new Error("UserContext must be used within a UserProvider");
+  }
+
+  const { setUser } = userContext;
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -54,10 +64,13 @@ const ProfilePage: React.FC = () => {
   if (error) return <div className="profile-page-error">Error: {error}</div>;
   if (!profile) return <div className="profile-page-loading">Loading...</div>;
 
+  // ✅ Fixed Logout Function
   const handleSignOut = () => {
-    localStorage.removeItem("authToken");
-    navigate("/auth");
-    window.location.reload();
+    localStorage.removeItem("authToken"); // ✅ Remove token from storage
+    setUser(null); // ✅ Clear user context
+    logout({
+      logoutParams: { returnTo: window.location.origin }, // ✅ Correct way to specify return URL
+    });
   };
 
   return (

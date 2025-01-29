@@ -21,6 +21,7 @@ import Footer from "./components/Footer";
 import BlogPostPage from "./components/BlogPostPage";
 import AuthPage from "./components/AuthPage";
 import { UserProvider } from "./context/UserContext";
+import { Auth0Provider } from "@auth0/auth0-react";
 
 const App: React.FC = () => {
   // State for quiz modal visibility and favorite color (if needed elsewhere)
@@ -30,7 +31,17 @@ const App: React.FC = () => {
   const openModal = () => setQuizModalOpen(true);
   const closeModal = () => setQuizModalOpen(false);
 
+  const domain: string = process.env.REACT_APP_AUTH0_DOMAIN ?? "";
+  const clientId: string = process.env.REACT_APP_AUTH0_CLIENT_ID ?? "";
+
   return (
+    <Auth0Provider
+    domain={domain}
+    clientId={clientId}
+    authorizationParams={{
+      redirect_uri: window.location.origin + "/auth/callback", // ✅ Ensure this matches Auth0
+    }}
+  >
     <UserProvider>
     <Router>
       <div className="App">
@@ -68,6 +79,7 @@ const App: React.FC = () => {
       </div>
     </Router>
     </UserProvider>
+    </Auth0Provider>
   );
 };
 

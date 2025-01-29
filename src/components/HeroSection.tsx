@@ -1,4 +1,7 @@
 import React, { useEffect, useRef } from "react";
+import { useAuth0 } from "@auth0/auth0-react";
+import { useContext } from "react";
+import { UserContext } from "../context/UserContext";
 import "../styles/HeroSection.css";
 
 interface HeroSectionProps {
@@ -7,6 +10,17 @@ interface HeroSectionProps {
 
 const HeroSection: React.FC<HeroSectionProps> = ({ openQuiz }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const { isAuthenticated } = useAuth0();
+  const userContext = useContext(UserContext);
+
+if (!userContext) {
+  throw new Error("UserContext must be used within a UserProvider");
+}
+
+const { user } = userContext; // ✅ Now TypeScript knows `user` is defined
+
+  const profileUrl = isAuthenticated || user ? "/profile" : "/auth"; // ✅ Redirect based on login status
+
 
   useEffect(() => {
     const videoElement = videoRef.current;
@@ -48,15 +62,10 @@ const HeroSection: React.FC<HeroSectionProps> = ({ openQuiz }) => {
 
       <div className="hero-content">
         <h1>Gear Tailored to You</h1>
-        {/* <p>Don't sweat the search, we've got you covered.</p> */}
         <div className="cta-buttons">
-          <button className="cta-btn" onClick={openQuiz}>
-            {" "}
-            {/* Wire up openModal to button click */}
-            Get Your Gear
-          </button>
-          <a href="/auth">
-          <button className="cta-btn cta-btn-secondary">Profile</button>
+          <button className="cta-btn" onClick={openQuiz}>Get Your Gear</button>
+          <a href={profileUrl}>
+            <button className="cta-btn cta-btn-secondary">Profile</button>
           </a>
         </div>
       </div>

@@ -106,6 +106,30 @@
     cursor: pointer;
 }
 
+.google-login-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    color: #333;
+    border: 1px solid #ddd;
+    padding: 10px 15px;
+    font-size: 1rem;
+    border-radius: 8px;
+    width: 100%;
+    transition: all 0.3s ease;
+  }
+  
+  .google-login-btn:hover {
+    background: #f8f9fa;
+    border-color: #bbb;
+  }
+  
+  .google-icon {
+    width: 20px;
+    margin-right: 10px;
+  }
+
 /* Mobile responsiveness for screens 480px and below */
 @media (max-width: 480px) {
     .auth-container {

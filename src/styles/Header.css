@@ -13,6 +13,13 @@
   box-sizing: border-box;
   transition: background-color 0.3s ease;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+
+}
+
+.logo{
+  flex: 1; /* Allows it to take up space on the left */
+  display: flex;
+  justify-content: flex-start; /* Pushes logo to the left */
 }
 
 .logo h1 {
@@ -25,6 +32,12 @@ a:-webkit-any-link {
   text-decoration: none;
 }
 
+.search-bar-container{
+  flex: 2; /* Allows the search bar to take up the center space */
+  display: flex;
+  justify-content: center; /* Centers the search bar */
+}
+
 /* Nav links styling */
 .nav-links {
   display: flex;
@@ -33,6 +46,8 @@ a:-webkit-any-link {
   gap: 20px;
   flex-grow: 1;
   max-width: 40%;
+
+  flex: 1; /* Pushes nav links to the right */
 }
 
 .nav-links a {
