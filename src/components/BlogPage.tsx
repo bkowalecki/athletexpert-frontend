@@ -1,6 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import { useQuery } from "@tanstack/react-query";
+import DOMPurify from "dompurify";
+import { Helmet } from "react-helmet";
 import "../styles/BlogPage.css";
 
 interface BlogPost {
@@ -13,99 +16,116 @@ interface BlogPost {
   slug: string;
 }
 
+const fetchPosts = async (searchQuery: string, page: number): Promise<BlogPost[]> => {
+  const response = await axios.get(`${process.env.REACT_APP_API_URL}/blogs`, {
+    params: {
+      searchQuery,
+      page,
+      size: 9,
+    },
+  });
+  return response.data.content;
+};
+
 const BlogPage: React.FC = () => {
-  const [posts, setPosts] = useState<BlogPost[]>([]);
-  const [blogSearchQuery, setBlogSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
+  const [posts, setPosts] = useState<BlogPost[]>([]);
   const [hasMorePosts, setHasMorePosts] = useState(true);
 
-  const fetchPosts = async (page: number) => {
-    setIsLoading(true);
-    try {
-      const response = await axios.get(
-        `${process.env.REACT_APP_API_URL}/blogs`,
-        {
-          params: {
-            searchQuery: blogSearchQuery,
-            page: page,
-            size: 9, // Ensures consistent page size for pagination
-          },
-        }
-      );
-      const newPosts = response.data.content;
-
-      // If fewer items than the page size are returned, there are no more posts.
-      const noMorePosts = newPosts.length < 9;
-
-      setPosts((prevPosts) =>
-        page === 0 ? newPosts : [...prevPosts, ...newPosts]
-      );
-      setHasMorePosts(!noMorePosts);
-    } catch (error) {
-      console.error("Error fetching blog posts!", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const { data, isLoading, refetch, isFetching } = useQuery<BlogPost[], Error>({
+    queryKey: ["posts", searchQuery, currentPage],
+    queryFn: () => fetchPosts(searchQuery, currentPage),
+    staleTime: 5000,
+    gcTime: 10000,
+    retry: 1,
+    refetchOnWindowFocus: false,
+  });
 
   useEffect(() => {
-    fetchPosts(0); // Fetch initial posts
-    setCurrentPage(0); // Reset page number
-  }, [blogSearchQuery]); // Refetch when the search query changes
+    if (data) {
+      setPosts((prevPosts) =>
+        currentPage === 0 ? data : [...prevPosts, ...data]
+      );
+
+      if (data.length < 9) {
+        setHasMorePosts(false); // Hide button if fewer than 9 posts are fetched
+      } else {
+        setHasMorePosts(true);
+      }
+    }
+  }, [data, currentPage]);
+
+  const handleSearchChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setSearchQuery(e.target.value);
+      setCurrentPage(0);
+      setHasMorePosts(true); // Reset for new search
+      refetch();
+    },
+    [refetch]
+  );
 
   const loadMorePosts = () => {
-    if (!isLoading && hasMorePosts) {
-      const nextPage = currentPage + 1;
-      fetchPosts(nextPage);
-      setCurrentPage(nextPage);
+    if (!isFetching) {
+      setCurrentPage((prevPage) => prevPage + 1);
     }
   };
 
   return (
     <div className="blog-page-container">
+      <Helmet>
+        <title>Blog - AthleteXpert</title>
+        <meta name="description" content="Discover the latest articles and insights on AthleteXpert." />
+      </Helmet>
+
       <h2 className="blog-heading">Blog</h2>
 
-      {/* Search Input */}
       <div className="blog-search-container">
         <input
           type="text"
-          value={blogSearchQuery}
-          onChange={(e) => setBlogSearchQuery(e.target.value)}
+          value={searchQuery}
+          onChange={handleSearchChange}
           placeholder="Search blog posts"
           className="blog-search-input"
+          aria-label="Search blog posts"
         />
       </div>
 
-      {/* Blog Posts */}
       <div className="blog-post-list">
-        {posts.map((post) => (
-          <div key={post.id} className="blog-post-item">
-            <img src={post.imageUrl} alt={post.title} className="blog-image" />
-            <div className="blog-info">
-              <h3>{post.title}</h3>
-              <p>By {post.author}</p>
-              <p>{new Date(post.publishedDate).toLocaleDateString()}</p>
-              <p>{post.summary}</p>
-              <Link to={`/blog/${post.slug}`} className="cta-button">
-                Read More
-              </Link>
+        {isLoading ? (
+          Array.from({ length: 9 }).map((_, index) => (
+            <div key={index} className="blog-post-item skeleton-loader"></div>
+          ))
+        ) : (
+          posts.map((post) => (
+            <div key={post.id} className="blog-post-item">
+              <img
+                src={post.imageUrl}
+                alt={post.title}
+                className="blog-image"
+                loading="lazy"
+              />
+              <div className="blog-info">
+                <h3 className="blog-title">{post.title}</h3>
+                <p className="blog-author">By {post.author}</p>
+                <p className="blog-date">{new Date(post.publishedDate).toLocaleDateString()}</p>
+                <p className="blog-description">{DOMPurify.sanitize(post.summary)}</p>
+                <Link to={`/blog/${post.slug}`} className="cta-button">
+                  Read More
+                </Link>
+              </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
 
-      {/* Load More Button */}
-      {hasMorePosts && !isLoading && (
+      {!isLoading && hasMorePosts && (
         <button onClick={loadMorePosts} className="load-more-button">
-          Load More
+          {isFetching ? "Loading..." : "Load More"}
         </button>
       )}
 
-      {/* Loading Indicator */}
-      {isLoading && <div className="loading-indicator">Loading...</div>}
-
-      {/* No Posts Found */}
       {!isLoading && posts.length === 0 && (
         <div className="no-results">No blog posts found. Try a different search.</div>
       )}

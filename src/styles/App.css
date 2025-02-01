@@ -1,39 +1,51 @@
+/* === Global Styles === */
 body {
   margin: 0;
-  width: 100vw;
+  padding: 0;
   font-family: 'Arial', sans-serif;
   background-color: #A23C20;
-  overflow-y: hidden; /* 🔥 Removes vertical scroll */
-  overflow-x: hidden; /* 🔥 Removes horizontal scroll */
+  overflow-x: hidden; /* Prevents horizontal scroll without affecting vertical scroll */
 }
 
+/* App Container */
 .App {
   display: flex;
   flex-direction: column;
-  min-height: 100vh; /* Ensure the entire viewport height is filled */
+  min-height: 100vh;
   background-color: #A23C20;
-  width: 100vw;
-  overflow-y: hidden; /* 🔥 Removes vertical scroll */
-  overflow-x: hidden; /* 🔥 Removes horizontal scroll */
+  overflow-x: hidden; /* Keeps layout clean horizontally */
 }
 
+/* Main Content Area */
 main {
-  flex: 1; /* This makes the main content take up available space */
+  flex: 1;
   display: flex;
   flex-direction: column;
-  /* align-items: center; */
-  width: 100vw; /* Ensures content spans the full width */
+  width: 100%; /* Use 100% instead of 100vw for better responsiveness */
   background-color: #A23C20;
+  /* padding: 1rem; Adds breathing room */
+  box-sizing: border-box; /* Ensures padding doesn’t overflow */
 }
 
+/* Footer */
 footer {
   padding: 20px;
   background-color: #333;
   color: #fff;
   text-align: center;
-  width: 100vw;
+  width: 100%;
 }
-/* Hide Scrollbars Without Disabling Scrolling */
+
+/* Optional: Subtle Custom Scrollbar for Better UX */
 ::-webkit-scrollbar {
-  display: none; /* Chrome, Safari */
+  width: 8px; /* Show scrollbar but make it minimal */
+}
+
+::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #777;
 }

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import "./styles/App.css"; // Main app styles
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 // Components
 import Header from "./components/Header";
@@ -23,8 +24,10 @@ import AuthPage from "./components/AuthPage";
 import { UserProvider } from "./context/UserContext";
 import { Auth0Provider } from "@auth0/auth0-react";
 
+// Create the QueryClient instance
+const queryClient = new QueryClient();
+
 const App: React.FC = () => {
-  // State for quiz modal visibility and favorite color (if needed elsewhere)
   const [favoriteColor, setFavoriteColor] = useState<string | null>(null);
   const [isQuizModalOpen, setQuizModalOpen] = useState(false);
 
@@ -36,49 +39,48 @@ const App: React.FC = () => {
 
   return (
     <Auth0Provider
-    domain={domain}
-    clientId={clientId}
-    authorizationParams={{
-      redirect_uri: window.location.origin + "/auth/callback", // ✅ Ensure this matches Auth0
-    }}
-  >
-    <UserProvider>
-    <Router>
-      <div className="App">
-        <Header />
-        <Routes>
-          {/* Home route */}
-          <Route
-            path="/"
-            element={
-              <>
-                <HeroSection openQuiz={openModal} />
-                <main>
-                  <FeaturedProductList />
-                  <TrendingProductList />
-                  <BlogSection />
-                </main>
-                <Quiz isOpen={isQuizModalOpen} closeModal={closeModal} />
-              </>
-            }
-          />
-          {/* Profile route */}
-          <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/blog" element={<BlogPage />} />
-          <Route path="/404" element={<NotFoundPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/auth" element={<AuthPage />} />
-          <Route path="/search" element={<SearchResults />} />
-          <Route path="/terms-of-service" element={<TermsAndConditionsPage />} />
-          <Route path="/blog/:slug" element={<BlogPostPage />} />
-          {/* Add more routes here as needed */}
-        </Routes>
-        <Footer/>
-      </div>
-    </Router>
-    </UserProvider>
+      domain={domain}
+      clientId={clientId}
+      authorizationParams={{
+        redirect_uri: window.location.origin + "/auth/callback",
+      }}
+    >
+      <QueryClientProvider client={queryClient}>
+        <UserProvider>
+          <Router>
+            <div className="App">
+              <Header />
+              <Routes>
+                <Route
+                  path="/"
+                  element={
+                    <>
+                      <HeroSection openQuiz={openModal} />
+                      <main>
+                        <FeaturedProductList />
+                        <TrendingProductList />
+                        <BlogSection />
+                      </main>
+                      <Quiz isOpen={isQuizModalOpen} closeModal={closeModal} />
+                    </>
+                  }
+                />
+                <Route path="/profile" element={<ProfilePage />} />
+                <Route path="/about" element={<AboutPage />} />
+                <Route path="/blog" element={<BlogPage />} />
+                <Route path="/404" element={<NotFoundPage />} />
+                <Route path="/register" element={<RegisterPage />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/auth" element={<AuthPage />} />
+                <Route path="/search" element={<SearchResults />} />
+                <Route path="/terms-of-service" element={<TermsAndConditionsPage />} />
+                <Route path="/blog/:slug" element={<BlogPostPage />} />
+              </Routes>
+              <Footer />
+            </div>
+          </Router>
+        </UserProvider>
+      </QueryClientProvider>
     </Auth0Provider>
   );
 };

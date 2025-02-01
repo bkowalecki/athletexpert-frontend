@@ -8,6 +8,7 @@ interface BlogPost {
   title: string;
   author: string;
   publishedDate: string;
+  sport: string;
   imageUrl: string;  // Assuming the blog post has an image URL field
   content: string;  // Assuming you have a content field for full post text
 }
