@@ -198,6 +198,19 @@
   
   /* Responsive Design */
   /* Responsive Design */
+
+  @media (max-width: 1024px) {
+    .blog-post-list {
+      grid-template-columns: repeat(2, 1fr); /* 2 columns on tablets */
+      gap: 1.5rem;
+      padding: 0 1rem;
+    }
+  
+    .blog-post-item {
+      min-height: 500px; /* Adjust height if needed for better layout */
+    }
+  }
+
 @media (max-width: 768px) {
     .blog-post-list {
       grid-template-columns: 1fr;  /* Single column layout for mobile */
