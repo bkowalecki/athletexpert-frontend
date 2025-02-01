@@ -197,40 +197,49 @@
   }
   
   /* Responsive Design */
-  @media (max-width: 1024px) {
+  /* Responsive Design */
+@media (max-width: 768px) {
     .blog-post-list {
-      grid-template-columns: repeat(2, 1fr);
-      gap: 1.5rem;
+      grid-template-columns: 1fr;  /* Single column layout for mobile */
+      gap: 1rem;
+      padding: 0 1rem;  /* Adjust padding to prevent squeezing */
     }
   
-    .blog-title {
-      font-size: 1.8rem;
+    .blog-post-item {
+      width: 100%;  /* Ensure blog items use full available width */
+      min-height: 500px;  /* Adjust height if needed for content visibility */
     }
   
-    .cta-button {
-      padding: 0.6rem 1.2rem;
-    }
-  }
-  
-  @media (max-width: 768px) {
-    .blog-heading {
-      font-size: 2rem;
-    }
-  
-    .blog-search-input {
-      max-width: 90%;
-    }
-  
-    .blog-post-list {
-      grid-template-columns: 1fr;
-      padding: 0 1rem;
+    .blog-image {
+      max-height: 240px;
+      object-fit: cover;
+      width: 100%;
     }
   
     .blog-title {
       font-size: 1.6rem;
     }
   
-    .cta-button {
-      padding: 0.5rem 1rem;
+    .blog-description {
+      font-size: 1rem;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .blog-post-item {
+      min-height: 550px;  /* Further increased height for small screens */
+    }
+  
+    .blog-title {
+      font-size: 1.5rem;
+    }
+  
+    .blog-description {
+      font-size: 0.95rem;
+    }
+  
+    .blog-image {
+      max-height: 220px;
+      aspect-ratio: 16/9;
     }
   }
