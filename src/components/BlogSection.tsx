@@ -29,8 +29,8 @@ const LatestBlogsSection: React.FC = () => {
   }, []);
 
   return (
-    <div className="latest-blog-list-container">
-      <h2 className="latest-heading">Latest Blogs</h2>
+    <section className="latest-blog-list-container">
+      <h2 className="latest-blog-heading">Latest Blogs</h2>
       <div className="latest-blog-section-list">
         {posts.map((post) => (
           <div key={post.id} className="latest-blog-section-item">
@@ -57,7 +57,7 @@ const LatestBlogsSection: React.FC = () => {
           </div>
         ))}
       </div>
-    </div>
+    </section>
   );
 };
 

@@ -29,48 +29,63 @@ const fetchPosts = async (searchQuery: string, page: number): Promise<BlogPost[]
 
 const BlogPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearchQuery = useDebounce(searchQuery, 300); // Debounce applied here
   const [currentPage, setCurrentPage] = useState(0);
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [hasMorePosts, setHasMorePosts] = useState(true);
 
   const { data, isLoading, refetch, isFetching } = useQuery<BlogPost[], Error>({
-    queryKey: ["posts", searchQuery, currentPage],
-    queryFn: () => fetchPosts(searchQuery, currentPage),
+    queryKey: ["posts", debouncedSearchQuery, currentPage],
+    queryFn: () => fetchPosts(debouncedSearchQuery, currentPage),
     staleTime: 5000,
     gcTime: 10000,
     retry: 1,
     refetchOnWindowFocus: false,
+    placeholderData: (previousData) => previousData || [], // Retain old data to avoid flickering
   });
 
   useEffect(() => {
     if (data) {
       setPosts((prevPosts) =>
-        currentPage === 0 ? data : [...prevPosts, ...data]
+        currentPage === 0 ? data : [...prevPosts, ...data.filter(post => !prevPosts.some(p => p.id === post.id))]
       );
-
+  
       if (data.length < 9) {
-        setHasMorePosts(false); // Hide button if fewer than 9 posts are fetched
+        setHasMorePosts(false);
       } else {
         setHasMorePosts(true);
       }
     }
   }, [data, currentPage]);
 
-  const handleSearchChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setSearchQuery(e.target.value);
-      setCurrentPage(0);
-      setHasMorePosts(true); // Reset for new search
-      refetch();
-    },
-    [refetch]
-  );
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+    setCurrentPage(0); // Reset to first page when searching
+    setHasMorePosts(true);
+  };
 
   const loadMorePosts = () => {
     if (!isFetching) {
       setCurrentPage((prevPage) => prevPage + 1);
     }
   };
+
+  // Utility for Debounce
+  function useDebounce(value: string, delay: number) {
+    const [debouncedValue, setDebouncedValue] = useState(value);
+  
+    useEffect(() => {
+      const handler = setTimeout(() => {
+        setDebouncedValue(value);
+      }, delay);
+  
+      return () => {
+        clearTimeout(handler);
+      };
+    }, [value, delay]);
+  
+    return debouncedValue;
+  }
 
   return (
     <div className="blog-page-container">
@@ -126,9 +141,9 @@ const BlogPage: React.FC = () => {
         </button>
       )}
 
-      {!isLoading && posts.length === 0 && (
-        <div className="no-results">No blog posts found. Try a different search.</div>
-      )}
+{!isLoading && !isFetching && posts.length === 0 && searchQuery && (
+  <div className="no-results">No blog posts found. Try a different search.</div>
+)}
     </div>
   );
 };

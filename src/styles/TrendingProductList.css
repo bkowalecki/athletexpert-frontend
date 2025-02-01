@@ -8,7 +8,7 @@
 /* 🔹 Trending Products Title */
 .trending-products-heading {
   font-size: 2.8rem;
-  color: #cccccc; /* Yellow contrast */
+  color: #ffffff;
   margin-bottom: 20px;
   letter-spacing: 1.5px;
   text-transform: uppercase;
@@ -17,6 +17,7 @@
   border-bottom: 3px solid rgba(255, 255, 255, 0.2);
   padding-bottom: 8px;
   display: inline-block;
+  cursor: default;
 }
 
 /* 🔹 Product Grid */

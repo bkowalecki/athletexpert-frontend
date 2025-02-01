@@ -45,8 +45,9 @@ const BlogPostPage: React.FC = () => {
 <div className="blog-post-header">
         <h1 className="blog-post-title">{post.title}</h1>
         <p className="blog-post-meta">
-          By {post.author} on {new Date(post.publishedDate).toLocaleDateString()}
+          By {post.author}
         </p>
+        <p>{new Date(post.publishedDate).toLocaleDateString()}</p>
       </div>
       
       <div className="blog-post-content" dangerouslySetInnerHTML={{ __html: post.content }} />

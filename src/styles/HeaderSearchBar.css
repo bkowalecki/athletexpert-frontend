@@ -15,7 +15,7 @@
     width: 100%;
     background: #222;
     border-radius: 50px;
-    padding: 8px 12px;
+    /* padding: 8px 12px; */
     border: 2px solid #A23C20;
     transition: all 0.3s ease-in-out;
     box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
@@ -56,15 +56,18 @@
     color: #ffffff;
     font-size: 14px;
     font-weight: bold;
-    border-radius: 50px;
+    border-radius: 50%; /* Make it a perfect circle */
     cursor: pointer;
     transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
+    width: 50px;    /* Equal width and height for a circle */
+    height: 50px;
+    padding: 0;     /* Ensure no extra padding */
+    line-height: 1; /* Prevent line-height from affecting height */
+    box-sizing: border-box; /* Ensure consistent sizing */
   }
   
   .search-button:hover {

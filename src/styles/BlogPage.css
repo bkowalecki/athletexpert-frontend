@@ -5,10 +5,19 @@
     background-color: #1e1e1e;
     padding: 4rem 2rem;
     max-width: 100%;
-    min-height: 60vh;
+    min-height: 100vh; /* Ensure it fills at least the full viewport */
     display: flex;
     flex-direction: column;
     gap: 2rem;
+  }
+  
+  /* Make the blog post list take up remaining space */
+  .blog-post-list {
+    flex: 1; /* Pushes the content to fill available space */
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    padding: 0 2rem;
   }
   
   /* Heading */
@@ -46,13 +55,6 @@
     box-shadow: 0 0 10px rgba(162, 60, 32, 0.8);
   }
   
-  /* Blog Post Grid */
-  .blog-post-list {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 2rem;
-    padding: 0 2rem;
-  }
   
   .blog-post-item {
     background-color: #292929;
@@ -193,7 +195,10 @@
     text-align: center;
     color: #ccc;
     font-size: 1.4rem;
-    margin-top: 2rem;
+    margin-top: auto; /* Push to center vertically */
+    margin-bottom: auto;
+    padding: 2rem 0;
+    flex-grow: 1; /* Helps to stretch and center content */
   }
   
   /* Responsive Design */

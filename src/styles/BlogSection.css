@@ -5,16 +5,23 @@
   padding: 3rem 2rem;
   display: flex;
   flex-direction: column;
+  justify-content: center;
   gap: 2rem;
+  text-align: center;
 }
 
-.latest-heading {
-  font-size: 2.5rem;
-  font-weight: bold;
-  color: #fff;
-  text-align: center;
-  margin-bottom: 2rem;
-  letter-spacing: 1px;
+.latest-blog-heading {
+  font-size: 2.8rem;
+  color: #ffffff;
+  margin-bottom: 20px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  font-weight: 800;
+  font-family: 'Arial', sans-serif;
+  border-bottom: 3px solid rgba(255, 255, 255, 0.2);
+  padding-bottom: 8px;
+  display: inline-block;
+  cursor: default;
 }
 
 .latest-blog-section-list {
@@ -26,6 +33,7 @@
 
 .latest-blog-section-item {
   display: flex;
+  text-align: left;
   flex-direction: column;
   justify-content: space-between;
   background-color: #333;
