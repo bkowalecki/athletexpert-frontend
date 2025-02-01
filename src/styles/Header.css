@@ -1,3 +1,5 @@
+/* Header.css */
+
 /* General styles for header */
 .app-header {
   display: flex;
@@ -13,13 +15,12 @@
   box-sizing: border-box;
   transition: background-color 0.3s ease;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-
 }
 
-.logo{
-  flex: 1; /* Allows it to take up space on the left */
+.logo {
+  flex: 1;
   display: flex;
-  justify-content: flex-start; /* Pushes logo to the left */
+  justify-content: flex-start;
 }
 
 .logo h1 {
@@ -32,10 +33,23 @@ a:-webkit-any-link {
   text-decoration: none;
 }
 
-.search-bar-container{
-  flex: 2; /* Allows the search bar to take up the center space */
+/* Container for the search bar in the header */
+.search-bar-container {
+  flex: 2;
   display: flex;
-  justify-content: center; /* Centers the search bar */
+  justify-content: center;
+}
+
+/* Desktop search wrapper */
+.desktop-search {
+  flex: 2;
+  display: flex;
+  justify-content: center;
+}
+
+/* Mobile search wrapper (inside the mobile menu) */
+.mobile-search {
+  margin-bottom: 15px;
 }
 
 /* Nav links styling */
@@ -46,8 +60,7 @@ a:-webkit-any-link {
   gap: 20px;
   flex-grow: 1;
   max-width: 40%;
-
-  flex: 1; /* Pushes nav links to the right */
+  flex: 1;
 }
 
 .nav-links a {
@@ -133,12 +146,20 @@ a:-webkit-any-link {
     font-size: 24px;
   }
 
-  .search-bar {
-    display: none; /* Hide search bar on small screens */
+  /* Hide the desktop search on mobile */
+  .desktop-search {
+    display: none;
   }
 }
 
 /* Ensure no horizontal scrolling */
 body, html {
   overflow-x: hidden;
+}
+
+/* Hide the mobile search on desktop */
+@media (min-width: 876px) {
+  .mobile-search {
+    display: none;
+  }
 }
