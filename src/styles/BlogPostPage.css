@@ -1,4 +1,4 @@
-/* === Blog Page Styles === */
+/* === Blog Post Page Styles === */
 
 :root {
   --background-color: #ffffff;
@@ -9,133 +9,139 @@
   --shadow-color: rgba(0, 0, 0, 0.1);
 }
 
-/* Blog Post List */
-.blog-post-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1.5rem;
-  padding: 1rem;
-}
-
-/* Blog Post Item */
-.blog-post-item {
+/* Blog Post Page Container */
+.blog-post-page {
   background-color: var(--background-color);
-  border: 1px solid #ddd;
-  box-shadow: 0 4px 6px var(--shadow-color);
-  border-radius: 8px;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  min-height: 450px; /* Increased minimum height for better visibility */
-  height: auto;
+  padding: 4rem 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+  color: var(--text-color);
+  font-family: 'Georgia', serif;
+  line-height: 1.8;
+  box-shadow: 0 4px 10px var(--shadow-color);
 }
 
-.blog-post-item:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 16px var(--shadow-color);
+.blog-post-header {
+  text-align: center;
+  margin-bottom: 2rem;
 }
 
-/* Blog Image */
-.blog-image {
-  width: 100%;
-  height: auto;
-  max-height: 250px;
-  object-fit: cover;
-  aspect-ratio: 16/9;
-}
-
-/* Blog Info */
-.blog-info {
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-  justify-content: space-between; /* Ensure content fills the space */
-}
-
-.blog-title {
-  font-size: 1.8rem;
+.blog-post-title {
+  font-size: 2.8rem;
   color: var(--heading-color);
+  font-weight: bold;
   margin-bottom: 0.5rem;
+  line-height: 1.3;
+}
+
+.blog-post-meta {
+  font-size: 1rem;
+  color: #777;
+  margin-bottom: 1.5rem;
+  font-style: italic;
+}
+
+.blog-post-image-container {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.blog-post-image {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px var(--shadow-color);
+}
+
+.blog-post-content {
+  padding: 1rem 0;
+  font-size: 1.2rem;
+  line-height: 1.85;
+}
+
+.blog-post-content p {
+  margin-bottom: 1.5rem;
+  text-align: justify;
+}
+
+.blog-post-content h2, .blog-post-content h3 {
+  color: var(--heading-color);
+  margin-top: 2rem;
+  margin-bottom: 1rem;
   font-weight: bold;
 }
 
-.blog-author,
-.blog-date {
-  font-size: 0.9rem;
-  color: #777;
-  margin: 0.2rem 0;
+.blog-post-content h2 {
+  font-size: 2rem;
+  border-bottom: 2px solid var(--link-color);
+  padding-bottom: 0.3rem;
 }
 
-.blog-description {
-  font-size: 1.1rem;
-  color: var(--text-color);
-  line-height: 1.6;
-  margin: 0.5rem 0;
-  flex-grow: 1;
-  overflow: hidden; /* Ensure long text doesn't overflow */
+.blog-post-content h3 {
+  font-size: 1.6rem;
+  color: var(--link-hover-color);
 }
 
-/* Call-to-Action Button */
-.cta-button {
-  background-color: var(--link-color);
-  color: white;
-  padding: 0.8rem 1rem;
-  text-align: center;
-  border: none;
-  cursor: pointer;
+.blog-post-content a {
+  color: var(--link-color);
   text-decoration: none;
-  transition: background-color 0.3s ease;
-  border-radius: 4px;
-  margin-top: auto; /* Ensure button stays at the bottom */
+  font-weight: bold;
 }
 
-.cta-button:hover {
-  background-color: var(--link-hover-color);
+.blog-post-content a:hover {
+  color: var(--link-hover-color);
+  text-decoration: underline;
 }
 
 /* Responsive Design */
+@media (max-width: 1024px) {
+  .blog-post-title {
+    font-size: 2.2rem;
+  }
+
+  .blog-post-content p {
+    font-size: 1.1rem;
+  }
+}
+
 @media (max-width: 768px) {
-  .blog-post-list {
-    grid-template-columns: 1fr;
-    gap: 1rem;
+  .blog-post-page {
+    padding: 2rem 1rem;
   }
 
-  .blog-post-item {
-    min-height: 500px; /* Ensure taller cards on mobile */
-    height: auto;
+  .blog-post-title {
+    font-size: 1.8rem;
   }
 
-  .blog-title {
-    font-size: 1.6rem;
+  .blog-post-meta {
+    font-size: 0.9rem;
   }
 
-  .blog-description {
+  .blog-post-content p {
     font-size: 1rem;
+    line-height: 1.75;
   }
 
-  .blog-image {
-    max-height: 240px;
+  .blog-post-image {
+    max-width: 90%;
+    margin: 0 auto;
   }
 }
 
 @media (max-width: 480px) {
-  .blog-post-item {
-    min-height: 550px; /* Further increased height for small screens */
-    height: auto;
+  .blog-post-title {
+    font-size: 1.6rem;
   }
 
-  .blog-title {
-    font-size: 1.5rem;
+  .blog-post-meta {
+    font-size: 0.85rem;
   }
 
-  .blog-description {
+  .blog-post-content p {
     font-size: 0.95rem;
   }
 
-  .blog-image {
-    max-height: 220px;
-    aspect-ratio: 16/9;
+  .blog-post-image {
+    max-width: 100%;
   }
 }
