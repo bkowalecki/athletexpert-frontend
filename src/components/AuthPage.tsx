@@ -48,6 +48,7 @@ const AuthPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+  document.cookie = "authToken=; Max-Age=0; path=/;";
     const endpoint = isLogin ? "login" : "register";
     const payload = isLogin
       ? { email: formData.email, password: formData.password }
@@ -124,9 +125,9 @@ const AuthPage: React.FC = () => {
           onClick={() =>
             loginWithRedirect({
               authorizationParams: {
-                connection: "google-oauth2",
+                audience: "https://athletexpert-api", // ✅ Your API identifier
                 scope: "openid profile email",
-                response_type: "id_token",
+                prompt: "consent",  // ✅ Force consent prompt
               },
             })
           }

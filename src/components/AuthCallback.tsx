@@ -17,32 +17,38 @@ const AuthCallback: React.FC = () => {
 
   useEffect(() => {
     const handleAuth = async () => {
-      if (isAuthenticated && auth0User) {
-        try {
-          const auth0Token = await getAccessTokenSilently();
-  
-          // ✅ Send the Auth0 token to your backend
-          const response = await fetch(`${process.env.REACT_APP_API_URL}/users/auth0-login`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            credentials: "include",
-            body: JSON.stringify({ token: auth0Token }),
-          });
-  
-          if (response.ok) {
-            const userData = await response.json();
-            setUser(userData);
-            navigate("/profile");
-          } else {
-            console.error("Failed to authenticate with backend:", response.status);
+        if (isAuthenticated && auth0User) {
+          try {
+            const idToken = await getAccessTokenSilently({
+              authorizationParams: {
+                audience: "https://athletexpert-api", // Ensure audience matches Auth0 settings
+                scope: "openid profile email",
+              },
+              detailedResponse: true, // ✅ Get both accessToken and idToken
+            });
+      
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/users/auth0-login`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              credentials: "include",
+              body: JSON.stringify({ token: idToken.id_token }), // ✅ Use id_token instead of access token
+            });
+      
+            if (response.ok) {
+              const userData = await response.json();
+              setUser(userData);
+              navigate("/profile");
+            } else {
+              console.error("Failed to authenticate with backend:", response.status);
+            }
+          } catch (error) {
+            console.error("Error during Auth0 callback:", error);
           }
-        } catch (error) {
-          console.error("Error during Auth0 callback:", error);
         }
-      }
-    };
+      };
+      
   
     handleAuth();
   }, [isAuthenticated, auth0User, getAccessTokenSilently, setUser, navigate]);

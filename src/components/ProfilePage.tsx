@@ -83,9 +83,9 @@ const ProfilePage: React.FC = () => {
         <div className="profile-info">
           <h1 className="profile-name">{profile.firstName} {profile.lastName}</h1>
           <p className="profile-bio">{profile.bio}</p>
-          {/* <button onClick={handleSignOut} className="profile-signout-button">
+          <button onClick={handleSignOut} className="profile-signout-button">
         Sign Out
-      </button> */}
+      </button>
         </div>
         
       </div>
