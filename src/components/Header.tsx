@@ -1,17 +1,26 @@
-// Header.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth0 } from "@auth0/auth0-react";
+import { UserContext } from '../context/UserContext';
 import '../styles/Header.css';
 import HeaderSearchBar from './HeaderSearchBar';
 
 const Header: React.FC = () => {
   const { isAuthenticated } = useAuth0();
+  const userContext = useContext(UserContext);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 875);
   const navigate = useNavigate();
 
-  // Listen for window resize to update mobile state
+  if (!userContext) {
+    throw new Error("UserContext must be used within a UserProvider");
+  }
+
+  const { user } = userContext;
+
+  // ✅ Unified authentication check
+  const isLoggedIn = isAuthenticated || user;
+
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth <= 875);
@@ -20,23 +29,10 @@ const Header: React.FC = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Toggle mobile menu open/close
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
-  // Close mobile menu when clicking outside the header
-  useEffect(() => {
-    const handleOutsideClick = (e: MouseEvent) => {
-      if (isMobileMenuOpen && !(e.target as HTMLElement).closest('.app-header')) {
-        setIsMobileMenuOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleOutsideClick);
-    return () => document.removeEventListener('mousedown', handleOutsideClick);
-  }, [isMobileMenuOpen]);
-
-  // Handler to close mobile menu (used for both nav links and search bar)
   const closeMobileMenu = () => {
     if (isMobile) {
       setIsMobileMenuOpen(false);
@@ -51,7 +47,6 @@ const Header: React.FC = () => {
         </Link>
       </div>
 
-      {/* Desktop search bar */}
       {!isMobile && (
         <div className="desktop-search">
           <HeaderSearchBar showSubmitButton={true} />
@@ -59,7 +54,6 @@ const Header: React.FC = () => {
       )}
 
       <nav className={`nav-links ${isMobileMenuOpen ? 'mobile-menu-open' : ''}`}>
-        {/* Mobile search bar (without submit button), with onSearchComplete closing the menu */}
         {isMobile && (
           <div className="mobile-search">
             <HeaderSearchBar
@@ -68,13 +62,15 @@ const Header: React.FC = () => {
             />
           </div>
         )}
+
         <Link
-          to={isAuthenticated ? "/profile" : "/auth"}
+          to={isLoggedIn ? "/profile" : "/auth"} // ✅ Unified login check
           className="nav-link"
           onClick={closeMobileMenu}
         >
           Profile
         </Link>
+
         <Link
           to="/blog"
           className="nav-link"
@@ -82,6 +78,7 @@ const Header: React.FC = () => {
         >
           Blog
         </Link>
+
         <Link
           to="/about"
           className="nav-link"

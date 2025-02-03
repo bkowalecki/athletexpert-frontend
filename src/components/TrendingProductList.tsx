@@ -20,8 +20,6 @@ const TrendingProductList: React.FC = () => {
       .get(`${process.env.REACT_APP_API_URL}/products/trending`)
       .then((response) => {
         setProducts(response.data);
-        console.log(response.data);
-        
       })
       .catch((error) => {
         console.error("There was an error fetching the products!", error);

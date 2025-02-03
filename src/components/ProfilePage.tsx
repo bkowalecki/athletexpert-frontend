@@ -29,49 +29,48 @@ const ProfilePage: React.FC = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/users/profile`,
-          {
-            method: "GET",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include", // Include authentication cookies
-          }
-        );
-
-        if (!response.ok) throw new Error("Failed to fetch profile.");
-
-        const data = await response.json();
-        console.log("Fetched Profile:", data);
-
-        setProfile({
-          name: data.name,
-          firstName: data.firstName,
-          lastName: data.lastName,
-          bio: data.bio || "No bio provided.",
-          profilePictureUrl: data.profilePictureUrl || null,
-          sports: data.sports ?? [], // Ensure sports is always an array
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/users/profile`, {
+          credentials: "include",
         });
-      } catch (err) {
-        setError(
-          err instanceof Error ? err.message : "An unknown error occurred."
-        );
+        if (!response.ok) throw new Error("Unauthorized");
+        const data = await response.json();
+        setProfile(data);
+      } catch {
+        setUser(null); // ✅ Clear user context if unauthorized
+        navigate("/auth"); // ✅ Redirect to login page
       }
     };
-
+  
     fetchProfile();
-  }, []);
+  }, [navigate, setUser]);
+  
 
   if (error) return <div className="profile-page-error">Error: {error}</div>;
   if (!profile) return <div className="profile-page-loading">Loading...</div>;
 
   // ✅ Fixed Logout Function
-  const handleSignOut = () => {
-    localStorage.removeItem("authToken"); // ✅ Remove token from storage
-    setUser(null); // ✅ Clear user context
-    logout({
-      logoutParams: { returnTo: window.location.origin }, // ✅ Correct way to specify return URL
-    });
+  const handleSignOut = async () => {
+    try {
+      await fetch(`${process.env.REACT_APP_API_URL}/users/logout`, {
+        method: "POST",
+        credentials: "include",
+      });
+  
+      document.cookie = "authToken=; Max-Age=0; path=/;";
+      setUser(null);
+  
+      logout({
+        logoutParams: {
+          returnTo: window.location.origin, // ✅ Redirect to the homepage
+        },
+      });
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
   };
+  
+  
+  
 
   return (
     <div className="profile-page-container">
