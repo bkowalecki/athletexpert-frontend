@@ -4,6 +4,7 @@ body {
   padding: 0;
   font-family: 'Arial', sans-serif;
   background-color: #A23C20;
+  /* height: 100%; */
   overflow-x: hidden; /* Prevents horizontal scroll without affecting vertical scroll */
 }
 

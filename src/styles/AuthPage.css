@@ -1,123 +1,104 @@
-.page-container {
+/* AuthPage CSS - Sleek, Sporty, and Responsive */
+
+/* General Page Layout */
+/* html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    background: linear-gradient(135deg, #2c2c2c, #1a1a1a);
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
-    background-color: #A23C20; /* Your main site background */
-    color: #333;
     font-family: 'Poppins', sans-serif;
-    padding: 20px;
-    box-sizing: border-box;
-}
-
-.auth-container {
-    width: 100%;
-    max-width: 400px;
-    margin: 0 auto;
-    padding: 30px;
-    background-color: #F5F5F5; /* Soft neutral background */
-    border-radius: 12px;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-    transition: background-color 0.3s ease;
-    box-sizing: border-box; /* Ensure padding is included in width calculations */
-}
-
-.auth-form {
+  } */
+  
+  .auth-page-wrapper {
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
-    gap: 20px;
-}
-
-.form-group input {
+    justify-content: center;
+    align-items: center;
+  }
+  
+  /* Auth Container */
+  .auth-container {
     width: 100%;
-    padding: 15px;
-    font-size: 1.1rem;
+    max-width: 450px;
+    padding: 30px;
+    background: linear-gradient(135deg, #2c2c2c, #1a1a1a);
+    color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+    box-sizing: border-box;
+    text-align: center;
+  }
+  
+  .auth-container h2 {
+    font-size: 2rem;
+    color: #ffffff;
+    margin-bottom: 20px;
+  }
+  
+  /* Form Styling */
+  .auth-container form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .auth-container input[type="text"],
+  .auth-container input[type="email"],
+  .auth-container input[type="password"] {
+    width: 90%; /* ✅ Match the button width */
+    padding: 12px 15px;
+    font-size: 1rem;
     border: 1px solid #ccc;
     border-radius: 8px;
     background-color: #fafafa;
-    color: #333;
     outline: none;
-    box-sizing: border-box;
-    transition: border 0.3s ease, box-shadow 0.3s ease;
-}
-
-.form-group input:focus {
+    transition: border 0.3s, box-shadow 0.3s;
+    color: #333;
+    margin: 0 auto; /* ✅ Center the input fields */
+  }
+  
+  .auth-container input:focus {
     border-color: #A23C20;
-    box-shadow: 0 0 5px rgba(162, 60, 32, 0.2);
-}
-
-.submit-button {
-    padding: 15px;
+    box-shadow: 0 0 8px rgba(162, 60, 32, 0.5);
+  }
+  
+  /* Button Styling */
+  .auth-container button[type="submit"],
+  .google-login-btn {
+    padding: 12px;
     font-size: 1.1rem;
     font-weight: bold;
-    text-transform: uppercase;
-    border: none;
-    background-color: #A23C20;
+    background: #A23C20;
     color: white;
+    border: none;
     border-radius: 8px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.submit-button:hover {
-    background-color: #8a2c1b;
-}
-
-.submit-button:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
-}
-
-.error-message {
-    color: #ff4d4d;
-    font-size: 1rem;
-    text-align: center;
-}
-
-.toggle-link {
-    margin-top: 20px;
-    text-align: center;
-    font-size: 0.95rem;
-    color: #333;
-}
-
-.toggle-link button {
-    background: none;
-    border: none;
-    color: #A23C20;
-    font-weight: bold;
-    cursor: pointer;
-    text-decoration: underline;
-    transition: color 0.3s ease;
-}
-
-.toggle-link button:hover {
-    color: #8a2c1b;
-}
-
-.strava-img-container > img{
-    display: flex;
-    /* justify-content: center;
-    align-items: center;
-    align-content: center; */
+    transition: background 0.3s ease;
     margin: 0 auto;
-    width: 100%;
-    cursor: pointer;
-}
-
-.google-login-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: block;
+    width: 70%; /* ✅ Center button with consistent width */
+  }
+  
+  .auth-container button[type="submit"]:hover,
+  .google-login-btn:hover {
+    background: #842D14;
+  }
+  
+  .google-login-btn {
     background: #ffffff;
     color: #333;
     border: 1px solid #ddd;
-    padding: 10px 15px;
-    font-size: 1rem;
-    border-radius: 8px;
-    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     transition: all 0.3s ease;
+    margin-top: 15px; /* ✅ Add space between buttons */
   }
   
   .google-login-btn:hover {
@@ -125,24 +106,47 @@
     border-color: #bbb;
   }
   
-  .google-icon {
-    width: 20px;
-    margin-right: 10px;
+  /* Error Message */
+  .error-message {
+    color: #ff4d4d;
+    font-size: 0.9rem;
+    text-align: center;
+    margin: 10px 0;
   }
-
-/* Mobile responsiveness for screens 480px and below */
-@media (max-width: 480px) {
+  
+  /* Toggle Auth Link */
+  .toggle-auth {
+    text-align: center;
+    color: #ffffff;
+    margin-top: 15px;
+    cursor: default;
+    font-size: 0.9rem;
+  }
+  
+  .toggle-auth a {
+    color: #A23C20;
+    text-decoration: underline;
+    cursor: pointer;
+    transition: color 0.3s ease;
+  }
+  
+  .toggle-auth a:hover {
+    color: #842D14;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 480px) {
     .auth-container {
-        width: 90%; /* Use percentage width for flexibility */
-        padding: 20px;
-        margin: 0 auto; /* Ensure it's centered */
+      width: 90%;
+      padding: 20px;
     }
-    
-    .form-group input {
-        padding: 12px;
+  
+    .auth-container h2 {
+      font-size: 1.5rem;
     }
-
-    .submit-button {
-        padding: 12px;
+  
+    .auth-container button[type="submit"], .google-login-btn {
+      font-size: 0.9rem;
+      padding: 10px;
     }
-}
+  }

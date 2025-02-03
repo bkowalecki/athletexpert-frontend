@@ -10,14 +10,17 @@ interface Profile {
   lastName: string;
   bio: string | null;
   profilePictureUrl: string | null;
-  sports: string[] | null; // Sports are an array of strings now
+  sports: string[] | null;
+  badges?: string[];
+  savedBlogs?: string[];
+  savedProducts?: string[];
 }
 
 const ProfilePage: React.FC = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
-  const { logout } = useAuth0(); // ✅ Get logout function from Auth0
+  const { logout } = useAuth0();
   const userContext = useContext(UserContext);
 
   if (!userContext) {
@@ -36,84 +39,111 @@ const ProfilePage: React.FC = () => {
         const data = await response.json();
         setProfile(data);
       } catch {
-        setUser(null); // ✅ Clear user context if unauthorized
-        navigate("/auth"); // ✅ Redirect to login page
+        setUser(null);
+        navigate("/auth");
       }
     };
-  
+
     fetchProfile();
   }, [navigate, setUser]);
-  
 
-  if (error) return <div className="profile-page-error">Error: {error}</div>;
-  if (!profile) return <div className="profile-page-loading">Loading...</div>;
+  if (error) return <div className="profile-error">Error: {error}</div>;
+  if (!profile) return <div className="profile-loading">Loading...</div>;
 
-  // ✅ Fixed Logout Function
   const handleSignOut = async () => {
     try {
       await fetch(`${process.env.REACT_APP_API_URL}/users/logout`, {
         method: "POST",
         credentials: "include",
       });
-  
+
       document.cookie = "authToken=; Max-Age=0; path=/;";
       setUser(null);
-  
+
       logout({
         logoutParams: {
-          returnTo: window.location.origin, // ✅ Redirect to the homepage
+          returnTo: window.location.origin,
         },
       });
     } catch (error) {
       console.error("Error during logout:", error);
     }
   };
-  
-  
-  
 
   return (
-    <div className="profile-page-container">
-      {/* Profile Header */}
-      <div className="profile-page-header">
-        <div className="profile-page-image-wrapper">
+    <div className="profile-container">
+      <div className="profile-banner">
+        <div className="profile-image-wrapper">
           <img
             src={profile.profilePictureUrl || "https://via.placeholder.com/150"}
             alt={profile.name}
-            className="profile-page-picture"
+            className="profile-image"
           />
         </div>
-        <div className="profile-page-info">
-          <h1 className="profile-page-name">
-            {profile.firstName} {profile.lastName}
-          </h1>
-          <p className="profile-page-bio">{profile.bio}</p>
+        <div className="profile-info">
+          <h1 className="profile-name">{profile.firstName} {profile.lastName}</h1>
+          <p className="profile-bio">{profile.bio}</p>
+          {/* <button onClick={handleSignOut} className="profile-signout-button">
+        Sign Out
+      </button> */}
         </div>
+        
       </div>
 
-      {/* Divider */}
-      <hr className="profile-page-divider" />
+      <hr className="profile-divider" />
 
-      {/* Sports & Stats Section */}
-      <div className="profile-page-details">
-        <h2 className="profile-page-section-heading">🏆 Sports & Stats</h2>
-        <div className="profile-page-sport-list">
-          {profile.sports && profile.sports.length > 0 ? (
-            profile.sports.map((sport, index) => (
-              <div key={index} className="profile-page-sport-item">
-                <h3 className="profile-page-sport-name">{String(sport)}</h3>
-              </div>
+      <div className="profile-section">
+        <h2 className="profile-subsection-header-text">Badges</h2>
+        <div className="profile-badges">
+          {profile.badges?.length ? (
+            profile.badges.map((badge, index) => (
+              <div key={index} className="badge-item">{badge}</div>
             ))
           ) : (
-            <p className="profile-page-no-sports">No sports added yet.</p>
+            <p>No badges yet. Start achieving!</p>
           )}
         </div>
       </div>
 
-      {/* Sign Out Button */}
-      <button onClick={handleSignOut} className="profile-page-signout-button">
-        Sign Out
-      </button>
+      <div className="profile-section">
+        <h2 className="profile-subsection-header-text">Sports & Stats</h2>
+        <div className="profile-sports">
+          {profile.sports?.length ? (
+            profile.sports.map((sport, index) => (
+              <div key={index} className="sport-item">{sport}</div>
+            ))
+          ) : (
+            <p>No sports added yet.</p>
+          )}
+        </div>
+      </div>
+
+      <div className="profile-section">
+        <h2 className="profile-subsection-header-text">Saved Blogs</h2>
+        <div className="profile-saved-blogs">
+          {profile.savedBlogs?.length ? (
+            profile.savedBlogs.map((blog, index) => (
+              <div key={index} className="saved-item">{blog}</div>
+            ))
+          ) : (
+            <p>No saved blogs yet.</p>
+          )}
+        </div>
+      </div>
+
+      <div className="profile-section">
+        <h2 className="profile-subsection-header-text">Saved Products</h2>
+        <div className="profile-saved-products">
+          {profile.savedProducts?.length ? (
+            profile.savedProducts.map((product, index) => (
+              <div key={index} className="saved-item">{product}</div>
+            ))
+          ) : (
+            <p>No saved products yet.</p>
+          )}
+        </div>
+      </div>
+
     </div>
   );
 };
