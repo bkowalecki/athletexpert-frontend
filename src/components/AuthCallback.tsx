@@ -20,21 +20,19 @@ const AuthCallback: React.FC = () => {
         if (isAuthenticated && auth0User) {
           try {
             const idToken = await getAccessTokenSilently({
-              authorizationParams: {
-                audience: "https://athletexpert-api", // Ensure audience matches Auth0 settings
-                scope: "openid profile email",
-              },
-              detailedResponse: true, // ✅ Get both accessToken and idToken
-            });
+                authorizationParams: {
+                  audience: process.env.REACT_APP_AUTH0_AUDIENCE,
+                  scope: "openid profile email",
+                },
+                detailedResponse: true,
+              });
       
             const response = await fetch(`${process.env.REACT_APP_API_URL}/users/auth0-login`, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              credentials: "include",
-              body: JSON.stringify({ token: idToken.id_token }), // ✅ Use id_token instead of access token
-            });
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify({ token: idToken.id_token }),
+              });
       
             if (response.ok) {
               const userData = await response.json();
