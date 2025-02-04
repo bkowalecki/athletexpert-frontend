@@ -52,6 +52,7 @@ const ProfilePage: React.FC = () => {
 
   const handleSignOut = async () => {
     try {
+      // Logout from backend
       await fetch(`${process.env.REACT_APP_API_URL}/users/logout`, {
         method: "POST",
         credentials: "include",
@@ -60,12 +61,16 @@ const ProfilePage: React.FC = () => {
         },
       });
   
-      document.cookie = "authToken=; Max-Age=0; path=/;";
+      // Clear auth token cookie manually
+      document.cookie = "authToken=; Max-Age=0; path=/; SameSite=None; Secure";
+  
+      // Clear user context
       setUser(null);
   
+      // Logout from Auth0
       logout({
         logoutParams: {
-          returnTo: window.location.origin, // Dynamically redirect to the current environment
+          returnTo: window.location.origin,
         },
       });
     } catch (error) {

@@ -50,10 +50,9 @@ const AppContent: React.FC = () => {
         if (response.ok) {
           const userData = await response.json();
           setUser(userData);
-        } else if (response.status === 401) {
-          // Clear invalid authToken cookie
-          document.cookie = "authToken=; Max-Age=0; path=/;";
-          setUser(null); // Clear user context
+        } else {
+          setUser(null); // Clear session if unauthorized
+          document.cookie = "authToken=; Max-Age=0; path=/; SameSite=None; Secure";
         }
       } catch (error) {
         console.error("Error checking session:", error);
@@ -62,7 +61,6 @@ const AppContent: React.FC = () => {
   
     checkSession();
   }, [location.pathname]);
-  
   
   
   
