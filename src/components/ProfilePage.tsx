@@ -52,31 +52,31 @@ const ProfilePage: React.FC = () => {
 
   const handleSignOut = async () => {
     try {
-      // Logout from backend
       await fetch(`${process.env.REACT_APP_API_URL}/users/logout`, {
         method: "POST",
         credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
       });
   
-      // Clear auth token cookie manually (backup in case backend fails)
+      // Clear authToken cookie manually
       document.cookie = "authToken=; Max-Age=0; path=/; SameSite=None; Secure";
   
       // Clear user context
       setUser(null);
   
-      // Logout from Auth0 completely (for SSO)
+      // Redirect immediately to avoid re-authentication before logout completes
+      navigate("/auth");
+  
+      // Logout from Auth0 (for SSO users)
       logout({
         logoutParams: {
-          returnTo: window.location.origin, // Redirect after logout
+          returnTo: window.location.origin,
         },
       });
     } catch (error) {
       console.error("Error during logout:", error);
     }
   };
+  
   
 
 

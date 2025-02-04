@@ -51,17 +51,19 @@ const AppContent: React.FC = () => {
           const userData = await response.json();
           setUser(userData);
         } else {
-          // Clear session if unauthorized
           setUser(null);
-          document.cookie = "authToken=; Max-Age=0; path=/; SameSite=None; Secure";
+          document.cookie = "authToken=; Max-Age=0; path=/; SameSite=None; Secure"; // ✅ Ensure cookie is cleared
         }
       } catch (error) {
         console.error("Error checking session:", error);
       }
     };
   
-    checkSession();
+    if (document.cookie.includes("authToken")) { // ✅ Only check session if token exists
+      checkSession();
+    }
   }, [location.pathname]);
+  
   
   
   
