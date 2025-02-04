@@ -64,9 +64,9 @@ const ProfilePage: React.FC = () => {
         setUser(null);
 
         logout({
-            logoutParams: {
-                returnTo: window.location.origin,
-            },
+          logoutParams: {
+            returnTo: "https://athletexpert.vercel.app", 
+          },
         });
     } catch (error) {
         console.error("Error during logout:", error);
