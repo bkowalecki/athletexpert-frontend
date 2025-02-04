@@ -52,26 +52,26 @@ const ProfilePage: React.FC = () => {
 
   const handleSignOut = async () => {
     try {
-        await fetch(`${process.env.REACT_APP_API_URL}/users/logout`, {
-            method: "POST",
-            credentials: "include",
-            headers: {
-                "Content-Type": "application/json",
-            },
-        });
-
-        document.cookie = "authToken=; Max-Age=0; path=/;";
-        setUser(null);
-
-        logout({
-          logoutParams: {
-            returnTo: "https://athletexpert.vercel.app", 
-          },
-        });
+      await fetch(`${process.env.REACT_APP_API_URL}/users/logout`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+  
+      document.cookie = "authToken=; Max-Age=0; path=/;";
+      setUser(null);
+  
+      logout({
+        logoutParams: {
+          returnTo: window.location.origin, // Dynamically redirect to the current environment
+        },
+      });
     } catch (error) {
-        console.error("Error during logout:", error);
+      console.error("Error during logout:", error);
     }
-};
+  };
 
 
   return (
