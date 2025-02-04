@@ -20,8 +20,10 @@ const ProfilePage: React.FC = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
-  const { logout } = useAuth0();
   const userContext = useContext(UserContext);
+
+
+const { logout, user: auth0User } = useAuth0();
 
   if (!userContext) {
     throw new Error("UserContext must be used within a UserProvider");
@@ -60,12 +62,24 @@ const ProfilePage: React.FC = () => {
       document.cookie = "authToken=; Max-Age=0; path=/; SameSite=None; Secure";
       setUser(null);
   
-      // ✅ Force refresh to clear lingering cookies from the browser cache
-      window.location.href = "/";
+      // ✅ Check if the user exists and logged in via Google SSO
+      if (auth0User && auth0User.sub?.startsWith("google-oauth2|")) {
+        // ✅ Log out from Auth0 and Google session
+        logout({
+          logoutParams: {
+            returnTo: "https://athletexpert.vercel.app",
+          },
+        });
+      } else {
+        // ✅ Just refresh for email/password users
+        window.location.href = "/";
+      }
     } catch (error) {
       console.error("Error during logout:", error);
     }
   };
+  
+  
   
   
   
