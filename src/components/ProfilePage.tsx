@@ -57,25 +57,16 @@ const ProfilePage: React.FC = () => {
         credentials: "include",
       });
   
-      // Clear authToken cookie manually
       document.cookie = "authToken=; Max-Age=0; path=/; SameSite=None; Secure";
-  
-      // Clear user context
       setUser(null);
   
-      // Redirect immediately to avoid re-authentication before logout completes
-      navigate("/auth");
-  
-      // Logout from Auth0 (for SSO users)
-      logout({
-        logoutParams: {
-          returnTo: window.location.origin,
-        },
-      });
+      // ✅ Force refresh to clear lingering cookies from the browser cache
+      window.location.href = "/";
     } catch (error) {
       console.error("Error during logout:", error);
     }
   };
+  
   
   
 
