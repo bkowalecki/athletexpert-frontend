@@ -43,18 +43,17 @@ const AppContent: React.FC = () => {
   useEffect(() => {
     const checkSession = async () => {
       try {
-        const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/users/session`,
-          {
-            credentials: "include",
-          }
-        );
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/users/session`, {
+          credentials: "include",
+        });
   
         if (response.ok) {
           const userData = await response.json();
           setUser(userData);
         } else if (response.status === 401) {
-          setUser(null); // Clear session if unauthorized
+          // Clear invalid authToken cookie
+          document.cookie = "authToken=; Max-Age=0; path=/;";
+          setUser(null); // Clear user context
         }
       } catch (error) {
         console.error("Error checking session:", error);
