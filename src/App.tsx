@@ -113,6 +113,7 @@ const App: React.FC = () => {
       clientId={clientId}
       authorizationParams={{
         redirect_uri: window.location.origin + "/auth/callback",
+        audience: process.env.REACT_APP_AUTH0_AUDIENCE,
       }}
     >
       <QueryClientProvider client={queryClient}>
