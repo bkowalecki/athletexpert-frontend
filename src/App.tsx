@@ -51,7 +51,8 @@ const AppContent: React.FC = () => {
           const userData = await response.json();
           setUser(userData);
         } else {
-          setUser(null); // Clear session if unauthorized
+          // Clear session if unauthorized
+          setUser(null);
           document.cookie = "authToken=; Max-Age=0; path=/; SameSite=None; Secure";
         }
       } catch (error) {

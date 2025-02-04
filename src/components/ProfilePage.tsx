@@ -61,22 +61,23 @@ const ProfilePage: React.FC = () => {
         },
       });
   
-      // Clear auth token cookie manually
+      // Clear auth token cookie manually (backup in case backend fails)
       document.cookie = "authToken=; Max-Age=0; path=/; SameSite=None; Secure";
   
       // Clear user context
       setUser(null);
   
-      // Logout from Auth0
+      // Logout from Auth0 completely (for SSO)
       logout({
         logoutParams: {
-          returnTo: window.location.origin,
+          returnTo: window.location.origin, // Redirect after logout
         },
       });
     } catch (error) {
       console.error("Error during logout:", error);
     }
   };
+  
 
 
   return (
