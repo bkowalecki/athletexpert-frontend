@@ -7,9 +7,19 @@ import "../styles/AuthPage.css";
 const AuthPage: React.FC = () => {
   const { setUser } = useContext(UserContext)!;
   const navigate = useNavigate();
-  const { getAccessTokenSilently, isAuthenticated, loginWithRedirect, user: auth0User } = useAuth0();
+  const {
+    getAccessTokenSilently,
+    isAuthenticated,
+    loginWithRedirect,
+    user: auth0User,
+  } = useAuth0();
   const [isLogin, setIsLogin] = useState(true);
-  const [formData, setFormData] = useState({ email: "", password: "", username: "", confirmPassword: "" });
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+    username: "",
+    confirmPassword: "",
+  });
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -19,19 +29,25 @@ const AuthPage: React.FC = () => {
           const accessToken = await getAccessTokenSilently();
           console.log("Access Token:", accessToken);
 
-          const response = await fetch(`${process.env.REACT_APP_API_URL}/users/auth0-login`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ token: accessToken }),
-            credentials: "include",
-          });
+          const response = await fetch(
+            `${process.env.REACT_APP_API_URL}/users/auth0-login`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ token: accessToken }),
+              credentials: "include",
+            }
+          );
 
           if (response.ok) {
             const userData = await response.json();
             setUser(userData);
             navigate("/profile");
           } else {
-            console.error("Failed to authenticate with backend:", response.status);
+            console.error(
+              "Failed to authenticate with backend:",
+              response.status
+            );
           }
         } catch (error) {
           console.error("Error during Auth0 login:", error);
@@ -48,20 +64,27 @@ const AuthPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-  document.cookie = "authToken=; Max-Age=0; path=/;";
+    document.cookie = "authToken=; Max-Age=0; path=/;";
     const endpoint = isLogin ? "login" : "register";
     const payload = isLogin
       ? { email: formData.email, password: formData.password }
-      : { username: formData.username, email: formData.email, password: formData.password };
-  
+      : {
+          username: formData.username,
+          email: formData.email,
+          password: formData.password,
+        };
+
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/users/${endpoint}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-        credentials: "include",
-      });
-  
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/users/${endpoint}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+          credentials: "include",
+        }
+      );
+
       const data = await response.json();
       if (response.ok) {
         setUser(data); // ✅ Set user context immediately
@@ -119,7 +142,7 @@ const AuthPage: React.FC = () => {
           )}
           <button type="submit">{isLogin ? "Login" : "Register"}</button>
         </form>
-  
+
         <button
           className="google-login-btn"
           onClick={() =>
@@ -127,16 +150,18 @@ const AuthPage: React.FC = () => {
               authorizationParams: {
                 audience: "https://athletexpert-api", // ✅ Your API identifier
                 scope: "openid profile email",
-                prompt: "consent",  // ✅ Force consent prompt
+                prompt: "consent", // ✅ Force consent prompt
               },
             })
           }
         >
           Sign in with Google
         </button>
-  
+
         <p className="toggle-auth" onClick={() => setIsLogin(!isLogin)}>
-          {isLogin ? "Don't have an account? Register here" : "Already have an account? Login"}
+          {isLogin
+            ? "Don't have an account? Register here"
+            : "Already have an account? Login"}
         </p>
       </div>
     </div>

@@ -22,8 +22,7 @@ const ProfilePage: React.FC = () => {
   const navigate = useNavigate();
   const userContext = useContext(UserContext);
 
-
-const { logout, user: auth0User } = useAuth0();
+  const { logout, user: auth0User } = useAuth0();
 
   if (!userContext) {
     throw new Error("UserContext must be used within a UserProvider");
@@ -34,9 +33,12 @@ const { logout, user: auth0User } = useAuth0();
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/users/profile`, {
-          credentials: "include",
-        });
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/users/profile`,
+          {
+            credentials: "include",
+          }
+        );
         if (!response.ok) throw new Error("Unauthorized");
         const data = await response.json();
         setProfile(data);
@@ -58,10 +60,10 @@ const { logout, user: auth0User } = useAuth0();
         method: "POST",
         credentials: "include",
       });
-  
+
       document.cookie = "authToken=; Max-Age=0; path=/; SameSite=None; Secure";
       setUser(null);
-  
+
       // ✅ Check if the user exists and logged in via Google SSO
       if (auth0User && auth0User.sub?.startsWith("google-oauth2|")) {
         // ✅ Log out from Auth0 and Google session
@@ -78,12 +80,10 @@ const { logout, user: auth0User } = useAuth0();
       console.error("Error during logout:", error);
     }
   };
-  
-  
-  
-  
-  
 
+  const handleSettingsClick = () => {
+    navigate("/settings"); // Redirect to the settings page
+  };
 
   return (
     <div className="profile-container">
@@ -96,18 +96,22 @@ const { logout, user: auth0User } = useAuth0();
           />
         </div>
         <div className="profile-info">
-          <h1 className="profile-name">{profile.firstName} {profile.lastName}</h1>
+          <h1 className="profile-name">
+            {profile.firstName} {profile.lastName}
+          </h1>
           <p className="profile-bio">{profile.bio}</p>
           <div>
-          <button onClick={handleSignOut} className="profile-cta-button">
-        Sign Out
-      </button>
-      <button onClick={handleSignOut} className="profile-cta-button">
-        Settings
-      </button>
-      </div>
+            <button onClick={handleSignOut} className="profile-cta-button">
+              Sign Out
+            </button>
+            <button
+              onClick={handleSettingsClick}
+              className="profile-cta-button"
+            >
+              Settings
+            </button>
+          </div>
         </div>
-        
       </div>
 
       <hr className="profile-divider" />
@@ -117,7 +121,9 @@ const { logout, user: auth0User } = useAuth0();
         <div className="profile-badges">
           {profile.badges?.length ? (
             profile.badges.map((badge, index) => (
-              <div key={index} className="badge-item">{badge}</div>
+              <div key={index} className="badge-item">
+                {badge}
+              </div>
             ))
           ) : (
             <p>No badges yet. Start achieving!</p>
@@ -130,7 +136,9 @@ const { logout, user: auth0User } = useAuth0();
         <div className="profile-sports">
           {profile.sports?.length ? (
             profile.sports.map((sport, index) => (
-              <div key={index} className="sport-item">{sport}</div>
+              <div key={index} className="sport-item">
+                {sport}
+              </div>
             ))
           ) : (
             <p>No sports added yet.</p>
@@ -143,7 +151,9 @@ const { logout, user: auth0User } = useAuth0();
         <div className="profile-saved-blogs">
           {profile.savedBlogs?.length ? (
             profile.savedBlogs.map((blog, index) => (
-              <div key={index} className="saved-item">{blog}</div>
+              <div key={index} className="saved-item">
+                {blog}
+              </div>
             ))
           ) : (
             <p>No saved blogs yet.</p>
@@ -156,14 +166,15 @@ const { logout, user: auth0User } = useAuth0();
         <div className="profile-saved-products">
           {profile.savedProducts?.length ? (
             profile.savedProducts.map((product, index) => (
-              <div key={index} className="saved-item">{product}</div>
+              <div key={index} className="saved-item">
+                {product}
+              </div>
             ))
           ) : (
             <p>No saved products yet.</p>
           )}
         </div>
       </div>
-
     </div>
   );
 };

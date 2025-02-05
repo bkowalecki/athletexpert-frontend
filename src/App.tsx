@@ -1,6 +1,11 @@
 import React, { useState, useEffect, useContext } from "react";
 import "./styles/App.css";
-import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useLocation,
+} from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import Header from "./components/Header";
@@ -47,30 +52,31 @@ const AppContent: React.FC = () => {
   useEffect(() => {
     const checkSession = async () => {
       try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/users/session`, {
-          credentials: "include",
-        });
-  
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/users/session`,
+          {
+            credentials: "include",
+          }
+        );
+
         if (response.ok) {
           const userData = await response.json();
           setUser(userData);
         } else {
           setUser(null);
-          document.cookie = "authToken=; Max-Age=0; path=/; SameSite=None; Secure"; // ✅ Ensure cookie is cleared
+          document.cookie =
+            "authToken=; Max-Age=0; path=/; SameSite=None; Secure"; // ✅ Ensure cookie is cleared
         }
       } catch (error) {
         console.error("Error checking session:", error);
       }
     };
-  
-    if (document.cookie.includes("authToken")) { // ✅ Only check session if token exists
+
+    if (document.cookie.includes("authToken")) {
+      // ✅ Only check session if token exists
       checkSession();
     }
   }, [location.pathname]);
-  
-  
-  
-  
 
   return (
     <div className="App">
@@ -98,7 +104,7 @@ const AppContent: React.FC = () => {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/auth" element={<AuthPage />} />
-        <Route path="/auth/callback" element={<AuthCallback />} /> {/* ✅ Add this */}
+        <Route path="/auth/callback" element={<AuthCallback />} />{" "}
         <Route path="/search" element={<SearchResults />} />
         <Route path="/terms-of-service" element={<TermsAndConditionsPage />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />

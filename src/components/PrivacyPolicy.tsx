@@ -38,7 +38,9 @@ const PrivacyPolicy: React.FC = () => {
       <ul>
         <li>To provide personalized product recommendations and content.</li>
         <li>To improve website functionality and user experience.</li>
-        <li>To send newsletters, updates, or promotional offers (with consent).</li>
+        <li>
+          To send newsletters, updates, or promotional offers (with consent).
+        </li>
         <li>To monitor platform usage, detect fraud, and enhance security.</li>
       </ul>
 
@@ -50,8 +52,8 @@ const PrivacyPolicy: React.FC = () => {
           operational support.
         </li>
         <li>
-          <strong>Legal Authorities:</strong> When required by law or to
-          protect our legal rights.
+          <strong>Legal Authorities:</strong> When required by law or to protect
+          our legal rights.
         </li>
         <li>
           <strong>Affiliate Partners:</strong> Limited data may be shared when
