@@ -1,7 +1,15 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import "../styles/AboutPage.css";
 
 const AboutPage: React.FC = () => {
+  const navigate = useNavigate();
+
+  const handleAuthPageNavigation = () => {
+     navigate("/auth");
+  }
+
+
   return (
     <div className="about-container">
       <div className="hero-section-about">
@@ -11,7 +19,7 @@ const AboutPage: React.FC = () => {
             We aren't just about sports gear. We are shaping the future of athletics with cutting-edge technology, 
             expert insights, and world-class products. From grassroots to greatness, we’re with you every step of the way.
           </p>
-          <button className="hero-button">Join the Movement</button>
+          <button className="hero-button" onClick={handleAuthPageNavigation}>Join the Movement</button>
         </div>
       </div>
 
