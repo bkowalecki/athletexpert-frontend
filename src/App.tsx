@@ -20,9 +20,13 @@ import SearchResults from "./components/SearchResults";
 import Footer from "./components/Footer";
 import BlogPostPage from "./components/BlogPostPage";
 import AuthPage from "./components/AuthPage";
+import PrivacyPolicy from "./components/PrivacyPolicy";
 import AuthCallback from "./components/AuthCallback";
 import { UserProvider, UserContext } from "./context/UserContext";
 import { Auth0Provider } from "@auth0/auth0-react";
+import AccountSettings from "./components/AccountSettings";
+
+import ScrollToTop from "./util/ScrollToTop";
 
 const queryClient = new QueryClient();
 
@@ -87,6 +91,7 @@ const AppContent: React.FC = () => {
           }
         />
         <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/settings" element={<AccountSettings />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/blog" element={<BlogPage />} />
         <Route path="/404" element={<NotFoundPage />} />
@@ -96,6 +101,7 @@ const AppContent: React.FC = () => {
         <Route path="/auth/callback" element={<AuthCallback />} /> {/* ✅ Add this */}
         <Route path="/search" element={<SearchResults />} />
         <Route path="/terms-of-service" element={<TermsAndConditionsPage />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/blog/:slug" element={<BlogPostPage />} />
       </Routes>
       <Footer />
@@ -119,6 +125,7 @@ const App: React.FC = () => {
       <QueryClientProvider client={queryClient}>
         <UserProvider>
           <Router>
+            <ScrollToTop />
             <AppContent />
           </Router>
         </UserProvider>

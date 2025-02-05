@@ -1,7 +1,7 @@
 /* 🌟 Main Container */
 .terms-container {
   padding: 50px;
-  max-width: 1000px;
+  /* max-width: 1000px; */
   margin: 40px auto;
   line-height: 1.8;
   font-family: 'Roboto', sans-serif;
@@ -13,9 +13,9 @@
 }
 
 /* 📌 Hover effect for subtle lift */
-.terms-container:hover {
+/* .terms-container:hover {
   transform: scale(1.01);
-}
+} */
 
 /* 🔹 Headers */
 .terms-container h1 {

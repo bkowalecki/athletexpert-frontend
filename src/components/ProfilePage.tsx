@@ -98,9 +98,14 @@ const { logout, user: auth0User } = useAuth0();
         <div className="profile-info">
           <h1 className="profile-name">{profile.firstName} {profile.lastName}</h1>
           <p className="profile-bio">{profile.bio}</p>
-          <button onClick={handleSignOut} className="profile-signout-button">
+          <div>
+          <button onClick={handleSignOut} className="profile-cta-button">
         Sign Out
       </button>
+      <button onClick={handleSignOut} className="profile-cta-button">
+        Settings
+      </button>
+      </div>
         </div>
         
       </div>

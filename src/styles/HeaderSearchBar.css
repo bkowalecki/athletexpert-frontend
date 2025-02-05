@@ -148,6 +148,7 @@
   @media (max-width: 768px) {
     .search-bar-container {
       max-width: 100%;
+      padding-top: .5rem
     }
   
     .header-search-bar {

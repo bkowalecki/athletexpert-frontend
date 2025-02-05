@@ -49,7 +49,8 @@ a:-webkit-any-link {
 
 /* Mobile search wrapper (inside the mobile menu) */
 .mobile-search {
-  margin-bottom: 15px;
+  margin-top: 15px;
+  /* margin-bottom: 15px; */
 }
 
 /* Nav links styling */

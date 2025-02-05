@@ -4,8 +4,9 @@
   flex-direction: column;
   min-height: 100vh;
   padding: 2rem;
-  max-width: 1300px;
-  margin: 0 auto;
+  padding-top: 5rem;
+  /* max-width: 1300px; */
+  /* margin: 0 auto; */
   font-family: 'Montserrat', sans-serif;
   color: #ffffff;
   background: #121212; /* Dark background for a sporty look */
@@ -72,41 +73,45 @@
   transition: background 0.3s ease, transform 0.2s ease;
 }
 
-.search-results-page-back-home:hover {
+/* .search-results-page-back-home:hover {
   background: #d34f2c;
   transform: scale(1.05);
-}
+} */
 
 /* Results Grid */
 .search-results-page-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  /* grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); */
   gap: 1.5rem;
   margin-top: 2rem;
 }
 
 /* Search Section */
 .search-results-page-section {
-  background: #1E1E1E;
+  /* background: #1E1E1E;
   border-radius: 15px;
   padding: 1.5rem;
   box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
-  transition: transform 0.3s ease;
+  transition: transform 0.3s ease; */
 }
 
-.search-results-page-section:hover {
+/* .search-results-page-section:hover {
   transform: translateY(-5px);
-}
+} */
 
 /* Section Title */
 .search-results-page-section-title {
-  font-size: 1.8rem;
+  font-size: 2rem; /* Slightly larger for stronger impact */
   margin-bottom: 1.5rem;
-  color: #A23C20;
+  color: #fff; /* High contrast gold for visibility */
   text-transform: uppercase;
-  font-weight: bold;
-  letter-spacing: 1px;
+  font-weight: 900; /* Bolder for emphasis */
+  letter-spacing: 1.5px; /* Enhanced spacing for clarity */
+  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.8); /* Adds depth and makes the text pop */
+  border-bottom: 2px solid #A23C20; /* Subtle accent line for structure */
+  padding-bottom: 5px; /* Clean separation from content */
 }
+
 
 /* Results List */
 .search-results-page-list {
@@ -129,6 +134,7 @@
 .search-results-page-item:hover {
   transform: scale(1.05);
   box-shadow: 0 10px 20px rgba(255, 255, 255, 0.2);
+  cursor: pointer;
 }
 
 /* Image Container */

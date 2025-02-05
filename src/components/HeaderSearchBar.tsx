@@ -56,7 +56,7 @@ const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
         <input
           type="text"
           className="search-input"
-          placeholder="Search for products, blogs..."
+          placeholder="Search"
           value={searchQuery}
           onChange={handleInputChange}
           aria-label="Search"

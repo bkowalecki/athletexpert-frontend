@@ -60,7 +60,7 @@ const SearchResults: React.FC = () => {
 
     fetchResults();
   }, [location.search]); // ✅ Re-fetch results when URL search query changes
-
+  console.log("Product Image URL:", products); 
   return (
     <div className="search-results-page-container">
       <h2 className="search-results-page-title">Search Results for: "{searchQuery}"</h2>
