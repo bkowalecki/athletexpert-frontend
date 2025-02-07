@@ -17,12 +17,14 @@ const FeaturedProductList: React.FC = () => {
 
   useEffect(() => {
     axios
-      .get(`${process.env.REACT_APP_API_URL}/featured-products/featured`)
+      .get(`${process.env.REACT_APP_API_URL}/products/featured`)
       .then((response) => {
+        console.log("✅ Featured Products API Response:", response.data);
         setProducts(response.data);
       })
       .catch((error) => {
-        console.error("There was an error fetching the products!", error);
+        console.error("🚨 Error fetching featured products!", error);
+        setProducts([]); // Prevent infinite loading
       });
   }, []);
 

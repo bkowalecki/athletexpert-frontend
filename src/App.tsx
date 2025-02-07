@@ -32,6 +32,7 @@ import { Auth0Provider } from "@auth0/auth0-react";
 import AccountSettings from "./components/AccountSettings";
 
 import ScrollToTop from "./util/ScrollToTop";
+import ProductsPage from "./components/ProductsPage";
 
 const queryClient = new QueryClient();
 
@@ -100,6 +101,7 @@ const AppContent: React.FC = () => {
         <Route path="/settings" element={<AccountSettings />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/blog" element={<BlogPage />} />
+        <Route path="/products" element={<ProductsPage />} />
         <Route path="/404" element={<NotFoundPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/login" element={<Login />} />

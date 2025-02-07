@@ -13,6 +13,7 @@ const AuthPage: React.FC = () => {
     loginWithRedirect,
     user: auth0User,
   } = useAuth0();
+
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
     email: "",
@@ -22,12 +23,13 @@ const AuthPage: React.FC = () => {
   });
   const [error, setError] = useState<string | null>(null);
 
+  /** ✅ Automatically logs in Auth0 users */
   useEffect(() => {
     const handleSSO = async () => {
       if (isAuthenticated && auth0User) {
         try {
           const accessToken = await getAccessTokenSilently();
-          console.log("Access Token:", accessToken);
+          console.log("🔑 Access Token:", accessToken);
 
           const response = await fetch(
             `${process.env.REACT_APP_API_URL}/users/auth0-login`,
@@ -35,7 +37,7 @@ const AuthPage: React.FC = () => {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ token: accessToken }),
-              credentials: "include",
+              credentials: "include", // ✅ Ensures cookies are sent
             }
           );
 
@@ -44,13 +46,10 @@ const AuthPage: React.FC = () => {
             setUser(userData);
             navigate("/profile");
           } else {
-            console.error(
-              "Failed to authenticate with backend:",
-              response.status
-            );
+            console.error("❌ Failed Auth0 backend login:", response.status);
           }
         } catch (error) {
-          console.error("Error during Auth0 login:", error);
+          console.error("❌ Error during Auth0 login:", error);
         }
       }
     };
@@ -58,51 +57,64 @@ const AuthPage: React.FC = () => {
     handleSSO();
   }, [isAuthenticated, auth0User, getAccessTokenSilently, setUser, navigate]);
 
+  /** ✅ Handles input changes */
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    document.cookie = "authToken=; Max-Age=0; path=/;";
+    setError(null);
+  
     const endpoint = isLogin ? "login" : "register";
     const payload = isLogin
-      ? { email: formData.email, password: formData.password }
+      ? { email: formData.email, password: formData.password, origin: window.location.origin }
       : {
           username: formData.username,
           email: formData.email,
           password: formData.password,
+          origin: window.location.origin,
         };
-
+  
     try {
-      const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/users/${endpoint}`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-          credentials: "include",
-        }
-      );
-
-      const data = await response.json();
-      if (response.ok) {
-        setUser(data); // ✅ Set user context immediately
-        navigate("/profile"); // ✅ Redirect to profile page
-      } else {
-        setError(data.message || "An error occurred. Please try again.");
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/users/${endpoint}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+        credentials: "include", // ✅ Ensures cookies are sent
+      });
+  
+      if (!response.ok) {
+        const data = await response.json().catch(() => null); // ✅ Prevent JSON parse error
+        setError(data?.message || "An error occurred. Please try again.");
+        return;
       }
+  
+      const userData = await response.json().catch(() => null); // ✅ Handle empty response
+      if (!userData || !userData.user) {
+        console.warn("⚠️ Empty response received from backend.");
+        setError("Login successful, but no user data received.");
+        return;
+      }
+  
+      setUser(userData.user);
+      navigate("/profile");
     } catch (error) {
-      console.error("Error during registration/login:", error);
+      console.error("❌ Error during authentication:", error);
       setError("An unexpected error occurred. Please try again.");
     }
   };
+  
+  
 
   return (
     <div className="auth-page-wrapper">
       <div className="auth-container">
         <h2>{isLogin ? "Welcome Back!" : "Create an Account"}</h2>
         {error && <p className="error-message">{error}</p>}
+
         <form onSubmit={handleSubmit}>
           {!isLogin && (
             <input
@@ -143,14 +155,15 @@ const AuthPage: React.FC = () => {
           <button type="submit">{isLogin ? "Login" : "Register"}</button>
         </form>
 
+        {/* ✅ Google Login Button */}
         <button
           className="google-login-btn"
           onClick={() =>
             loginWithRedirect({
               authorizationParams: {
-                audience: "https://athletexpert-api", // ✅ Your API identifier
+                audience: "https://athletexpert-api",
                 scope: "openid profile email",
-                prompt: "consent", // ✅ Force consent prompt
+                prompt: "consent",
               },
             })
           }

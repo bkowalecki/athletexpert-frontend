@@ -72,6 +72,14 @@ const Header: React.FC = () => {
         </Link>
 
         <Link
+          to={"/products"} // ✅ Unified login check
+          className="nav-link"
+          onClick={closeMobileMenu}
+        >
+          Products
+        </Link>
+
+        <Link
           to="/blog"
           className="nav-link"
           onClick={closeMobileMenu}

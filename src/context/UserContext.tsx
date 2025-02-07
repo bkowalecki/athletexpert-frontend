@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect, ReactNode } from "react";
-import { useAuth0 } from "@auth0/auth0-react";
+import axios from "axios";
 
 export type User = {
   username: string;
@@ -25,35 +25,33 @@ interface UserProviderProps {
 
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const { isAuthenticated, user: auth0User, getAccessTokenSilently } = useAuth0();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    const loadUser = async () => {
+    const checkSession = async () => {
       try {
-        if (isAuthenticated && auth0User) {
-          const token = await getAccessTokenSilently(); // ✅ Retrieve fresh token
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/users/session`, {
+          withCredentials: true, // ✅ Ensures cookies are sent
+        });
 
-          localStorage.setItem("authToken", token); // ✅ Save token for persistence
-
-          const userData: User = {
-            username: auth0User.nickname ?? "Guest",
-            email: auth0User.email ?? "no-email@unknown.com",
-            firstName: auth0User.given_name ?? "",
-            lastName: auth0User.family_name ?? "",
-            profilePictureUrl: auth0User.picture ?? "",
-            bio: null,
-            sports: [],
-          };
-
-          setUser(userData);
+        if (response.status === 200) {
+          console.log("✅ Session Active:", response.data);
+          setUser(response.data);
+          setIsAuthenticated(true);
+        } else {
+          console.warn("⚠️ No active session, user is logged out.");
+          setUser(null);
+          setIsAuthenticated(false);
         }
       } catch (error) {
-        console.error("Error loading user:", error);
+        console.warn("⚠️ Session check failed, user is logged out.");
+        setUser(null);
+        setIsAuthenticated(false);
       }
     };
 
-    loadUser();
-  }, [isAuthenticated, auth0User, getAccessTokenSilently]);
+    checkSession(); // ✅ Always check session on page load
+  }, []);
 
   return <UserContext.Provider value={{ user, setUser, isAuthenticated }}>{children}</UserContext.Provider>;
 };

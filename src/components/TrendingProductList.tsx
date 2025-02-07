@@ -8,7 +8,7 @@ interface Product {
   brand: string;
   category: string;
   price: number | null;
-  imgurl: string;  // Changed from imgurl for consistency
+  imgUrl: string;  // Changed from imgurl for consistency
   amazon_url: string; // Changed from amazon_url for consistency
 }
 
@@ -19,12 +19,15 @@ const TrendingProductList: React.FC = () => {
     axios
       .get(`${process.env.REACT_APP_API_URL}/products/trending`)
       .then((response) => {
+        console.log("✅ Trending Products API Response:", response.data);
         setProducts(response.data);
       })
       .catch((error) => {
-        console.error("There was an error fetching the products!", error);
+        console.error("🚨 Error fetching trending products!", error);
+        setProducts([]); // Prevent infinite loading
       });
   }, []);
+  
 
   return (
     <section className="trending-products-section">
@@ -35,7 +38,7 @@ const TrendingProductList: React.FC = () => {
           <div key={product.id} className="trending-products-item">
             <div className="trending-products-image-container">
               <img
-                src={product.imgurl}
+                src={product.imgUrl}
                 alt={product.name}
                 className="trending-products-image"
               />

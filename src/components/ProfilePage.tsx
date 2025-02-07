@@ -64,18 +64,22 @@ const ProfilePage: React.FC = () => {
       document.cookie = "authToken=; Max-Age=0; path=/; SameSite=None; Secure";
       setUser(null);
 
-      // ✅ Check if the user exists and logged in via Google SSO
-      if (auth0User && auth0User.sub?.startsWith("google-oauth2|")) {
-        // ✅ Log out from Auth0 and Google session
-        logout({
-          logoutParams: {
-            returnTo: "https://athletexpert.vercel.app",
-          },
-        });
-      } else {
-        // ✅ Just refresh for email/password users
-        window.location.href = "/";
-      }
+      const returnUrl = window.location.origin.includes("localhost")
+      ? "http://localhost:3000"
+      : "https://athletexpert.vercel.app";
+    
+    // ✅ Check if the user exists and logged in via Google SSO
+    if (auth0User && auth0User.sub?.startsWith("google-oauth2|")) {
+      // ✅ Log out from Auth0 and Google session
+      logout({
+        logoutParams: {
+          returnTo: returnUrl, // 🔥 Dynamically set based on environment
+        },
+      });
+    } else {
+      // ✅ Just refresh for email/password users
+      window.location.href = "/";
+    }
     } catch (error) {
       console.error("Error during logout:", error);
     }
