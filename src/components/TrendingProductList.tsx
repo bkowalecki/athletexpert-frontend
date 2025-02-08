@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import axios from "axios";
 import "../styles/TrendingProductList.css";
 
@@ -30,7 +31,15 @@ const TrendingProductList: React.FC = () => {
   
 
   return (
+
     <section className="trending-products-section">
+    <motion.div
+    initial={{ opacity: 0, y: 40 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.8 }}
+    viewport={{ once: true }}  // Ensures it only animates once
+    className="trending-products-container"
+  >
       <h2 className="trending-products-heading">Trending</h2>
       <div className="trending-products-grid">
         {products.map((product) => (
@@ -60,8 +69,9 @@ const TrendingProductList: React.FC = () => {
             </a>
           </div>
         ))}
-      </div>
+      </div> </motion.div>
     </section>
+   
   );
 };
 

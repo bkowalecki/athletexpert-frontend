@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import "../styles/BlogSection.css"; // Updated CSS file name
@@ -29,7 +30,14 @@ const LatestBlogsSection: React.FC = () => {
   }, []);
 
   return (
-    <section className="latest-blog-list-container">
+   
+    <section className="latest-blog-list-container"> <motion.div
+    initial={{ opacity: 0, y: 40 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.8 }}
+    viewport={{ once: true }}  // Ensures it only animates once
+    className="trending-products-container"
+  >
       <h2 className="latest-blog-heading">Latest Blogs</h2>
       <div className="latest-blog-section-list">
         {posts.map((post) => (
@@ -56,8 +64,9 @@ const LatestBlogsSection: React.FC = () => {
             </div>
           </div>
         ))}
-      </div>
+      </div></motion.div>
     </section>
+    
   );
 };
 

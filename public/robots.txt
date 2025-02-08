@@ -1,3 +1,20 @@
-# https://www.robotstxt.org/robotstxt.html
+# robots.txt for AthleteXpert
+
 User-agent: *
-Disallow:
+Disallow: /admin/
+Disallow: /auth/
+Disallow: /settings/
+Disallow: /cart/
+Disallow: /checkout/
+Disallow: /api/
+Disallow: /server/
+
+# Allow search engines to index the main pages
+Allow: /$
+Allow: /products/
+Allow: /blogs/
+Allow: /about/
+Allow: /contact/
+
+# Sitemap reference
+Sitemap: https://athletexpert.com/sitemap.xml

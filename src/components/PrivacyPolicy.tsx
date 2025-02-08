@@ -5,7 +5,7 @@ const PrivacyPolicy: React.FC = () => {
   return (
     <div className="terms-container">
       <h1>Privacy Policy</h1>
-      <p>Last updated: [Insert Date]</p>
+      <p>Last updated: [February 7th, 2025]</p>
 
       <h2>1. Introduction</h2>
       <p>

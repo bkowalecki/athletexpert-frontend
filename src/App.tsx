@@ -7,6 +7,7 @@ import {
   useLocation,
 } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { AnimatePresence, motion } from "framer-motion";
 
 import Header from "./components/Header";
 import HeroSection from "./components/HeroSection";
@@ -50,6 +51,17 @@ const AppContent: React.FC = () => {
 
   const { user, setUser } = userContext;
 
+  const PageWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -10 }}
+      transition={{ duration: 0.4, ease: "easeOut" }}
+    >
+      {children}
+    </motion.div>
+  );
+
   useEffect(() => {
     const checkSession = async () => {
       try {
@@ -82,11 +94,13 @@ const AppContent: React.FC = () => {
   return (
     <div className="App">
       <Header />
+      <AnimatePresence mode="wait">
       <Routes>
         <Route
           path="/"
-          element={
+          element={<PageWrapper>
             <>
+            
               <HeroSection openQuiz={openModal} />
               <main>
                 <FeaturedProductList />
@@ -94,24 +108,26 @@ const AppContent: React.FC = () => {
                 <BlogSection />
               </main>
               <Quiz isOpen={isQuizModalOpen} closeModal={closeModal} />
-            </>
+              
+            </></PageWrapper>
           }
         />
-        <Route path="/profile" element={<ProfilePage />} />
-        <Route path="/settings" element={<AccountSettings />} />
-        <Route path="/about" element={<AboutPage />} />
-        <Route path="/blog" element={<BlogPage />} />
-        <Route path="/products" element={<ProductsPage />} />
-        <Route path="/404" element={<NotFoundPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/auth" element={<AuthPage />} />
+        <Route path="/profile" element={<PageWrapper><ProfilePage /></PageWrapper>} />
+        <Route path="/settings" element={<PageWrapper><AccountSettings /></PageWrapper>} />
+        <Route path="/about" element={<PageWrapper><AboutPage /></PageWrapper>} />
+        <Route path="/blog" element={<PageWrapper><BlogPage /></PageWrapper>} />
+        <Route path="/products" element={<PageWrapper><ProductsPage /></PageWrapper>} />
+        <Route path="/404" element={<PageWrapper><NotFoundPage /></PageWrapper>} />
+        <Route path="/register" element={<PageWrapper><RegisterPage /></PageWrapper>} />
+        <Route path="/login" element={<PageWrapper><Login /></PageWrapper>} />
+        <Route path="/auth" element={<PageWrapper><AuthPage /></PageWrapper>} />
         <Route path="/auth/callback" element={<AuthCallback />} />{" "}
-        <Route path="/search" element={<SearchResults />} />
-        <Route path="/terms-of-service" element={<TermsAndConditionsPage />} />
-        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-        <Route path="/blog/:slug" element={<BlogPostPage />} />
+        <Route path="/search" element={<PageWrapper><SearchResults /></PageWrapper>} />
+        <Route path="/terms-of-service" element={<PageWrapper><TermsAndConditionsPage /></PageWrapper>} />
+        <Route path="/privacy-policy" element={<PageWrapper><PrivacyPolicy /></PageWrapper>} />
+        <Route path="/blog/:slug" element={<PageWrapper><BlogPostPage /></PageWrapper>} />
       </Routes>
+      </AnimatePresence>
       <Footer />
     </div>
   );

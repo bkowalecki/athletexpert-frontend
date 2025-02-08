@@ -6,7 +6,7 @@ const TermsAndConditionsPage: React.FC = () => {
     <div className="terms-container">
       <h1>Terms and Conditions</h1>
 
-      <p>Last updated: [Insert Date]</p>
+      <p>Last updated: [February 7th, 2025]</p>
 
       <h2>1. Introduction</h2>
       <p>

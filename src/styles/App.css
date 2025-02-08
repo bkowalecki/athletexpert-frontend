@@ -1,9 +1,14 @@
+
+html{
+  overflow-y: scroll;
+}
+
 /* === Global Styles === */
 body {
   margin: 0;
   padding: 0;
   font-family: 'Arial', sans-serif;
-  background-color: #A23C20;
+  background-color: #000;
   /* height: 100%; */
   overflow-x: hidden; /* Prevents horizontal scroll without affecting vertical scroll */
 }
@@ -13,7 +18,7 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background-color: #A23C20;
+  background-color: #000;
   overflow-x: hidden; /* Keeps layout clean horizontally */
 }
 
@@ -23,7 +28,7 @@ main {
   display: flex;
   flex-direction: column;
   width: 100%; /* Use 100% instead of 100vw for better responsiveness */
-  background-color: #A23C20;
+  background-color: #000;
   /* padding: 1rem; Adds breathing room */
   box-sizing: border-box; /* Ensures padding doesn’t overflow */
 }

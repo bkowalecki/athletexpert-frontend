@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import axios from "axios";
 import "../styles/FeaturedProductList.css";
 
@@ -29,7 +30,15 @@ const FeaturedProductList: React.FC = () => {
   }, []);
 
   return (
+
     <section className="featured-products-section">
+          <motion.div
+    initial={{ opacity: 0, y: 40 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.8 }}
+    viewport={{ once: true }}  // Ensures it only animates once
+    className="featured-products-container"
+  >
       <h2 className="featured-products-heading">Featured</h2>
       <div className="featured-products-grid">
         {products.map((product) => (
@@ -58,8 +67,9 @@ const FeaturedProductList: React.FC = () => {
             </a>
           </div>
         ))}
-      </div>
+      </div></motion.div>
     </section>
+    
   );
 };
 
