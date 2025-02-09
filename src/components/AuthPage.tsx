@@ -22,10 +22,19 @@ const AuthPage: React.FC = () => {
 
   /** ✅ Only redirect **if session is checked AND user is logged in** */
   useEffect(() => {
-    if (isSessionChecked && user) {
-      navigate("/profile", { replace: true });
+    console.log("Session Checked:", isSessionChecked, "User:", user);
+  
+    if (isSessionChecked) {
+      if (user && typeof user === "object" && "email" in user) {
+        console.log("✅ Redirecting to /profile");
+        navigate("/profile", { replace: true });
+      } else {
+        console.log("✅ No active session, staying on /auth");
+      }
     }
   }, [isSessionChecked, user, navigate]);
+  
+  
 
   /** ✅ Handle Auth0 login only if needed */
   useEffect(() => {
