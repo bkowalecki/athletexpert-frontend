@@ -1,28 +1,42 @@
-// src/components/SignUp.tsx
-import React, { useState, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { UserContext } from './UserContext';
-import '../styles/SignUp.css';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useUserContext } from "../components/UserContext"; // ✅ Import the safe hook
+import "../styles/SignUp.css";
 
 const SignUp: React.FC = () => {
-  const { setUser } = useContext(UserContext);
+  const { setUser } = useUserContext(); // ✅ No more undefined error
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    username: '',
-    password: '',
-    email: ''
+    username: "",
+    password: "",
+    email: "",
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Save user data (for now, just in local state)
-    setUser(formData);
-    navigate('/profile');
+
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/users/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        throw new Error("Registration failed");
+      }
+
+      const userData = await response.json();
+      setUser(userData.user);
+      navigate("/profile");
+    } catch (error) {
+      console.error("❌ Error during signup:", error);
+    }
   };
 
   return (

@@ -1,26 +1,29 @@
 import React, { useEffect, useRef } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
-import { useContext } from "react";
-import { UserContext } from "../context/UserContext";
+import { useUserContext } from "../components/UserContext";
+import { useNavigate } from "react-router-dom";
 import "../styles/HeroSection.css";
 
 interface HeroSectionProps {
-  openQuiz: () => void; // Define openModal prop
+  openQuiz: () => void;
 }
 
 const HeroSection: React.FC<HeroSectionProps> = ({ openQuiz }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const { isAuthenticated } = useAuth0();
-  const userContext = useContext(UserContext);
+  const { user, isSessionChecked } = useUserContext();
+  const navigate = useNavigate();
 
-if (!userContext) {
-  throw new Error("UserContext must be used within a UserProvider");
-}
+  /** ✅ Clicking "Profile" should go to `/profile` if logged in, otherwise `/auth` */
+  const handleProfileClick = () => {
+    if (!isSessionChecked) return; // 🔹 Wait for session check before redirecting
 
-const { user } = userContext; // ✅ Now TypeScript knows `user` is defined
-
-  const profileUrl = isAuthenticated || user ? "/profile" : "/auth"; // ✅ Redirect based on login status
-
+    if (isAuthenticated || user) {
+      navigate("/profile");
+    } else {
+      navigate("/auth");
+    }
+  };
 
   useEffect(() => {
     const videoElement = videoRef.current;
@@ -63,10 +66,12 @@ const { user } = userContext; // ✅ Now TypeScript knows `user` is defined
       <div className="hero-content">
         <h1>Gear Tailored to You</h1>
         <div className="cta-buttons">
-          <button className="cta-btn" onClick={openQuiz}>Get Your Gear</button>
-          <a href={profileUrl}>
-            <button className="cta-btn cta-btn-secondary">Profile</button>
-          </a>
+          <button className="cta-btn" onClick={openQuiz}>
+            Get Your Gear
+          </button>
+          <button className="cta-btn cta-btn-secondary" onClick={handleProfileClick}>
+            Profile
+          </button>
         </div>
       </div>
     </div>

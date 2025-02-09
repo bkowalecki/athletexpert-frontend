@@ -20,7 +20,7 @@ const TrendingProductList: React.FC = () => {
     axios
       .get(`${process.env.REACT_APP_API_URL}/products/trending`)
       .then((response) => {
-        console.log("✅ Trending Products API Response:", response.data);
+        // console.log("✅ Trending Products API Response:", response.data);
         setProducts(response.data);
       })
       .catch((error) => {

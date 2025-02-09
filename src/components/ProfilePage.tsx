@@ -1,7 +1,6 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth0 } from "@auth0/auth0-react";
-import { UserContext } from "../context/UserContext";
+import { useUserContext } from "../components/UserContext";
 import "../styles/ProfilePage.css";
 
 interface Profile {
@@ -20,39 +19,44 @@ const ProfilePage: React.FC = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
-  const userContext = useContext(UserContext);
-
-  const { logout, user: auth0User } = useAuth0();
-
-  if (!userContext) {
-    throw new Error("UserContext must be used within a UserProvider");
-  }
-
-  const { setUser } = userContext;
+  const { user, setUser, isSessionChecked } = useUserContext();
 
   useEffect(() => {
+    if (!isSessionChecked) return; // ✅ Prevents premature redirects
+
+    if (!user) {
+      console.warn("⚠️ No valid session. Redirecting to /auth...");
+      navigate("/auth", { replace: true });
+      return;
+    }
+
     const fetchProfile = async () => {
       try {
-        const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/users/profile`,
-          {
-            credentials: "include",
-          }
-        );
-        if (!response.ok) throw new Error("Unauthorized");
-        const data = await response.json();
-        setProfile(data);
-      } catch {
-        setUser(null);
-        navigate("/auth");
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/users/profile`, {
+          credentials: "include",
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setProfile(data);
+        } else {
+          console.warn("⚠️ No valid session. Redirecting to /auth...");
+          navigate("/auth", { replace: true });
+        }
+      } catch (error) {
+        console.error("❌ Error fetching profile:", error);
+        navigate("/auth", { replace: true });
       }
     };
 
     fetchProfile();
-  }, [navigate, setUser]);
+  }, [user, isSessionChecked, navigate, setUser]);
 
-  if (error) return <div className="profile-error">Error: {error}</div>;
-  if (!profile) return <div className="profile-loading">Loading...</div>;
+  if (!isSessionChecked) {
+    return <div className="profile-loading">Checking session...</div>;
+  }
+
+  if (!profile) return <div className="profile-loading">No profile data found.</div>;
 
   const handleSignOut = async () => {
     try {
@@ -61,32 +65,14 @@ const ProfilePage: React.FC = () => {
         credentials: "include",
       });
 
-      document.cookie = "authToken=; Max-Age=0; path=/; SameSite=None; Secure";
+      document.cookie = "authToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; Secure; HttpOnly; SameSite=None";
+
       setUser(null);
-
-      const returnUrl = window.location.origin.includes("localhost")
-      ? "http://localhost:3000"
-      : "https://athletexpert.vercel.app";
-    
-    // ✅ Check if the user exists and logged in via Google SSO
-    if (auth0User && auth0User.sub?.startsWith("google-oauth2|")) {
-      // ✅ Log out from Auth0 and Google session
-      logout({
-        logoutParams: {
-          returnTo: returnUrl, // 🔥 Dynamically set based on environment
-        },
-      });
-    } else {
-      // ✅ Just refresh for email/password users
-      window.location.href = "/";
-    }
+      console.log("🔹 User successfully logged out.");
+      navigate("/", { replace: true });
     } catch (error) {
-      console.error("Error during logout:", error);
+      console.error("❌ Error during logout:", error);
     }
-  };
-
-  const handleSettingsClick = () => {
-    navigate("/settings"); // Redirect to the settings page
   };
 
   return (
@@ -108,10 +94,7 @@ const ProfilePage: React.FC = () => {
             <button onClick={handleSignOut} className="profile-cta-button">
               Sign Out
             </button>
-            <button
-              onClick={handleSettingsClick}
-              className="profile-cta-button"
-            >
+            <button onClick={() => navigate("/settings")} className="profile-cta-button">
               Settings
             </button>
           </div>
@@ -168,15 +151,16 @@ const ProfilePage: React.FC = () => {
       <div className="profile-section">
         <h2 className="profile-subsection-header-text">Saved Products</h2>
         <div className="profile-saved-products">
-          {profile.savedProducts?.length ? (
+          {/* {profile.savedProducts?.length ? (
             profile.savedProducts.map((product, index) => (
-              <div key={index} className="saved-item">
-                {product}
+              <div key={index} className="saved-product-card">
+                <img src={product} alt="Saved Product" className="saved-product-image" />
+                <h3>{product}</h3>
               </div>
             ))
           ) : (
             <p>No saved products yet.</p>
-          )}
+          )} */}
         </div>
       </div>
     </div>

@@ -1,18 +1,13 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
-import { UserContext } from "../context/UserContext";
+import { useUserContext } from "../components/UserContext"; // ✅ Ensure correct context usage
 import "../styles/AuthPage.css";
 
 const AuthPage: React.FC = () => {
-  const { setUser } = useContext(UserContext)!;
+  const { setUser, user, isSessionChecked } = useUserContext(); // ✅ Safe context access
   const navigate = useNavigate();
-  const {
-    getAccessTokenSilently,
-    isAuthenticated,
-    loginWithRedirect,
-    user: auth0User,
-  } = useAuth0();
+  const { getAccessTokenSilently, isAuthenticated, loginWithRedirect, user: auth0User } = useAuth0();
 
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
@@ -22,92 +17,97 @@ const AuthPage: React.FC = () => {
     confirmPassword: "",
   });
   const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [auth0Attempted, setAuth0Attempted] = useState(false);
 
-  /** ✅ Automatically logs in Auth0 users */
+  /** ✅ Only redirect **if session is checked AND user is logged in** */
   useEffect(() => {
-    const handleSSO = async () => {
-      if (isAuthenticated && auth0User) {
-        try {
-          const accessToken = await getAccessTokenSilently();
-          console.log("🔑 Access Token:", accessToken);
+    if (isSessionChecked && user) {
+      navigate("/profile", { replace: true });
+    }
+  }, [isSessionChecked, user, navigate]);
 
-          const response = await fetch(
-            `${process.env.REACT_APP_API_URL}/users/auth0-login`,
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ token: accessToken }),
-              credentials: "include", // ✅ Ensures cookies are sent
-            }
-          );
+  /** ✅ Handle Auth0 login only if needed */
+  useEffect(() => {
+    if (isSessionChecked && isAuthenticated && auth0User && !user && !auth0Attempted) {
+      handleSSO();
+    }
+  }, [isSessionChecked, isAuthenticated, auth0User, user, auth0Attempted]);
 
-          if (response.ok) {
-            const userData = await response.json();
-            setUser(userData);
-            navigate("/profile");
-          } else {
-            console.error("❌ Failed Auth0 backend login:", response.status);
-          }
-        } catch (error) {
-          console.error("❌ Error during Auth0 login:", error);
+  /** ✅ Handles Auth0 SSO Login */
+  const handleSSO = async () => {
+    try {
+      setAuth0Attempted(true);
+      const accessToken = await getAccessTokenSilently();
+
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/users/auth0-login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token: accessToken }),
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        const userData = await response.json();
+        if (userData?.user) {
+          setUser(userData.user);
+          navigate("/profile", { replace: true });
+        } else {
+          setError("Login successful, but no user data received.");
         }
+      } else {
+        console.error("❌ Failed Auth0 backend login:", response.status);
       }
-    };
-
-    handleSSO();
-  }, [isAuthenticated, auth0User, getAccessTokenSilently, setUser, navigate]);
+    } catch (error) {
+      console.error("❌ Error during Auth0 login:", error);
+    }
+  };
 
   /** ✅ Handles input changes */
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
+  /** ✅ Handles manual email/password login */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-  
+    setIsSubmitting(true);
+
     const endpoint = isLogin ? "login" : "register";
     const payload = isLogin
-      ? { email: formData.email, password: formData.password, origin: window.location.origin }
-      : {
-          username: formData.username,
-          email: formData.email,
-          password: formData.password,
-          origin: window.location.origin,
-        };
-  
+      ? { email: formData.email, password: formData.password }
+      : { username: formData.username, email: formData.email, password: formData.password };
+
     try {
       const response = await fetch(`${process.env.REACT_APP_API_URL}/users/${endpoint}`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
-        credentials: "include", // ✅ Ensures cookies are sent
+        credentials: "include",
       });
-  
+
       if (!response.ok) {
-        const data = await response.json().catch(() => null); // ✅ Prevent JSON parse error
+        const data = await response.json().catch(() => null);
         setError(data?.message || "An error occurred. Please try again.");
         return;
       }
-  
-      const userData = await response.json().catch(() => null); // ✅ Handle empty response
-      if (!userData || !userData.user) {
-        console.warn("⚠️ Empty response received from backend.");
-        setError("Login successful, but no user data received.");
-        return;
-      }
-  
+
+      const userData = await response.json();
       setUser(userData.user);
-      navigate("/profile");
+      navigate("/profile", { replace: true });
     } catch (error) {
       console.error("❌ Error during authentication:", error);
       setError("An unexpected error occurred. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
-  
-  
+
+  /** ✅ Prevent flashing of login page before session check */
+  if (!isSessionChecked) {
+    return <div className="auth-loading">Checking session...</div>;
+  }
 
   return (
     <div className="auth-page-wrapper">
@@ -152,7 +152,9 @@ const AuthPage: React.FC = () => {
               required
             />
           )}
-          <button type="submit">{isLogin ? "Login" : "Register"}</button>
+          <button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? "Processing..." : isLogin ? "Login" : "Register"}
+          </button>
         </form>
 
         {/* ✅ Google Login Button */}
@@ -167,14 +169,13 @@ const AuthPage: React.FC = () => {
               },
             })
           }
+          disabled={isSubmitting}
         >
           Sign in with Google
         </button>
 
         <p className="toggle-auth" onClick={() => setIsLogin(!isLogin)}>
-          {isLogin
-            ? "Don't have an account? Register here"
-            : "Already have an account? Login"}
+          {isLogin ? "Don't have an account? Register here" : "Already have an account? Login"}
         </p>
       </div>
     </div>

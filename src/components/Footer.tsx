@@ -1,6 +1,6 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import '../styles/Footer.css';
+import React from "react";
+import { Link } from "react-router-dom";
+import "../styles/Footer.css";
 
 const Footer: React.FC = () => {
   return (
@@ -16,6 +16,7 @@ const Footer: React.FC = () => {
           <Link to="/privacy-policy">Privacy Policy</Link>
           <Link to="/terms-of-service">Terms of Service</Link>
           <Link to="/contact">Contact Us</Link>
+          <Link to="/about">About</Link>
         </div>
 
         {/* <div className="social-media">
@@ -30,9 +31,11 @@ const Footer: React.FC = () => {
           </a>
         </div> */}
       </div>
-      
+
       <div className="footer-bottom">
-        <p>&copy; {new Date().getFullYear()} AthleteXpert. All rights reserved.</p>
+        <p>
+          &copy; {new Date().getFullYear()} AthleteXpert. All rights reserved.
+        </p>
       </div>
     </footer>
   );

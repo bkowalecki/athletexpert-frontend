@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState } from "react";
 import "./styles/App.css";
 import {
   BrowserRouter as Router,
@@ -28,7 +28,7 @@ import BlogPostPage from "./components/BlogPostPage";
 import AuthPage from "./components/AuthPage";
 import PrivacyPolicy from "./components/PrivacyPolicy";
 import AuthCallback from "./components/AuthCallback";
-import { UserProvider, UserContext } from "./context/UserContext";
+import { UserProvider, useUserContext } from "./components/UserContext"; // ✅ Correct import
 import { Auth0Provider } from "@auth0/auth0-react";
 import AccountSettings from "./components/AccountSettings";
 
@@ -41,15 +41,12 @@ const AppContent: React.FC = () => {
   const [isQuizModalOpen, setQuizModalOpen] = useState(false);
   const openModal = () => setQuizModalOpen(true);
   const closeModal = () => setQuizModalOpen(false);
-
   const location = useLocation();
-  const userContext = useContext(UserContext);
+  const { isSessionChecked } = useUserContext(); // ✅ Ensures session is verified before rendering
 
-  if (!userContext) {
-    throw new Error("UserContext must be used within a UserProvider");
+  if (!isSessionChecked) {
+    return <div className="loading-screen">Checking session...</div>; // ✅ Prevents UI flicker
   }
-
-  const { user, setUser } = userContext;
 
   const PageWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
     <motion.div
@@ -62,71 +59,42 @@ const AppContent: React.FC = () => {
     </motion.div>
   );
 
-  useEffect(() => {
-    const checkSession = async () => {
-      try {
-        const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/users/session`,
-          {
-            credentials: "include",
-          }
-        );
-
-        if (response.ok) {
-          const userData = await response.json();
-          setUser(userData);
-        } else {
-          setUser(null);
-          document.cookie =
-            "authToken=; Max-Age=0; path=/; SameSite=None; Secure"; // ✅ Ensure cookie is cleared
-        }
-      } catch (error) {
-        console.error("Error checking session:", error);
-      }
-    };
-
-    if (document.cookie.includes("authToken")) {
-      // ✅ Only check session if token exists
-      checkSession();
-    }
-  }, [location.pathname]);
-
   return (
     <div className="App">
       <Header />
       <AnimatePresence mode="wait">
-      <Routes>
-        <Route
-          path="/"
-          element={<PageWrapper>
-            <>
-            
-              <HeroSection openQuiz={openModal} />
-              <main>
-                <FeaturedProductList />
-                <TrendingProductList />
-                <BlogSection />
-              </main>
-              <Quiz isOpen={isQuizModalOpen} closeModal={closeModal} />
-              
-            </></PageWrapper>
-          }
-        />
-        <Route path="/profile" element={<PageWrapper><ProfilePage /></PageWrapper>} />
-        <Route path="/settings" element={<PageWrapper><AccountSettings /></PageWrapper>} />
-        <Route path="/about" element={<PageWrapper><AboutPage /></PageWrapper>} />
-        <Route path="/blog" element={<PageWrapper><BlogPage /></PageWrapper>} />
-        <Route path="/products" element={<PageWrapper><ProductsPage /></PageWrapper>} />
-        <Route path="/404" element={<PageWrapper><NotFoundPage /></PageWrapper>} />
-        <Route path="/register" element={<PageWrapper><RegisterPage /></PageWrapper>} />
-        <Route path="/login" element={<PageWrapper><Login /></PageWrapper>} />
-        <Route path="/auth" element={<PageWrapper><AuthPage /></PageWrapper>} />
-        <Route path="/auth/callback" element={<AuthCallback />} />{" "}
-        <Route path="/search" element={<PageWrapper><SearchResults /></PageWrapper>} />
-        <Route path="/terms-of-service" element={<PageWrapper><TermsAndConditionsPage /></PageWrapper>} />
-        <Route path="/privacy-policy" element={<PageWrapper><PrivacyPolicy /></PageWrapper>} />
-        <Route path="/blog/:slug" element={<PageWrapper><BlogPostPage /></PageWrapper>} />
-      </Routes>
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <PageWrapper>
+                <>
+                  <HeroSection openQuiz={openModal} />
+                  <main>
+                    <FeaturedProductList />
+                    <TrendingProductList />
+                    <BlogSection />
+                  </main>
+                  <Quiz isOpen={isQuizModalOpen} closeModal={closeModal} />
+                </>
+              </PageWrapper>
+            }
+          />
+          <Route path="/profile" element={<PageWrapper><ProfilePage /></PageWrapper>} />
+          <Route path="/settings" element={<PageWrapper><AccountSettings /></PageWrapper>} />
+          <Route path="/about" element={<PageWrapper><AboutPage /></PageWrapper>} />
+          <Route path="/blog" element={<PageWrapper><BlogPage /></PageWrapper>} />
+          <Route path="/products" element={<PageWrapper><ProductsPage /></PageWrapper>} />
+          <Route path="/404" element={<PageWrapper><NotFoundPage /></PageWrapper>} />
+          <Route path="/register" element={<PageWrapper><RegisterPage /></PageWrapper>} />
+          <Route path="/login" element={<PageWrapper><Login /></PageWrapper>} />
+          <Route path="/auth" element={<PageWrapper><AuthPage /></PageWrapper>} />
+          <Route path="/auth/callback" element={<AuthCallback />} />
+          <Route path="/search" element={<PageWrapper><SearchResults /></PageWrapper>} />
+          <Route path="/terms-of-service" element={<PageWrapper><TermsAndConditionsPage /></PageWrapper>} />
+          <Route path="/privacy-policy" element={<PageWrapper><PrivacyPolicy /></PageWrapper>} />
+          <Route path="/blog/:slug" element={<PageWrapper><BlogPostPage /></PageWrapper>} />
+        </Routes>
       </AnimatePresence>
       <Footer />
     </div>
@@ -147,7 +115,7 @@ const App: React.FC = () => {
       }}
     >
       <QueryClientProvider client={queryClient}>
-        <UserProvider>
+        <UserProvider> {/* ✅ Wraps entire app to ensure UserContext is available */}
           <Router>
             <ScrollToTop />
             <AppContent />

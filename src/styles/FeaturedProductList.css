@@ -1,9 +1,10 @@
 /* 🌟 Featured Products Section */
 .featured-products-section {
   padding: 20px 5vw;
-  background: linear-gradient(120deg, #A23C20, #842D14); /* Warm, smooth gradient */
+  background: linear-gradient(140deg, #A23C20, #842D14); /* Warm, smooth gradient */
   text-align: center;
 }
+
 
 /* 🔹 Featured Products Title */
 .featured-products-heading {
@@ -106,7 +107,6 @@
   text-decoration: none;
   padding: 12px 18px;
   border-radius: 10px;
-  margin-top: 15px;
   transition: background 0.3s ease-in-out, transform 0.2s ease-in-out;
 }
 

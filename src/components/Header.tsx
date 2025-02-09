@@ -1,32 +1,23 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
-import { UserContext } from '../context/UserContext';
-import '../styles/Header.css';
-import HeaderSearchBar from './HeaderSearchBar';
+import { useUserContext } from "../components/UserContext";
+import "../styles/Header.css";
+import HeaderSearchBar from "./HeaderSearchBar";
 
 const Header: React.FC = () => {
   const { isAuthenticated } = useAuth0();
-  const userContext = useContext(UserContext);
+  const { user, isSessionChecked } = useUserContext();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 875);
   const navigate = useNavigate();
-
-  if (!userContext) {
-    throw new Error("UserContext must be used within a UserProvider");
-  }
-
-  const { user } = userContext;
-
-  // ✅ Unified authentication check
-  const isLoggedIn = isAuthenticated || user;
 
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth <= 875);
     };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const toggleMobileMenu = () => {
@@ -36,6 +27,17 @@ const Header: React.FC = () => {
   const closeMobileMenu = () => {
     if (isMobile) {
       setIsMobileMenuOpen(false);
+    }
+  };
+
+  /** ✅ Clicking "Profile" should go to `/profile` if logged in, otherwise `/auth` */
+  const handleProfileClick = () => {
+    if (!isSessionChecked) return; // 🔹 Prevent redirect before session check
+
+    if (isAuthenticated || user) {
+      navigate("/profile");
+    } else {
+      navigate("/auth");
     }
   };
 
@@ -53,56 +55,30 @@ const Header: React.FC = () => {
         </div>
       )}
 
-      <nav className={`nav-links ${isMobileMenuOpen ? 'mobile-menu-open' : ''}`}>
+      <nav className={`nav-links ${isMobileMenuOpen ? "mobile-menu-open" : ""}`}>
         {isMobile && (
           <div className="mobile-search">
-            <HeaderSearchBar
-              showSubmitButton={false}
-              onSearchComplete={closeMobileMenu}
-            />
+            <HeaderSearchBar showSubmitButton={false} onSearchComplete={closeMobileMenu} />
           </div>
         )}
 
-        <Link
-          to={isLoggedIn ? "/profile" : "/auth"} // ✅ Unified login check
-          className="nav-link"
-          onClick={closeMobileMenu}
-        >
-          Profile
-        </Link>
-
-        <Link
-          to={"/products"} // ✅ Unified login check
-          className="nav-link"
-          onClick={closeMobileMenu}
-        >
+        <Link to="/products" className="nav-link" onClick={closeMobileMenu}>
           Products
         </Link>
 
-        <Link
-          to="/blog"
-          className="nav-link"
-          onClick={closeMobileMenu}
-        >
+        <Link to="/blog" className="nav-link" onClick={closeMobileMenu}>
           Blog
         </Link>
 
-        <Link
-          to="/about"
-          className="nav-link"
-          onClick={closeMobileMenu}
-        >
-          About
+        <Link to="/profile" className="nav-link" onClick={closeMobileMenu}>
+          Profile
         </Link>
       </nav>
 
-      <div
-        className={`hamburger-menu ${isMobileMenuOpen ? 'open' : ''}`}
-        onClick={toggleMobileMenu}
-      >
-        <div className={`bar ${isMobileMenuOpen ? 'open' : ''}`}></div>
-        <div className={`bar ${isMobileMenuOpen ? 'open' : ''}`}></div>
-        <div className={`bar ${isMobileMenuOpen ? 'open' : ''}`}></div>
+      <div className={`hamburger-menu ${isMobileMenuOpen ? "open" : ""}`} onClick={toggleMobileMenu}>
+        <div className={`bar ${isMobileMenuOpen ? "open" : ""}`}></div>
+        <div className={`bar ${isMobileMenuOpen ? "open" : ""}`}></div>
+        <div className={`bar ${isMobileMenuOpen ? "open" : ""}`}></div>
       </div>
     </header>
   );

@@ -1,22 +1,18 @@
-import React, { useState, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { UserContext } from './UserContext';
-import '../styles/Login.css';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useUserContext } from "../components/UserContext"; // ✅ Import the safe hook
+import "../styles/Login.css";
 
 const Login: React.FC = () => {
-  const { setUser } = useContext(UserContext);
+  const { setUser } = useUserContext(); // ✅ No more undefined error
   const navigate = useNavigate();
 
-  const [credentials, setCredentials] = useState({ email: '', password: '' });
+  const [credentials, setCredentials] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setCredentials(prevState => ({
-      ...prevState,
-      [name]: value,
-    }));
+    setCredentials((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -24,28 +20,25 @@ const Login: React.FC = () => {
     setLoading(true);
     setError(null);
 
-    console.log(credentials); // Add this to see the credentials before the request
-
     try {
       const response = await fetch(`${process.env.REACT_APP_API_URL}/users/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(credentials),
+        credentials: "include",
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        localStorage.setItem('authToken', data.token);
+        localStorage.setItem("authToken", data.token);
         setUser(data.user);
-        navigate('/profile');
+        navigate("/profile");
       } else {
-        setError(data.message || 'Login failed. Please try again.');
+        setError(data.message || "Login failed. Please try again.");
       }
     } catch (err) {
-      setError('An error occurred. Please try again later.');
+      setError("An error occurred. Please try again later.");
     } finally {
       setLoading(false);
     }
@@ -60,7 +53,7 @@ const Login: React.FC = () => {
       <form onSubmit={handleSubmit} className="login-form">
         <div className="form-group">
           <input
-            type="email" // Changed to email
+            type="email"
             name="email"
             value={credentials.email}
             onChange={handleChange}
@@ -83,7 +76,7 @@ const Login: React.FC = () => {
         </div>
 
         <button type="submit" className="submit-button" disabled={loading}>
-          {loading ? 'Logging in...' : 'Login'}
+          {loading ? "Logging in..." : "Login"}
         </button>
       </form>
     </div>

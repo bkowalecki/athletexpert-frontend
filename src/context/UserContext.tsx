@@ -1,57 +1,57 @@
-import React, { createContext, useState, useEffect, ReactNode } from "react";
-import axios from "axios";
+// src/context/UserContext.tsx
+import React, { createContext, useContext, useState, ReactNode, useEffect } from "react";
 
-export type User = {
+interface User {
   username: string;
   email: string;
-  firstName?: string;
-  lastName?: string;
-  profilePictureUrl?: string;
-  bio?: string | null;
-  sports?: string[] | null;
-};
+}
 
 interface UserContextProps {
   user: User | null;
-  setUser: React.Dispatch<React.SetStateAction<User | null>>;
-  isAuthenticated: boolean;
+  setUser: (user: User | null) => void;
+  isSessionChecked: boolean;
 }
 
-export const UserContext = createContext<UserContextProps | undefined>(undefined);
+const UserContext = createContext<UserContextProps | undefined>(undefined);
 
-interface UserProviderProps {
-  children: ReactNode;
-}
+export const useUserContext = () => {
+  const context = useContext(UserContext);
+  if (!context) {
+    throw new Error("useUserContext must be used within a UserProvider");
+  }
+  return context;
+};
 
-export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
+export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isSessionChecked, setIsSessionChecked] = useState(false);
 
   useEffect(() => {
     const checkSession = async () => {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/users/session`, {
-          withCredentials: true, // ✅ Ensures cookies are sent
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/users/session`, {
+          credentials: "include",
         });
 
-        if (response.status === 200) {
-          console.log("✅ Session Active:", response.data);
-          setUser(response.data);
-          setIsAuthenticated(true);
+        if (response.ok) {
+          const userData = await response.json();
+          setUser(userData);
         } else {
-          console.warn("⚠️ No active session, user is logged out.");
           setUser(null);
-          setIsAuthenticated(false);
         }
       } catch (error) {
-        console.warn("⚠️ Session check failed, user is logged out.");
         setUser(null);
-        setIsAuthenticated(false);
+      } finally {
+        setIsSessionChecked(true);
       }
     };
 
-    checkSession(); // ✅ Always check session on page load
+    checkSession();
   }, []);
 
-  return <UserContext.Provider value={{ user, setUser, isAuthenticated }}>{children}</UserContext.Provider>;
+  return (
+    <UserContext.Provider value={{ user, setUser, isSessionChecked }}>
+      {children}
+    </UserContext.Provider>
+  );
 };

@@ -20,7 +20,7 @@ const FeaturedProductList: React.FC = () => {
     axios
       .get(`${process.env.REACT_APP_API_URL}/products/featured`)
       .then((response) => {
-        console.log("✅ Featured Products API Response:", response.data);
+        // console.log("✅ Featured Products API Response:", response.data);
         setProducts(response.data);
       })
       .catch((error) => {

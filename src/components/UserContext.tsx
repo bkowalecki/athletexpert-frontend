@@ -1,28 +1,62 @@
-// src/components/UserContext.tsx
-import React, { createContext, useState, ReactNode } from 'react';
+import React, { createContext, useState, useEffect, ReactNode, useContext } from "react";
 
-interface User {
+export type User = {
   username: string;
   email: string;
-  password: string;
-}
+  firstName?: string;
+  lastName?: string;
+  profilePictureUrl?: string;
+  bio?: string | null;
+  sports?: string[] | null;
+};
 
 interface UserContextProps {
   user: User | null;
   setUser: React.Dispatch<React.SetStateAction<User | null>>;
+  isSessionChecked: boolean;
 }
 
-export const UserContext = createContext<UserContextProps>({
-  user: null,
-  setUser: () => {}
-});
+const UserContext = createContext<UserContextProps | undefined>(undefined);
 
 export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [isSessionChecked, setIsSessionChecked] = useState(false);
+
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/users/session`, {
+          credentials: "include",
+        });
+
+        if (response.ok) {
+          const userData = await response.json();
+          setUser(userData);
+        } else {
+          setUser(null);
+        }
+      } catch (error) {
+        console.error("❌ Error checking session:", error);
+        setUser(null);
+      } finally {
+        setIsSessionChecked(true);
+      }
+    };
+
+    checkSession();
+  }, []);
 
   return (
-    <UserContext.Provider value={{ user, setUser }}>
+    <UserContext.Provider value={{ user, setUser, isSessionChecked }}>
       {children}
     </UserContext.Provider>
   );
+};
+
+export const useUserContext = (): UserContextProps => {
+  const context = useContext(UserContext);
+  if (!context) {
+    throw new Error("useUserContext must be used within a UserProvider");
+  }
+  return context;
 };

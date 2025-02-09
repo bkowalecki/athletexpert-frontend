@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from "react";
-import { UserContext } from "../context/UserContext";
+import { useUserContext } from "../components/UserContext";
 import "../styles/AccountSettings.css";
 
 interface UserProfile {
@@ -12,7 +12,7 @@ interface UserProfile {
 }
 
 const AccountSettings: React.FC = () => {
-  const { user, setUser } = useContext(UserContext)!;
+  const { user, setUser } = useUserContext(); 
   const [formData, setFormData] = useState<UserProfile>({
     username: "",
     firstName: "",

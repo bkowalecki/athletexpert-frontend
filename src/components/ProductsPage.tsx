@@ -44,17 +44,21 @@ const ProductsPage: React.FC = () => {
 
   const handleSaveProduct = async (productId: number) => {
     try {
-      await axios.post(
+      const response = await axios.post(
         `${process.env.REACT_APP_API_URL}/users/saved-products/${productId}`,
-        {}, 
+        {},
         { withCredentials: true }
       );
   
-      setSavedProducts((prev) => [...prev, productId]);
+      if (response.status === 200) {
+        setSavedProducts((prev) => [...prev, productId]);
+        console.log("✅ Product saved successfully!");
+      }
     } catch (error) {
       console.error("🚨 Error saving product:", error);
     }
   };
+  
 
   return (
     <div className="products-page">
