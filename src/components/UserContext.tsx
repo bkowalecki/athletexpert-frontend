@@ -24,24 +24,24 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   useEffect(() => {
     const checkSession = async () => {
-      try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/users/session`, {
-          credentials: "include",
-        });
+  try {
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/users/session`, {
+      credentials: "include", // ✅ Ensures cookies are sent
+    });
 
-        if (response.ok) {
-          const userData = await response.json();
-          setUser(userData);
-        } else {
-          setUser(null);
-        }
-      } catch (error) {
-        console.error("❌ Error checking session:", error);
-        setUser(null);
-      } finally {
-        setIsSessionChecked(true);
-      }
-    };
+    if (response.ok) {
+      const userData = await response.json();
+      setUser(userData);
+    } else {
+      setUser(null);
+    }
+  } catch (error) {
+    console.error("❌ Error checking session:", error);
+    setUser(null);
+  } finally {
+    setIsSessionChecked(true);
+  }
+};
 
     checkSession();
   }, []);
