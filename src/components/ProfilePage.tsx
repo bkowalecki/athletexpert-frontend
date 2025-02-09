@@ -3,6 +3,20 @@ import { useNavigate } from "react-router-dom";
 import { useUserContext } from "../components/UserContext";
 import "../styles/ProfilePage.css";
 
+interface Product {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  affiliateLink: string;
+  imgUrl: string;
+  brand: string;
+  category: string;
+  retailer: string;
+  featured?: boolean;
+  trending?: boolean;
+}
+
 interface Profile {
   name: string;
   firstName: string;
@@ -12,7 +26,7 @@ interface Profile {
   sports: string[] | null;
   badges?: string[];
   savedBlogs?: string[];
-  savedProducts?: string[];
+  savedProducts?: Product[];
 }
 
 const ProfilePage: React.FC = () => {
@@ -152,16 +166,30 @@ const ProfilePage: React.FC = () => {
       <div className="profile-section">
         <h2 className="profile-subsection-header-text">Saved Products</h2>
         <div className="profile-saved-products">
-          {/* {profile.savedProducts?.length ? (
-            profile.savedProducts.map((product, index) => (
-              <div key={index} className="saved-product-card">
-                <img src={product} alt="Saved Product" className="saved-product-image" />
-                <h3>{product}</h3>
-              </div>
-            ))
-          ) : (
-            <p>No saved products yet.</p>
-          )} */}
+        {profile.savedProducts?.length ? (
+      profile.savedProducts.map((product, index) => (
+        <div key={product.id || index} className="saved-product-card">
+          <img 
+            src={product.imgUrl} 
+            alt={product.name} 
+            className="saved-product-image" 
+          />
+          <h3>{product.name}</h3>
+          <p>{product.brand}</p>
+          <p>${product.price.toFixed(2)}</p>
+          <a 
+            href={product.affiliateLink} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="buy-now-btn"
+          >
+            Buy Now
+          </a>
+        </div>
+      ))
+    ) : (
+      <p>No saved products yet.</p>
+    )}
         </div>
       </div>
     </div>
