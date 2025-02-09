@@ -70,6 +70,7 @@ const ProfilePage: React.FC = () => {
       setUser(null);
       console.log("🔹 User successfully logged out.");
       navigate("/", { replace: true });
+      window.location.href = "/";
     } catch (error) {
       console.error("❌ Error during logout:", error);
     }
