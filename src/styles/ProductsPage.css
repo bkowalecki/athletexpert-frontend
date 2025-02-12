@@ -1,8 +1,13 @@
 /* 🌟 General Styles */
 .products-page {
-  padding: 2rem;
+  padding-top: 5rem; /* ✅ Always 5rem padding at the top */
   background: #1e1e1e;
   color: #fff;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
 }
 
 /* 🌟 Header */
@@ -12,6 +17,7 @@
   background: linear-gradient(145deg, #a23c20, #8a2f17);
   border-radius: 15px;
   margin-bottom: 2rem;
+  width: 100%;
 }
 
 .products-header h1 {
@@ -24,88 +30,162 @@
   margin-bottom: 1rem;
 }
 
-.cta-button {
-  display: inline-block;
-  background-color: #ff6347;
-  padding: 12px 24px;
-  border-radius: 25px;
-  color: white;
-  text-decoration: none;
-  transition: background 0.3s ease-in-out;
-}
-
-.cta-button:hover {
-  background: #e04e32;
-}
-
-/* 🌟 Filters */
-.products-filters {
+/* 🌟 Filters & Search */
+.filters-container {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
   gap: 1rem;
-  margin-bottom: 2rem;
+  width: 100%;
+  max-width: 1200px;
   background: #2c2c2c;
   padding: 1rem;
   border-radius: 8px;
+  justify-content: center;
 }
 
-.search-bar {
-  width: 100%;
-  padding: 12px;
+.filters-container input,
+.filters-container select {
+  flex: 1;
+  padding: 14px;
+  font-size: 1rem;
   border: none;
   background: #444;
   color: white;
-  border-radius: 5px;
+  border-radius: 6px;
+  transition: all 0.3s ease-in-out;
 }
 
-.filter-group label {
-  display: block;
-  margin-bottom: 5px;
-  font-weight: bold;
+.filters-container select {
+  cursor: pointer;
+}
+
+.filters-container input:hover,
+.filters-container select:hover {
+  background: #555;
+}
+
+/* ✅ Styled Search Bar */
+.search-bar {
+  flex: 1.5;
+  min-width: 250px;
+  padding: 14px;
+  font-size: 1rem;
+  border: 2px solid #a23c20;
+  background: #333;
+  color: white;
+  border-radius: 8px;
+  transition: all 0.3s ease-in-out;
+}
+
+.search-bar:hover,
+.search-bar:focus {
+  border-color: #ffdd57;
+  outline: none;
 }
 
 /* 🌟 Product Grid */
-.products-grid {
+.product-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 4rem; /* ✅ Fixed spacing between rows */
+  justify-content: center;
+  width: 95vw;
+  /* max-width: 1300px; */
+  padding: 2rem 1rem;
 }
 
 /* 🌟 Product Card */
 .product-card {
   background: #292929;
-  padding: 1rem;
+  padding: 1.5rem;
   border-radius: 12px;
   text-align: center;
-  transition: transform 0.3s ease-in-out;
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* height: 100%;
+  min-height: 430px; ✅ Adjusted for consistency */
+  justify-content: space-between;
+  overflow: hidden;
+  border: 2px solid transparent;
+  /* margin-bottom: 1.5rem; ✅ Extra spacing between rows */
 }
 
 .product-card:hover {
-  transform: translateY(-8px);
+  transform: translateY(-6px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
+  border-color: #ffdd57;
 }
 
+/* ✅ Product Image */
 .product-image {
   width: 100%;
   height: 200px;
-  object-fit: cover;
+  object-fit: contain; /* ✅ Ensures images fit without being cut off */
   border-radius: 8px;
   margin-bottom: 0.8rem;
 }
 
-.product-price {
+/* ✅ Text Styles */
+.product-name {
   font-size: 1.2rem;
   font-weight: bold;
-  color: #ffdd57;
+  max-height: 2.8em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-/* 🌟 Buttons */
+.product-description {
+  font-size: 0.9rem;
+  color: #bbb;
+  margin-bottom: 0.5rem;
+  max-height: 2.8em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ✅ Price Style */
+.product-price {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #ffdd57;
+  margin: 0.5rem 0;
+}
+
+/* ✅ Prevents button overflow */
 .product-actions {
+  width: 100%;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
 }
 
+/* 🌟 Badges */
+.trending-badge,
+.featured-badge {
+  display: inline-block;
+  font-size: 0.8rem;
+  font-weight: bold;
+  padding: 6px 12px;
+  border-radius: 15px;
+  margin-bottom: 8px;
+}
+
+.trending-badge {
+  background: #ff4500;
+  color: white;
+}
+
+.featured-badge {
+  background: #ffdd57;
+  color: black;
+}
+
+/* 🌟 Buttons */
 .buy-button {
   display: inline-block;
   padding: 10px;
@@ -113,7 +193,11 @@
   color: white;
   border-radius: 5px;
   text-decoration: none;
+  font-weight: bold;
   transition: background 0.3s ease-in-out;
+  width: 100%;
+  text-align: center;
+  max-height: 40px;
 }
 
 .buy-button:hover {
@@ -127,6 +211,8 @@
   padding: 8px;
   cursor: pointer;
   transition: all 0.3s ease-in-out;
+  width: 100%;
+  max-height: 40px;
 }
 
 .save-button.saved {
@@ -140,24 +226,64 @@
   color: #1e1e1e;
 }
 
+/* 🌟 Loading & Error */
+.loading-text,
+.error-text {
+  text-align: center;
+  font-size: 1.2rem;
+  margin-top: 1.5rem;
+  color: #ffdd57;
+}
+
+/* 🌟 No Products */
+.no-products-text {
+  text-align: center;
+  font-size: 1.2rem;
+  margin-top: 2rem;
+  color: #ffdd57;
+}
+
 /* 🌟 Responsive Design */
 @media (max-width: 768px) {
+  .products-page {
+    padding-top: 5rem;
+  }
+
   .products-header h1 {
     font-size: 2rem;
   }
 
-  .products-filters {
+  .filters-container {
     flex-direction: column;
+    /* align-items: center; */
+    width: 90%;
+    padding: 1rem;
   }
 
-  .products-grid {
+  .filters-container select {
+    width: 100%;
+    padding: 14px;
+  }
+
+  .filters-container input{
+
+  }
+
+  .product-grid {
     grid-template-columns: 1fr;
+    width: 75vw;
     display: flex;
     flex-direction: column;
     align-items: center;
   }
 
   .product-card {
-    padding: 1rem;
+    width: 90%;
+    min-height: 420px; /* ✅ Consistent height for mobile */
+    margin-bottom: 2rem; /* ✅ Extra spacing for better UX */
+  }
+
+  .product-image {
+    height: 180px;
   }
 }

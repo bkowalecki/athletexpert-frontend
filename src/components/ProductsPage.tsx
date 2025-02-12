@@ -11,7 +11,7 @@ interface Product {
   affiliateLink: string;
   imgUrl: string;
   brand: string;
-  category: string;
+  categories: string;
   retailer: string;
   trending: boolean;
   featured: boolean;
@@ -35,7 +35,9 @@ const ProductsPage: React.FC = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/products`);
+        const response = await axios.get(
+          `${process.env.REACT_APP_API_URL}/products`
+        );
         setProducts(response.data);
         setFilteredProducts(response.data);
       } catch (error) {
@@ -91,11 +93,15 @@ const ProductsPage: React.FC = () => {
     }
 
     if (selectedCategory) {
-      filtered = filtered.filter((product) => product.category === selectedCategory);
+      filtered = filtered.filter(
+        (product) => product.categories === selectedCategory
+      );
     }
 
     if (selectedRetailer) {
-      filtered = filtered.filter((product) => product.retailer === selectedRetailer);
+      filtered = filtered.filter(
+        (product) => product.retailer === selectedRetailer
+      );
     }
 
     if (sortOption === "priceLow") {
@@ -105,7 +111,14 @@ const ProductsPage: React.FC = () => {
     }
 
     setFilteredProducts(filtered);
-  }, [searchQuery, selectedBrand, selectedCategory, selectedRetailer, sortOption, products]);
+  }, [
+    searchQuery,
+    selectedBrand,
+    selectedCategory,
+    selectedRetailer,
+    sortOption,
+    products,
+  ]);
 
   return (
     <div className="products-page">
@@ -120,25 +133,53 @@ const ProductsPage: React.FC = () => {
           onChange={(e) => setSearchQuery(e.target.value)}
           className="search-bar"
         />
-        <select value={selectedBrand} onChange={(e) => setSelectedBrand(e.target.value)}>
+        <select
+          value={selectedBrand}
+          onChange={(e) => setSelectedBrand(e.target.value)}
+        >
           <option value="">All Brands</option>
-          {[...new Set(products.map((p) => p.brand))].map((brand) => (
-            <option key={brand} value={brand}>{brand}</option>
-          ))}
+          {[...new Set(products.map((p) => p.brand))].map((brand, index) =>
+            brand ? (
+              <option key={`${brand}-${index}`} value={brand}>
+                {brand}
+              </option>
+            ) : null
+          )}
         </select>
-        <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)}>
+
+        <select
+          value={selectedCategory}
+          onChange={(e) => setSelectedCategory(e.target.value)}
+        >
           <option value="">All Categories</option>
-          {[...new Set(products.map((p) => p.category))].map((category) => (
-            <option key={category} value={category}>{category}</option>
-          ))}
+          {[...new Set(products.map((p) => p.categories))].map(
+            (category, index) =>
+              category ? (
+                <option key={`${category}-${index}`} value={category}>
+                  {category}
+                </option>
+              ) : null
+          )}
         </select>
-        <select value={selectedRetailer} onChange={(e) => setSelectedRetailer(e.target.value)}>
+
+        <select
+          value={selectedRetailer}
+          onChange={(e) => setSelectedRetailer(e.target.value)}
+        >
           <option value="">All Retailers</option>
-          {[...new Set(products.map((p) => p.retailer))].map((retailer) => (
-            <option key={retailer} value={retailer}>{retailer}</option>
-          ))}
+          {[...new Set(products.map((p) => p.retailer))].map(
+            (retailer, index) =>
+              retailer ? (
+                <option key={`${retailer}-${index}`} value={retailer}>
+                  {retailer}
+                </option>
+              ) : null
+          )}
         </select>
-        <select value={sortOption} onChange={(e) => setSortOption(e.target.value)}>
+        <select
+          value={sortOption}
+          onChange={(e) => setSortOption(e.target.value)}
+        >
           <option value="default">Sort By</option>
           <option value="priceLow">Price: Low to High</option>
           <option value="priceHigh">Price: High to Low</option>
@@ -152,20 +193,33 @@ const ProductsPage: React.FC = () => {
       {/* Product Grid */}
       <div className="product-grid">
         {filteredProducts.length > 0 ? (
-          filteredProducts.map((product) => (
-            <div key={product.id} className="product-card">
-              {product.trending && <span className="trending-badge">🔥 Trending</span>}
-              {product.featured && <span className="featured-badge">⭐ Featured</span>}
-              <img src={product.imgUrl} alt={product.name} className="product-image" />
+          filteredProducts.map((product, index) => (
+            <div key={product.id || `product-${index}`} className="product-card">
+              {product.trending && (
+                <span className="trending-badge">🔥 Trending</span>
+              )}
+              {product.featured && (
+                <span className="featured-badge">⭐ Featured</span>
+              )}
+              <img
+                src={product.imgUrl}
+                alt={product.name}
+                className="product-image"
+              />
               <h3>{product.name}</h3>
               <p className="product-description">{product.description}</p>
               <p className="product-price">${product.price.toFixed(2)}</p>
-              <a href={product.affiliateLink} target="_blank" rel="noopener noreferrer" className="buy-button">
+              {/* <a
+                href={product.affiliateLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="buy-button"
+              >
                 Buy Now
-              </a>
+              </a> */}
               {user && (
-                <button 
-                  className="save-button" 
+                <button
+                  className="save-button"
                   onClick={() => handleSaveProduct(product.id)}
                   disabled={saving === product.id}
                 >

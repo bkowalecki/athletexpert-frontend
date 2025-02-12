@@ -17,6 +17,14 @@ interface Product {
   trending?: boolean;
 }
 
+interface BlogPost {
+  id: number;
+  title: string;
+  author: string;
+  imageUrl: string;
+  slug: string;
+}
+
 interface Profile {
   name: string;
   firstName: string;
@@ -25,18 +33,17 @@ interface Profile {
   profilePictureUrl: string | null;
   sports: string[] | null;
   badges?: string[];
-  savedBlogs?: string[];
+  savedBlogs?: BlogPost[]; // ✅ Ensure this is properly populated
   savedProducts?: Product[];
 }
 
 const ProfilePage: React.FC = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const { user, setUser, isSessionChecked } = useUserContext();
 
   useEffect(() => {
-    if (!isSessionChecked) return; // ✅ Prevents premature redirects
+    if (!isSessionChecked) return;
 
     if (!user) {
       console.warn("⚠️ No valid session. Redirecting to /auth...");
@@ -52,6 +59,7 @@ const ProfilePage: React.FC = () => {
 
         if (response.ok) {
           const data = await response.json();
+          console.log("✅ Profile data:", data); // ✅ Debugging output
           setProfile(data);
         } else {
           console.warn("⚠️ No valid session. Redirecting to /auth...");
@@ -148,48 +156,61 @@ const ProfilePage: React.FC = () => {
         </div>
       </div>
 
+      {/* ✅ FIXED: Display saved blogs correctly */}
       <div className="profile-section">
         <h2 className="profile-subsection-header-text">Saved Blogs</h2>
-        <div className="profile-saved-blogs">
-          {profile.savedBlogs?.length ? (
-            profile.savedBlogs.map((blog, index) => (
-              <div key={index} className="saved-item">
-                {blog}
-              </div>
-            ))
-          ) : (
-            <p>No saved blogs yet.</p>
-          )}
+        <div className="saved-blogs-grid">
+  {profile.savedBlogs && profile.savedBlogs.length ? (
+    profile.savedBlogs.map((blog) => (
+      <div key={blog.id} className="saved-blog-card">
+        {/* Blog Image */}
+        <img src={blog.imageUrl} alt={blog.title} className="saved-blog-image" />
+
+        {/* Blog Details */}
+        <div className="saved-blog-details">
+          <h3 className="blog-title">{blog.title}</h3>
+          <p className="blog-author">By {blog.author}</p>
+
+          {/* Read More Button */}
+          <a href={`/blog/${blog.slug}`} className="read-blog-btn">
+            Read More
+          </a>
         </div>
       </div>
+    ))
+  ) : (
+    <p className="no-blogs-text">No saved blogs yet.</p>
+  )}
+</div>
 
+
+      </div>
+
+      {/* Saved Products Section */}
       <div className="profile-section">
         <h2 className="profile-subsection-header-text">Saved Products</h2>
         <div className="profile-saved-products">
-        {profile.savedProducts?.length ? (
-      profile.savedProducts.map((product, index) => (
-        <div key={product.id || index} className="saved-product-card">
-          <img 
-            src={product.imgUrl} 
-            alt={product.name} 
-            className="saved-product-image" 
-          />
-          <h3>{product.name}</h3>
-          <p>{product.brand}</p>
-          <p>${product.price.toFixed(2)}</p>
-          <a 
-            href={product.affiliateLink} 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="buy-now-btn"
-          >
-            Buy Now
-          </a>
-        </div>
-      ))
-    ) : (
-      <p>No saved products yet.</p>
-    )}
+          {profile.savedProducts?.length ? (
+            <div className="saved-products-grid">
+              {profile.savedProducts.map((product) => (
+                <div key={product.id} className="saved-product-card">
+                  <img src={product.imgUrl} alt={product.name} className="saved-product-image" />
+                  <div className="saved-product-details">
+                    <h3 className="product-name">{product.name}</h3>
+                    <p className="product-brand">{product.brand}</p>
+                    <p className="product-price">${product.price.toFixed(2)}</p>
+                    <div className="saved-product-actions">
+                      <a href={product.affiliateLink} target="_blank" rel="noopener noreferrer" className="buy-now-btn">
+                        Buy Now
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="no-products-text">No saved products yet.</p>
+          )}
         </div>
       </div>
     </div>

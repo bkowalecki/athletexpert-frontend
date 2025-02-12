@@ -304,7 +304,7 @@
 }
 
 /* Product Grid */
-.product-grid {
+.quiz-product-grid {
   display: flex;
   flex-wrap: wrap;
   gap: 30px;
@@ -313,7 +313,7 @@
 }
 
 /* Responsive product card */
-.product-card {
+.quiz-product-card {
   background-color: #fff;
   border-radius: 15px; /* Softer corners */
   padding: 20px;
@@ -328,7 +328,7 @@
   border: 1px solid rgba(0, 0, 0, 0.05); /* Subtle border */
 }
 
-.product-card:hover {
+.quiz-product-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
 }
