@@ -32,7 +32,7 @@
   border-radius: 14px;
   padding: 20px;
   text-align: center;
-  box-shadow: 0 6px 15px rgba(255, 255, 255, 0.2); /* Inverse shadow */
+
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   overflow: hidden;
   cursor: pointer;
