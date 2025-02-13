@@ -50,7 +50,7 @@
 }
 
 .hero-content h1 {
-  font-size: 48px;
+  font-size: clamp(2.8rem, 4.5vw, 4rem);
   margin-bottom: 20px;
   font-family: 'Arial', sans-serif;
   letter-spacing: 1px;

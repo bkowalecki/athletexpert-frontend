@@ -119,7 +119,7 @@ const BlogPage: React.FC = () => {
                 <p className="blog-author">By {post.author}</p>
                 <p className="blog-date">{new Date(post.publishedDate).toLocaleDateString()}</p>
                 <p className="blog-description">{DOMPurify.sanitize(post.summary)}</p>
-                <Link to={`/blog/${post.slug}`} className="cta-button">Read More</Link>
+                <Link to={`/blog/${post.slug}`} className="blog-read-more-btn">Read More</Link>
                 {user && (
                   <button className="save-blog-btn" onClick={() => handleSaveBlog(post.id)}>
                     Save Blog

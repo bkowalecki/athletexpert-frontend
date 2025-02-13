@@ -168,8 +168,8 @@ const ProfilePage: React.FC = () => {
 
         {/* Blog Details */}
         <div className="saved-blog-details">
-          <h3 className="blog-title">{blog.title}</h3>
-          <p className="blog-author">By {blog.author}</p>
+          <h3 className="saved-blog-title">{blog.title}</h3>
+          <p className="saved-blog-author">By {blog.author}</p>
 
           {/* Read More Button */}
           <a href={`/blog/${blog.slug}`} className="read-blog-btn">

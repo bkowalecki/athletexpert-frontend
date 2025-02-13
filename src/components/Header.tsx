@@ -62,6 +62,10 @@ const Header: React.FC = () => {
           </div>
         )}
 
+      <Link to="/community" className="nav-link" onClick={closeMobileMenu}>
+          Community
+        </Link>
+
         <Link to="/products" className="nav-link" onClick={closeMobileMenu}>
           Products
         </Link>

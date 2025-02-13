@@ -1,0 +1,177 @@
+/* 🌟 General Styles */
+.community-page {
+    width: 100%;
+    min-height: 100vh;
+    background: #1e1e1e;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* 🌟 Hero Section */
+.community-hero {
+    position: relative;
+    width: 100%;
+    height: 400px;
+    overflow: hidden;
+}
+
+.community-hero-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.7;
+}
+
+.community-hero-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 2;
+}
+
+.community-hero-content h1 {
+    font-size: 3rem;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+/* 🌟 Search Bar */
+.community-search-bar {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.community-search-bar input {
+    width: 300px;
+    padding: 12px;
+    font-size: 1rem;
+    border: 2px solid #a23c20;
+    background: #333;
+    color: white;
+    border-radius: 8px;
+    transition: all 0.3s ease-in-out;
+}
+
+.community-search-bar input:focus {
+    border-color: #ffdd57;
+    outline: none;
+}
+
+/* 🌟 Featured Sport */
+.featured-sport {
+    text-align: center;
+    width: 600px;
+    /* margin-top: 50px; */
+}
+
+.featured-sport h2 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+}
+
+.featured-sport-card {
+    position: relative;
+    width: 95%;
+    max-width: 600px;
+    height: 300px;
+    background: #292929;
+    border-radius: 14px;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.featured-sport-bg {
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    opacity: 0.4;
+}
+
+.featured-sport-info {
+    position: absolute;
+    bottom: 10px;
+    left: 20px;
+    color: white;
+}
+
+.featured-sport-info h3 {
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+/* 🌟 Masonry Sports Grid */
+.sports-masonry {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    padding: 20px;
+    width: 90%;
+    max-width: 1400px;
+}
+
+.sport-card {
+    position: relative;
+    border-radius: 14px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.3s ease-in-out;
+}
+
+.sport-card:hover {
+    transform: scale(1.05);
+}
+
+/* 🎭 Masonry Grid Effect */
+.sport-card-0 { flex-basis: 48%; height: 250px; }
+.sport-card-1 { flex-basis: 23%; height: 200px; }
+.sport-card-2 { flex-basis: 30%; height: 300px; }
+.sport-card-3 { flex-basis: 40%; height: 350px; }
+
+.sport-card-bg {
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    opacity: 0.5;
+}
+
+.sport-card-info {
+    position: absolute;
+    bottom: 10px;
+    left: 20px;
+    color: white;
+}
+
+.sport-card-info h3 {
+    font-size: 1.4rem;
+    font-weight: bold;
+}
+
+/* 📱 Mobile Adjustments */
+@media (max-width: 768px) {
+    .community-hero-content h1 {
+        font-size: 2.5rem;
+    }
+
+    .sports-masonry {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .sport-card {
+        width: 100%;
+        height: auto;
+    }
+
+    .sport-card-0, .sport-card-1, .sport-card-2, .sport-card-3 {
+        flex-basis: 100%;
+        height: 200px;
+    }
+}

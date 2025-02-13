@@ -1,104 +1,115 @@
 /* 🌟 Featured Products Section */
 .featured-products-section {
-  padding: 20px 5vw;
-  background: linear-gradient(140deg, #A23C20, #842D14); /* Warm, smooth gradient */
+  padding: 0 5vw 5vw;
+  background: linear-gradient(180deg, #A23C20 0%, #842D14 100%);
   text-align: center;
+  /* width: 100%; */
 }
 
-
-/* 🔹 Featured Products Title */
+/* 🎯 Featured Heading */
 .featured-products-heading {
-  font-size: 2.8rem;
-  color: #ffffff;
-  margin-bottom: 20px;
-  letter-spacing: 1.5px;
+  font-size: clamp(2.4rem, 4vw, 3.5rem);
+  color: #FFF;
   text-transform: uppercase;
-  font-weight: 800;
-  font-family: 'Arial', sans-serif;
-  border-bottom: 3px solid rgba(255, 255, 255, 0.2);
-  padding-bottom: 8px;
-  display: inline-block;
-  cursor: default;
+  font-weight: 900;
+  font-family: 'Oswald', sans-serif;
+  letter-spacing: 3px;
+  margin-bottom: 20px;
 }
 
-/* 🔹 Product Grid */
+/* ✅ Desktop Product Grid (Hidden on Mobile) */
 .featured-products-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(275px, 1fr));
   gap: 20px;
   justify-content: center;
+  align-items: center;  /* ✅ Ensures proper vertical alignment */
   padding-top: 20px;
+
+  margin: 0 auto; /* ✅ Centers the entire grid */
 }
 
-/* 🌟 Individual Product Card */
-.featured-products-item {
-  position: relative;
-  background: #1e1e1e; /* Dark neutral card */
+
+/* ✅ Hide on Mobile */
+@media (max-width: 768px) {
+  .featured-products-grid {
+    display: none;
+  }
+}
+
+/* 🔹 Product Card */
+/* 🌟 Featured Product Cards */
+.featured-product-item {
+  background: #1e1e1e;
   border-radius: 14px;
+  height: 380px;
   padding: 20px;
   text-align: center;
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3); /* Subtle shadow */
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   overflow: hidden;
   cursor: pointer;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* ✅ Ensures all elements are evenly spaced */
+  align-items: center;
+  min-height: 420px; /* ✅ Ensures uniform height */
 }
 
-/* 🌟 Hover Effect */
-.featured-products-item:hover {
+.featured-product-item:hover {
   transform: scale(1.02);
   box-shadow: 0 12px 25px rgba(255, 180, 0, 0.3);
 }
 
-/* 🔹 Product Image Container */
-.featured-products-image-container {
+/* 🔹 Product Image */
+.featured-product-image-container {
   width: 100%;
-  height: 250px; /* Fixed height */
+  height: 200px;
   overflow: hidden;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
 }
 
-/* 🔹 Product Image */
-.featured-products-image {
+.featured-product-image {
   width: 100%;
   height: 100%;
-  object-fit: cover; /* 🔥 Ensures full coverage */
-  transition: transform 0.3s ease;
-}
-
-.featured-products-item:hover .featured-products-image {
-  transform: scale(1.05);
+  object-fit: cover;
 }
 
 /* 🔹 Product Info */
-.featured-products-info {
-  margin-top: 15px;
+
+.featured-product-info {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  text-align: center;
 }
 
-.featured-products-name {
-  font-size: 1.8rem;
-  font-weight: 700;
-  color: #f5f5f5; /* Neutral white */
+.featured-product-name {
+  font-size: 1.6rem;
+  font-weight: bold;
+  color: #f5f5f5;
   letter-spacing: 1px;
 }
 
-.featured-products-brand {
-  font-size: 1.4rem;
-  color: #bbb; /* Softer, neutral text */
+.featured-product-brand {
+  font-size: 1.2rem;
+  color: #bbb;
   font-weight: 500;
   margin-top: 4px;
 }
 
-/* 🔥 Price Color Updated to #1DB954 (Spotify Green) */
-.featured-products-price {
+.featured-product-price {
   font-size: 1.4rem;
   font-weight: bold;
-  color: #cccccc; /* 🔥 High-contrast, premium green */
+  color: #ffdd57;
   margin-top: 10px;
 }
 
-/* 🌟 CTA Button (Now Blue for Amazon Branding) */
-.featured-products-cta-button {
+/* 🌟 CTA Button */
+.featured-product-cta-button {
   display: inline-block;
   background: linear-gradient(45deg, #0077FF, #005FCC);
   color: #ffffff;
@@ -110,39 +121,97 @@
   transition: background 0.3s ease-in-out, transform 0.2s ease-in-out;
 }
 
-.featured-products-cta-button:hover {
+.featured-product-cta-button:hover {
   background: linear-gradient(45deg, #005FCC, #004BB8);
   transform: scale(1.05);
   color: #ffffff;
 }
 
-/* 📱 Mobile Responsive Design */
-@media (max-width: 1024px) {
-  .featured-products-grid {
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  }
+/* 🌟 Mobile Carousel (Hidden on Desktop) */
+.featured-carousel-wrapper {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  /* padding: 10px; */
 }
 
+/* ✅ Show only on Mobile */
 @media (max-width: 768px) {
-  .featured-products-heading {
-    font-size: 2.5rem;
+  .featured-carousel-wrapper {
+    display: flex;
   }
+}
+
+/* 🔄 Carousel */
+.featured-carousel {
+  display: flex;
+  width: 100%;
+  transition: transform 0.5s ease-in-out;
+}
+
+/* 🏆 Active Carousel Item */
+.featured-carousel-item {
+  flex: 0 0 100%;
+  text-align: center;
+  opacity: 0;
+  transform: scale(0.9);
+  /* transition: all 0.5s ease-in-out; */
+  display: none;
+}
+
+.featured-carousel-item.active {
+  opacity: 1;
+  transform: scale(1);
+  display: block;
+}
+
+/* 🌟 Featured Carousel Navigation Buttons */
+.featured-carousel-button {
+  background: none;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  z-index: 2;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px; /* ✅ Fixed width */
+  height: 90px; /* ✅ Fixed height */
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+  transition: background-color 0.3s ease, transform 0.2s ease-in-out;
+}
+
+.featured-carousel-button.left {
+  left: 10px;
+}
+
+.featured-carousel-button.right {
+  right: 10px;
+}
+
+.featured-carousel-button:hover {
+  background-color: #A23C20;
   
-  .featured-products-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
 }
 
-@media (max-width: 480px) {
-  .featured-products-grid {
-    grid-template-columns: repeat(1, 1fr);
-  }
-
-  .featured-products-heading {
-    font-size: 2rem;
-  }
-
-  .featured-products-item {
-    padding: 18px;
-  }
+/* 🎯 Arrows */
+.featured-carousel-button svg {
+  stroke: white;
+  width: 24px;
+  height: 80px;
+  color: #fff;
+  transition: stroke 0.3s ease;
 }
+
+
+.featured-carousel-button:hover svg {
+  stroke: #ffcc00;
+}
+

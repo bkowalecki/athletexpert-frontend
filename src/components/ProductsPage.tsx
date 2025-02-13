@@ -194,7 +194,10 @@ const ProductsPage: React.FC = () => {
       <div className="product-grid">
         {filteredProducts.length > 0 ? (
           filteredProducts.map((product, index) => (
-            <div key={product.id || `product-${index}`} className="product-card">
+            <div
+              key={product.id || `product-${index}`}
+              className="product-card"
+            >
               {product.trending && (
                 <span className="trending-badge">🔥 Trending</span>
               )}
@@ -207,16 +210,16 @@ const ProductsPage: React.FC = () => {
                 className="product-image"
               />
               <h3>{product.name}</h3>
-              <p className="product-description">{product.description}</p>
+              {/* <p className="product-description">{product.description}</p> */}
               <p className="product-price">${product.price.toFixed(2)}</p>
-              {/* <a
+              <a
                 href={product.affiliateLink}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="buy-button"
               >
-                Buy Now
-              </a> */}
+                🛒 View on Amazon
+              </a>
               {user && (
                 <button
                   className="save-button"

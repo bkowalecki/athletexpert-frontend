@@ -1,0 +1,79 @@
+/* 🌟 General Styles */
+.sport-page {
+    width: 100%;
+    min-height: 100vh;
+    background: #1e1e1e;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-bottom: 3rem;
+  }
+  
+  /* 🎥 Hero Section */
+  .sport-hero {
+    position: relative;
+    opacity: .7;
+    width: 100%;
+    height: 350px;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+  
+  .sport-hero-overlay {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    border-radius: 10px;
+  }
+  
+  .sport-hero h1 {
+    font-size: 3rem;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+  
+  .sport-hero p {
+    font-size: 1.2rem;
+    margin-top: 10px;
+    color: #ffdd57;
+  }
+  
+  /* 📖 Sport Information */
+  .sport-about, .sport-leaderboard, .sport-gear, .sport-blogs {
+    width: 90%;
+    max-width: 900px;
+    margin-top: 40px;
+    padding: 20px;
+    background: #292929;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+  }
+  
+  .sport-about h2, .sport-leaderboard h2, .sport-gear h2, .sport-blogs h2 {
+    font-size: 2rem;
+    color: #ffdd57;
+    margin-bottom: 10px;
+  }
+  
+  .sport-about p, .sport-leaderboard p, .sport-gear p, .sport-blogs p {
+    font-size: 1.1rem;
+    color: #ddd;
+    line-height: 1.5;
+  }
+  
+  /* 📱 Responsive */
+  @media (max-width: 768px) {
+    .sport-hero h1 {
+      font-size: 2.5rem;
+    }
+  
+    .sport-about, .sport-leaderboard, .sport-gear, .sport-blogs {
+      width: 95%;
+    }
+  }
+  

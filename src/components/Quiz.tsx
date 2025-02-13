@@ -113,6 +113,7 @@ const Quiz: React.FC<QuizProps> = ({ isOpen, closeModal }) => {
       fetch(`${process.env.REACT_APP_API_URL}/recommendations`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify(answers),
       })
         .then((res) => (res.ok ? res.json() : Promise.reject()))

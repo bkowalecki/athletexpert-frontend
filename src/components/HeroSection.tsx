@@ -64,7 +64,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ openQuiz }) => {
       </video>
 
       <div className="hero-content">
-        <h1>Gear Tailored to You</h1>
+        <h1>Where Athletes Find Their Edge.</h1>
         <div className="cta-buttons">
           <button className="cta-btn" onClick={openQuiz}>
             Get Your Gear
