@@ -54,7 +54,7 @@ const SportPage: React.FC = () => {
 
       {/* 📖 About the Sport */}
       <section className="sport-about">
-        <h2>About {currentSport.title}</h2>
+        <h2>About</h2>
         <p>
           {currentSport.title} is a {currentSport.extra_data.category.toLowerCase()} that is played {currentSport.extra_data.type.toLowerCase()}.
           It has gained {currentSport.extra_data.popularity.toLowerCase()} popularity worldwide.
@@ -69,13 +69,13 @@ const SportPage: React.FC = () => {
 
       {/* 🏋️ Recommended Gear */}
       <section className="sport-gear">
-        <h2>🏋️ Popular Gear for {currentSport.title}</h2>
+        <h2>Gear</h2>
         <p>Top gear recommendations for this sport will appear here.</p>
       </section>
 
       {/* 📝 Related Blog Posts */}
       <section className="sport-blogs">
-        <h2>📝 Related Blog Posts</h2>
+        <h2>Blog</h2>
         <p>Discover articles, tips, and guides for {currentSport.title}.</p>
       </section>
     </div>

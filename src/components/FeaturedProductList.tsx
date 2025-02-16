@@ -10,7 +10,7 @@ interface Product {
   category: string;
   price: number | null;
   imgUrl: string;
-  amazonUrl: string;
+  affiliateLink: string;
 }
 
 const FeaturedProductList: React.FC = () => {
@@ -21,6 +21,7 @@ const FeaturedProductList: React.FC = () => {
     axios
       .get(`${process.env.REACT_APP_API_URL}/products/featured`)
       .then((response) => {
+        console.log(response);
         if (response.data.length > 0) {
           setProducts(response.data);
         }
@@ -76,7 +77,7 @@ const FeaturedProductList: React.FC = () => {
                   </p>
                 </div>
                 <a
-                  href={product.amazonUrl}
+                  href={product.affiliateLink}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="featured-product-cta-button"
@@ -144,7 +145,7 @@ const FeaturedProductList: React.FC = () => {
                       </p>
                     </div>
                     <a
-                      href={products[currentIndex]?.amazonUrl}
+                      href={products[currentIndex]?.affiliateLink}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="featured-product-cta-button"

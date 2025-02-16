@@ -1,0 +1,106 @@
+/* CSS */
+.onboarding-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background: linear-gradient(135deg, #2A6045, #A23C20);
+  color: #fff;
+  font-family: "Montserrat", sans-serif;
+  text-align: center;
+  padding: 2rem;
+}
+
+.onboarding-step {
+  background: rgba(0, 0, 0, 0.7);
+  padding: 2rem;
+  border-radius: 20px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.6);
+  width: 100%;
+  max-width: 500px;
+  transition: all 0.5s ease;
+}
+
+.onboarding-step h2 {
+  margin-bottom: 2rem;
+  color: #FFD700;
+}
+
+.onboarding-step input,
+.onboarding-step select,
+.onboarding-step textarea {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border: none;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.sports-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 15px;
+  margin: 20px 0;
+}
+
+.sport-option {
+  background: #FFD700;
+  color: #1e1e1e;
+  padding: 15px;
+  border-radius: 12px;
+  cursor: pointer;
+  text-align: center;
+  transition: transform 0.3s ease;
+}
+
+.sport-option.selected {
+  background: #A23C20;
+  color: #fff;
+  transform: scale(1.1);
+}
+
+.sport-option:hover {
+  background: #FF5733;
+}
+
+.onboarding-btn {
+  background: #FF6F00;
+  color: white;
+  border: none;
+  padding: 15px 20px;
+  margin: 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  font-size: 1.2rem;
+}
+
+.onboarding-btn:hover {
+  background: #A23C20;
+}
+
+@media (max-width: 600px) {
+  .onboarding-step {
+    width: 90%;
+  }
+
+  .sports-grid {
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  }
+
+  .onboarding-btn {
+    padding: 12px 15px;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.onboarding-step {
+  animation: fadeIn 1s ease;
+}

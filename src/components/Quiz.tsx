@@ -298,7 +298,7 @@ const Quiz: React.FC<QuizProps> = ({ isOpen, closeModal }) => {
 
               {step === totalSteps && (
                 <div className="recommended-products">
-                  <h3>Recommended Products</h3>
+                  <h3>Recommended For You</h3>
                   <div className="product-grid">
                     {recommendedProducts.map((product, index) => (
                       <div key={index} className="product-card animate-product">

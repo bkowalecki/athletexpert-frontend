@@ -377,11 +377,14 @@
   .quiz-modal {
     width: 90vw; /* Maintain spacing between items on smaller screens */
     max-width: 98vw;
+    background-color: #A23C20;
+    color: white;
     /* height:48vh; */
   }
 
   .quiz-container h2 {
-    font-size: 1.8rem
+    font-size: 1.8rem;
+    color: white;
   }
 
   .quiz-option {
@@ -403,6 +406,7 @@
 
   .quiz-modal-content{
     padding-top: 7vh;
+    max-height: 500px;
   }
 
   .quiz-option {

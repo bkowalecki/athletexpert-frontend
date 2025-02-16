@@ -138,6 +138,10 @@ const ProfilePage: React.FC = () => {
           ) : (
             <p>No badges yet. Start achieving!</p>
           )}
+                        <div className="badge-item-one-of-a-kind">
+                        <img src="https://athletexpertbucket.s3.us-east-1.amazonaws.com/badges/White+Gold+Black+Modern+Elegant+Football+Club+Badge+Logo.png" alt="whhops" className="badge-image" />
+
+              </div>
         </div>
       </div>
 

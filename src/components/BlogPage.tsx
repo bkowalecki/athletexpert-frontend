@@ -4,7 +4,7 @@ import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 import DOMPurify from "dompurify";
 import { Helmet } from "react-helmet";
-import { useUserContext } from "../components/UserContext"; // ✅ Fix: Import user context
+import { useUserContext } from "../components/UserContext"; 
 import "../styles/BlogPage.css";
 
 interface BlogPost {
@@ -17,7 +17,10 @@ interface BlogPost {
   slug: string;
 }
 
-const fetchPosts = async (searchQuery: string, page: number): Promise<BlogPost[]> => {
+const fetchPosts = async (
+  searchQuery: string,
+  page: number
+): Promise<BlogPost[]> => {
   const response = await axios.get(`${process.env.REACT_APP_API_URL}/blogs`, {
     params: { searchQuery, page, size: 9 },
   });
@@ -30,7 +33,7 @@ const BlogPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [hasMorePosts, setHasMorePosts] = useState(true);
-  const { user } = useUserContext(); // ✅ Fix: Get user context
+  const { user } = useUserContext();
 
   const { data, isLoading, isFetching } = useQuery<BlogPost[], Error>({
     queryKey: ["posts", debouncedSearchQuery, currentPage],
@@ -44,7 +47,14 @@ const BlogPage: React.FC = () => {
   useEffect(() => {
     if (data) {
       setPosts((prevPosts) =>
-        currentPage === 0 ? data : [...prevPosts, ...data.filter((post) => !prevPosts.some((p) => p.id === post.id))]
+        currentPage === 0
+          ? data
+          : [
+              ...prevPosts,
+              ...data.filter(
+                (post) => !prevPosts.some((p) => p.id === post.id)
+              ),
+            ]
       );
       setHasMorePosts(data.length >= 9);
     }
@@ -57,16 +67,13 @@ const BlogPage: React.FC = () => {
     }
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/users/saved-blogs/${blogId}`, {
-        method: "POST",
-        credentials: "include",
-      });
-
-      if (response.ok) {
-        console.log("✅ Blog saved successfully!");
-      } else {
-        console.error("🚨 Error saving blog.");
-      }
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/users/saved-blogs/${blogId}`,
+        {
+          method: "POST",
+          credentials: "include",
+        }
+      );
     } catch (error) {
       console.error("🚨 Error:", error);
     }
@@ -91,7 +98,10 @@ const BlogPage: React.FC = () => {
     <div className="blog-page-container">
       <Helmet>
         <title>Blog - AthleteXpert</title>
-        <meta name="description" content="Discover the latest articles and insights on AthleteXpert." />
+        <meta
+          name="description"
+          content="Discover the latest articles and insights on AthleteXpert."
+        />
       </Helmet>
 
       <h2 className="blog-heading">Blog</h2>
@@ -108,31 +118,51 @@ const BlogPage: React.FC = () => {
       </div>
 
       <div className="blog-post-list">
-        {isLoading ? (
-          Array.from({ length: 9 }).map((_, index) => <div key={index} className="blog-post-item skeleton-loader"></div>)
-        ) : (
-          posts.map((post) => (
-            <div key={post.id} className="blog-post-item">
-              <img src={post.imageUrl} alt={post.title} className="blog-image" loading="lazy" />
-              <div className="blog-info">
-                <h3 className="blog-title">{post.title}</h3>
-                <p className="blog-author">By {post.author}</p>
-                <p className="blog-date">{new Date(post.publishedDate).toLocaleDateString()}</p>
-                <p className="blog-description">{DOMPurify.sanitize(post.summary)}</p>
-                <Link to={`/blog/${post.slug}`} className="blog-read-more-btn">Read More</Link>
-                {user && (
-                  <button className="save-blog-btn" onClick={() => handleSaveBlog(post.id)}>
-                    Save Blog
-                  </button>
-                )}
+        {isLoading
+          ? Array.from({ length: 9 }).map((_, index) => (
+              <div key={index} className="blog-post-item skeleton-loader"></div>
+            ))
+          : posts.map((post) => (
+              <div key={post.id} className="blog-post-item">
+                <img
+                  src={post.imageUrl}
+                  alt={post.title}
+                  className="blog-image"
+                  loading="lazy"
+                />
+                <div className="blog-info">
+                  <h3 className="blog-title">{post.title}</h3>
+                  <p className="blog-author">By {post.author}</p>
+                  <p className="blog-date">
+                    {new Date(post.publishedDate).toLocaleDateString()}
+                  </p>
+                  <p className="blog-description">
+                    {DOMPurify.sanitize(post.summary)}
+                  </p>
+                  <Link
+                    to={`/blog/${post.slug}`}
+                    className="blog-read-more-btn"
+                  >
+                    Read More
+                  </Link>
+                  {user && (
+                    <button
+                      className="save-blog-btn"
+                      onClick={() => handleSaveBlog(post.id)}
+                    >
+                      Save Blog
+                    </button>
+                  )}
+                </div>
               </div>
-            </div>
-          ))
-        )}
+            ))}
       </div>
 
       {!isLoading && hasMorePosts && (
-        <button onClick={() => setCurrentPage((prev) => prev + 1)} className="load-more-button">
+        <button
+          onClick={() => setCurrentPage((prev) => prev + 1)}
+          className="load-more-button"
+        >
           {isFetching ? "Loading..." : "Load More"}
         </button>
       )}

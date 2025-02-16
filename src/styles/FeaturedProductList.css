@@ -189,7 +189,7 @@
   cursor: pointer;
   z-index: 2;
   position: absolute;
-  top: 50%;
+  top: 75%;
   transform: translateY(-50%);
   display: flex;
   /* align-items: center; */
@@ -202,11 +202,11 @@
 }
 
 .featured-carousel-button.left {
-  left: 10px;
+  left: 0px;
 }
 
 .featured-carousel-button.right {
-  right: 10px;
+  right: 0px;
 }
 
 .featured-carousel-button:hover {

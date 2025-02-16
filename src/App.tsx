@@ -28,11 +28,13 @@ import SearchResults from "./components/SearchResults";
 import Footer from "./components/Footer";
 import BlogPostPage from "./components/BlogPostPage";
 import AuthPage from "./components/AuthPage";
+import OnboardingPage from "./components/OnboardingPage";
 import PrivacyPolicy from "./components/PrivacyPolicy";
 import AuthCallback from "./components/AuthCallback";
-import { UserProvider, useUserContext } from "./components/UserContext"; // ✅ Correct import
+import { UserProvider, useUserContext } from "./components/UserContext"; 
 import { Auth0Provider } from "@auth0/auth0-react";
 import AccountSettings from "./components/AccountSettings";
+import { Navigate } from "react-router-dom";
 
 import ScrollToTop from "./util/ScrollToTop";
 import ProductsPage from "./components/ProductsPage";
@@ -44,11 +46,26 @@ const AppContent: React.FC = () => {
   const openModal = () => setQuizModalOpen(true);
   const closeModal = () => setQuizModalOpen(false);
   const location = useLocation();
-  const { isSessionChecked } = useUserContext(); // ✅ Ensures session is verified before rendering
+  const { isSessionChecked } = useUserContext(); // Ensures session is verified before rendering
 
   if (!isSessionChecked) {
-    return <div className="loading-screen">Checking session...</div>; // ✅ Prevents UI flicker
+    return <div className="loading-screen">Checking session...</div>; // Prevents UI flicker
   }
+
+  const OnboardingRoute = ({ children }: { children: React.ReactNode }) => {
+    const { user, isSessionChecked } = useUserContext();
+
+    if (!isSessionChecked) {
+        return <div>Checking session...</div>;
+    }
+
+    // Redirect if onboarding is complete
+    if (user && user.firstName) {
+        return <Navigate to="/profile" replace />;
+    }
+
+    return <>{children}</>;
+};
 
   const PageWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
     <motion.div
@@ -69,7 +86,6 @@ const AppContent: React.FC = () => {
           <Route
             path="/"
             element={
-              <PageWrapper>
                 <>
                   <HeroSection openQuiz={openModal} />
                   <main>
@@ -79,7 +95,6 @@ const AppContent: React.FC = () => {
                   </main>
                   <Quiz isOpen={isQuizModalOpen} closeModal={closeModal} />
                 </>
-              </PageWrapper>
             }
           />
           <Route path="/profile" element={<PageWrapper><ProfilePage /></PageWrapper>} />
@@ -93,6 +108,7 @@ const AppContent: React.FC = () => {
           <Route path="/community" element={<PageWrapper><Community /></PageWrapper>} />
           <Route path="/community/:sport" element={<SportPage />} /> {/* ✅ Add this */}
           <Route path="/auth" element={<PageWrapper><AuthPage /></PageWrapper>} />
+          <Route path="/account-setup" element={<OnboardingRoute><OnboardingPage /></OnboardingRoute>} />
           <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/search" element={<PageWrapper><SearchResults /></PageWrapper>} />
           <Route path="/terms-of-service" element={<PageWrapper><TermsAndConditionsPage /></PageWrapper>} />
