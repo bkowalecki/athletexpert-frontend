@@ -1,9 +1,9 @@
 /* 🌟 Featured Products Section */
 .featured-products-section {
-  padding: 0 5vw 5vw;
+  padding-bottom: 5vw;
   background: linear-gradient(180deg, #A23C20 0%, #842D14 100%);
   text-align: center;
-  /* width: 100%; */
+  width: 100vw;
 }
 
 /* 🎯 Featured Heading */
@@ -14,19 +14,20 @@
   font-weight: 900;
   font-family: 'Oswald', sans-serif;
   letter-spacing: 3px;
-  margin-bottom: 20px;
+  margin-bottom: 3rem;
+  margin-top: 3rem;
 }
 
 /* ✅ Desktop Product Grid (Hidden on Mobile) */
 .featured-products-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(275px, 1fr));
-  gap: 20px;
+  gap: 2rem;
   justify-content: center;
   align-items: center;  /* ✅ Ensures proper vertical alignment */
-  padding-top: 20px;
+ 
 
-  margin: 0 auto; /* ✅ Centers the entire grid */
+  margin: 0 2rem; /* ✅ Centers the entire grid */
 }
 
 
@@ -146,7 +147,8 @@
   align-items: center;
   justify-content: center;
   position: relative;
-  width: 100%;
+  width: 90%;
+  margin: 0 auto
   /* overflow: hidden; */
   /* padding: 10px; */
 }

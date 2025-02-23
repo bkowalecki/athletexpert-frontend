@@ -6,7 +6,8 @@
     "extra_data": {
       "category": "Racquet Sport",
       "type": "Indoor/Outdoor",
-      "popularity": "Moderate"
+      "popularity": "Moderate",
+      "summary": "Badminton originated from ancient games in Asia and evolved in India and England during the 19th century. It became formalized in the 1870s and is now played competitively worldwide."
     }
   },
   {
@@ -16,7 +17,8 @@
     "extra_data": {
       "category": "Team Sport",
       "type": "Outdoor",
-      "popularity": "High"
+      "popularity": "High",
+      "summary": "Baseball traces its origins to 18th-century bat-and-ball games in North America and Europe. It developed into the modern sport in the mid-19th century and became known as America's pastime."
     }
   },
   {
@@ -26,7 +28,8 @@
     "extra_data": {
       "category": "Team Sport",
       "type": "Indoor/Outdoor",
-      "popularity": "Very High"
+      "popularity": "Very High",
+      "summary": "Basketball was invented in December 1891 by Dr. James Naismith, a Canadian physical education instructor seeking an engaging indoor game. His 13 original rules laid the foundation for the sport, which rapidly spread worldwide and became an Olympic event by 1936."
     }
   },
   {
@@ -36,7 +39,8 @@
     "extra_data": {
       "category": "Combat Sport",
       "type": "Indoor",
-      "popularity": "High"
+      "popularity": "High",
+      "summary": "Boxing has roots in ancient civilizations with early forms of pugilism in Egypt and Greece. Modern boxing emerged in the 18th century, evolving into a regulated sport with a rich competitive history."
     }
   },
   {
@@ -46,7 +50,8 @@
     "extra_data": {
       "category": "Team Sport",
       "type": "Outdoor",
-      "popularity": "High"
+      "popularity": "High",
+      "summary": "Cricket began as a rural pastime in 16th-century England and evolved into an organized sport by the 18th century. It is now celebrated internationally, particularly in former British colonies."
     }
   },
   {
@@ -56,7 +61,8 @@
     "extra_data": {
       "category": "Individual Sport",
       "type": "Outdoor",
-      "popularity": "High"
+      "popularity": "High",
+      "summary": "Cycling emerged in the 19th century with the invention of the bicycle. It quickly grew into a competitive sport and recreational activity, highlighted by events like the Tour de France."
     }
   },
   {
@@ -66,7 +72,8 @@
     "extra_data": {
       "category": "Competitive Gaming",
       "type": "Indoor/Online",
-      "popularity": "Very High"
+      "popularity": "Very High",
+      "summary": "Esports originated from early computer competitions in the 1970s and 80s, evolving into a global phenomenon with professional leagues and international tournaments across various game genres."
     }
   },
   {
@@ -76,7 +83,8 @@
     "extra_data": {
       "category": "Team Sport",
       "type": "Outdoor",
-      "popularity": "Very High"
+      "popularity": "Very High",
+      "summary": "Football, or soccer, developed in 19th-century England from various regional games. Its simplicity and universal appeal have made it the world's most popular sport."
     }
   },
   {
@@ -86,7 +94,8 @@
     "extra_data": {
       "category": "Individual Sport",
       "type": "Outdoor",
-      "popularity": "Moderate"
+      "popularity": "Moderate",
+      "summary": "Golf originated in Scotland during the 15th century, evolving from simple stick-and-ball games. It is known for its iconic courses and prestigious tournaments such as The Open Championship."
     }
   },
   {
@@ -96,7 +105,8 @@
     "extra_data": {
       "category": "Team Sport",
       "type": "Indoor/Outdoor",
-      "popularity": "High"
+      "popularity": "High",
+      "summary": "Hockey's history spans ancient stick-and-ball games, with modern field and ice hockey emerging in the 19th century. Both forms have grown into globally competitive sports."
     }
   },
   {
@@ -106,7 +116,8 @@
     "extra_data": {
       "category": "Winter Sport",
       "type": "Indoor",
-      "popularity": "Moderate"
+      "popularity": "Moderate",
+      "summary": "Ice skating began as a practical mode of winter transportation and evolved into a popular recreational activity and competitive sport, particularly in figure skating and speed skating."
     }
   },
   {
@@ -116,7 +127,8 @@
     "extra_data": {
       "category": "Combat Sport",
       "type": "Indoor",
-      "popularity": "Very High"
+      "popularity": "Very High",
+      "summary": "Mixed Martial Arts (MMA) draws from various traditional combat sports. Its modern form emerged in the late 20th century, combining techniques from boxing, wrestling, and martial arts into a highly competitive sport."
     }
   },
   {
@@ -126,7 +138,8 @@
     "extra_data": {
       "category": "Racquet Sport",
       "type": "Indoor/Outdoor",
-      "popularity": "Very High"
+      "popularity": "Very High",
+      "summary": "Pickleball was invented in 1965 in the United States as a family-friendly paddle sport. It uniquely blends elements of tennis, badminton, and ping-pong, leading to rapid international growth."
     }
   },
   {
@@ -136,7 +149,8 @@
     "extra_data": {
       "category": "Team Sport",
       "type": "Outdoor",
-      "popularity": "Moderate"
+      "popularity": "Moderate",
+      "summary": "Rugby originated in 19th-century England when a football player picked up the ball during a match. It has since evolved into a physically demanding sport with passionate followings worldwide."
     }
   },
   {
@@ -146,7 +160,8 @@
     "extra_data": {
       "category": "Individual Sport",
       "type": "Outdoor",
-      "popularity": "High"
+      "popularity": "High",
+      "summary": "Running is one of humanity's oldest activities, rooted in survival and competition. It has evolved into both a recreational pursuit and a competitive sport with events ranging from sprints to marathons."
     }
   },
   {
@@ -156,7 +171,8 @@
     "extra_data": {
       "category": "Extreme Sport",
       "type": "Outdoor",
-      "popularity": "High"
+      "popularity": "High",
+      "summary": "Skateboarding emerged in the 1950s in California as an alternative to surfing during flat weather. It has grown into a creative, urban sport with a vibrant counterculture and international competitions."
     }
   },
   {
@@ -167,7 +183,7 @@
       "category": "Individual Sport",
       "type": "Outdoor",
       "popularity": "Moderate",
-      "summary":"Basketball was invented in December 1891 by Dr. James Naismith, a Canadian physical education instructor who was looking for an engaging indoor game to keep his students active during the winter. Using a soccer ball and two peach baskets as makeshift goals, Naismith devised 13 simple rules that laid the foundation for the sport. The game quickly spread throughout the United States and then around the world, evolving with innovations such as dribbling and specialized equipment. By 1936, basketball had become an official Olympic sport, and the establishment of professional leagues—most notably the National Basketball Association (NBA) in 1946—cemented its status as a major global sport. Today, basketball is celebrated for its fast pace, strategic depth, and the incredible athleticism of its players."
+      "summary": "Skiing originated as a means of transportation in snowy regions thousands of years ago. It evolved into a popular recreational and competitive sport, featured prominently in the Winter Olympics."
     }
   },
   {
@@ -177,7 +193,8 @@
     "extra_data": {
       "category": "Winter Sport",
       "type": "Outdoor",
-      "popularity": "Moderate"
+      "popularity": "Moderate",
+      "summary": "Snowboarding was developed in the 1960s and 70s as a hybrid of skiing, surfing, and skateboarding. It gained mainstream popularity in the 1990s and is now a staple winter sport."
     }
   },
   {
@@ -187,7 +204,8 @@
     "extra_data": {
       "category": "Team Sport",
       "type": "Outdoor",
-      "popularity": "Very High"
+      "popularity": "Very High",
+      "summary": "Soccer, or football, has ancient origins but was codified in 19th-century England. Its universal appeal and simplicity have made it the most popular sport in the world."
     }
   },
   {
@@ -197,7 +215,8 @@
     "extra_data": {
       "category": "Water Sport",
       "type": "Outdoor",
-      "popularity": "Moderate"
+      "popularity": "Moderate",
+      "summary": "Surfing originated in ancient Polynesian culture as both a recreational activity and a spiritual practice. It has evolved into a competitive sport celebrated for its connection to nature and a free-spirited lifestyle."
     }
   },
   {
@@ -207,7 +226,8 @@
     "extra_data": {
       "category": "Individual Sport",
       "type": "Indoor/Outdoor",
-      "popularity": "High"
+      "popularity": "High",
+      "summary": "Swimming has been a vital skill for survival and recreation since ancient times. It evolved into a competitive sport with standardized events featured in the modern Olympic Games."
     }
   },
   {
@@ -217,7 +237,8 @@
     "extra_data": {
       "category": "Racquet Sport",
       "type": "Outdoor",
-      "popularity": "High"
+      "popularity": "High",
+      "summary": "Tennis began in 12th-century France as a handball game before evolving into a racket sport in the 19th century. Its prestigious tournaments and athletic elegance have made it a global favorite."
     }
   },
   {
@@ -227,7 +248,8 @@
     "extra_data": {
       "category": "Team Sport",
       "type": "Indoor/Outdoor",
-      "popularity": "High"
+      "popularity": "High",
+      "summary": "Volleyball was invented in 1895 by William G. Morgan in the United States as a less intense alternative to basketball. It has grown into a fast-paced, dynamic sport enjoyed worldwide."
     }
   },
   {
@@ -237,7 +259,8 @@
     "extra_data": {
       "category": "Combat Sport",
       "type": "Indoor",
-      "popularity": "High"
+      "popularity": "High",
+      "summary": "Wrestling is one of the oldest sports in history, with roots in ancient civilizations. It has evolved into various styles and remains a core element of modern combat sports and the Olympic Games."
     }
   },
   {
@@ -247,7 +270,8 @@
     "extra_data": {
       "category": "Mind & Body",
       "type": "Indoor/Outdoor",
-      "popularity": "Very High"
+      "popularity": "Very High",
+      "summary": "Yoga originated in ancient India as a spiritual and physical practice aimed at achieving balance and inner peace. Over time, it has evolved into a globally embraced discipline promoting health and well-being."
     }
   }
 ]

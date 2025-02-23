@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useUserContext } from "../components/UserContext";
 import "../styles/ProductsPage.css";
+import FeaturedProductList from "./FeaturedProductList";
 
 interface Product {
   id: number;
@@ -122,13 +123,13 @@ const ProductsPage: React.FC = () => {
 
   return (
     <div className="products-page">
-      <h1>Find Your Perfect Gear</h1>
+      <h1>Explore</h1>
 
       {/* Search & Filters */}
       <div className="filters-container">
         <input
           type="text"
-          placeholder="🔍 Search products..."
+          placeholder="Search"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="search-bar"
@@ -151,7 +152,7 @@ const ProductsPage: React.FC = () => {
           value={selectedCategory}
           onChange={(e) => setSelectedCategory(e.target.value)}
         >
-          <option value="">All Categories</option>
+          <option value="">Categories</option>
           {[...new Set(products.map((p) => p.categories))].map(
             (category, index) =>
               category ? (
@@ -166,7 +167,7 @@ const ProductsPage: React.FC = () => {
           value={selectedRetailer}
           onChange={(e) => setSelectedRetailer(e.target.value)}
         >
-          <option value="">All Retailers</option>
+          <option value="">Retailers</option>
           {[...new Set(products.map((p) => p.retailer))].map(
             (retailer, index) =>
               retailer ? (
@@ -209,26 +210,27 @@ const ProductsPage: React.FC = () => {
                 alt={product.name}
                 className="product-image"
               />
-              <h3>{product.name}</h3>
-              {/* <p className="product-description">{product.description}</p> */}
-              <p className="product-price">${product.price.toFixed(2)}</p>
-              <a
-                href={product.affiliateLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="buy-button"
-              >
-                🛒 View on Amazon
-              </a>
-              {user && (
-                <button
-                  className="save-button"
-                  onClick={() => handleSaveProduct(product.id)}
-                  disabled={saving === product.id}
+              <div className="products-page-product-card-info">
+                <h3>{product.name}</h3>
+                <p className="product-price">${product.price.toFixed(2)}</p>
+                <a
+                  href={product.affiliateLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="products-page-product-buy-button"
                 >
-                  {saving === product.id ? "Saving..." : "Save"}
-                </button>
-              )}
+                  🛒 View on Amazon
+                </a>
+                {user && (
+                  <button
+                    className="save-button"
+                    onClick={() => handleSaveProduct(product.id)}
+                    disabled={saving === product.id}
+                  >
+                    {saving === product.id ? "Saving..." : "Save"}
+                  </button>
+                )}
+              </div>
             </div>
           ))
         ) : !loading ? (

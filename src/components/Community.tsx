@@ -1,101 +1,130 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import sportsData from "../data/sports.json";
+import sportsDataRaw from "../data/sports.json";
 import "../styles/Community.css";
 
+// Define the type for each sport.
+interface Sport {
+  title: string;
+  backgroundImage: string;
+}
+
+// Cast the imported JSON to an array of Sport objects.
+const sportsData = sportsDataRaw as Sport[];
+
+// Custom hook for debouncing a value (e.g., search input)
+function useDebounce<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState<T>(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => setDebouncedValue(value), delay);
+    return () => clearTimeout(handler);
+  }, [value, delay]);
+
+  return debouncedValue;
+}
+
+// Props for the FeaturedSportCard component
+interface FeaturedSportCardProps {
+  sport: Sport;
+  navigate: (path: string) => void;
+}
+
+const FeaturedSportCard: React.FC<FeaturedSportCardProps> = React.memo(
+  ({ sport, navigate }) => (
+    <motion.div
+      className="featured-sport-card"
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.6 }}
+      onClick={() => navigate(`${sport.title.toLowerCase()}`)}
+    >
+      <div
+        className="featured-sport-bg"
+        style={{ backgroundImage: `url(${sport.backgroundImage})` }}
+      />
+      <div className="featured-sport-info">
+        <h2>{sport.title}</h2>
+      </div>
+    </motion.div>
+  )
+);
+
+// Props for the SportCard component
+interface SportCardProps {
+  sport: Sport;
+  index: number;
+  navigate: (path: string) => void;
+}
+
+const SportCard: React.FC<SportCardProps> = React.memo(
+  ({ sport, index, navigate }) => (
+    <motion.div
+      className={`sport-card sport-card-${index % 4}`}
+      onClick={() => navigate(`${sport.title.toLowerCase()}`)}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+    >
+      <div
+        className="sport-card-bg"
+        style={{ backgroundImage: `url(${sport.backgroundImage})` }}
+      />
+      <div className="sport-card-info">
+        <h3>{sport.title}</h3>
+      </div>
+    </motion.div>
+  )
+);
+
 const Community: React.FC = () => {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [filteredSports, setFilteredSports] = useState(sportsData);
-  const [featuredSport, setFeaturedSport] = useState(sportsData[0]);
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [featuredSport, setFeaturedSport] = useState<Sport>(sportsData[0]);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    setFilteredSports(
-      sportsData.filter((sport) =>
-        sport.title.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    );
-  }, [searchQuery]);
+  // Debounce search query to avoid filtering on every keystroke
+  const debouncedSearchQuery = useDebounce<string>(searchQuery, 300);
 
-  // Randomly select a featured sport on first load
+  // Memoize filtered sports list for performance
+  const filteredSports = useMemo(
+    () =>
+      sportsData.filter((sport: Sport) =>
+        sport.title.toLowerCase().includes(debouncedSearchQuery.toLowerCase())
+      ),
+    [debouncedSearchQuery]
+  );
+
+  // Ensure the featured sport stays constant across sessions using localStorage
   useEffect(() => {
-    const randomSport =
-      sportsData[Math.floor(Math.random() * sportsData.length)];
-    setFeaturedSport(randomSport);
+    const storedSport = localStorage.getItem("featuredSport");
+    if (storedSport) {
+      try {
+        setFeaturedSport(JSON.parse(storedSport));
+      } catch (error) {
+        console.error("Error parsing stored featured sport:", error);
+      }
+    } else {
+      const randomSport = sportsData[Math.floor(Math.random() * sportsData.length)];
+      setFeaturedSport(randomSport);
+      localStorage.setItem("featuredSport", JSON.stringify(randomSport));
+    }
   }, []);
+
+  // Memoize navigation handler
+  const handleNavigation = useCallback(
+    (sportTitle: string) => {
+      navigate(`${sportTitle.toLowerCase()}`);
+    },
+    [navigate]
+  );
 
   return (
     <div className="community-page">
-      {/* 🌟 Hero Section */}
-      <div className="community-hero">
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          preload="auto"
-          poster="/images/community-hero-poster.png"
-          className="community-hero-video"
-        >
-          <source src="/video/athletexpertheadervideo.mp4" type="video/mp4" />
-          <source src="/video/athletexpertheadervideo.webm" type="video/webm" />
-          Your browser does not support the video tag.
-        </video>
-
-        <div className="community-hero-content">
-          <h1>Find Your Sport. Join the Community.</h1>
-          <div className="community-search-bar">
-            <input
-              type="text"
-              placeholder="Search for a sport..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* 🌟 Featured Sport Section */}
-      <div className="featured-sport">
-        <h2>Featured Sport</h2>
-        <motion.div
-          className="featured-sport-card"
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.6 }}
-          onClick={() => navigate(`/community/${featuredSport.title.toLowerCase()}`)}
-        >
-          <div
-            className="featured-sport-bg"
-            style={{ backgroundImage: `url(${featuredSport.backgroundImage})` }}
-          />
-          <div className="featured-sport-info">
-            <h2>{featuredSport.title}</h2>
-          
-          </div>
-        </motion.div>
-      </div>
-
-      {/* 🌟 Masonry Sports Grid */}
+     
       <div className="sports-masonry">
-        {filteredSports.map((sport, index) => (
-          <motion.div
-            key={sport.title}
-            className={`sport-card sport-card-${index % 4}`}
-            onClick={() => navigate(`/community/${sport.title.toLowerCase()}`)}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-          >
-            <div
-              className="sport-card-bg"
-              style={{ backgroundImage: `url(${sport.backgroundImage})` }}
-            />
-            <div className="sport-card-info">
-              <h3>{sport.title}</h3>
-            </div>
-          </motion.div>
+        {filteredSports.map((sport: Sport, index: number) => (
+          <SportCard key={sport.title} sport={sport} index={index} navigate={handleNavigation} />
         ))}
       </div>
     </div>

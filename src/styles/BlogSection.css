@@ -1,37 +1,48 @@
-/* Latest Blog Section Styles */
 
-.latest-blog-list-container {
+
+
+
+/* Latest Blog Section Container */
+.latest-blog-section-container {
   background-color: #a23c20;
-  padding: 3rem 2rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 2rem;
   text-align: center;
+  /* margin-bottom: 3rem; */
 }
 
+/* Content Wrapper */
+.latest-blog-section-content {
+  margin: 0 auto;
+}
+
+/* Latest Blog Heading */
 .latest-blog-heading {
   font-size: clamp(2.4rem, 4vw, 3.5rem);
-  color: #FFF;
+  color: #fff;
   text-transform: uppercase;
   font-weight: 900;
   font-family: 'Oswald', sans-serif;
   letter-spacing: 3px;
-  margin-bottom: 20px;
+  margin-bottom: 3rem;
+  margin-top: 3rem;
 }
 
-.latest-blog-section-list {
+/* Desktop Grid View */
+.latest-blog-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.5rem;
-  list-style-type: none;
+  gap: 2rem;
+  margin: 0 2rem;
+  margin-bottom: 3rem;
 }
 
-.latest-blog-section-item {
+
+
+/* Blog Card (common styles) */
+.latest-blog-card {
   display: flex;
-  text-align: left;
   flex-direction: column;
   justify-content: space-between;
+  text-align: left;
   background-color: #122;
   border-radius: 10px;
   padding: 1.5rem;
@@ -40,7 +51,7 @@
   color: #fff;
 }
 
-.latest-blog-section-item:hover {
+.latest-blog-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
 }
@@ -50,29 +61,28 @@
   justify-content: center;
 }
 
-.latest-blog-section-image {
+.latest-blog-image {
   width: 100%;
   height: auto;
   border-radius: 8px;
 }
 
-.latest-blog-section-title {
+.latest-blog-info {
+  margin-top: 1rem;
+}
+
+.latest-blog-title {
   font-size: 1.75rem;
   font-weight: bold;
   color: #fff;
   margin-bottom: 1rem;
 }
 
-.latest-blog-section-author {
+.latest-blog-author,
+.latest-blog-date {
   font-size: 1rem;
   color: #bbb;
   margin-bottom: 0.5rem;
-}
-
-.latest-blog-section-date {
-  font-size: 1rem;
-  color: #bbb;
-  margin-bottom: 1rem;
 }
 
 .latest-blog-summary {
@@ -86,20 +96,96 @@
   justify-content: center;
 }
 
-.latest-blog-section-cta-button {
+.latest-blog-cta-button {
   background-color: #A23C20;
   color: white;
   padding: 0.8rem 2rem;
   border-radius: 5px;
   text-decoration: none;
   text-align: center;
-  display: inline-block;
   font-weight: bold;
   text-transform: uppercase;
   letter-spacing: 1px;
   transition: background-color 0.3s ease;
 }
 
-.latest-blog-section-cta-button:hover {
+.latest-blog-cta-button:hover {
   background-color: #8a2a14;
+}
+
+/* Mobile Carousel Styles */
+.latest-blog-carousel-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 95%;
+  margin: 0 auto;
+  margin-bottom: 3rem;
+  overflow: hidden;
+}
+
+.latest-blog-carousel {
+  width: 100%;
+  position: relative;
+}
+
+/* Carousel Item */
+.latest-blog-carousel-item {
+  width: 100%;
+  display: block;
+}
+
+/* Carousel Navigation Buttons */
+.latest-blog-carousel-button {
+  background: none;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  width: 40px;
+  height: 40px;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 50%;
+  transition: background-color 0.3s ease;
+}
+
+.latest-blog-carousel-button.left {
+  left: 10px;
+}
+
+.latest-blog-carousel-button.right {
+  right: 10px;
+}
+
+.latest-blog-carousel-button:hover {
+  background-color: #a23c20;
+}
+
+.latest-blog-carousel-button svg {
+  stroke: white;
+  width: 24px;
+  height: 24px;
+  transition: stroke 0.3s ease;
+}
+
+.latest-blog-carousel-button:hover svg {
+  stroke: #ffcc00;
+}
+
+/* Hide grid view on mobile */
+@media (max-width: 768px) {
+  .latest-blog-grid {
+    display: none;
+  }
+}
+
+/* Hide carousel on desktop */
+@media (min-width: 768px) {
+  .latest-blog-carousel-wrapper {
+    display: none;
+  }
 }

@@ -17,6 +17,7 @@ type FormDataType = {
   bio: string;
 };
 
+
 const OnboardingPage = () => {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
