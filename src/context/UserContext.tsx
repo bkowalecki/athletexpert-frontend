@@ -8,6 +8,8 @@ export type User = {
   profilePictureUrl?: string;
   bio?: string | null;
   sports?: string[] | null;
+  savedBlogs?: { id: number; title: string; slug: string }[]; // ✅ FIXED
+  savedProducts?: { id: number; name: string }[]; // ✅ FIXED
 };
 
 interface UserContextProps {

@@ -8,6 +8,8 @@ import {
 } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import Header from "./components/Header";
 import HeroSection from "./components/HeroSection";
@@ -80,6 +82,7 @@ const AppContent: React.FC = () => {
 
   return (
     <div className="App">
+      <ToastContainer position="top-center" autoClose={3000} />
       <Header />
       <AnimatePresence mode="wait">
         <Routes>

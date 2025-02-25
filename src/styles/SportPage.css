@@ -1,227 +1,156 @@
-/* Branding Variables */
+/* ✅ General Styling */
 :root {
-  --primary-bg: #1e1e1e;
-  --accent: #FF6F00;
-  --text-color: #ffffff;
-  --heading-font: 'Montserrat', sans-serif;
-  --base-font-size: 16px;
+  --primary-bg: #121212; /* Dark background */
+  --accent: #FF6F00; /* Orange accent */
+  --text-color: #ffffff; /* Ensures text is WHITE */
+  --btn-hover: #ff8c3f; /* Lighter orange for hover */
+  --font-family: 'Montserrat', sans-serif;
 }
 
-/* Global Reset */
-* {
-  box-sizing: border-box;
-}
 
-body {
-  margin: 0;
-  font-family: var(--heading-font);
-  font-size: var(--base-font-size);
-}
 
-/* Page Container */
-.community-sport-page {
+/* ✅ Sport Page */
+.sport-page {
   width: 100%;
   min-height: 100vh;
-  background: var(--primary-bg);
-  color: var(--text-color);
   display: flex;
   flex-direction: column;
   align-items: center;
   padding-bottom: 2rem;
 }
 
-/* Not Found */
-.community-sport-page-not-found-title {
-  font-size: 2rem;
-  margin-top: 2rem;
-}
-.community-sport-page-not-found-text {
-  font-size: 1.1rem;
-  margin-top: 1rem;
-}
-
-/* Hero Section */
-.community-sport-page-hero {
-  position: relative;
+/* ✅ Hero Section */
+.sport-page-hero {
   width: 100%;
   height: 350px;
   background-size: cover;
   background-position: center;
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.community-sport-page-hero-overlay {
+
+.sport-page-hero-overlay {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.65);
+  background: rgba(0, 0, 0, 0.7);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 0 1rem;
 }
-.community-sport-page-hero-title {
+
+.sport-page-title {
   font-size: 3.5rem;
   font-weight: bold;
   text-transform: uppercase;
-  letter-spacing: 2px;
-  text-shadow: 2px 2px 8px rgba(0,0,0,0.9);
-  margin-bottom: 1rem;
-  color: var(--text-color);
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+  color: #ffffff; /* Ensures title is WHITE */
 }
 
-/* CTA Buttons */
-.community-sport-page-hero-ctas {
+/* ✅ Buttons */
+.sport-page-buttons {
   display: flex;
   gap: 1rem;
+  margin-top: 1rem;
 }
-.community-sport-page-cta-btn {
+
+.sport-page-btn {
   font-size: 1rem;
   padding: 0.75rem 1.5rem;
   border-radius: 30px;
   cursor: pointer;
-  border: 2px solid transparent;
-  transition: background 0.3s, color 0.3s, border 0.3s;
-  background: transparent;
-  color: var(--text-color);
-}
-.community-sport-page-cta-btn.primary {
-  background: var(--accent);
-  border-color: var(--accent);
-}
-.community-sport-page-cta-btn.primary:hover {
-  background: transparent;
-  color: var(--accent);
-  border-color: var(--accent);
-}
-.community-sport-page-cta-btn.secondary {
-  border: 2px solid var(--accent);
-}
-.community-sport-page-cta-btn.secondary:hover {
-  background: var(--accent);
-  color: var(--text-color);
+  border: none;
+  transition: background 0.3s, color 0.3s;
 }
 
-/* About, Gear, Blog Sections - Minimal styling */
-.community-sport-page-about,
-.community-sport-page-gear,
-.community-sport-page-blogs {
+.sport-page-btn.primary {
+  background: var(--accent);
+  color: #ffffff;
+}
+
+.sport-page-btn.primary:hover {
+  background: var(--btn-hover);
+}
+
+.sport-page-btn.secondary {
+  background: transparent;
+  color: var(--accent);
+  border: 2px solid var(--accent);
+}
+
+.sport-page-btn.secondary:hover {
+  background: var(--accent);
+  color: #ffffff;
+}
+
+/* ✅ Sections */
+.sport-page-section {
   width: 90%;
   max-width: 900px;
   margin-top: 2rem;
   padding: 1.5rem;
-  background: transparent;
+  text-align: center;
+  color: #ffffff; /* Ensures all section text is WHITE */
 }
 
-/* Section Headings with Left Accent */
-.community-sport-page-section-title {
+.sport-page-section-title {
   font-size: 2rem;
   color: var(--accent);
   margin-bottom: 1rem;
-  position: relative;
-  padding-left: 1.5rem;
-}
-.community-sport-page-section-title::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 4px;
-  height: 80%;
-  background: var(--accent);
-  border-radius: 2px;
-}
-
-/* Section Text */
-.community-sport-page-section-text {
-  font-size: 1.1rem;
-  line-height: 1.6;
-  color: var(--text-color);
-  margin: 0;
-}
-
-/* Summary Text */
-.community-sport-page-summary {
-  margin-top: 1rem;
-  padding: 1rem;
-  border-left: 4px solid var(--accent);
-}
-.community-sport-page-summary-text {
-  font-size: 1.1rem;
-  line-height: 1.6;
-  color: var(--text-color);
-  margin: 0;
-}
-
-/* Fun Fact Section */
-.community-sport-page-funfact {
-  width: 90%;
-  max-width: 900px;
-  margin-top: 2rem;
-  padding: 2rem 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-}
-.community-sport-page-funfact-blob-container {
-  position: relative;
-  width: 70%;
-  margin: 0 auto;
-}
-.community-sport-page-funfact-blob {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-.community-sport-page-funfact-inside {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 90%;
-  transform: translate(-50%, -50%);
   text-align: center;
-  z-index: 2;
-  padding: 1rem;
-}
-.community-sport-page-funfact-text {
-  font-size: 1.4rem;
-  font-weight: bold;
-  color: var(--text-color);
-  margin: 0;
 }
 
-/* Responsive Adjustments */
+/* ✅ Fun Fact Box */
+.sport-page-funfact-box {
+  background: rgba(255, 111, 0, 0.2);
+  padding: 1.5rem;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.sport-page-funfact-text {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #ffffff; /* Ensures fun fact text is WHITE */
+}
+
+/* ✅ Not Found */
+.sport-page-not-found {
+  font-size: 2rem;
+  margin-top: 2rem;
+  text-align: center;
+  color: #ffffff; /* Ensures "Sport Not Found" is WHITE */
+}
+
+.sport-page-not-found-text {
+  font-size: 1.2rem;
+  margin-top: 1rem;
+  text-align: center;
+  color: #ffffff;
+}
+
+/* ✅ Mobile Responsiveness */
 @media (max-width: 768px) {
-  .community-sport-page-hero {
-    height: 300px;
+  .sport-page-hero {
+    height: 280px;
   }
-  .community-sport-page-hero-title {
+  .sport-page-title {
     font-size: 2.5rem;
   }
-  .community-sport-page-hero-ctas {
+  .sport-page-buttons {
     flex-direction: column;
     gap: 0.75rem;
   }
-  .community-sport-page-about,
-  .community-sport-page-gear,
-  .community-sport-page-blogs,
-  .community-sport-page-funfact {
+  .sport-page-section {
     padding: 1rem;
     margin-top: 1.5rem;
   }
-  .community-sport-page-section-title {
+  .sport-page-section-title {
     font-size: 1.75rem;
-  }
-  .community-sport-page-section-text {
-    font-size: 1rem;
-  }
-  .community-sport-page-funfact-blob-container {
-    width: 100%;
   }
 }

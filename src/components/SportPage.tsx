@@ -28,9 +28,9 @@ const SportPage: React.FC = () => {
 
   if (!currentSport) {
     return (
-      <div className="community-sport-page">
-        <h2 className="community-sport-page-not-found-title">Sport Not Found</h2>
-        <p className="community-sport-page-not-found-text">
+      <div className="sport-page">
+        <h2 className="sport-page-not-found">Sport Not Found</h2>
+        <p className="sport-page-not-found-text">
           We couldn't find information on this sport. Try another!
         </p>
       </div>
@@ -38,88 +38,63 @@ const SportPage: React.FC = () => {
   }
 
   return (
-    <div className="community-sport-page">
+    <div className="sport-page">
       {/* Hero Section */}
       <div
-        className="community-sport-page-hero"
+        className="sport-page-hero"
         style={{ backgroundImage: `url(${currentSport.backgroundImage})` }}
       >
-        <div className="community-sport-page-hero-overlay">
+        <div className="sport-page-hero-overlay">
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="community-sport-page-hero-title"
+            className="sport-page-title"
           >
             {currentSport.title}
           </motion.h1>
-          <div className="community-sport-page-hero-ctas">
-            <button className="community-sport-page-cta-btn primary">
-              Add as Player
-            </button>
-            <button className="community-sport-page-cta-btn secondary">
-              Follow
-            </button>
+          <div className="sport-page-buttons">
+            <button className="sport-page-btn primary">Add as Player</button>
+            <button className="sport-page-btn secondary">Follow</button>
           </div>
         </div>
       </div>
 
       {/* About Section */}
-      <section className="community-sport-page-about">
-        <h2 className="community-sport-page-section-title">About</h2>
+      <section className="sport-page-section">
+        <h2 className="sport-page-section-title">About {currentSport.title}</h2>
         {currentSport.extra_data.summary && (
-          <div className="community-sport-page-summary">
-            <p className="community-sport-page-summary-text">
-              {currentSport.extra_data.summary}
-            </p>
-          </div>
+          <p className="sport-page-text">{currentSport.extra_data.summary}</p>
         )}
       </section>
 
       {/* Fun Fact Section */}
-      <section className="community-sport-page-funfact">
+      <section className="sport-page-section sport-page-funfact">
+        <h2 className="sport-page-section-title">Fun Fact</h2>
         <motion.div
-          className="community-sport-page-funfact-blob-container"
-          initial={{ scale: 0.95 }}
+          initial={{ scale: 0.9 }}
           animate={{ scale: 1 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          className="sport-page-funfact-box"
         >
-          <svg className="community-sport-page-funfact-blob"
-            viewBox="0 0 200 150"
-            preserveAspectRatio="none">
-  <path fill="var(--accent)" d="M56.7,2.4C56.7,7.9,28.3,15.9,-0.1,15.9C-28.5,15.9,-57,7.9,-57,2.4C-57,-3.2,-28.5,-6.4,-0.1,-6.4C28.3,-6.4,56.7,-3.2,56.7,2.4Z" transform="translate(100 100)" />
-</svg>
-          <svg
-            className="community-sport-page-funfact-blob"
-            viewBox="0 0 200 150"
-            preserveAspectRatio="none"
-          >
-            <path
-              d="M110,30 C140,10, 170,40, 160,70 C150,100, 120,120, 90,110 C60,100, 50,70, 65,50 C80,30, 95,35, 110,30 Z"
-              fill="var(--accent)"
-            />
-            
-          </svg>
-          <div className="community-sport-page-funfact-inside">
-            <p className="community-sport-page-funfact-text">
-              Fun Fact: This sport originally had wildly different rules that evolved dramatically over time!
-            </p>
-          </div>
+          <p className="sport-page-funfact-text">
+            This sport originally had wildly different rules that evolved over time!
+          </p>
         </motion.div>
       </section>
 
       {/* Gear Section */}
-      <section className="community-sport-page-gear">
-        <h2 className="community-sport-page-section-title">Gear</h2>
-        <p className="community-sport-page-section-text">
+      <section className="sport-page-section">
+        <h2 className="sport-page-section-title">Recommended Gear</h2>
+        <p className="sport-page-text">
           Top gear recommendations for this sport will appear here.
         </p>
       </section>
 
       {/* Blog Section */}
-      <section className="community-sport-page-blogs">
-        <h2 className="community-sport-page-section-title">Blog</h2>
-        <p className="community-sport-page-section-text">
+      <section className="sport-page-section">
+        <h2 className="sport-page-section-title">Explore More</h2>
+        <p className="sport-page-text">
           Discover articles, tips, and guides for {currentSport.title}.
         </p>
       </section>

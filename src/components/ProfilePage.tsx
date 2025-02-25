@@ -26,25 +26,25 @@ interface BlogPost {
 }
 
 interface Profile {
-  name: string;
   firstName: string;
   lastName: string;
   bio: string | null;
   profilePictureUrl: string | null;
   sports: string[] | null;
   badges?: string[];
-  savedBlogs?: BlogPost[]; // ✅ Ensure this is properly populated
-  savedProducts?: Product[];
+  savedBlogIds?: number[]; // ✅ IDs only
+  savedProductIds?: number[]; // ✅ IDs only
 }
 
 const ProfilePage: React.FC = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [savedBlogs, setSavedBlogs] = useState<BlogPost[]>([]);
+  const [savedProducts, setSavedProducts] = useState<Product[]>([]);
   const navigate = useNavigate();
   const { user, setUser, isSessionChecked } = useUserContext();
 
   useEffect(() => {
     if (!isSessionChecked) return;
-
     if (!user) {
       console.warn("⚠️ No valid session. Redirecting to /auth...");
       navigate("/auth", { replace: true });
@@ -53,17 +53,28 @@ const ProfilePage: React.FC = () => {
 
     const fetchProfile = async () => {
       try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/users/profile`, {
-          credentials: "include",
-        });
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/users/profile`,
+          {
+            credentials: "include",
+          }
+        );
 
-        if (response.ok) {
-          const data = await response.json();
-          console.log("✅ Profile data:", data); // ✅ Debugging output
-          setProfile(data);
-        } else {
-          console.warn("⚠️ No valid session. Redirecting to /auth...");
-          navigate("/auth", { replace: true });
+        if (!response.ok) throw new Error("❌ Failed to fetch profile");
+
+        const data: Profile = await response.json();
+        console.log("✅ Full Profile Data:", data);
+        setProfile(data);
+
+        // ✅ Ensure both fetch functions are called with IDs
+        if (data.savedBlogIds?.length) {
+          console.log("🔍 Fetching Blogs for IDs:", data.savedBlogIds);
+          fetchSavedBlogs(data.savedBlogIds);
+        }
+
+        if (data.savedProductIds?.length) {
+          console.log("🔍 Fetching Products for IDs:", data.savedProductIds);
+          fetchSavedProducts(data.savedProductIds);
         }
       } catch (error) {
         console.error("❌ Error fetching profile:", error);
@@ -74,11 +85,67 @@ const ProfilePage: React.FC = () => {
     fetchProfile();
   }, [user, isSessionChecked, navigate, setUser]);
 
-  if (!isSessionChecked) {
-    return <div className="profile-loading">Checking session...</div>;
+  /** ✅ Fetch Full Blog Details */
+  const fetchSavedBlogs = async (blogIds: number[]) => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/blogs/bulk-fetch`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ids: blogIds }),
+        }
+      );
+
+      if (!response.ok) throw new Error("❌ Failed to fetch blogs");
+
+      const data: BlogPost[] = await response.json();
+      console.log("✅ Blogs Loaded:", data);
+      setSavedBlogs(data);
+    } catch (error) {
+      console.error("❌ Error fetching saved blogs:", error);
+    }
+  };
+
+  /** ✅ Fetch Full Product Details */
+  /** ✅ Fetch Full Product Details */
+const fetchSavedProducts = async (productIds: number[]) => {
+  if (!productIds.length) {
+    console.warn("⚠️ No product IDs found to fetch.");
+    return;
   }
 
-  if (!profile) return <div className="profile-loading">No profile data found.</div>;
+  try {
+    console.log("🔍 Sending request to fetch products for IDs:", productIds);
+
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/products/bulk-fetch`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ids: productIds }),
+    });
+
+    if (!response.ok) {
+      throw new Error("❌ Failed to fetch products");
+    }
+
+    const data: Product[] = await response.json();
+
+    console.log("✅ Products Loaded:", data);
+    
+    if (data.length === 0) {
+      console.warn("⚠️ No products returned from bulk-fetch.");
+    }
+
+    setSavedProducts(data);
+  } catch (error) {
+    console.error("❌ Error fetching saved products:", error);
+  }
+};
+
+  if (!isSessionChecked)
+    return <div className="profile-loading">Checking session...</div>;
+  if (!profile)
+    return <div className="profile-loading">No profile data found.</div>;
 
   const handleSignOut = async () => {
     try {
@@ -86,11 +153,7 @@ const ProfilePage: React.FC = () => {
         method: "POST",
         credentials: "include",
       });
-
-      document.cookie = "authToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; Secure; HttpOnly; SameSite=None";
-
       setUser(null);
-      console.log("🔹 User successfully logged out.");
       navigate("/", { replace: true });
       window.location.href = "/";
     } catch (error) {
@@ -104,7 +167,7 @@ const ProfilePage: React.FC = () => {
         <div className="profile-image-wrapper">
           <img
             src={profile.profilePictureUrl || "https://via.placeholder.com/150"}
-            alt={profile.name}
+            alt="Profile"
             className="profile-image"
           />
         </div>
@@ -117,7 +180,10 @@ const ProfilePage: React.FC = () => {
             <button onClick={handleSignOut} className="profile-cta-button">
               Sign Out
             </button>
-            <button onClick={() => navigate("/settings")} className="profile-cta-button">
+            <button
+              onClick={() => navigate("/settings")}
+              className="profile-cta-button"
+            >
               Settings
             </button>
           </div>
@@ -126,6 +192,7 @@ const ProfilePage: React.FC = () => {
 
       <hr className="profile-divider" />
 
+      <div className="profile-section">
       <div className="profile-section">
         <h2 className="profile-subsection-header-text">Badges</h2>
         <div className="profile-badges">
@@ -159,52 +226,58 @@ const ProfilePage: React.FC = () => {
           )}
         </div>
       </div>
-
-      {/* ✅ FIXED: Display saved blogs correctly */}
-      <div className="profile-section">
         <h2 className="profile-subsection-header-text">Saved Blogs</h2>
         <div className="saved-blogs-grid">
-  {profile.savedBlogs && profile.savedBlogs.length ? (
-    profile.savedBlogs.map((blog) => (
-      <div key={blog.id} className="saved-blog-card">
-        {/* Blog Image */}
-        <img src={blog.imageUrl} alt={blog.title} className="saved-blog-image" />
-
-        {/* Blog Details */}
-        <div className="saved-blog-details">
-          <h3 className="saved-blog-title">{blog.title}</h3>
-          <p className="saved-blog-author">By {blog.author}</p>
-
-          {/* Read More Button */}
-          <a href={`/blog/${blog.slug}`} className="read-blog-btn">
-            Read More
-          </a>
+          {savedBlogs.length > 0 ? (
+            savedBlogs.map((blog) => (
+              <div key={blog.id} className="saved-blog-card">
+                <img
+                  src={blog.imageUrl}
+                  alt={blog.title}
+                  className="saved-blog-image"
+                />
+                <div className="saved-blog-details">
+                  <h3 className="saved-blog-title">{blog.title}</h3>
+                  <p className="saved-blog-author">By {blog.author}</p>
+                  <a href={`/blog/${blog.slug}`} className="read-blog-btn">
+                    Read More
+                  </a>
+                </div>
+              </div>
+            ))
+          ) : (
+            <p className="no-blogs-text">No saved blogs yet.</p>
+          )}
         </div>
       </div>
-    ))
-  ) : (
-    <p className="no-blogs-text">No saved blogs yet.</p>
-  )}
-</div>
 
-
-      </div>
-
-      {/* Saved Products Section */}
       <div className="profile-section">
         <h2 className="profile-subsection-header-text">Saved Products</h2>
         <div className="profile-saved-products">
-          {profile.savedProducts?.length ? (
+          {savedProducts.length > 0 ? (
             <div className="saved-products-grid">
-              {profile.savedProducts.map((product) => (
+              {savedProducts.map((product) => (
                 <div key={product.id} className="saved-product-card">
-                  <img src={product.imgUrl} alt={product.name} className="saved-product-image" />
+                  <img
+                    src={product.imgUrl}
+                    alt={product.name}
+                    className="saved-product-image"
+                  />
                   <div className="saved-product-details">
                     <h3 className="product-name">{product.name}</h3>
                     <p className="product-brand">{product.brand}</p>
-                    <p className="product-price">${product.price.toFixed(2)}</p>
+                    <p className="product-price">
+                      {product.price
+                        ? `$${product.price.toFixed(2)}`
+                        : "Price unavailable"}
+                    </p>
                     <div className="saved-product-actions">
-                      <a href={product.affiliateLink} target="_blank" rel="noopener noreferrer" className="buy-now-btn">
+                      <a
+                        href={product.affiliateLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="buy-now-btn"
+                      >
                         Buy Now
                       </a>
                     </div>

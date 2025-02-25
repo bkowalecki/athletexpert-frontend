@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useUserContext } from "../components/UserContext";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "../styles/ProductsPage.css";
 import FeaturedProductList from "./FeaturedProductList";
 
@@ -12,7 +14,6 @@ interface Product {
   affiliateLink: string;
   imgUrl: string;
   brand: string;
-  categories: string;
   retailer: string;
   trending: boolean;
   featured: boolean;
@@ -24,15 +25,10 @@ const ProductsPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState<number | null>(null);
+  const [savedProductIds, setSavedProductIds] = useState<number[]>([]);
   const { user } = useUserContext();
 
-  // Search & Filter State
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedBrand, setSelectedBrand] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
-  const [selectedRetailer, setSelectedRetailer] = useState("");
-  const [sortOption, setSortOption] = useState("default");
-
+  // Fetch all products
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -52,32 +48,65 @@ const ProductsPage: React.FC = () => {
     fetchProducts();
   }, []);
 
-  // Handle Product Save
-  const handleSaveProduct = async (productId: number) => {
+  // Fetch user's saved products
+  useEffect(() => {
+    if (!user) return;
+
+    const fetchSavedProducts = async () => {
+      try {
+        const response = await axios.get(
+          `${process.env.REACT_APP_API_URL}/users/saved-products`,
+          { withCredentials: true }
+        );
+        setSavedProductIds(response.data.map((product: Product) => product.id));
+      } catch (error) {
+        console.error("❌ Error fetching saved products:", error);
+      }
+    };
+
+    fetchSavedProducts();
+  }, [user]);
+
+  // Handle Save/Unsave Product
+  const toggleSaveProduct = async (productId: number) => {
     if (!user) {
-      console.warn("⚠️ User not logged in. Redirecting to /auth...");
-      window.location.href = "/auth";
+      toast.warn("⚠️ You need to log in to save products!", {
+        position: "top-center",
+      });
       return;
     }
 
+    const isSaved = savedProductIds.includes(productId);
     setSaving(productId);
+
     try {
-      const response = await axios.post(
-        `${process.env.REACT_APP_API_URL}/users/saved-products/${productId}`,
-        {},
-        { withCredentials: true }
-      );
+      const response = await axios({
+        method: isSaved ? "DELETE" : "POST",
+        url: `${process.env.REACT_APP_API_URL}/users/saved-products/${productId}`,
+        withCredentials: true,
+      });
 
       if (response.status === 200) {
-        console.log("✅ Product saved successfully!");
+        setSavedProductIds((prev) =>
+          isSaved ? prev.filter((id) => id !== productId) : [...prev, productId]
+        );
+
+        toast.success(isSaved ? "Product removed!" : "Product saved!", {
+          position: "bottom-center",
+        });
       }
     } catch (error) {
-      console.error("🚨 Error saving product:", error);
-      alert("Failed to save product. Try again.");
+      toast.error("❌ Error saving product. Try again.");
     } finally {
       setSaving(null);
     }
   };
+
+  // Search & Filter State
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedBrand, setSelectedBrand] = useState("");
+  const [selectedRetailer, setSelectedRetailer] = useState("");
+  const [sortOption, setSortOption] = useState("default");
 
   // Apply Search & Filters
   useEffect(() => {
@@ -93,12 +122,6 @@ const ProductsPage: React.FC = () => {
       filtered = filtered.filter((product) => product.brand === selectedBrand);
     }
 
-    if (selectedCategory) {
-      filtered = filtered.filter(
-        (product) => product.categories === selectedCategory
-      );
-    }
-
     if (selectedRetailer) {
       filtered = filtered.filter(
         (product) => product.retailer === selectedRetailer
@@ -112,14 +135,7 @@ const ProductsPage: React.FC = () => {
     }
 
     setFilteredProducts(filtered);
-  }, [
-    searchQuery,
-    selectedBrand,
-    selectedCategory,
-    selectedRetailer,
-    sortOption,
-    products,
-  ]);
+  }, [searchQuery, selectedBrand, selectedRetailer, sortOption, products]);
 
   return (
     <div className="products-page">
@@ -149,21 +165,6 @@ const ProductsPage: React.FC = () => {
         </select>
 
         <select
-          value={selectedCategory}
-          onChange={(e) => setSelectedCategory(e.target.value)}
-        >
-          <option value="">Categories</option>
-          {[...new Set(products.map((p) => p.categories))].map(
-            (category, index) =>
-              category ? (
-                <option key={`${category}-${index}`} value={category}>
-                  {category}
-                </option>
-              ) : null
-          )}
-        </select>
-
-        <select
           value={selectedRetailer}
           onChange={(e) => setSelectedRetailer(e.target.value)}
         >
@@ -177,6 +178,7 @@ const ProductsPage: React.FC = () => {
               ) : null
           )}
         </select>
+
         <select
           value={sortOption}
           onChange={(e) => setSortOption(e.target.value)}
@@ -223,11 +225,17 @@ const ProductsPage: React.FC = () => {
                 </a>
                 {user && (
                   <button
-                    className="save-button"
-                    onClick={() => handleSaveProduct(product.id)}
+                    className={`save-button ${
+                      savedProductIds.includes(product.id) ? "unsave" : ""
+                    }`}
+                    onClick={() => toggleSaveProduct(product.id)}
                     disabled={saving === product.id}
                   >
-                    {saving === product.id ? "Saving..." : "Save"}
+                    {saving === product.id
+                      ? "Saving..."
+                      : savedProductIds.includes(product.id)
+                      ? "Unsave"
+                      : "Save"}
                   </button>
                 )}
               </div>
