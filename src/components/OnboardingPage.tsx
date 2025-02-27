@@ -62,7 +62,7 @@ const OnboardingPage = () => {
       case 1:
         return (
           <div className="onboarding-step">
-            <h2>Let's Start with Your Name!</h2>
+            <h2>Let's Start with Your Name</h2>
             <input
               type="text"
               name="firstName"
@@ -121,10 +121,10 @@ const OnboardingPage = () => {
       case 4:
         return (
           <div className="onboarding-step">
-            <h2>Almost There! Anything else you'd like to share?</h2>
+            <h2>Profile Bio</h2>
             <textarea
               name="bio"
-              placeholder="Tell us something fun about you! (Optional)"
+              placeholder="Tell us about yourself (Optional, but encouraged 😊)"
               value={formData.bio}
               onChange={handleChange}
             ></textarea>
@@ -140,7 +140,7 @@ const OnboardingPage = () => {
 
   return (
     <div className="onboarding-container">
-      <h1>🎉 Welcome to AthleteXpert! 🏆</h1>
+      <h1>Welcome!</h1>
       {renderStep()}
     </div>
   );

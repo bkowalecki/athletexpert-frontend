@@ -58,25 +58,30 @@ interface SportCardProps {
   navigate: (path: string) => void;
 }
 
-const SportCard: React.FC<SportCardProps> = React.memo(
-  ({ sport, index, navigate }) => (
-    <motion.div
-      className={`sport-card sport-card-${index % 4}`}
-      onClick={() => navigate(`${sport.title.toLowerCase()}`)}
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
-    >
-      <div
-        className="sport-card-bg"
-        style={{ backgroundImage: `url(${sport.backgroundImage})` }}
+const SportCard: React.FC<SportCardProps> = React.memo(({ sport, index, navigate }) => (
+  <motion.div
+    className={`sport-card sport-card-${index % 4}`}
+    onClick={() => navigate(`${sport.title.toLowerCase()}`)}
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.4 }}
+  >
+    <div className="sport-card-bg">
+      <img 
+        src={sport.backgroundImage} 
+        alt={sport.title} 
+        className="sport-card-image"
+        loading="lazy"  // ✅ Lazy load for performance
+        width="300" 
+        height="200"
       />
-      <div className="sport-card-info">
-        <h3>{sport.title}</h3>
-      </div>
-    </motion.div>
-  )
-);
+    </div>
+    <div className="sport-card-info">
+      <h3>{sport.title}</h3>
+    </div>
+  </motion.div>
+));
+
 
 const Community: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");

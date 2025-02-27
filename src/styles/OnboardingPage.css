@@ -5,7 +5,8 @@
   align-items: center;
   justify-content: center;
   height: 100vh;
-  background: linear-gradient(135deg, #2A6045, #A23C20);
+  background: linear-gradient(135deg, #872D1A 0%, #A23C20 40%, #D14A1F 100%);
+
   color: #fff;
   font-family: "Montserrat", sans-serif;
   text-align: center;
@@ -13,10 +14,10 @@
 }
 
 .onboarding-step {
-  background: rgba(0, 0, 0, 0.7);
+ 
   padding: 2rem;
   border-radius: 20px;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.6);
+
   width: 100%;
   max-width: 500px;
   transition: all 0.5s ease;
@@ -24,7 +25,7 @@
 
 .onboarding-step h2 {
   margin-bottom: 2rem;
-  color: #FFD700;
+  color: white;
 }
 
 .onboarding-step input,

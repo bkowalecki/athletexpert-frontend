@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUserContext } from "../components/UserContext";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "../styles/ProfilePage.css";
 
 interface Product {
@@ -107,40 +109,101 @@ const ProfilePage: React.FC = () => {
     }
   };
 
-  /** ✅ Fetch Full Product Details */
-  /** ✅ Fetch Full Product Details */
-const fetchSavedProducts = async (productIds: number[]) => {
-  if (!productIds.length) {
-    console.warn("⚠️ No product IDs found to fetch.");
-    return;
-  }
-
-  try {
-    console.log("🔍 Sending request to fetch products for IDs:", productIds);
-
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/products/bulk-fetch`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ids: productIds }),
-    });
-
-    if (!response.ok) {
-      throw new Error("❌ Failed to fetch products");
+  const toggleSaveProduct = async (productId: number) => {
+    if (!user) {
+      toast.warn("⚠️ You need to log in to save products!", { position: "top-center" });
+      return;
     }
 
-    const data: Product[] = await response.json();
+    const isSaved = savedProducts.some((product) => product.id === productId);
 
-    console.log("✅ Products Loaded:", data);
-    
-    if (data.length === 0) {
-      console.warn("⚠️ No products returned from bulk-fetch.");
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/users/saved-products/${productId}`,
+        {
+          method: isSaved ? "DELETE" : "POST",
+          credentials: "include",
+        }
+      );
+
+      if (response.ok) {
+        setSavedProducts((prev) =>
+          isSaved ? prev.filter((product) => product.id !== productId) : [...prev, { id: productId } as Product]
+        );
+
+        toast.success(isSaved ? "Product removed!" : "Product saved!", { position: "bottom-center" });
+      }
+    } catch (error) {
+      toast.error("❌ Error saving product. Try again.");
+    }
+  };
+
+  const toggleSaveBlog = async (blogId: number) => {
+    if (!user) {
+      toast.warn("⚠️ You need to log in to save blogs!", { position: "top-center" });
+      return;
     }
 
-    setSavedProducts(data);
-  } catch (error) {
-    console.error("❌ Error fetching saved products:", error);
-  }
-};
+    const isSaved = savedBlogs.some((blog) => blog.id === blogId);
+
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/users/saved-blogs/${blogId}`,
+        {
+          method: isSaved ? "DELETE" : "POST",
+          credentials: "include",
+        }
+      );
+
+      if (response.ok) {
+        setSavedBlogs((prev) =>
+          isSaved ? prev.filter((blog) => blog.id !== blogId) : [...prev, { id: blogId } as BlogPost]
+        );
+
+        toast.success(isSaved ? "Blog removed!" : "Blog saved!", { position: "bottom-center" });
+      }
+    } catch (error) {
+      toast.error("❌ Error saving blog. Try again.");
+    }
+  };
+
+  /** ✅ Fetch Full Product Details */
+  /** ✅ Fetch Full Product Details */
+  const fetchSavedProducts = async (productIds: number[]) => {
+    if (!productIds.length) {
+      console.warn("⚠️ No product IDs found to fetch.");
+      return;
+    }
+
+    try {
+      console.log("🔍 Sending request to fetch products for IDs:", productIds);
+
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/products/bulk-fetch`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ids: productIds }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("❌ Failed to fetch products");
+      }
+
+      const data: Product[] = await response.json();
+
+      console.log("✅ Products Loaded:", data);
+
+      if (data.length === 0) {
+        console.warn("⚠️ No products returned from bulk-fetch.");
+      }
+
+      setSavedProducts(data);
+    } catch (error) {
+      console.error("❌ Error fetching saved products:", error);
+    }
+  };
 
   if (!isSessionChecked)
     return <div className="profile-loading">Checking session...</div>;
@@ -193,7 +256,6 @@ const fetchSavedProducts = async (productIds: number[]) => {
       <hr className="profile-divider" />
 
       <div className="profile-section">
-      <div className="profile-section">
         <h2 className="profile-subsection-header-text">Badges</h2>
         <div className="profile-badges">
           {profile.badges?.length ? (
@@ -205,14 +267,15 @@ const fetchSavedProducts = async (productIds: number[]) => {
           ) : (
             <p>No badges yet. Start achieving!</p>
           )}
-                        <div className="badge-item-one-of-a-kind">
-                        <img src="https://athletexpertbucket.s3.us-east-1.amazonaws.com/badges/White+Gold+Black+Modern+Elegant+Football+Club+Badge+Logo.png" alt="whhops" className="badge-image" />
-
-              </div>
+          <div className="badge-item-one-of-a-kind">
+            <img
+              src="https://athletexpertbucket.s3.us-east-1.amazonaws.com/badges/White+Gold+Black+Modern+Elegant+Football+Club+Badge+Logo.png"
+              alt="whhops"
+              className="badge-image"
+            />
+          </div>
         </div>
-      </div>
 
-      <div className="profile-section">
         <h2 className="profile-subsection-header-text">Sports & Stats</h2>
         <div className="profile-sports">
           {profile.sports?.length ? (
@@ -225,70 +288,52 @@ const fetchSavedProducts = async (productIds: number[]) => {
             <p>No sports added yet.</p>
           )}
         </div>
-      </div>
         <h2 className="profile-subsection-header-text">Saved Blogs</h2>
-        <div className="saved-blogs-grid">
-          {savedBlogs.length > 0 ? (
-            savedBlogs.map((blog) => (
-              <div key={blog.id} className="saved-blog-card">
-                <img
-                  src={blog.imageUrl}
-                  alt={blog.title}
-                  className="saved-blog-image"
-                />
-                <div className="saved-blog-details">
-                  <h3 className="saved-blog-title">{blog.title}</h3>
-                  <p className="saved-blog-author">By {blog.author}</p>
-                  <a href={`/blog/${blog.slug}`} className="read-blog-btn">
-                    Read More
-                  </a>
-                </div>
+      <div className="profile-saved-blogs-grid">
+        {savedBlogs.length > 0 ? (
+          savedBlogs.map((blog) => (
+            <div key={blog.id} className="saved-blog-card">
+              <img src={blog.imageUrl} alt={blog.title} className="saved-blog-image" />
+              <div className="saved-blog-details">
+                <h3 className="saved-blog-title">{blog.title}</h3>
+                <p className="saved-blog-author">By {blog.author}</p>
+                <a href={`/blog/${blog.slug}`} className="read-blog-btn">
+                  Read More
+                </a>
+                <button className="save-blog-btn unsave" onClick={() => toggleSaveBlog(blog.id)}>
+                  Unsave
+                </button>
               </div>
-            ))
-          ) : (
-            <p className="no-blogs-text">No saved blogs yet.</p>
-          )}
-        </div>
+            </div>
+          ))
+        ) : (
+          <p className="profile-no-blogs-text">No saved blogs yet.</p>
+        )}
       </div>
 
-      <div className="profile-section">
-        <h2 className="profile-subsection-header-text">Saved Products</h2>
-        <div className="profile-saved-products">
-          {savedProducts.length > 0 ? (
-            <div className="saved-products-grid">
-              {savedProducts.map((product) => (
-                <div key={product.id} className="saved-product-card">
-                  <img
-                    src={product.imgUrl}
-                    alt={product.name}
-                    className="saved-product-image"
-                  />
-                  <div className="saved-product-details">
-                    <h3 className="product-name">{product.name}</h3>
-                    <p className="product-brand">{product.brand}</p>
-                    <p className="product-price">
-                      {product.price
-                        ? `$${product.price.toFixed(2)}`
-                        : "Price unavailable"}
-                    </p>
-                    <div className="saved-product-actions">
-                      <a
-                        href={product.affiliateLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="buy-now-btn"
-                      >
-                        Buy Now
-                      </a>
-                    </div>
-                  </div>
+      <h2 className="profile-subsection-header-text">Saved Products</h2>
+      <div className="profile-saved-products">
+        {savedProducts.length > 0 ? (
+          <div className="saved-products-grid">
+            {savedProducts.map((product) => (
+              <div key={product.id} className="saved-product-card">
+                <img src={product.imgUrl} alt={product.name} className="saved-product-image" />
+                <div className="saved-product-details">
+                  <h3 className="product-name">{product.name}</h3>
+                  <a href={product.affiliateLink} target="_blank" rel="noopener noreferrer" className="buy-now-btn">
+                    Buy Now
+                  </a>
+                  <button className="save-button unsave" onClick={() => toggleSaveProduct(product.id)}>
+                    Unsave
+                  </button>
                 </div>
-              ))}
-            </div>
-          ) : (
-            <p className="no-products-text">No saved products yet.</p>
-          )}
-        </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="profile-no-products-text">No saved products yet.</p>
+        )}
+      </div>
       </div>
     </div>
   );

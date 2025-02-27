@@ -146,8 +146,8 @@
 /* 🌟 Buttons */
 .products-page-product-buy-button {
   display: inline-block;
-  padding: 12px 16px;
-  margin-bottom: 12px;
+  padding: 12px 0px;
+  margin-bottom: 0;
   background: #ff9900;
   color: #111;
   font-size: 1rem;
@@ -156,6 +156,7 @@
   text-align: center;
   text-decoration: none;
   border: 2px solid #e68a00;
+  width: 100%;
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
@@ -175,7 +176,7 @@
 
 
 .save-button {
-  margin-top: 1rem;
+  /* margin-top: 1rem; */
   background: black;
   font-size: 1rem;
   font-weight: bold;
@@ -188,8 +189,8 @@
 }
 
 .save-button.unsave {
-  background: #122;
-  color: white;
+  background: white;
+  color: #122;
   border: none;
 }
 
@@ -233,7 +234,7 @@
 
   .filters-container select,
   .filters-container input {
-    width: 100%;
+    /* width: 100%; */
     padding: 14px;
   }
 
