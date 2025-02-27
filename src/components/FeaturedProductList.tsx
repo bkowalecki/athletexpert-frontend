@@ -17,7 +17,6 @@ const FeaturedProductList: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const carouselRef = useRef<HTMLDivElement>(null);
-  const [dragConstraints, setDragConstraints] = useState({ left: 0, right: 0 });
 
   useEffect(() => {
     axios
@@ -33,23 +32,17 @@ const FeaturedProductList: React.FC = () => {
       });
   }, []);
 
-  // Calculate drag constraints based on carousel width
-  useEffect(() => {
-    if (carouselRef.current) {
-      const containerWidth = carouselRef.current.offsetWidth;
-      const totalWidth = carouselRef.current.scrollWidth;
-      setDragConstraints({ right: 0, left: -(totalWidth - containerWidth) });
-    }
-  }, [products]);
+  // Get the current carousel container width
+  const getWidth = () => (carouselRef.current ? carouselRef.current.offsetWidth : 0);
 
-  // Update currentIndex when drag ends based on drag offset
+  // Update currentIndex based on swipe offset
   const handleDragEnd = (_: any, info: { offset: { x: number } }) => {
-    const width = carouselRef.current?.offsetWidth || 0;
-    const delta = -info.offset.x / width;
-    let newIndex = currentIndex + Math.round(delta);
-    if (newIndex < 0) newIndex = 0;
-    if (newIndex >= products.length) newIndex = products.length - 1;
-    setCurrentIndex(newIndex);
+    const threshold = 100; // Swipe threshold (in pixels)
+    if (info.offset.x < -threshold && currentIndex < products.length - 1) {
+      setCurrentIndex((prev) => prev + 1);
+    } else if (info.offset.x > threshold && currentIndex > 0) {
+      setCurrentIndex((prev) => prev - 1);
+    }
   };
 
   const nextSlide = () => {
@@ -108,11 +101,9 @@ const FeaturedProductList: React.FC = () => {
           <motion.div
             className="featured-carousel"
             drag="x"
-            dragConstraints={dragConstraints}
+            dragElastic={0.2}
             onDragEnd={handleDragEnd}
-            animate={{
-              x: -currentIndex * (carouselRef.current?.offsetWidth || 0),
-            }}
+            animate={{ x: -currentIndex * getWidth() }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
           >
             {products.map((product) => (
@@ -126,16 +117,10 @@ const FeaturedProductList: React.FC = () => {
                     />
                   </div>
                   <div className="featured-product-info">
-                    <h3 className="featured-product-name">
-                      {product.name}
-                    </h3>
-                    <p className="featured-product-brand">
-                      {product.brand}
-                    </p>
+                    <h3 className="featured-product-name">{product.name}</h3>
+                    <p className="featured-product-brand">{product.brand}</p>
                     <p className="featured-product-price">
-                      {product.price != null
-                        ? `$${product.price.toFixed(2)}`
-                        : "N/A"}
+                      {product.price != null ? `$${product.price.toFixed(2)}` : "N/A"}
                     </p>
                   </div>
                   <a
