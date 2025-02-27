@@ -19,7 +19,6 @@ const FeaturedProductList: React.FC = () => {
   const carouselRef = useRef<HTMLDivElement>(null);
   const [dragConstraints, setDragConstraints] = useState({ left: 0, right: 0 });
 
-  // Fetch featured products on mount
   useEffect(() => {
     axios
       .get(`${process.env.REACT_APP_API_URL}/products/featured`)
@@ -34,7 +33,7 @@ const FeaturedProductList: React.FC = () => {
       });
   }, []);
 
-  // Set drag constraints once carousel dimensions are known
+  // Calculate drag constraints based on carousel width
   useEffect(() => {
     if (carouselRef.current) {
       const containerWidth = carouselRef.current.offsetWidth;
@@ -43,7 +42,28 @@ const FeaturedProductList: React.FC = () => {
     }
   }, [products]);
 
-  // When a dot is clicked, update current index (for mobile)
+  // Update currentIndex when drag ends based on drag offset
+  const handleDragEnd = (_: any, info: { offset: { x: number } }) => {
+    const width = carouselRef.current?.offsetWidth || 0;
+    const delta = -info.offset.x / width;
+    let newIndex = currentIndex + Math.round(delta);
+    if (newIndex < 0) newIndex = 0;
+    if (newIndex >= products.length) newIndex = products.length - 1;
+    setCurrentIndex(newIndex);
+  };
+
+  const nextSlide = () => {
+    if (products.length > 0) {
+      setCurrentIndex((prev) => (prev + 1) % products.length);
+    }
+  };
+
+  const prevSlide = () => {
+    if (products.length > 0) {
+      setCurrentIndex((prev) => (prev === 0 ? products.length - 1 : prev - 1));
+    }
+  };
+
   const handleDotClick = (index: number) => {
     setCurrentIndex(index);
   };
@@ -89,7 +109,10 @@ const FeaturedProductList: React.FC = () => {
             className="featured-carousel"
             drag="x"
             dragConstraints={dragConstraints}
-            animate={{ x: -currentIndex * (carouselRef.current?.offsetWidth || 0) }}
+            onDragEnd={handleDragEnd}
+            animate={{
+              x: -currentIndex * (carouselRef.current?.offsetWidth || 0),
+            }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
           >
             {products.map((product) => (
@@ -110,7 +133,9 @@ const FeaturedProductList: React.FC = () => {
                       {product.brand}
                     </p>
                     <p className="featured-product-price">
-                      {product.price != null ? `$${product.price.toFixed(2)}` : "N/A"}
+                      {product.price != null
+                        ? `$${product.price.toFixed(2)}`
+                        : "N/A"}
                     </p>
                   </div>
                   <a
@@ -134,6 +159,38 @@ const FeaturedProductList: React.FC = () => {
               />
             ))}
           </div>
+          <button className="featured-carousel-button left" onClick={prevSlide}>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 50 100"
+              fill="currentColor"
+              width="24px"
+              height="80px"
+            >
+              <path
+                d="M40 5 L10 50 L40 95"
+                stroke="currentColor"
+                strokeWidth="5"
+                fill="none"
+              />
+            </svg>
+          </button>
+          <button className="featured-carousel-button right" onClick={nextSlide}>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 50 100"
+              fill="currentColor"
+              width="24px"
+              height="80px"
+            >
+              <path
+                d="M10 5 L40 50 L10 95"
+                stroke="currentColor"
+                strokeWidth="5"
+                fill="none"
+              />
+            </svg>
+          </button>
         </div>
       </div>
     </section>

@@ -13,9 +13,9 @@
 }
 
 .featured-products-heading {
-  font-size: 2.5rem;
+  font-size: clamp(2.4rem, 4vw, 3.5rem);
   text-transform: uppercase;
-  letter-spacing: 2px;
+  letter-spacing: 3px;
   text-align: left;
   margin-bottom: 2rem;
 }
@@ -25,6 +25,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(275px, 1fr));
   gap: 2rem;
+  margin: 0 2rem;
 }
 
 .featured-product-item {
@@ -133,5 +134,33 @@
   }
   .carousel-dots .dot.active {
     background: #ff9900;
+  }
+  .featured-carousel-button {
+    background: rgba(0, 0, 0, 0.3);
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    z-index: 2;
+    transition: background 0.3s;
+  }
+  .featured-carousel-button.left {
+    left: 10px;
+  }
+  .featured-carousel-button.right {
+    right: 10px;
+  }
+  .featured-carousel-button:hover {
+    background: #ff9900;
+  }
+  .featured-carousel-button svg {
+    width: 24px;
+    height: 24px;
+    color: #fff;
   }
 }
