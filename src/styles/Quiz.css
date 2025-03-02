@@ -262,7 +262,7 @@
   margin-bottom: 15px;
 }
 
-.nav-button {
+.quiz-nav-button {
   padding: 12px 35px;  /* Slightly longer for emphasis */
   font-size: 1rem;
   color: #ffffff;  /* White text for contrast */
@@ -274,17 +274,17 @@
   font-family: 'Arial', sans-serif;  /* Simple and clean font */
 }
 
-.nav-button:hover {
+.quiz-nav-button:hover {
   background-color: #8C341C;  /* Slightly darker on hover */
   transform: translateY(-2px);  /* Lift the button slightly on hover */
 }
 
-.nav-button:focus {
+.quiz-nav-button:focus {
   outline: none;
   box-shadow: 0 0 0 3px rgba(162, 60, 32, 0.4);  /* Subtle focus shadow */
 }
 
-.nav-button:active {
+.quiz-nav-button:active {
   background-color: #732A17;  /* Darker for active state */
   transform: translateY(0);  /* Remove lift on click */
 }
@@ -316,12 +316,12 @@
 .quiz-product-card {
   background-color: #fff;
   border-radius: 15px; /* Softer corners */
-  padding: 20px;
+  /* padding: 20px; */
   text-align: center;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  width: 250px; /* Default width */
-  min-height: 420px; /* Slightly larger to accommodate extra spacing */
+  /* width: 250px; Default width */
+  /* min-height: 420px; Slightly larger to accommodate extra spacing */
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -333,6 +333,10 @@
   box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
 }
 
+.quiz-product-card h4 {
+  color: black;
+}
+
 /* Responsive Image */
 .quiz-product-image {
   width: 100%;
@@ -341,7 +345,7 @@
   object-fit: contain;
   margin-bottom: 15px;
   border-radius: 8px;
-  background-color: #f0f0f0;
+  /* background-color: #f0f0f0; */
 }
 
 .buy-button {
@@ -397,7 +401,23 @@
   .quiz-modal {
     width: 95vw; /* Maintain spacing between items on smaller screens */
     max-width: 95vw;
+    /* max-height: 60vh; */
+    /* overflow-y: scroll; */
     /* height:60vh; */
+  }
+
+  .carousel-text {
+    color: #fff;
+  }
+
+  .quiz-nav-button {
+    background-color: #ddd;
+    color: #8C341C;
+  }
+
+  .recommended-products h3 {
+    font-size: 1.8rem;
+    color: #fff;
   }
 
   .quiz-container h2 {

@@ -248,7 +248,7 @@ const Quiz: React.FC<QuizProps> = ({ isOpen, closeModal }) => {
                   </div>
                   <div className="quiz-navigation">
                     <button
-                      className="nav-button"
+                      className="quiz-nav-button"
                       onClick={() =>
                         handleNext("sport", sportsData[carouselIndex].title.toLowerCase())
                       }
@@ -299,9 +299,9 @@ const Quiz: React.FC<QuizProps> = ({ isOpen, closeModal }) => {
               {step === totalSteps && (
                 <div className="recommended-products">
                   <h3>Recommended For You</h3>
-                  <div className="product-grid">
+                  <div className="quiz-product-grid">
                     {recommendedProducts.map((product, index) => (
-                      <div key={index} className="product-card animate-product">
+                      <div key={index} className="quiz-product-card animate-product">
                         <a
                           href={product.affiliateLink}
                           target="_blank"

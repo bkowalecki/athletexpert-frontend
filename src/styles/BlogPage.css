@@ -253,7 +253,7 @@
 @media (max-width: 768px) {
     .blog-post-list {
       grid-template-columns: 1fr;  /* Single column layout for mobile */
-      gap: 1rem;
+      gap: 2rem;
       padding: 0 1rem;  /* Adjust padding to prevent squeezing */
     }
   

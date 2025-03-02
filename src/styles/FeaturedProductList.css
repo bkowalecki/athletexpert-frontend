@@ -1,23 +1,28 @@
 /* Featured Products Section */
 .featured-products-section {
-  padding: 3rem 1rem;
-  background: #1e1e1e;
+  /* padding: 3rem 1rem; */
+  background: #a23c20;
   color: #fff;
   width: 100%;
 }
 
 .featured-products-container {
-  /* max-width: 1200px;
-  margin: 0 auto;
+  /* max-width: 1200px; */
+  /* margin: 0 auto;
   position: relative; */
+  margin-bottom: 3rem;
 }
+
 
 .featured-products-heading {
   font-size: clamp(2.4rem, 4vw, 3.5rem);
+  text-align: center;
+  color: #fff;
   text-transform: uppercase;
+  font-weight: 900;
+  font-family: 'Oswald', sans-serif;
   letter-spacing: 3px;
-  text-align: left;
-  margin-bottom: 2rem;
+  margin: 3rem 0;
 }
 
 /* Desktop Grid View */
@@ -115,7 +120,7 @@
   }
   .featured-carousel-item {
     min-width: 100%;
-    padding: 1rem;
+    padding: 0 1rem;
     box-sizing: border-box;
   }
   .carousel-dots {

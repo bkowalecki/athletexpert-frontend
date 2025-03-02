@@ -53,10 +53,10 @@ const SportPage: React.FC = () => {
           >
             {currentSport.title}
           </motion.h1>
-          <div className="sport-page-buttons">
+          {/* <div className="sport-page-buttons">
             <button className="sport-page-btn primary">Add as Player</button>
             <button className="sport-page-btn secondary">Follow</button>
-          </div>
+          </div> */}
         </div>
       </div>
 

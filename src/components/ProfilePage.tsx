@@ -111,7 +111,9 @@ const ProfilePage: React.FC = () => {
 
   const toggleSaveProduct = async (productId: number) => {
     if (!user) {
-      toast.warn("⚠️ You need to log in to save products!", { position: "top-center" });
+      toast.warn("⚠️ You need to log in to save products!", {
+        position: "top-center",
+      });
       return;
     }
 
@@ -128,10 +130,14 @@ const ProfilePage: React.FC = () => {
 
       if (response.ok) {
         setSavedProducts((prev) =>
-          isSaved ? prev.filter((product) => product.id !== productId) : [...prev, { id: productId } as Product]
+          isSaved
+            ? prev.filter((product) => product.id !== productId)
+            : [...prev, { id: productId } as Product]
         );
 
-        toast.success(isSaved ? "Product removed!" : "Product saved!", { position: "bottom-center" });
+        toast.success(isSaved ? "Product removed!" : "Product saved!", {
+          position: "bottom-center",
+        });
       }
     } catch (error) {
       toast.error("❌ Error saving product. Try again.");
@@ -140,7 +146,9 @@ const ProfilePage: React.FC = () => {
 
   const toggleSaveBlog = async (blogId: number) => {
     if (!user) {
-      toast.warn("⚠️ You need to log in to save blogs!", { position: "top-center" });
+      toast.warn("⚠️ You need to log in to save blogs!", {
+        position: "top-center",
+      });
       return;
     }
 
@@ -157,10 +165,14 @@ const ProfilePage: React.FC = () => {
 
       if (response.ok) {
         setSavedBlogs((prev) =>
-          isSaved ? prev.filter((blog) => blog.id !== blogId) : [...prev, { id: blogId } as BlogPost]
+          isSaved
+            ? prev.filter((blog) => blog.id !== blogId)
+            : [...prev, { id: blogId } as BlogPost]
         );
 
-        toast.success(isSaved ? "Blog removed!" : "Blog saved!", { position: "bottom-center" });
+        toast.success(isSaved ? "Blog removed!" : "Blog saved!", {
+          position: "bottom-center",
+        });
       }
     } catch (error) {
       toast.error("❌ Error saving blog. Try again.");
@@ -239,24 +251,13 @@ const ProfilePage: React.FC = () => {
             {profile.firstName} {profile.lastName}
           </h1>
           <p className="profile-bio">{profile.bio}</p>
-          <div>
-            <button onClick={handleSignOut} className="profile-cta-button">
-              Sign Out
-            </button>
-            <button
-              onClick={() => navigate("/settings")}
-              className="profile-cta-button"
-            >
-              Settings
-            </button>
-          </div>
         </div>
       </div>
 
       <hr className="profile-divider" />
 
       <div className="profile-section">
-        <h2 className="profile-subsection-header-text">Badges</h2>
+        {/* <h2 className="profile-subsection-header-text">Badges</h2>
         <div className="profile-badges">
           {profile.badges?.length ? (
             profile.badges.map((badge, index) => (
@@ -274,7 +275,7 @@ const ProfilePage: React.FC = () => {
               className="badge-image"
             />
           </div>
-        </div>
+        </div> */}
 
         <h2 className="profile-subsection-header-text">Sports & Stats</h2>
         <div className="profile-sports">
@@ -289,51 +290,82 @@ const ProfilePage: React.FC = () => {
           )}
         </div>
         <h2 className="profile-subsection-header-text">Saved Blogs</h2>
-      <div className="profile-saved-blogs-grid">
-        {savedBlogs.length > 0 ? (
-          savedBlogs.map((blog) => (
-            <div key={blog.id} className="saved-blog-card">
-              <img src={blog.imageUrl} alt={blog.title} className="saved-blog-image" />
-              <div className="saved-blog-details">
-                <h3 className="saved-blog-title">{blog.title}</h3>
-                <p className="saved-blog-author">By {blog.author}</p>
-                <a href={`/blog/${blog.slug}`} className="read-blog-btn">
-                  Read More
-                </a>
-                <button className="save-blog-btn unsave" onClick={() => toggleSaveBlog(blog.id)}>
-                  Unsave
-                </button>
-              </div>
-            </div>
-          ))
-        ) : (
-          <p className="profile-no-blogs-text">No saved blogs yet.</p>
-        )}
-      </div>
-
-      <h2 className="profile-subsection-header-text">Saved Products</h2>
-      <div className="profile-saved-products">
-        {savedProducts.length > 0 ? (
-          <div className="saved-products-grid">
-            {savedProducts.map((product) => (
-              <div key={product.id} className="saved-product-card">
-                <img src={product.imgUrl} alt={product.name} className="saved-product-image" />
-                <div className="saved-product-details">
-                  <h3 className="product-name">{product.name}</h3>
-                  <a href={product.affiliateLink} target="_blank" rel="noopener noreferrer" className="buy-now-btn">
-                    Buy Now
+        <div className="profile-saved-blogs-grid">
+          {savedBlogs.length > 0 ? (
+            savedBlogs.map((blog) => (
+              <div key={blog.id} className="saved-blog-card">
+                <img
+                  src={blog.imageUrl}
+                  alt={blog.title}
+                  className="saved-blog-image"
+                />
+                <div className="saved-blog-details">
+                  <h3 className="saved-blog-title">{blog.title}</h3>
+                  <p className="saved-blog-author">By {blog.author}</p>
+                  <a href={`/blog/${blog.slug}`} className="read-blog-btn">
+                    Read More
                   </a>
-                  <button className="save-button unsave" onClick={() => toggleSaveProduct(product.id)}>
+                  <button
+                    className="save-blog-btn unsave"
+                    onClick={() => toggleSaveBlog(blog.id)}
+                  >
                     Unsave
                   </button>
                 </div>
               </div>
-            ))}
+            ))
+          ) : (
+            <p className="profile-no-blogs-text">No saved blogs yet.</p>
+          )}
+        </div>
+
+        <h2 className="profile-subsection-header-text">Saved Products</h2>
+        <div className="profile-saved-products">
+          {savedProducts.length > 0 ? (
+            <div className="saved-products-grid">
+              {savedProducts.map((product) => (
+                <div key={product.id} className="saved-product-card">
+                  <img
+                    src={product.imgUrl}
+                    alt={product.name}
+                    className="saved-product-image"
+                  />
+                  <div className="saved-product-details">
+                    <h3 className="product-name">{product.name}</h3>
+                    <a
+                      href={product.affiliateLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="buy-now-btn"
+                    >
+                      Buy Now
+                    </a>
+                    <button
+                      className="save-button unsave"
+                      onClick={() => toggleSaveProduct(product.id)}
+                    >
+                      Unsave
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="profile-no-products-text">No saved products yet.</p>
+          )}
+        </div>
+
+        <div>
+            <button onClick={handleSignOut} className="profile-cta-button">
+              Sign Out
+            </button>
+            <button
+              onClick={() => navigate("/settings")}
+              className="profile-cta-button"
+            >
+              Settings
+            </button>
           </div>
-        ) : (
-          <p className="profile-no-products-text">No saved products yet.</p>
-        )}
-      </div>
       </div>
     </div>
   );

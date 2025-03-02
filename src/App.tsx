@@ -25,7 +25,7 @@ import RegisterPage from "./components/RegisterPage";
 import Login from "./components/Login";
 import TermsAndConditionsPage from "./components/TermsAndConditions";
 import BlogPage from "./components/BlogPage";
-import Community from "./components/Community";
+import CommunityPage from "./components/CommunityPage";
 import SportPage from "./components/SportPage";
 import SearchResults from "./components/SearchResults";
 import Footer from "./components/Footer";
@@ -109,7 +109,7 @@ const AppContent: React.FC = () => {
           <Route path="/404" element={<PageWrapper><NotFoundPage /></PageWrapper>} />
           <Route path="/register" element={<PageWrapper><RegisterPage /></PageWrapper>} />
           <Route path="/login" element={<PageWrapper><Login /></PageWrapper>} />
-          <Route path="/community" element={<PageWrapper><Community /></PageWrapper>} />
+          <Route path="/community" element={<PageWrapper><CommunityPage /></PageWrapper>} />
           <Route path="/community/:sport" element={<SportPage />} /> {/* ✅ Add this */}
           <Route path="/auth" element={<PageWrapper><AuthPage /></PageWrapper>} />
           <Route path="/account-setup" element={<OnboardingRoute><OnboardingPage /></OnboardingRoute>} />

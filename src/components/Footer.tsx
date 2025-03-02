@@ -7,18 +7,18 @@ const Footer: React.FC = () => {
     <footer className="app-footer">
       <div className="footer-container">
         <div className="footer-content">
-          <div className="footer-logo">
+          {/* <div className="footer-logo">
             <Link to="/">
               <h2>AthleteXpert</h2>
             </Link>
-          </div>
+          </div> */}
           <div className="footer-links">
             <Link to="/privacy-policy">Privacy Policy</Link>
             <Link to="/terms-of-service">Terms of Service</Link>
             <Link to="/contact">Contact Us</Link>
             <Link to="/about">About</Link>
           </div>
-          <div className="social-media">
+          {/* <div className="social-media">
             <a
               href="https://www.facebook.com"
               target="_blank"
@@ -43,7 +43,7 @@ const Footer: React.FC = () => {
             >
               <i className="fab fa-instagram"></i>
             </a>
-          </div>
+          </div> */}
         </div>
         <div className="footer-bottom">
           <p>

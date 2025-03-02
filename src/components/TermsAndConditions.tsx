@@ -49,7 +49,7 @@ const TermsAndConditionsPage: React.FC = () => {
       </p>
       <p>
         Certain promotions, advertising, or features of the site may require parental 
-        consent for users under the age of 18. Please review our <a href="/privacy-policy">Privacy Policy</a> 
+        consent for users under the age of 18. Please review our <a href="/privacy-policy">Privacy Policy </a> 
         for details on how we handle data from minors.
       </p>
 

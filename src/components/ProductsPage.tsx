@@ -171,7 +171,7 @@ const ProductsPage: React.FC = () => {
           )}
         </select>
 
-        <select
+        {/* <select
           value={selectedRetailer}
           onChange={(e) => setSelectedRetailer(e.target.value)}
         >
@@ -184,7 +184,7 @@ const ProductsPage: React.FC = () => {
                 </option>
               ) : null
           )}
-        </select>
+        </select> */}
 
         <select
           value={sortOption}

@@ -78,7 +78,7 @@
 @media (min-width: 768px) {
   .footer-content {
     flex-direction: row;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
   }
   .footer-links {

@@ -63,6 +63,7 @@ const TrendingProductList: React.FC = () => {
                   <img
                     src={product.imgUrl}
                     alt={product.name}
+                    loading="lazy"
                     className="trending-product-image"
                   />
                 </div>
@@ -127,6 +128,7 @@ const TrendingProductList: React.FC = () => {
                       <img
                         src={products[currentIndex]?.imgUrl}
                         alt={products[currentIndex]?.name}
+                        loading="lazy"
                         className="trending-product-image"
                       />
                     </div>

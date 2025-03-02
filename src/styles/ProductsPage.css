@@ -90,7 +90,7 @@
   justify-content: space-between;
   overflow: hidden;
   border: 2px solid #a23c20;
-  min-height: 420px; /* ✅ Ensures all cards are the same height */
+  /* min-height: 420px;  */
 }
 
 .product-card:hover {

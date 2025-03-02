@@ -13,7 +13,7 @@
 /* Blog Post Page Container */
 .blog-post-page {
   background-color: var(--background-color);
-  margin-top: 4.5vh;
+  margin-top: 5vh;
   padding: 4rem 2rem;
   width: 100%;
   min-height: 100vh;
@@ -48,6 +48,13 @@
   color: #fff;
   /* margin-bottom: 1.5rem; */
   font-style: italic;
+  margin-right: 1rem;
+}
+
+.blog-post-author-and-date{
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .blog-post-image-container {

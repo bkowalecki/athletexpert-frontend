@@ -58,14 +58,14 @@
 
 .profile-name {
   font-size: 3.2rem; /* Bold for impact */
-  color: #FFD700; /* Gold for high contrast and a premium, sporty vibe */
+  color: #fff; /* Gold for high contrast and a premium, sporty vibe */
   font-weight: 900; /* Extra bold for that standout athlete energy */
   text-transform: uppercase; /* Keeps it strong and consistent with sports aesthetics */
   letter-spacing: 1.5px; /* Adds a sleek, modern touch */
   margin: 0;
   display: inline-block;
   padding-bottom: 5px;
-  border-bottom: 3px solid #FFD700; /* Clean underline to anchor the text visually */
+  border-bottom: 3px solid #A23C20; /* Clean underline to anchor the text visually */
   transition: transform 0.2s ease-in-out, letter-spacing 0.2s ease-in-out; /* Subtle dynamic feel */
 }
 
@@ -78,7 +78,7 @@
 .profile-bio {
   font-size: 1.1rem;
   color: #ddd;
-  font-style: italic;
+  /* font-style: italic; */
   margin: 10px 0;        /* ✅ Center the bio horizontally */
   max-width: 50%;           /* ✅ Limit width to half of the container */
   word-wrap: break-word;    /* ✅ Break long words gracefully */
@@ -89,7 +89,7 @@
 .profile-divider {
   border: none;
   height: 2px;
-  background: #FFD700;
+  background: #A23C20;
   margin: 20px 0;
 }
 
@@ -488,6 +488,10 @@
 
 @media (max-width: 768px) {
 
+  .profile-section{
+    margin: 0;
+  }
+
   .profile-info{
     
     text-align: center;
@@ -500,12 +504,13 @@
 
   .profile-container {
     padding: 15px;
-    padding-top: 5rem;
+    padding-top: 5.5rem;
   }
 
   .profile-banner {
     flex-direction: column; /* ✅ Stack items vertically on small screens */
     gap: 15px;
+    padding-left: 0;
   }
 
   .profile-name {
@@ -529,4 +534,8 @@
     padding: 15px 20px;
     font-size: 1rem;
   }
+
+  /* .saved-blog-card{
+    width:10rem;
+  } */
 }
