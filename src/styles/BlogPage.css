@@ -3,7 +3,7 @@
 /* Overall Container */
 .blog-page-container {
     background-color: #1e1e1e;
-    padding: 4rem 2rem;
+    padding: 4rem 0rem;
     max-width: 100%;
     min-height: 100vh; /* Ensure it fills at least the full viewport */
     display: flex;

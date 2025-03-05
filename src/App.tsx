@@ -12,35 +12,34 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 
-import Header from "./components/Header";
-import HeroSection from "./components/HeroSection";
-import FeaturedProductList from "./components/FeaturedProductList";
-import TrendingProductList from "./components/TrendingProductList";
-import BlogSection from "./components/BlogSection";
-import Quiz from "./components/Quiz";
-import ProfilePage from "./components/ProfilePage";
+import Header from "./features/layout/Header";
+import HeroSection from "./features/layout/HeroSection";
+import FeaturedProductList from "./features/products/FeaturedProductList";
+import TrendingProductList from "./features/products/TrendingProductList";
+import BlogSection from "./features/blog/BlogSection";
+import Quiz from "./features/recommender/Quiz";
+import ProfilePage from "./features/profile/ProfilePage";
 import AboutPage from "./components/AboutPage";
 import NotFoundPage from "./components/four0fourPage";
-import RegisterPage from "./components/RegisterPage";
-import Login from "./components/Login";
-import TermsAndConditionsPage from "./components/TermsAndConditions";
-import BlogPage from "./components/BlogPage";
-import CommunityPage from "./components/CommunityPage";
-import SportPage from "./components/SportPage";
-import SearchResults from "./components/SearchResults";
-import Footer from "./components/Footer";
-import BlogPostPage from "./components/BlogPostPage";
-import AuthPage from "./components/AuthPage";
-import OnboardingPage from "./components/OnboardingPage";
-import PrivacyPolicy from "./components/PrivacyPolicy";
-import AuthCallback from "./components/AuthCallback";
-import { UserProvider, useUserContext } from "./components/UserContext"; 
+import TermsAndConditionsPage from "./features/legal/TermsAndConditions";
+import BlogPage from "./features/blog/BlogPage";
+import CommunityPage from "./features/community/CommunityPage";
+import SportPage from "./features/community/SportPage";
+import SearchResults from "./features/search/SearchResults";
+import Footer from "./features/layout/Footer";
+import BlogPostPage from "./features/blog/BlogPostPage";
+import AuthPage from "./features/auth/AuthPage";
+import OnboardingPage from "./features/profile/OnboardingPage";
+import PrivacyPolicy from "./features/legal/PrivacyPolicy";
+import ProductDetail from "./features/products/ProductDetail";
+import AuthCallback from "./features/auth/AuthCallback";
+import { UserProvider, useUserContext } from "./context/UserContext"; 
 import { Auth0Provider } from "@auth0/auth0-react";
-import AccountSettings from "./components/AccountSettings";
+import AccountSettings from "./features/profile/AccountSettings";
 import { Navigate } from "react-router-dom";
 
 import ScrollToTop from "./util/ScrollToTop";
-import ProductsPage from "./components/ProductsPage";
+import ProductsPage from "./features/products/ProductsPage";
 
 const queryClient = new QueryClient();
 
@@ -106,9 +105,8 @@ const AppContent: React.FC = () => {
           <Route path="/about" element={<PageWrapper><AboutPage /></PageWrapper>} />
           <Route path="/blog" element={<PageWrapper><BlogPage /></PageWrapper>} />
           <Route path="/products" element={<PageWrapper><ProductsPage /></PageWrapper>} />
+          <Route path="/products/:id" element={<PageWrapper><ProductDetail /></PageWrapper>} />
           <Route path="/404" element={<PageWrapper><NotFoundPage /></PageWrapper>} />
-          <Route path="/register" element={<PageWrapper><RegisterPage /></PageWrapper>} />
-          <Route path="/login" element={<PageWrapper><Login /></PageWrapper>} />
           <Route path="/community" element={<PageWrapper><CommunityPage /></PageWrapper>} />
           <Route path="/community/:sport" element={<SportPage />} /> {/* ✅ Add this */}
           <Route path="/auth" element={<PageWrapper><AuthPage /></PageWrapper>} />

@@ -7,7 +7,7 @@
       "category": "Racquet Sport",
       "type": "Indoor/Outdoor",
       "popularity": "Moderate",
-      "summary": "Badminton originated from ancient games in Asia and evolved in India and England during the 19th century. It became formalized in the 1870s and is now played competitively worldwide."
+      "summary": "Badminton is a fast-paced racquet sport that requires agility, precision, and strategic thinking. Played either in singles or doubles, the game involves hitting a shuttlecock over a net using lightweight racquets, with the goal of landing it in the opponent's court while preventing a return. Unlike other racquet sports, badminton is unique in its reliance on a shuttlecock, which is aerodynamically designed to slow down mid-air, leading to rapid exchanges and quick reflex-based rallies. It is popular worldwide, particularly in Asia and Europe, and is an Olympic sport known for its intense speed and endurance demands. Whether played recreationally or professionally, badminton offers an excellent cardiovascular workout while enhancing hand-eye coordination and reaction time."
     }
   },
   {
@@ -18,7 +18,7 @@
       "category": "Team Sport",
       "type": "Outdoor",
       "popularity": "High",
-      "summary": "Baseball traces its origins to 18th-century bat-and-ball games in North America and Europe. It developed into the modern sport in the mid-19th century and became known as America's pastime."
+      "summary": "Baseball is a bat-and-ball sport that combines strategy, skill, and teamwork. Played between two teams of nine players, the game consists of innings where one team bats while the other fields, aiming to score runs by hitting the ball and running around four bases. Pitchers use a variety of throws to outsmart batters, while fielders work to catch, throw, and tag out runners. Known as \"America’s pastime,\" baseball has a deep-rooted history in the United States but is also widely popular in countries like Japan, the Dominican Republic, and South Korea. With its mix of power, precision, and endurance, baseball requires both individual excellence and seamless coordination, making it an exciting sport for players and fans alike."
     }
   },
   {
@@ -29,7 +29,7 @@
       "category": "Team Sport",
       "type": "Indoor/Outdoor",
       "popularity": "Very High",
-      "summary": "Basketball was invented in December 1891 by Dr. James Naismith, a Canadian physical education instructor seeking an engaging indoor game. His 13 original rules laid the foundation for the sport, which rapidly spread worldwide and became an Olympic event by 1936."
+      "summary": "Basketball is a dynamic, high-intensity sport that combines speed, skill, and teamwork. Played between two teams of five players, the objective is to score points by shooting the ball into the opponent's hoop while defending your own. With constant movement, fast breaks, and strategic plays, basketball demands agility, endurance, and sharp decision-making. The game is played on a rectangular court, where players dribble, pass, and shoot while maneuvering around defenders. Originating in 1891, basketball has grown into a global phenomenon, with the NBA being the most prestigious professional league. Whether played on city streets or in professional arenas, basketball is a thrilling sport that fosters athleticism, coordination, and competitive spirit."
     }
   },
   {
@@ -40,7 +40,7 @@
       "category": "Combat Sport",
       "type": "Indoor",
       "popularity": "High",
-      "summary": "Boxing has roots in ancient civilizations with early forms of pugilism in Egypt and Greece. Modern boxing emerged in the 18th century, evolving into a regulated sport with a rich competitive history."
+      "summary": "Boxing is a combat sport that tests strength, strategy, and endurance, as two opponents face off in a ring, aiming to land punches while avoiding their opponent’s strikes. Fighters compete in timed rounds, using footwork, head movement, and defensive techniques to outmaneuver their adversary. Victory can be achieved through knockout (KO), technical knockout (TKO), or by accumulating more points based on clean, effective punches. Boxing demands intense physical conditioning, mental toughness, and discipline, making it one of the most physically demanding sports. With a rich history dating back to ancient civilizations, boxing remains a globally popular sport, producing legendary fighters and thrilling matches that captivate audiences worldwide."
     }
   },
   {
@@ -51,7 +51,7 @@
       "category": "Team Sport",
       "type": "Outdoor",
       "popularity": "High",
-      "summary": "Cricket began as a rural pastime in 16th-century England and evolved into an organized sport by the 18th century. It is now celebrated internationally, particularly in former British colonies."
+      "summary": "Cricket is a bat-and-ball sport that emphasizes strategy, endurance, and teamwork. Played between two teams of 11 players, the game revolves around one team batting to score runs while the other bowls and fields to restrict scoring and take wickets. Matches can range from fast-paced T20 games to multi-day Test matches, offering different formats for players and fans. The sport is especially popular in countries like India, England, Australia, and Pakistan, with international tournaments like the ICC Cricket World Cup drawing massive audiences. Cricket requires a blend of skill, patience, and tactical decision-making, making it one of the most complex yet captivating sports in the world."
     }
   },
   {

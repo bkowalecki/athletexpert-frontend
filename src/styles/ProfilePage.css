@@ -283,37 +283,33 @@
 /* Saved Blogs Grid */
 .profile-saved-blogs-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Responsive Grid */
-  gap: 16px;
-  padding: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  padding: 20px;
 }
 
 /* Blog Card */
 .saved-blog-card {
-  background: #1c1c1c; /* Dark background like saved products */
+  background: #1c1c1c;
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
-  transition: transform 0.2s ease-in-out;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s ease;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  padding-bottom: 12px;
-  max-width: 325px;
+  justify-content: space-between;
+  text-align: left;
+  max-width: 300px;
 }
 
 .saved-blog-card:hover {
-  transform: scale(1.03); /* Smooth hover effect */
+  transform: scale(1.03);
 }
 
 /* Blog Image */
 .saved-blog-image-container {
   width: 100%;
-  font-size: 1.6rem;
-  height: 150px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  height: 180px;
   overflow: hidden;
 }
 
@@ -325,42 +321,60 @@
 
 /* Blog Details */
 .saved-blog-details {
-  text-align: center;
-  padding: 10px 15px;
-}
-
-.blog-title {
-  font-size: 16px;
-  font-weight: bold;
-  color: white;
-  margin-bottom: 4px;
-}
-
-.blog-author {
-  font-size: 14px;
-  color: #aaa;
-  margin-bottom: 8px;
-}
-
-/* Action Button */
-.saved-blog-actions {
+  padding: 15px;
   display: flex;
-  justify-content: center;
-  margin-top: 8px;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.saved-blog-title {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #fff;
+  margin: 0;
+}
+
+.saved-blog-author {
+  font-size: 1rem;
+  color: #ccc;
+  margin: 0;
 }
 
 .read-blog-btn {
-  background: #A23C20; /* Burnt Orange (AthleteXpert Theme) */
-  color: white;
-  font-size: 14px;
-  padding: 8px 12px;
-  border-radius: 6px;
+  font-size: 1.2rem;
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  background: #A23C20;
+  color: #fff;
   text-decoration: none;
-  transition: 0.2s;
+  border-radius: 6px;
+  font-weight: bold;
+  transition: background 0.3s ease;
+  text-align: center;
 }
 
 .read-blog-btn:hover {
-  background: #87301a; /* Darker shade for hover effect */
+  background: #842d14;
+}
+
+
+/* Action Button */
+.saved-blog-cta-button {
+  font-size: 1.2rem;
+  display: inline-block;
+  margin-top: auto;
+  padding: 0.75rem 1.5rem;
+  background: #ff9900;
+  color: #111;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: bold;
+  transition: background 0.3s ease;
+  text-align: center;
+}
+
+.saved-blog-cta-button:hover {
+  background: #e68a00;
 }
 
 /* No Blogs Text */
@@ -387,101 +401,137 @@
 /* Responsive Grid Layout */
 .saved-products-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); /* Auto-adjust for mobile */
-  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  padding: 20px;
 }
 
 /* Product Card */
 .saved-product-card {
-  background: #1c1c1c; /* Dark UI */
-  max-width: 325px;
-  border-radius: 10px;
+  background: #1c1c1c;
+  border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
-  transition: transform 0.2s ease-in-out;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  text-align: left;
+  max-width: 300px;
+  
 }
 
 .saved-product-card:hover {
-  transform: scale(1.02); /* Subtle hover effect */
+  transform: scale(1.03);
 }
 
 /* Product Image */
 .saved-product-image {
   width: 100%;
-  height: 180px;
+  height: 200px;
   object-fit: cover;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 /* Product Details */
 .saved-product-details {
-  padding: 12px;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
   text-align: center;
 }
 
 .product-name {
-  font-size: 16px;
+  font-size: 1.4rem;
   font-weight: bold;
-  color: white;
-  margin-bottom: 4px;
+  color: #fff;
+  margin: 0;
 }
 
 .product-brand {
-  font-size: 13px;
+  font-size: 1rem;
   color: #ccc;
-  margin-bottom: 4px;
+  margin: 0;
 }
 
 .product-price {
-  font-size: 16px;
+  font-size: 1.2rem;
   font-weight: bold;
-  color: #2A6045;
-  margin-bottom: 10px;
+  color: #111;
+  margin: 0;
 }
 
-/* Actions */
-.saved-product-actions {
-  display: flex;
-  justify-content: space-between;
-  gap: 8px;
-  margin-top: 10px;
-}
-
-/* Buy Now Button */
-.buy-now-btn {
-  background: #A23C20;
-  color: white;
-  font-size: 14px;
-  padding: 8px;
-  border-radius: 6px;
+/* CTA Button for Products */
+.saved-product-cta-button {
+  font-size: 1.2rem;
+  display: inline-block;
+  margin-top: auto;
+  padding: 0.75rem 1.5rem;
+  background: #ff9900;
+  color: #111;
   text-decoration: none;
-  width: 100%;
+  border-radius: 6px;
+  font-weight: bold;
+  transition: background 0.3s ease;
   text-align: center;
-  transition: 0.2s;
+}
+
+.buy-now-btn {
+  font-size: 1rem;
+  display: inline-block;
+  margin-top: auto;
+  padding: 0.75rem 1.5rem;
+  background: #ff9900;
+  color: #111;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: bold;
+  transition: background 0.3s ease;
+  text-align: center;
 }
 
 .buy-now-btn:hover {
-  background: #87301a;
+  background: #e68a00;
 }
 
-/* Remove Button */
-.remove-btn {
+.saved-product-cta-button:hover {
+  background: #e68a00;
+}
+
+.remove-btn,
+.save-button.unsave,
+.save-product-btn.unsave,
+.save-blog-btn.unsave {
   background: transparent;
   border: 2px solid #A23C20;
   color: #A23C20;
-  font-size: 14px;
-  padding: 6px;
+  font-size: 1rem;
+  padding: 6px 10px;
   border-radius: 6px;
   cursor: pointer;
-  width: 100%;
-  transition: 0.2s;
+  transition: background 0.2s ease, color 0.2s ease;
 }
 
-.remove-btn:hover {
+.remove-btn:hover,
+.save-button.unsave:hover,
+.save-product-btn.unsave:hover,
+.save-blog-btn.unsave:hover {
   background: #A23C20;
-  color: white;
+  color: #111;
 }
 
+/* Motivational Quote Section */
+.motivational-quote {
+  background: transparent;
+  padding: 2rem 1rem;
+  margin: 3rem auto 1rem;
+  text-align: center;
+  font-family: 'Dancing Script', cursive; /* A less fancy, clean script */
+  font-size: 2.8rem;
+  color: #ff9900;
+  border-top: 2px solid #A23C20;
+}
 
 
 

@@ -1,19 +1,50 @@
-/* Featured Products Section */
+/* FEATURED SECTION WITH BUBBLE BACKGROUND */
 .featured-products-section {
-  /* padding: 3rem 1rem; */
-  background: #a23c20;
-  color: #fff;
+  position: relative;
+  overflow: hidden;
   width: 100%;
+  color: #fff;
+  /* Create a gradient background similar to your about page hero */
+  background: linear-gradient(135deg, #A23C20, #d45330);
+  /* padding: 3rem 1rem; */
 }
 
+/* Bubbles (pseudo-elements) */
+.featured-products-section::before,
+.featured-products-section::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  z-index: 0;
+}
+
+.featured-products-section::before {
+  top: -150px;
+  right: -150px;
+  height: 400px;
+  width: 400px;
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.featured-products-section::after {
+  bottom: -150px;
+  left: -150px;
+  height: 400px;
+  width: 400px;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Container above the bubbles */
 .featured-products-container {
-  /* max-width: 1200px; */
-  /* margin: 0 auto;
-  position: relative; */
-  margin-bottom: 3rem;
+  position: relative;
+  z-index: 1; /* Ensures this content is above the pseudo-elements */
+  margin-bottom: 5rem;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-
+/* Section Heading */
 .featured-products-heading {
   font-size: clamp(2.4rem, 4vw, 3.5rem);
   text-align: center;
@@ -68,12 +99,12 @@
 }
 
 .featured-product-name {
-  font-size: 1.4rem;
+  font-size: 1.6rem;
   margin: 0.5rem 0;
 }
 
 .featured-product-brand {
-  font-size: 1.1rem;
+  font-size: 1.4rem;
   color: #ccc;
   margin-bottom: 0.5rem;
 }
@@ -81,10 +112,12 @@
 .featured-product-price {
   font-size: 1.2rem;
   font-weight: bold;
-  color: #ff9900;
+  color: #fff;
 }
 
+/* CTA Button */
 .featured-product-cta-button {
+  font-size: 1.2rem;
   display: inline-block;
   margin-top: auto;
   margin-bottom: 1rem;
@@ -101,7 +134,7 @@
   background: #e68a00;
 }
 
-/* Mobile Carousel */
+/* MOBILE CAROUSEL */
 .mobile-view {
   display: none;
 }
@@ -114,6 +147,23 @@
     display: block;
     position: relative;
     overflow: hidden;
+  }
+
+  .featured-products-container {
+    margin-bottom: 3rem;
+  }
+
+  .featured-products-section::before {
+    top: -80px;
+    right: -80px;
+    height: 200px;
+    width: 200px;
+  }
+  .featured-products-section::after {
+    bottom: -80px;
+    left: -80px;
+    height: 200px;
+    width: 200px;
   }
   .featured-carousel {
     display: flex;

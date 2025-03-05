@@ -81,7 +81,7 @@
 .latest-blog-author,
 .latest-blog-date {
   font-size: 1rem;
-  color: #bbb;
+  color: #fff;
   margin-bottom: 0.5rem;
 }
 
@@ -89,6 +89,10 @@
   font-size: 1.2rem;
   color: #bbb;
   margin-bottom: 1.5rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;      /* Limit to 3 lines */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .latest-blog-cta-container {

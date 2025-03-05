@@ -14,7 +14,7 @@
 .blog-post-page {
   background-color: var(--background-color);
   margin-top: 5vh;
-  padding: 4rem 2rem;
+  padding: 4rem 0rem;
   width: 100%;
   min-height: 100vh;
   color: var(--text-color);
@@ -24,6 +24,36 @@
   flex-direction: column;
   align-items: center;
   box-sizing: border-box;
+}
+
+/* Back Link Container */
+.back-link-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto 2rem;  /* Center container and add space below */
+  padding: 1rem;        /* Provide some breathing room */
+  text-align: left;     /* Align the back link to the left */
+}
+
+/* Back Link Style */
+.back-link {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1.1rem;
+  color: #fff; /* Uses your defined link color */
+  text-decoration: none;
+  transition: color 0.3s ease, transform 0.2s ease;
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border: 2px solid var(--link-color);
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+/* Hover Effect for Back Link */
+.back-link:hover {
+  color: #fff;
+  border-color: var(--link-hover-color);
+  transform: translateX(-5px);
 }
 
 .blog-post-header {
@@ -79,7 +109,7 @@
   font-size: 1.2rem;
   line-height: 1.8;
   width: 100%;
-  max-width: 1000px;
+  max-width: 90vw;
   background: var(--content-background);
   border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 12px;
@@ -149,7 +179,7 @@
 
 @media (max-width: 768px) {
   .blog-post-page {
-    padding: 2rem 1rem;
+    padding: 2rem 0rem;
   }
 
   .blog-post-title {
