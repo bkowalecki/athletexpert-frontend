@@ -1,212 +1,232 @@
 /* Define CSS Variables for Branding */
 :root {
-    --primary-bg: #000000;
-    --secondary-bg: #1c1c1c;
-    --accent1: #FF6F00;  /* Main orange accent */
-    --accent2: #FF8C00;  /* Secondary orange accent */
-    --sport-card-text-color: #ffffff;
-    --font-family: 'Montserrat', sans-serif;
-    --transition-speed: 0.3s;
-  }
-  
-  /* 🌟 General Styles */
-  .community-page {
-    width: 100%;
-    min-height: 100vh;
-    background: linear-gradient(135deg, var(--primary-bg), var(--secondary-bg));
-    color: var(--sport-card-text-color);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 3rem 0 50px;
-    font-family: var(--font-family);
-  }
-  
-  /* 🔍 Focal, Modern Search Bar */
-  .community-search-bar {
-    margin: 20px 0;
-    display: flex;
-    justify-content: center;
-    width: 100%;
-  }
-  
+  --primary-bg: #000000;
+  --secondary-bg: #1c1c1c;
+  --accent1: #FF6F00;  /* Main orange accent */
+  --accent2: #FF8C00;  /* Secondary orange accent */
+  --sport-card-text-color: #ffffff;
+  --font-family: 'Montserrat', sans-serif;
+  --transition-speed: 0.3s;
+}
+
+/* 🌟 General Styles */
+.community-page {
+  width: 100%;
+  min-height: 100vh;
+  background: linear-gradient(135deg, var(--primary-bg), var(--secondary-bg));
+  color: var(--sport-card-text-color);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 3rem 0 50px;
+  font-family: var(--font-family);
+}
+
+/* 🔍 Focal, Modern Search Bar */
+.community-search-bar {
+  margin: 20px 0;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.community-search-bar input {
+  width: 350px;
+  padding: 16px 20px;
+  font-size: 1.2rem;
+  background-color: #1f1f1f;
+  color: var(--sport-card-text-color);
+  border: none;
+  border-radius: 25px;
+  box-shadow: inset 0 0 0 2px var(--accent1);
+  transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+}
+
+.community-search-bar input:focus {
+  box-shadow: inset 0 0 0 2px var(--accent2), 0 0 10px var(--accent1);
+  outline: none;
+  transform: scale(1.02);
+}
+
+/* 🌟 Featured Sport (Optional Section) */
+.featured-sport {
+  text-align: center;
+  width: 100%;
+  margin-top: 40px;
+  padding: 0 20px;
+}
+
+.featured-sport h2 {
+  font-size: 2.5rem;
+  margin-bottom: 30px;
+  color: var(--sport-card-text-color);
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8);
+}
+
+.featured-sport-card {
+  position: relative;
+  width: 90%;
+  max-width: 600px;
+  height: 300px;
+  margin: 0 auto;
+  background: #292929;
+  border-radius: 16px;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
+  transition: transform 0.5s ease;
+}
+
+.featured-sport-card:hover {
+  transform: translateY(-10px);
+}
+
+.featured-sport-bg {
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  opacity: 0.5;
+  transition: opacity 0.4s ease;
+}
+
+.featured-sport-card:hover .featured-sport-bg {
+  opacity: 0.7;
+}
+
+.featured-sport-info {
+  position: absolute;
+  bottom: 20px;
+  left: 30px;
+  text-align: left;
+}
+
+.featured-sport-info h2 {
+  font-size: 2rem;
+  font-weight: bold;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 10px 15px;
+  border-radius: 10px;
+}
+
+/* 🌟 Masonry Sports Grid */
+.sports-masonry {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+  margin-top: 40px;
+  width: 90%;
+  max-width: 1400px;
+}
+
+/* 🏀 Sport Card - Sleek, Consistent, and Sporty */
+.sport-card {
+  position: relative;
+  border-radius: 15px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+  border: 2px solid var(--accent1);
+  background: linear-gradient(135deg, var(--secondary-bg), var(--primary-bg));
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+}
+
+.sport-card:hover {
+  transform: scale(1.03);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7);
+}
+
+.sport-card-bg {
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+}
+
+.sport-card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.sport-card:hover .sport-card-image {
+  transform: scale(1.05);
+}
+
+/* Overlay Enhancement */
+.sport-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(45deg, transparent 40%, rgba(0, 0, 0, 0.5));
+  pointer-events: none;
+}
+
+/* Sport Card Info with High Contrast and Sporty Aesthetic */
+.sport-card-info {
+  padding: 15px;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(5px);
+}
+
+.sport-card-info h3 {
+  margin: 0;
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: var(--sport-card-text-color);
+  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.8);
+}
+
+/* 📱 Mobile Adjustments */
+@media (max-width: 768px) {
   .community-search-bar input {
-    width: 350px;
-    padding: 16px 20px;
-    font-size: 1.2rem;
-    background-color: #1f1f1f;
-    color: var(--sport-card-text-color);
-    border: none;
-    border-radius: 25px;
-    box-shadow: inset 0 0 0 2px var(--accent1);
-    transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+    width: 220px;
+    padding: 12px 16px;
   }
-  
-  .community-search-bar input:focus {
-    box-shadow: inset 0 0 0 2px var(--accent2), 0 0 10px var(--accent1);
-    outline: none;
-    transform: scale(1.02);
-  }
-  
-  /* 🌟 Featured Sport (Optional Section) */
-  .featured-sport {
-    text-align: center;
-    width: 100%;
-    margin-top: 40px;
-    padding: 0 20px;
-  }
-  
-  .featured-sport h2 {
-    font-size: 2.5rem;
-    margin-bottom: 30px;
-    color: var(--sport-card-text-color);
-    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8);
-  }
-  
-  .featured-sport-card {
-    position: relative;
-    width: 90%;
-    max-width: 600px;
-    height: 300px;
-    margin: 0 auto;
-    background: #292929;
-    border-radius: 16px;
-    overflow: hidden;
-    cursor: pointer;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
-    transition: transform 0.5s ease;
-  }
-  
-  .featured-sport-card:hover {
-    transform: translateY(-10px);
-  }
-  
-  .featured-sport-bg {
-    width: 100%;
-    height: 100%;
-    background-size: cover;
-    background-position: center;
-    opacity: 0.5;
-    transition: opacity 0.4s ease;
-  }
-  
-  .featured-sport-card:hover .featured-sport-bg {
-    opacity: 0.7;
-  }
-  
-  .featured-sport-info {
-    position: absolute;
-    bottom: 20px;
-    left: 30px;
-    text-align: left;
-  }
-  
-  .featured-sport-info h2 {
-    font-size: 2rem;
-    font-weight: bold;
-    background: rgba(0, 0, 0, 0.5);
-    padding: 10px 15px;
-    border-radius: 10px;
-  }
-  
-  /* 🌟 Masonry Sports Grid */
+
   .sports-masonry {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 20px;
-    margin-top: 40px;
-    width: 90%;
-    max-width: 1400px;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   }
-  
-  /* 🏀 Sport Card - Sleek, Consistent, and Sporty */
-  .sport-card {
-    position: relative;
-    border-radius: 15px;
-    overflow: hidden;
-    cursor: pointer;
-    transition: transform 0.4s ease, box-shadow 0.4s ease;
-    border: 2px solid var(--accent1);
-    background: linear-gradient(135deg, var(--secondary-bg), var(--primary-bg));
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-  }
-  
-  .sport-card:hover {
-    transform: scale(1.03);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7);
-  }
-  
-  /* Consistent Image Height for Sport Cards */
+
   .sport-card-bg {
-    width: 100%;
-    height: 200px;
-    background-size: cover;
-    background-position: center;
-    opacity: 0.8;
-    transition: opacity 0.4s ease;
+    height: 140px;
   }
-  
-  .sport-card:hover .sport-card-bg {
-    opacity: 1;
-  }
-  
-  /* Enhance Cards with Negative Space and Overlay */
-  .sport-card::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(45deg, transparent 40%, rgba(0, 0, 0, 0.5));
-    pointer-events: none;
-  }
-  
-  /* Sport Card Info with High Contrast and Sporty Aesthetic */
-  .sport-card-info {
-    padding: 15px;
-    text-align: center;
-    position: relative;
-    z-index: 1;
-    background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(5px);
-  }
-  
+
   .sport-card-info h3 {
-    margin: 0;
-    font-size: 1.8rem;
-    font-weight: bold;
-    color: var(--sport-card-text-color);
-    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.8);
+    font-size: 1.2rem;
   }
-  
-  /* 📱 Mobile Adjustments */
-  @media (max-width: 768px) {
-    .community-search-bar input {
-      width: 220px;
-      padding: 12px 16px;
-    }
-    .sports-masonry {
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    }
-    .sport-card-bg {
-      height: 180px;
-    }
-    .featured-sport-card {
-      height: 220px;
-    }
-    .featured-sport-info h2 {
-      font-size: 1.5rem;
-    }
+
+  .featured-sport-card {
+    height: 220px;
   }
-  
-  @media (max-width: 480px) {
-    .community-search-bar input {
-      width: 180px;
-      padding: 10px 14px;
-    }
-    .sports-masonry {
-      grid-template-columns: 1fr;
-    }
+
+  .featured-sport-info h2 {
+    font-size: 1.5rem;
   }
-  
+}
+
+@media (max-width: 480px) {
+  .community-search-bar input {
+    width: 180px;
+    padding: 10px 14px;
+  }
+
+  .sports-masonry {
+    grid-template-columns: 1fr;
+  }
+
+  .sport-card-bg {
+    height: 120px;
+  }
+
+  .sport-card-info h3 {
+    font-size: 1rem;
+  }
+}

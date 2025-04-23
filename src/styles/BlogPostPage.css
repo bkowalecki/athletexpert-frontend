@@ -66,7 +66,7 @@
 }
 
 .blog-post-title {
-  font-size: 2.8rem;
+  font-size: 2rem;
   color: #ccc;
   font-weight: bold;
   margin: 0 ;
@@ -133,7 +133,7 @@
 }
 
 .blog-post-content h2 {
-  font-size: 2rem;
+  font-size: 1.6rem;
   border-bottom: 2px solid var(--link-color);
   padding-bottom: 0.3rem;
 }
@@ -183,7 +183,7 @@
   }
 
   .blog-post-title {
-    font-size: 1.8rem;
+    font-size: 2rem;
   }
 
   .blog-post-meta {
@@ -209,7 +209,7 @@
 
 @media (max-width: 480px) {
   .blog-post-title {
-    font-size: 1.6rem;
+    font-size: 2rem;
   }
 
   .blog-post-meta {
@@ -217,7 +217,7 @@
   }
 
   .blog-post-content p {
-    font-size: 0.95rem;
+    font-size: 1rem;
   }
 
   .blog-post-image {

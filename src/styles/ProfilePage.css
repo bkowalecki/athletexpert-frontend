@@ -518,7 +518,7 @@
 .save-product-btn.unsave:hover,
 .save-blog-btn.unsave:hover {
   background: #A23C20;
-  color: #111;
+  color: #ccc;
 }
 
 /* Motivational Quote Section */
