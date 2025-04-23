@@ -99,7 +99,7 @@ const SearchResults: React.FC = () => {
                 <li
                   key={blog.id}
                   className="search-results-page-item"
-                  onClick={() => navigate(`/blogs/${blog.slug || blog.id}`)}
+                  onClick={() => navigate(`/blog/${blog.slug || blog.id}`)}
                 >
                   <img src={blog.imageUrl} alt={blog.title} className="search-results-page-image" />
                   <h4 className="search-results-page-item-title">{blog.title}</h4>
