@@ -1,202 +1,153 @@
-/* Full Page Container */
 .search-results-page-container {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  padding: 2rem;
-  padding-top: 5rem;
-  /* max-width: 1300px; */
-  /* margin: 0 auto; */
+  padding: 5rem 1rem 0 1rem;
+  background: #121212;
   font-family: 'Montserrat', sans-serif;
-  color: #ffffff;
-  background: #121212; /* Dark background for a sporty look */
+  color: #fff;
 }
 
-/* Search Title */
 .search-results-page-title {
-  font-size: 2.5rem;
+  font-size: 1.8rem;
   text-align: center;
-  color: #ffffff;
   margin-bottom: 2rem;
-  letter-spacing: 1.5px;
-  font-weight: 700;
   text-transform: uppercase;
   border-bottom: 2px solid #A23C20;
-  padding-bottom: 1rem;
+  padding-bottom: 0.5rem;
 }
 
-/* Loading & Error Messages */
 .search-results-page-loading,
 .search-results-page-error {
   text-align: center;
-  font-size: 1.3rem;
-  margin-top: 2rem;
-  color: #d34f2c;
+  color: #ff4d4d;
+  margin-top: 1rem;
+  font-weight: 600;
 }
 
-/* No Results Styling */
 .search-results-page-no-results {
   text-align: center;
-  padding: 3rem;
-  font-size: 1.4rem;
-  color: #bbb;
+  margin-top: 3rem;
 }
 
 .search-results-page-no-results-img {
-  width: 250px;
-  margin-bottom: 1rem;
+  width: 200px;
   opacity: 0.9;
 }
 
 .search-results-page-no-results-text {
-  font-size: 1.8rem;
-  color: #ffffff;
-  margin-bottom: 0.5rem;
+  font-size: 1.4rem;
+  margin: 1rem 0 0.5rem;
   font-weight: bold;
 }
 
 .search-results-page-no-results-suggestion {
   font-size: 1rem;
   color: #ccc;
-  margin-bottom: 1.5rem;
 }
 
 .search-results-page-back-home {
   display: inline-block;
-  padding: 12px 24px;
-  color: white;
+  margin-top: 1rem;
   background: #A23C20;
+  color: white;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
   text-decoration: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: bold;
-  transition: background 0.3s ease, transform 0.2s ease;
+  font-weight: 600;
+  transition: all 0.3s ease;
 }
-
-/* .search-results-page-back-home:hover {
+.search-results-page-back-home:hover {
   background: #d34f2c;
   transform: scale(1.05);
-} */
+}
 
-/* Results Grid */
 .search-results-page-grid {
-  display: grid;
-  /* grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); */
-  gap: 1.5rem;
-  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
 }
-
-/* Search Section */
-.search-results-page-section {
-  /* background: #1E1E1E;
-  border-radius: 15px;
-  padding: 1.5rem;
-  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
-  transition: transform 0.3s ease; */
-}
-
-/* .search-results-page-section:hover {
-  transform: translateY(-5px);
-} */
 
 /* Section Title */
 .search-results-page-section-title {
-  font-size: 2rem; /* Slightly larger for stronger impact */
-  margin-bottom: 1.5rem;
-  color: #fff; /* High contrast gold for visibility */
+  font-size: 1.4rem;
+  font-weight: 700;
   text-transform: uppercase;
-  font-weight: 900; /* Bolder for emphasis */
-  letter-spacing: 1.5px; /* Enhanced spacing for clarity */
-  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.8); /* Adds depth and makes the text pop */
-  border-bottom: 2px solid #A23C20; /* Subtle accent line for structure */
-  padding-bottom: 5px; /* Clean separation from content */
+  border-bottom: 1px solid #A23C20;
+  margin-bottom: 1rem;
+  padding-bottom: 0.4rem;
 }
-
 
 /* Results List */
 .search-results-page-list {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 1.5rem;
-  list-style: none;
   padding: 0;
+  list-style: none;
 }
 
-/* Individual Result Items */
+/* Item Card */
 .search-results-page-item {
-  background: #222;
+  background: #1f1f1f;
   border-radius: 12px;
   overflow: hidden;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  position: relative;
-  max-width: 500px;
-}
-
-.search-results-page-item:hover {
-  transform: scale(1.05);
-  box-shadow: 0 10px 20px rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
   cursor: pointer;
 }
+.search-results-page-item:hover {
+  transform: scale(1.02);
+  box-shadow: 0 8px 18px rgba(255, 255, 255, 0.15);
+}
 
-/* Image Container */
 .search-results-page-image {
   width: 100%;
-  height: 220px;
+  height: 180px;
   object-fit: cover;
-  transition: opacity 0.3s ease;
+  display: block;
 }
 
-/* Product & Blog Titles */
 .search-results-page-item-title {
-  font-size: 1.3rem;
+  font-size: 1.2rem;
   margin: 1rem;
   font-weight: bold;
-  color: #ffffff;
+  color: #fff;
 }
 
-/* Prices */
 .search-results-page-item-price {
+  margin: 0 1rem 1rem;
   font-size: 1.1rem;
   color: #A23C20;
-  font-weight: bold;
-  margin: 0.5rem 1rem 1rem;
+  font-weight: 600;
 }
 
-/* Blog Meta Info */
 .search-results-page-item-meta {
   font-size: 0.9rem;
-  color: #bbb;
-  margin: 0.5rem 1rem;
+  margin: 0 1rem;
+  color: #aaa;
 }
 
-/* Blog Summary */
 .search-results-page-item-summary {
-  font-size: 1rem;
-  color: #ddd;
+  font-size: 0.95rem;
   margin: 0.5rem 1rem 1rem;
+  color: #ddd;
 }
 
-/* Responsive Adjustments */
+/* 📱 Mobile-first responsiveness */
 @media (max-width: 768px) {
-  .search-results-page-list {
-    grid-template-columns: repeat(1, 1fr);
-  }
-
   .search-results-page-title {
-    font-size: 2rem;
+    font-size: 1.5rem;
   }
 
   .search-results-page-section-title {
-    font-size: 1.6rem;
-  }
-
-  .search-results-page-item-title {
     font-size: 1.2rem;
   }
-}
 
-@media (max-width: 1024px) {
   .search-results-page-list {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr;
+  }
+
+  .search-results-page-image {
+    height: 150px;
   }
 }

@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useLocation } from 'react-router-dom'; // Import useLocation to track URL changes
+import { useLocation, useNavigate } from 'react-router-dom';
 import '../../styles/SearchResults.css';
 
-// Interface for product data
 interface Product {
   id: number;
   name: string;
@@ -11,7 +10,6 @@ interface Product {
   imgUrl: string;
 }
 
-// Interface for blog post data
 interface BlogPost {
   id: number;
   title: string;
@@ -19,7 +17,7 @@ interface BlogPost {
   publishedDate: string;
   summary: string;
   imageUrl: string;
-  sport: string;
+  slug: string; // You may need to ensure this field is available
 }
 
 const SearchResults: React.FC = () => {
@@ -28,17 +26,18 @@ const SearchResults: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const location = useLocation(); // ✅ Reactively track URL changes
+  const location = useLocation();
+  const navigate = useNavigate();
   const params = new URLSearchParams(location.search);
-  const searchQuery = params.get("query") || ""; 
+  const searchQuery = params.get("query") || "";
 
   useEffect(() => {
-    if (!searchQuery.trim()) return; // Prevent fetching on empty query
+    if (!searchQuery.trim()) return;
 
     const fetchResults = async () => {
       setLoading(true);
       try {
-        const [productResponse, blogResponse] = await Promise.all([
+        const [productRes, blogRes] = await Promise.all([
           axios.get(`${process.env.REACT_APP_API_URL}/products/search`, {
             params: { query: searchQuery },
             withCredentials: true,
@@ -48,9 +47,8 @@ const SearchResults: React.FC = () => {
             withCredentials: true,
           }),
         ]);
-
-        setProducts(productResponse.data);
-        setBlogs(blogResponse.data);
+        setProducts(productRes.data);
+        setBlogs(blogRes.data);
       } catch (err) {
         setError("Failed to load search results. Please try again.");
       } finally {
@@ -59,30 +57,25 @@ const SearchResults: React.FC = () => {
     };
 
     fetchResults();
-  }, [location.search]); // ✅ Re-fetch results when URL search query changes
-  console.log("Product Image URL:", products); 
+  }, [location.search]);
+
   return (
     <div className="search-results-page-container">
-      <h2 className="search-results-page-title">Search Results for: "{searchQuery}"</h2>
+      <h2 className="search-results-page-title">Results for: "{searchQuery}"</h2>
 
-      {/* Loading State */}
-      {loading && <p className="search-results-page-loading">Loading search results...</p>}
-
-      {/* Error State */}
+      {loading && <p className="search-results-page-loading">Loading...</p>}
       {error && <p className="search-results-page-error">{error}</p>}
 
-      {/* No Results Styling */}
       {!loading && !error && products.length === 0 && blogs.length === 0 && (
         <div className="search-results-page-no-results">
-          <img src="/images/no-results.svg" alt="No results found" className="search-results-page-no-results-img" />
-          <p className="search-results-page-no-results-text">No results found for "{searchQuery}".</p>
-          <p className="search-results-page-no-results-suggestion">Try searching for something else or browse our latest products and blogs!</p>
+          {/* <img src="/images/no-results.svg" alt="No results" className="search-results-page-no-results-img" /> */}
+          <p className="search-results-page-no-results-text">No results found.</p>
+          <p className="search-results-page-no-results-suggestion">Try different keywords or browse our content.</p>
           <a href="/" className="search-results-page-back-home">Return to Homepage</a>
         </div>
       )}
 
       <div className="search-results-page-grid">
-        {/* Product Results */}
         {products.length > 0 && (
           <section className="search-results-page-section">
             <h3 className="search-results-page-section-title">Products</h3>
@@ -98,13 +91,16 @@ const SearchResults: React.FC = () => {
           </section>
         )}
 
-        {/* Blog Results */}
         {blogs.length > 0 && (
           <section className="search-results-page-section">
             <h3 className="search-results-page-section-title">Blog Posts</h3>
             <ul className="search-results-page-list">
               {blogs.map((blog) => (
-                <li key={blog.id} className="search-results-page-item">
+                <li
+                  key={blog.id}
+                  className="search-results-page-item"
+                  onClick={() => navigate(`/blogs/${blog.slug || blog.id}`)}
+                >
                   <img src={blog.imageUrl} alt={blog.title} className="search-results-page-image" />
                   <h4 className="search-results-page-item-title">{blog.title}</h4>
                   <p className="search-results-page-item-meta">By {blog.author} on {new Date(blog.publishedDate).toLocaleDateString()}</p>
