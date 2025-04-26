@@ -80,6 +80,7 @@ export type User = {
   profilePictureUrl?: string;
   bio?: string | null;
   sports?: string[] | null;
+  authProvider?: 'local' | 'auth0'; // ⭐ ADD THIS
 };
 
 interface UserContextProps {
@@ -103,7 +104,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     if (response.ok) {
       const userData = await response.json();
-      setUser(userData);
+      setUser({ ...userData, authProvider: 'auth0' }); 
     } else {
       setUser(null);
     }

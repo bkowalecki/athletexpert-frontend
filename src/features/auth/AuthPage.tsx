@@ -71,7 +71,8 @@ const AuthPage: React.FC = () => {
       if (response.ok) {
         const userData = await response.json();
         if (userData?.user) {
-          setUser(userData.user);
+          setUser({ ...userData.user, authProvider: 'local' });
+
           navigate("/profile", { replace: true });
         } else {
           setError("Login successful, but no user data received.");
@@ -119,7 +120,8 @@ const AuthPage: React.FC = () => {
       }
   
       const userData = await response.json();
-      setUser(userData.user);
+      setUser({ ...userData.user, authProvider: 'local' });
+
       navigate("/account-setup", { replace: true }); // 👈 Go to onboarding after registration
     } catch (error) {
       console.error("Error during authentication:", error);
