@@ -16,9 +16,9 @@ const HeroSection: React.FC<HeroSectionProps> = ({ openQuiz }) => {
 
   /** ✅ Clicking "Profile" should go to `/profile` if logged in, otherwise `/auth` */
   const handleProfileClick = () => {
-    if (!isSessionChecked) return; // 🔹 Wait for session check before redirecting
+    if (!isSessionChecked) return;
 
-    if (isAuthenticated || user) {
+    if (user) {
       navigate("/profile");
     } else {
       navigate("/auth");

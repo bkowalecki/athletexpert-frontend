@@ -32,13 +32,14 @@ const Header: React.FC = () => {
 
   /** ✅ Clicking "Profile" should go to `/profile` if logged in, otherwise `/auth` */
   const handleProfileClick = () => {
-    if (!isSessionChecked) return; // 🔹 Prevent action before session checking is done
+    if (!isSessionChecked) return; // 🔹 wait until session check finishes
 
-    if (isAuthenticated || user) {
+    if (user) {
       navigate("/profile");
     } else {
       navigate("/auth");
     }
+    
 
     closeMobileMenu(); // Close mobile menu after clicking
   };
