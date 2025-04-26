@@ -47,6 +47,28 @@ const ProfilePage: React.FC = () => {
   const { user, setUser, isSessionChecked } = useUserContext();
   const { logout: auth0Logout } = useAuth0(); // ⭐️ Grab auth0Logout from SDK
 
+    // ✅ ADD THIS useEffect to force re-fetch session every time you visit /auth
+    useEffect(() => {
+      const recheckSession = async () => {
+        try {
+          const response = await fetch(`${process.env.REACT_APP_API_URL}/users/session`, {
+            credentials: "include",
+          });
+          if (response.ok) {
+            const userData = await response.json();
+            setUser({ ...userData, authProvider: "local" });
+            navigate("/profile", { replace: true });
+          } else {
+            console.log("No active session found (expected)");
+          }
+        } catch (error) {
+          console.error("Error rechecking session:", error);
+        }
+      };
+  
+      recheckSession();
+    }, [setUser, navigate]);
+
   useEffect(() => {
     if (!isSessionChecked) return;
     if (!user) {
