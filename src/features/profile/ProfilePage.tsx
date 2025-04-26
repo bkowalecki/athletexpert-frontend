@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUserContext } from "../../context/UserContext";
 import { toast } from "react-toastify";
+import { useAuth0 } from "@auth0/auth0-react"; // ⭐️ Add this!
 import "react-toastify/dist/ReactToastify.css";
 import "../../styles/ProfilePage.css";
 
@@ -34,8 +35,8 @@ interface Profile {
   profilePictureUrl: string | null;
   sports: string[] | null;
   badges?: string[];
-  savedBlogIds?: number[]; // ✅ IDs only
-  savedProductIds?: number[]; // ✅ IDs only
+  savedBlogIds?: number[];
+  savedProductIds?: number[];
 }
 
 const ProfilePage: React.FC = () => {
@@ -44,6 +45,7 @@ const ProfilePage: React.FC = () => {
   const [savedProducts, setSavedProducts] = useState<Product[]>([]);
   const navigate = useNavigate();
   const { user, setUser, isSessionChecked } = useUserContext();
+  const { logout: auth0Logout } = useAuth0(); // ⭐️ Grab auth0Logout from SDK
 
   useEffect(() => {
     if (!isSessionChecked) return;
@@ -55,12 +57,9 @@ const ProfilePage: React.FC = () => {
 
     const fetchProfile = async () => {
       try {
-        const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/users/profile`,
-          {
-            credentials: "include",
-          }
-        );
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/users/profile`, {
+          credentials: "include",
+        });
 
         if (!response.ok) throw new Error("❌ Failed to fetch profile");
 
@@ -68,14 +67,10 @@ const ProfilePage: React.FC = () => {
         console.log("✅ Full Profile Data:", data);
         setProfile(data);
 
-        // ✅ Ensure both fetch functions are called with IDs
         if (data.savedBlogIds?.length) {
-          console.log("🔍 Fetching Blogs for IDs:", data.savedBlogIds);
           fetchSavedBlogs(data.savedBlogIds);
         }
-
         if (data.savedProductIds?.length) {
-          console.log("🔍 Fetching Products for IDs:", data.savedProductIds);
           fetchSavedProducts(data.savedProductIds);
         }
       } catch (error) {
@@ -85,35 +80,45 @@ const ProfilePage: React.FC = () => {
     };
 
     fetchProfile();
-  }, [user, isSessionChecked, navigate, setUser]);
+  }, [user, isSessionChecked, navigate]);
 
-  /** ✅ Fetch Full Blog Details */
   const fetchSavedBlogs = async (blogIds: number[]) => {
     try {
-      const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/blogs/bulk-fetch`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ids: blogIds }),
-        }
-      );
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/blogs/bulk-fetch`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids: blogIds }),
+      });
 
       if (!response.ok) throw new Error("❌ Failed to fetch blogs");
 
       const data: BlogPost[] = await response.json();
-      console.log("✅ Blogs Loaded:", data);
       setSavedBlogs(data);
     } catch (error) {
       console.error("❌ Error fetching saved blogs:", error);
     }
   };
 
+  const fetchSavedProducts = async (productIds: number[]) => {
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/products/bulk-fetch`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids: productIds }),
+      });
+
+      if (!response.ok) throw new Error("❌ Failed to fetch products");
+
+      const data: Product[] = await response.json();
+      setSavedProducts(data);
+    } catch (error) {
+      console.error("❌ Error fetching saved products:", error);
+    }
+  };
+
   const toggleSaveProduct = async (productId: number) => {
     if (!user) {
-      toast.warn("⚠️ You need to log in to save products!", {
-        position: "top-center",
-      });
+      toast.warn("⚠️ You need to log in to save products!", { position: "top-center" });
       return;
     }
 
@@ -134,10 +139,7 @@ const ProfilePage: React.FC = () => {
             ? prev.filter((product) => product.id !== productId)
             : [...prev, { id: productId } as Product]
         );
-
-        toast.success(isSaved ? "Product removed!" : "Product saved!", {
-          position: "bottom-center",
-        });
+        toast.success(isSaved ? "Product removed!" : "Product saved!", { position: "bottom-center" });
       }
     } catch (error) {
       toast.error("❌ Error saving product. Try again.");
@@ -146,9 +148,7 @@ const ProfilePage: React.FC = () => {
 
   const toggleSaveBlog = async (blogId: number) => {
     if (!user) {
-      toast.warn("⚠️ You need to log in to save blogs!", {
-        position: "top-center",
-      });
+      toast.warn("⚠️ You need to log in to save blogs!", { position: "top-center" });
       return;
     }
 
@@ -169,72 +169,30 @@ const ProfilePage: React.FC = () => {
             ? prev.filter((blog) => blog.id !== blogId)
             : [...prev, { id: blogId } as BlogPost]
         );
-
-        toast.success(isSaved ? "Blog removed!" : "Blog saved!", {
-          position: "bottom-center",
-        });
+        toast.success(isSaved ? "Blog removed!" : "Blog saved!", { position: "bottom-center" });
       }
     } catch (error) {
       toast.error("❌ Error saving blog. Try again.");
     }
   };
 
-  /** ✅ Fetch Full Product Details */
-  /** ✅ Fetch Full Product Details */
-  const fetchSavedProducts = async (productIds: number[]) => {
-    if (!productIds.length) {
-      console.warn("⚠️ No product IDs found to fetch.");
-      return;
-    }
-
-    try {
-      console.log("🔍 Sending request to fetch products for IDs:", productIds);
-
-      const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/products/bulk-fetch`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ids: productIds }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("❌ Failed to fetch products");
-      }
-
-      const data: Product[] = await response.json();
-
-      console.log("✅ Products Loaded:", data);
-
-      if (data.length === 0) {
-        console.warn("⚠️ No products returned from bulk-fetch.");
-      }
-
-      setSavedProducts(data);
-    } catch (error) {
-      console.error("❌ Error fetching saved products:", error);
-    }
-  };
-
-  if (!isSessionChecked)
-    return <div className="profile-loading">Checking session...</div>;
-  if (!profile)
-    return <div className="profile-loading">No profile data found.</div>;
-
   const handleSignOut = async () => {
     try {
-      const currentAuthProvider = user?.authProvider; // 👈 capture before killing
-  
+      const currentAuthProvider = user?.authProvider;
+
       await fetch(`${process.env.REACT_APP_API_URL}/users/logout`, {
         method: "POST",
         credentials: "include",
       });
+
       setUser(null);
-  
-      if (currentAuthProvider === 'auth0') {
-        // Redirect to Auth0 logout only if logged in through Google SSO
-        window.location.href = `https://${process.env.REACT_APP_AUTH0_DOMAIN}/v2/logout?client_id=${process.env.REACT_APP_AUTH0_CLIENT_ID}&returnTo=${encodeURIComponent(window.location.origin + "/auth")}`;
+
+      if (currentAuthProvider === "auth0") {
+        auth0Logout({
+          logoutParams: {
+            returnTo: window.location.origin + "/auth",
+          },
+        });
       } else {
         window.location.href = "/auth";
       }
@@ -243,12 +201,13 @@ const ProfilePage: React.FC = () => {
       toast.error("Error signing out. Please try again.", { position: "top-center" });
     }
   };
-  
-  
-  
+
+  if (!isSessionChecked) return <div className="profile-loading">Checking session...</div>;
+  if (!profile) return <div className="profile-loading">No profile data found.</div>;
 
   return (
     <div className="profile-container">
+      {/* --- Profile Banner and Info --- */}
       <div className="profile-banner">
         <div className="profile-image-wrapper">
           <img
@@ -267,121 +226,67 @@ const ProfilePage: React.FC = () => {
 
       <hr className="profile-divider" />
 
-      <div className="profile-section">
-        {/* <h2 className="profile-subsection-header-text">Badges</h2>
-        <div className="profile-badges">
-          {profile.badges?.length ? (
-            profile.badges.map((badge, index) => (
-              <div key={index} className="badge-item">
-                {badge}
-              </div>
-            ))
-          ) : (
-            <p>No badges yet. Start achieving!</p>
-          )}
-          <div className="badge-item-one-of-a-kind">
-            <img
-              src="https://athletexpertbucket.s3.us-east-1.amazonaws.com/badges/White+Gold+Black+Modern+Elegant+Football+Club+Badge+Logo.png"
-              alt="whhops"
-              className="badge-image"
-            />
-          </div>
-        </div> */}
+      {/* --- Sports --- */}
+      <h2 className="profile-subsection-header-text">Sports & Stats</h2>
+      <div className="profile-sports">
+        {profile.sports?.length ? (
+          profile.sports.map((sport, index) => (
+            <div key={index} className="sport-item">{sport}</div>
+          ))
+        ) : (
+          <p>No sports added yet.</p>
+        )}
+      </div>
 
-        <h2 className="profile-subsection-header-text">Sports & Stats</h2>
-        <div className="profile-sports">
-          {profile.sports?.length ? (
-            profile.sports.map((sport, index) => (
-              <div key={index} className="sport-item">
-                {sport}
+      {/* --- Saved Blogs --- */}
+      <h2 className="profile-subsection-header-text">Saved Blogs</h2>
+      <div className="profile-saved-blogs-grid">
+        {savedBlogs.length > 0 ? (
+          savedBlogs.map((blog) => (
+            <div key={blog.id} className="saved-blog-card">
+              <img src={blog.imageUrl} alt={blog.title} className="saved-blog-image" />
+              <div className="saved-blog-details">
+                <h3 className="saved-blog-title">{blog.title}</h3>
+                <p className="saved-blog-author">By {blog.author}</p>
+                <a href={`/blog/${blog.slug}`} className="read-blog-btn">Read More</a>
+                <button className="save-blog-btn unsave" onClick={() => toggleSaveBlog(blog.id)}>Unsave</button>
               </div>
-            ))
-          ) : (
-            <p>No sports added yet.</p>
-          )}
-        </div>
-        <h2 className="profile-subsection-header-text">Saved Blogs</h2>
-        <div className="profile-saved-blogs-grid">
-          {savedBlogs.length > 0 ? (
-            savedBlogs.map((blog) => (
-              <div key={blog.id} className="saved-blog-card">
-                <img
-                  src={blog.imageUrl}
-                  alt={blog.title}
-                  className="saved-blog-image"
-                />
-                <div className="saved-blog-details">
-                  <h3 className="saved-blog-title">{blog.title}</h3>
-                  <p className="saved-blog-author">By {blog.author}</p>
-                  <a href={`/blog/${blog.slug}`} className="read-blog-btn">
-                    Read More
-                  </a>
-                  <button
-                    className="save-blog-btn unsave"
-                    onClick={() => toggleSaveBlog(blog.id)}
-                  >
-                    Unsave
-                  </button>
-                </div>
-              </div>
-            ))
-          ) : (
-            <p className="profile-no-blogs-text">No saved blogs yet.</p>
-          )}
-        </div>
-
-        <h2 className="profile-subsection-header-text">Saved Products</h2>
-        <div className="profile-saved-products">
-          {savedProducts.length > 0 ? (
-            <div className="saved-products-grid">
-              {savedProducts.map((product) => (
-                <div key={product.id} className="saved-product-card">
-                  <img
-                    src={product.imgUrl}
-                    alt={product.name}
-                    className="saved-product-image"
-                  />
-                  <div className="saved-product-details">
-                    <h3 className="product-name">{product.name}</h3>
-                    <a
-                      href={product.affiliateLink}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="buy-now-btn"
-                    >
-                      View on Amazon
-                    </a>
-                    <button
-                      className="save-product-btn unsave"
-                      onClick={() => toggleSaveProduct(product.id)}
-                    >
-                      Unsave
-                    </button>
-                  </div>
-                </div>
-              ))}
             </div>
-          ) : (
-            <p className="profile-no-products-text">No saved products yet.</p>
-          )}
-        </div>
+          ))
+        ) : (
+          <p className="profile-no-blogs-text">No saved blogs yet.</p>
+        )}
+      </div>
 
-        
-        <div className="motivational-quote">
-  "Every champion was once a contender who refused to give up." - Rocky Balboa
-</div>
-
-        <div>
-            <button onClick={handleSignOut} className="profile-cta-button">
-              Sign Out
-            </button>
-            <button
-              onClick={() => navigate("/settings")}
-              className="profile-cta-button"
-            >
-              Settings
-            </button>
+      {/* --- Saved Products --- */}
+      <h2 className="profile-subsection-header-text">Saved Products</h2>
+      <div className="profile-saved-products">
+        {savedProducts.length > 0 ? (
+          <div className="saved-products-grid">
+            {savedProducts.map((product) => (
+              <div key={product.id} className="saved-product-card">
+                <img src={product.imgUrl} alt={product.name} className="saved-product-image" />
+                <div className="saved-product-details">
+                  <h3 className="product-name">{product.name}</h3>
+                  <a href={product.affiliateLink} target="_blank" rel="noopener noreferrer" className="buy-now-btn">View on Amazon</a>
+                  <button className="save-product-btn unsave" onClick={() => toggleSaveProduct(product.id)}>Unsave</button>
+                </div>
+              </div>
+            ))}
           </div>
+        ) : (
+          <p className="profile-no-products-text">No saved products yet.</p>
+        )}
+      </div>
+
+      {/* --- Motivational Quote and Buttons --- */}
+      <div className="motivational-quote">
+        "Every champion was once a contender who refused to give up." - Rocky Balboa
+      </div>
+
+      <div>
+        <button onClick={handleSignOut} className="profile-cta-button">Sign Out</button>
+        <button onClick={() => navigate("/settings")} className="profile-cta-button">Settings</button>
       </div>
     </div>
   );
