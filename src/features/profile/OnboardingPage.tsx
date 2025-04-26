@@ -17,7 +17,6 @@ type FormDataType = {
   bio: string;
 };
 
-
 const OnboardingPage = () => {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
@@ -62,7 +61,7 @@ const OnboardingPage = () => {
       case 1:
         return (
           <div className="onboarding-step">
-            <h2>Let's Start with Your Name</h2>
+            <h2>What's your name?</h2>
             <input
               type="text"
               name="firstName"
@@ -79,29 +78,35 @@ const OnboardingPage = () => {
               onChange={handleChange}
               required
             />
-            <button className="onboarding-btn" onClick={() => setStep(2)}>Next</button>
+            <button className="onboarding-btn" onClick={() => setStep(2)}>Next ➔</button>
           </div>
         );
 
       case 2:
         return (
           <div className="onboarding-step">
-            <h2>What's Your Favorite Color?</h2>
-            <select name="favoriteColor" value={formData.favoriteColor} onChange={handleChange}>
-              <option value="">Select a color</option>
+            <h2>Pick your favorite color</h2>
+            <div className="color-options">
               {favoriteColors.map((color) => (
-                <option key={color} value={color}>{color}</option>
+                <div
+                  key={color}
+                  className={`color-option ${formData.favoriteColor === color ? "selected" : ""}`}
+                  style={{ backgroundColor: color.toLowerCase() }}
+                  onClick={() => setFormData({ ...formData, favoriteColor: color })}
+                ></div>
               ))}
-            </select>
-            <button className="onboarding-btn" onClick={() => setStep(1)}>Back</button>
-            <button className="onboarding-btn" onClick={() => setStep(3)}>Next</button>
+            </div>
+            <div className="button-group">
+              <button className="onboarding-btn" onClick={() => setStep(1)}>← Back</button>
+              <button className="onboarding-btn" onClick={() => setStep(3)}>Next ➔</button>
+            </div>
           </div>
         );
 
       case 3:
         return (
           <div className="onboarding-step">
-            <h2>Pick Your Sports!</h2>
+            <h2>Select your sports squad!</h2>
             <div className="sports-grid">
               {sportsOptions.map((sport) => (
                 <div
@@ -113,23 +118,27 @@ const OnboardingPage = () => {
                 </div>
               ))}
             </div>
-            <button className="onboarding-btn" onClick={() => setStep(2)}>Back</button>
-            <button className="onboarding-btn" onClick={() => setStep(4)}>Next</button>
+            <div className="button-group">
+              <button className="onboarding-btn" onClick={() => setStep(2)}>← Back</button>
+              <button className="onboarding-btn" onClick={() => setStep(4)}>Next ➔</button>
+            </div>
           </div>
         );
 
       case 4:
         return (
           <div className="onboarding-step">
-            <h2>Profile Bio</h2>
+            <h2>Write your story!</h2>
             <textarea
               name="bio"
-              placeholder="Tell us about yourself (Optional, but encouraged 😊)"
+              placeholder="Tell us about yourself (Optional)"
               value={formData.bio}
               onChange={handleChange}
             ></textarea>
-            <button className="onboarding-btn" onClick={() => setStep(3)}>Back</button>
-            <button className="onboarding-btn" onClick={handleSubmit}>Finish</button>
+            <div className="button-group">
+              <button className="onboarding-btn" onClick={() => setStep(3)}>← Back</button>
+              <button className="onboarding-btn" onClick={handleSubmit}>Finish ✅</button>
+            </div>
           </div>
         );
 
@@ -140,7 +149,8 @@ const OnboardingPage = () => {
 
   return (
     <div className="onboarding-container">
-      <h1>Welcome!</h1>
+      <div className="onboarding-progress">Step {step} of 4</div>
+      <h1>Welcome to AthleteXpert!</h1>
       {renderStep()}
     </div>
   );

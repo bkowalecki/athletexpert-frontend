@@ -66,14 +66,14 @@
     }
   },
   {
-    "title": "Esports",
+    "title": "E-Sports",
     "logo": "/icons/esports_icon.png",
     "backgroundImage": "/images/sports/esports_bg.jpg",
     "extra_data": {
       "category": "Competitive Gaming",
       "type": "Indoor/Online",
       "popularity": "Very High",
-      "summary": "Esports originated from early computer competitions in the 1970s and 80s, evolving into a global phenomenon with professional leagues and international tournaments across various game genres."
+      "summary": "E-sports originated from early computer competitions in the 1970s and 80s, evolving into a global phenomenon with professional leagues and international tournaments across various game genres."
     }
   },
   {
