@@ -179,14 +179,14 @@ const ProfilePage: React.FC = () => {
   const handleSignOut = async () => {
     try {
       const currentAuthProvider = user?.authProvider;
-
+  
       await fetch(`${process.env.REACT_APP_API_URL}/users/logout`, {
         method: "POST",
         credentials: "include",
       });
-
+  
       setUser(null);
-
+  
       if (currentAuthProvider === "auth0") {
         auth0Logout({
           logoutParams: {
@@ -194,13 +194,15 @@ const ProfilePage: React.FC = () => {
           },
         });
       } else {
-        window.location.href = "/auth";
+        // ⭐ Force a full window reload to hard-clear memory/cookies
+        window.location.href = window.location.origin + "/auth";
       }
     } catch (error) {
       console.error("❌ Error during logout:", error);
       toast.error("Error signing out. Please try again.", { position: "top-center" });
     }
   };
+  
 
   if (!isSessionChecked) return <div className="profile-loading">Checking session...</div>;
   if (!profile) return <div className="profile-loading">No profile data found.</div>;
