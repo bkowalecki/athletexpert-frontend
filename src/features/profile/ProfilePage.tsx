@@ -224,31 +224,25 @@ const ProfilePage: React.FC = () => {
 
   const handleSignOut = async () => {
     try {
+      await fetch(`${process.env.REACT_APP_API_URL}/users/logout`, {
+        method: "POST",
+        credentials: "include",
+      });
+      setUser(null);
+  
       if (user?.authProvider === 'auth0') {
-        console.log("Signing out from Auth0 session...");
-        await fetch(`${process.env.REACT_APP_API_URL}/users/logout`, {
-          method: "POST",
-          credentials: "include",
-        });
-        setUser(null);
-  
-        // 👇 Redirect to Auth0's logout endpoint
-        window.location.href = `https://${process.env.REACT_APP_AUTH0_DOMAIN}/v2/logout?client_id=${process.env.REACT_APP_AUTH0_CLIENT_ID}&returnTo=${encodeURIComponent(window.location.origin)}`;
-  
+        // Redirect to Auth0 logout only if logged in through Google SSO
+        window.location.href = `https://${process.env.REACT_APP_AUTH0_DOMAIN}/v2/logout?client_id=${process.env.REACT_APP_AUTH0_CLIENT_ID}&returnTo=${encodeURIComponent(window.location.origin + "/auth")}`;
       } else {
-        console.log("Signing out from local session...");
-        await fetch(`${process.env.REACT_APP_API_URL}/users/logout`, {
-          method: "POST",
-          credentials: "include",
-        });
-        setUser(null);
-        window.location.reload(); // 👈 For local users
+        // Local login? Just reload the page
+        window.location.href = "/auth";
       }
     } catch (error) {
       console.error("❌ Error during logout:", error);
       toast.error("Error signing out. Please try again.", { position: "top-center" });
     }
   };
+  
   
 
   return (

@@ -80,8 +80,9 @@ export type User = {
   profilePictureUrl?: string;
   bio?: string | null;
   sports?: string[] | null;
-  authProvider?: 'local' | 'auth0'; // ⭐ ADD THIS
+  authProvider?: 'local' | 'auth0'; // ⭐️ Add this
 };
+
 
 interface UserContextProps {
   user: User | null;

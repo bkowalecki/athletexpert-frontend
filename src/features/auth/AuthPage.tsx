@@ -71,7 +71,7 @@ const AuthPage: React.FC = () => {
       if (response.ok) {
         const userData = await response.json();
         if (userData?.user) {
-          setUser({ ...userData.user, authProvider: 'local' });
+          setUser({ ...userData.user, authProvider: 'auth0' });
 
           navigate("/profile", { replace: true });
         } else {
