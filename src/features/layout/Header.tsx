@@ -32,13 +32,15 @@ const Header: React.FC = () => {
 
   /** ✅ Clicking "Profile" should go to `/profile` if logged in, otherwise `/auth` */
   const handleProfileClick = () => {
-    if (!isSessionChecked) return; // 🔹 Prevent redirect before session check
+    if (!isSessionChecked) return; // 🔹 Prevent action before session checking is done
 
     if (isAuthenticated || user) {
       navigate("/profile");
     } else {
       navigate("/auth");
     }
+
+    closeMobileMenu(); // Close mobile menu after clicking
   };
 
   return (
@@ -62,7 +64,7 @@ const Header: React.FC = () => {
           </div>
         )}
 
-      <Link to="/community" className="nav-link" onClick={closeMobileMenu}>
+        <Link to="/community" className="nav-link" onClick={closeMobileMenu}>
           Community
         </Link>
 
@@ -74,9 +76,10 @@ const Header: React.FC = () => {
           Blog
         </Link>
 
-        <Link to="/profile" className="nav-link" onClick={closeMobileMenu}>
+        {/* 🛠 Updated Profile button */}
+        <button onClick={handleProfileClick} className="nav-link profile-link-button">
           Profile
-        </Link>
+        </button>
       </nav>
 
       <div className={`hamburger-menu ${isMobileMenuOpen ? "open" : ""}`} onClick={toggleMobileMenu}>
