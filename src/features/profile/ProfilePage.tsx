@@ -224,17 +224,18 @@ const ProfilePage: React.FC = () => {
 
   const handleSignOut = async () => {
     try {
+      const currentAuthProvider = user?.authProvider; // 👈 capture before killing
+  
       await fetch(`${process.env.REACT_APP_API_URL}/users/logout`, {
         method: "POST",
         credentials: "include",
       });
       setUser(null);
   
-      if (user?.authProvider === 'auth0') {
+      if (currentAuthProvider === 'auth0') {
         // Redirect to Auth0 logout only if logged in through Google SSO
         window.location.href = `https://${process.env.REACT_APP_AUTH0_DOMAIN}/v2/logout?client_id=${process.env.REACT_APP_AUTH0_CLIENT_ID}&returnTo=${encodeURIComponent(window.location.origin + "/auth")}`;
       } else {
-        // Local login? Just reload the page
         window.location.href = "/auth";
       }
     } catch (error) {
@@ -242,6 +243,7 @@ const ProfilePage: React.FC = () => {
       toast.error("Error signing out. Please try again.", { position: "top-center" });
     }
   };
+  
   
   
 
