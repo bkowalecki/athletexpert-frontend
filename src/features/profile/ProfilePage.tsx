@@ -45,7 +45,7 @@ const ProfilePage: React.FC = () => {
   const [savedProducts, setSavedProducts] = useState<Product[]>([]);
   const navigate = useNavigate();
   const { user, setUser, isSessionChecked, checkSession } = useUserContext();
-  const { logout: auth0Logout } = useAuth0(); // ⭐️ Grab auth0Logout from SDK
+  const { logout: auth0Logout } = useAuth0();
 
   useEffect(() => {
     if (!isSessionChecked) return;
@@ -186,7 +186,7 @@ const ProfilePage: React.FC = () => {
       });
   
       setUser(null);
-      await checkSession(); // ✅ After logout, verify session is cleared
+      await checkSession(); // ✅ Immediately revalidate with server
   
       if (currentAuthProvider === "auth0") {
         auth0Logout({
@@ -195,7 +195,7 @@ const ProfilePage: React.FC = () => {
           },
         });
       } else {
-        window.location.href = "/auth";
+        window.location.href = "/auth"; // ✅ Hard reload for full memory wipe
       }
     } catch (error) {
       console.error("❌ Error during logout:", error);
