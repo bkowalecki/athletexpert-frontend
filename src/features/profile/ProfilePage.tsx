@@ -44,7 +44,7 @@ const ProfilePage: React.FC = () => {
   const [savedBlogs, setSavedBlogs] = useState<BlogPost[]>([]);
   const [savedProducts, setSavedProducts] = useState<Product[]>([]);
   const navigate = useNavigate();
-  const { user, setUser, isSessionChecked } = useUserContext();
+  const { user, setUser, isSessionChecked, checkSession } = useUserContext();
   const { logout: auth0Logout } = useAuth0(); // ⭐️ Grab auth0Logout from SDK
 
   useEffect(() => {
@@ -179,14 +179,15 @@ const ProfilePage: React.FC = () => {
   const handleSignOut = async () => {
     try {
       const currentAuthProvider = user?.authProvider;
-
+  
       await fetch(`${process.env.REACT_APP_API_URL}/users/logout`, {
         method: "POST",
         credentials: "include",
       });
-
+  
       setUser(null);
-
+      await checkSession(); // ✅ After logout, verify session is cleared
+  
       if (currentAuthProvider === "auth0") {
         auth0Logout({
           logoutParams: {
@@ -194,7 +195,7 @@ const ProfilePage: React.FC = () => {
           },
         });
       } else {
-        navigate("/auth", { replace: true });
+        window.location.href = "/auth";
       }
     } catch (error) {
       console.error("❌ Error during logout:", error);
