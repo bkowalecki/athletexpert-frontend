@@ -99,9 +99,9 @@
     }
   },
   {
-    "title": "Hockey",
+    "title": "Ice Hockey",
     "logo": "/icons/hockey_icon.png",
-    "backgroundImage": "/images/sports/hockey_bg.jpg",
+    "backgroundImage": "/images/sports/ice_hockey_bg.jpg",
     "extra_data": {
       "category": "Team Sport",
       "type": "Indoor/Outdoor",
