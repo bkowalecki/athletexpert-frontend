@@ -228,11 +228,12 @@ const ProfilePage: React.FC = () => {
         method: "POST",
         credentials: "include",
       });
-      setUser(null);
-      navigate("/", { replace: true });
-      window.location.href = "/";
+      setUser(null);  // Clear user from context
+      toast.success("You have been signed out.", { position: "top-center" });
+      window.location.reload();  // 🚀 Force a clean reload so cookies and session are properly cleared
     } catch (error) {
       console.error("❌ Error during logout:", error);
+      toast.error("Error signing out. Please try again.", { position: "top-center" });
     }
   };
 

@@ -149,8 +149,6 @@ const OnboardingPage = () => {
 
   return (
     <div className="onboarding-container">
-      <div className="onboarding-progress">Step {step} of 4</div>
-      <h1>Welcome to AthleteXpert!</h1>
       {renderStep()}
     </div>
   );
