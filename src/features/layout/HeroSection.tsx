@@ -27,20 +27,29 @@ const HeroSection: React.FC<HeroSectionProps> = ({ openQuiz }) => {
 
   useEffect(() => {
     const videoElement = videoRef.current;
-
+  
     if (videoElement) {
       videoElement.muted = true;
       videoElement.setAttribute("playsinline", "true");
-
+  
       const playPromise = videoElement.play();
-
+  
       if (playPromise !== undefined) {
         playPromise
           .then(() => {
             console.log("Video playing successfully");
           })
           .catch((error) => {
-            console.error("Autoplay blocked, manual play required:", error);
+            console.error("Autoplay blocked. Waiting for user interaction to play:", error);
+  
+            const tryPlayOnInteraction = () => {
+              videoElement.play().catch((err) => console.error("Still couldn't play:", err));
+              document.removeEventListener('touchstart', tryPlayOnInteraction);
+              document.removeEventListener('scroll', tryPlayOnInteraction);
+            };
+  
+            document.addEventListener('touchstart', tryPlayOnInteraction);
+            document.addEventListener('scroll', tryPlayOnInteraction);
           });
       }
     }
