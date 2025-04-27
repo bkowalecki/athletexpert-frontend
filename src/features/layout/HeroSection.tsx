@@ -54,12 +54,12 @@ const HeroSection: React.FC<HeroSectionProps> = ({ openQuiz }) => {
         loop
         muted
         playsInline
-        preload="auto"
+        preload="none"
         poster="/images/hero-poster.png"
         className="hero-video"
       >
-        {/* <source src="/video/hero-video.mp4" type="video/mp4" /> */}
         <source src="/video/athletexpertheadervideo.webm" type="video/webm" />
+        <source src="/video/hero-video.mp4" type="video/mp4" />
         Your browser does not support the video tag.
       </video>
 
