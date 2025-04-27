@@ -11,7 +11,7 @@ interface Product {
   category: string;
   price: number | null;
   imgUrl: string;
-  amazon_url: string;
+  affiliateLink: string;
 }
 
 const fetchTrendingProducts = async (): Promise<Product[]> => {
@@ -89,10 +89,10 @@ const TrendingProductList: React.FC = () => {
                 </p>
               </div>
               <a
-                href={product.amazon_url}
+                href={product.affiliateLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="trending-product-cta-button"
+                className="featured-product-cta-button"
               >
                 View on Amazon
               </a>
@@ -154,7 +154,7 @@ const TrendingProductList: React.FC = () => {
                     </p>
                   </div>
                   <a
-                    href={currentProduct.amazon_url}
+                    href={currentProduct.affiliateLink}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="trending-product-cta-button"
