@@ -39,7 +39,6 @@ const Header: React.FC = () => {
     } else {
       navigate("/auth");
     }
-    
 
     closeMobileMenu(); // Close mobile menu after clicking
   };
@@ -58,10 +57,15 @@ const Header: React.FC = () => {
         </div>
       )}
 
-      <nav className={`nav-links ${isMobileMenuOpen ? "mobile-menu-open" : ""}`}>
+      <nav
+        className={`nav-links ${isMobileMenuOpen ? "mobile-menu-open" : ""}`}
+      >
         {isMobile && (
           <div className="mobile-search">
-            <HeaderSearchBar showSubmitButton={false} onSearchComplete={closeMobileMenu} />
+            <HeaderSearchBar
+              showSubmitButton={false}
+              onSearchComplete={closeMobileMenu}
+            />
           </div>
         )}
 
@@ -78,12 +82,15 @@ const Header: React.FC = () => {
         </Link>
 
         {/* 🛠 Updated Profile button */}
-        <button onClick={handleProfileClick} className="nav-link profile-link-button">
+        <Link to="/profile" onClick={handleProfileClick} className="nav-link">
           Profile
-        </button>
+        </Link>
       </nav>
 
-      <div className={`hamburger-menu ${isMobileMenuOpen ? "open" : ""}`} onClick={toggleMobileMenu}>
+      <div
+        className={`hamburger-menu ${isMobileMenuOpen ? "open" : ""}`}
+        onClick={toggleMobileMenu}
+      >
         <div className={`bar ${isMobileMenuOpen ? "open" : ""}`}></div>
         <div className={`bar ${isMobileMenuOpen ? "open" : ""}`}></div>
         <div className={`bar ${isMobileMenuOpen ? "open" : ""}`}></div>

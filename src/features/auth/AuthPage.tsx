@@ -11,6 +11,8 @@ const AuthPage: React.FC = () => {
     getAccessTokenSilently,
     isAuthenticated,
     loginWithRedirect,
+    loginWithPopup,
+    getIdTokenClaims,
     user: auth0User,
   } = useAuth0();
 
@@ -71,7 +73,7 @@ const AuthPage: React.FC = () => {
       if (response.ok) {
         const userData = await response.json();
         if (userData?.user) {
-          setUser({ ...userData.user, authProvider: 'auth0' });
+          setUser({ ...userData.user, authProvider: "auth0" });
 
           navigate("/profile", { replace: true });
         } else {
@@ -95,7 +97,7 @@ const AuthPage: React.FC = () => {
     e.preventDefault();
     setError(null);
     setIsSubmitting(true);
-  
+
     const endpoint = isLogin ? "login" : "register";
     const payload = isLogin
       ? { email: formData.email, password: formData.password }
@@ -104,23 +106,26 @@ const AuthPage: React.FC = () => {
           email: formData.email,
           password: formData.password,
         };
-  
+
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/users/${endpoint}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-        credentials: "include",
-      });
-  
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/users/${endpoint}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+          credentials: "include",
+        }
+      );
+
       if (!response.ok) {
         const data = await response.json().catch(() => null);
         setError(data?.message || "An error occurred. Please try again.");
         return;
       }
-  
+
       const userData = await response.json();
-      setUser({ ...userData.user, authProvider: 'local' });
+      setUser({ ...userData.user, authProvider: "local" });
 
       navigate("/account-setup", { replace: true }); // 👈 Go to onboarding after registration
     } catch (error) {
@@ -188,18 +193,49 @@ const AuthPage: React.FC = () => {
           </button>
         </form>
 
-        {/* ✅ Google Login Button */}
         <button
           className="google-login-btn"
-          onClick={() =>
-            loginWithRedirect({
-              authorizationParams: {
-                audience: "https://athletexpert-api",
-                scope: "openid profile email",
-                prompt: "consent",
-              },
-            })
-          }
+          onClick={async () => {
+            try {
+              await loginWithPopup({
+                authorizationParams: {
+                  audience: "https://athletexpert-api",
+                  scope: "openid profile email",
+                  connection: "google-oauth2", // ✅ Force direct Google login
+                },
+              });
+
+              const idTokenClaims = await getIdTokenClaims();
+              if (!idTokenClaims) {
+                console.error("❌ No ID Token claims received.");
+                return;
+              }
+
+              const idToken = idTokenClaims.__raw;
+
+              const response = await fetch(
+                `${process.env.REACT_APP_API_URL}/users/auth0-login`,
+                {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  credentials: "include",
+                  body: JSON.stringify({ token: idToken }),
+                }
+              );
+
+              if (response.ok) {
+                const userData = await response.json();
+                setUser({ ...userData, authProvider: "auth0" });
+                navigate("/profile");
+              } else {
+                console.error("❌ Backend auth failed after SSO.");
+                navigate("/auth");
+              }
+            } catch (error) {
+              console.error("❌ Error during Google SSO Popup:", error);
+              navigate("/auth");
+            }
+          }}
           disabled={isSubmitting}
         >
           Sign in with Google
