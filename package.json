@@ -63,6 +63,7 @@
     "@typescript-eslint/parser": "^8.31.0",
     "babel-eslint": "^10.1.0",
     "vite-plugin-pwa": "^1.0.0",
+    "workbox-cli": "^7.3.0",
     "workbox-webpack-plugin": "^7.3.0"
   }
 }
