@@ -1,7 +1,7 @@
 // HeaderSearchBar.tsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import '../../styles/HeaderSearchBar.css';
+import "../../styles/HeaderSearchBar.css";
 import sportsTerms from "../../data/sportsTerms.json"; // Import your sports terms JSON
 
 // Define props to conditionally show the submit button and handle search completion
@@ -25,7 +25,7 @@ const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
     setSearchQuery(query);
 
     if (query.length > 1) {
-      const filteredSuggestions = sportsTerms.sportsTerms.filter(term =>
+      const filteredSuggestions = sportsTerms.sportsTerms.filter((term) =>
         term.toLowerCase().startsWith(query.toLowerCase())
       );
       setSuggestions(filteredSuggestions);
@@ -62,7 +62,11 @@ const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
           aria-label="Search"
         />
         {showSubmitButton && (
-          <div className="search-button" onClick={handleSearchSubmit}></div>
+          <button
+            type="submit"
+            className="search-button"
+            aria-label="Search"
+          ></button>
         )}
       </form>
       {showDropdown && suggestions.length > 0 && (

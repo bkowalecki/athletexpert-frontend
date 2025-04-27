@@ -48,11 +48,18 @@ const BlogPostCard: React.FC<{
   userExists: boolean;
 }> = ({ post, isSaved, onToggleSave, userExists }) => (
   <div key={post.id} className="blog-post-item">
-    <img src={post.imageUrl} alt={post.title} className="blog-image" loading="lazy" />
+    <img
+      src={post.imageUrl}
+      alt={post.title}
+      className="blog-image"
+      loading="lazy"
+    />
     <div className="blog-info">
       <h3 className="blog-title">{post.title}</h3>
       <p className="blog-author">By {post.author}</p>
-      <p className="blog-date">{new Date(post.publishedDate).toLocaleDateString()}</p>
+      <p className="blog-date">
+        {new Date(post.publishedDate).toLocaleDateString()}
+      </p>
       <p className="blog-description">{DOMPurify.sanitize(post.summary)}</p>
       <Link to={`/blog/${post.slug}`} className="blog-read-more-btn">
         Read More
@@ -103,7 +110,9 @@ const BlogPage: React.FC = () => {
           ? postsData
           : [
               ...prevPosts,
-              ...postsData.filter((post) => !prevPosts.some((p) => p.id === post.id)),
+              ...postsData.filter(
+                (post) => !prevPosts.some((p) => p.id === post.id)
+              ),
             ]
       );
       setHasMorePosts(postsData.length >= 9);
@@ -177,10 +186,10 @@ const BlogPage: React.FC = () => {
   return (
     <div className="blog-page-container">
       <Helmet>
-        <title>Blog - AthleteXpert</title>
+        <title>AthleteXpert | Blog</title>
         <meta
           name="description"
-          content="Discover the latest articles and insights on AthleteXpert."
+          content="Get the latest athletic tips, guides, and news on the AthleteXpert blog."
         />
       </Helmet>
 

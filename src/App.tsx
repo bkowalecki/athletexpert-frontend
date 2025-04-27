@@ -11,7 +11,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-
+import { Helmet } from "react-helmet";
 import Header from "./features/layout/Header";
 import HeroSection from "./features/layout/HeroSection";
 import FeaturedProductList from "./features/products/FeaturedProductList";
@@ -37,8 +37,10 @@ import { UserProvider, useUserContext } from "./context/UserContext";
 import { Auth0Provider } from "@auth0/auth0-react";
 import AccountSettings from "./features/profile/AccountSettings";
 import { Navigate } from "react-router-dom";
-
+import { SportsProvider } from "./context/SportsContext";
 import ScrollToTop from "./util/ScrollToTop";
+import RequireAuth from "./features/auth/RequireAuth"; // ✅ Import RequireAuth
+import ErrorBoundary from "./components/common/ErrorBoundary"; // ⭐ Add this import
 import ProductsPage from "./features/products/ProductsPage";
 
 const queryClient = new QueryClient();
@@ -47,7 +49,7 @@ const AppContent: React.FC = () => {
   const [isQuizModalOpen, setQuizModalOpen] = useState(false);
   const openModal = () => setQuizModalOpen(true);
   const closeModal = () => setQuizModalOpen(false);
-  const location = useLocation();
+  // const location = useLocation();
   const { isSessionChecked } = useUserContext(); // Ensures session is verified before rendering
 
   if (!isSessionChecked) {
@@ -82,9 +84,11 @@ const AppContent: React.FC = () => {
 
   return (
     <div className="App">
+      <SportsProvider>
       <ToastContainer position="top-center" autoClose={3000} />
       <Header />
       <AnimatePresence mode="wait">
+      <ErrorBoundary>
         <Routes>
           <Route
             path="/"
@@ -100,7 +104,7 @@ const AppContent: React.FC = () => {
                 </>
             }
           />
-          <Route path="/profile" element={<PageWrapper><ProfilePage /></PageWrapper>} />
+          <Route path="/profile" element={<RequireAuth><PageWrapper><ProfilePage /></PageWrapper></RequireAuth>} />
           <Route path="/settings" element={<PageWrapper><AccountSettings /></PageWrapper>} />
           <Route path="/about" element={<PageWrapper><AboutPage /></PageWrapper>} />
           <Route path="/blog" element={<PageWrapper><BlogPage /></PageWrapper>} />
@@ -117,8 +121,10 @@ const AppContent: React.FC = () => {
           <Route path="/privacy-policy" element={<PageWrapper><PrivacyPolicy /></PageWrapper>} />
           <Route path="/blog/:slug" element={<PageWrapper><BlogPostPage /></PageWrapper>} />
         </Routes>
+        </ErrorBoundary>
       </AnimatePresence>
       <Footer />
+      </SportsProvider>
     </div>
   );
 };
@@ -126,6 +132,8 @@ const AppContent: React.FC = () => {
 const App: React.FC = () => {
   const domain: string = process.env.REACT_APP_AUTH0_DOMAIN ?? "";
   const clientId: string = process.env.REACT_APP_AUTH0_CLIENT_ID ?? "";
+
+  
 
   return (
     <Auth0Provider

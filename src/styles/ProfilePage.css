@@ -377,6 +377,17 @@
   background: #e68a00;
 }
 
+.profile-no-sports {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.profile-no-sports-text {
+  margin-bottom: 10px;
+  font-size: 1rem;
+  color: #666;
+}
+
 /* No Blogs Text */
 .profile-no-blogs-text {
   text-align: center;

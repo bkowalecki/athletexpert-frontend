@@ -42,19 +42,39 @@ const OnboardingPage = () => {
     });
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+  
+    if (!formData.firstName.trim() || !formData.lastName.trim()) {
+      alert("⚠️ Please enter both your first name and last name.");
+      return;
+    }
+  
     try {
-      const payload = { ...formData };
-      await axios.post(`${process.env.REACT_APP_API_URL}/users/account-setup`, payload, {
-        withCredentials: true,
-        headers: { "Content-Type": "application/json" }
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/users/account-setup`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          bio: formData.bio,
+          sports: formData.sports,
+        }),
       });
-      navigate("/profile");
+  
+      if (response.ok) {
+        console.log("✅ Account setup complete!");
+        navigate("/profile");
+      } else {
+        console.error("❌ Failed to submit onboarding form");
+      }
     } catch (error) {
-      console.error("Error submitting onboarding data:", error);
-      alert("Failed to complete onboarding. Please try again.");
+      console.error("❌ Error submitting onboarding:", error);
     }
   };
+  
+  
 
   const renderStep = () => {
     switch (step) {

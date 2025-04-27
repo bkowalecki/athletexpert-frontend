@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import sportsData from "../../data/sports.json";
 import "../../styles/SportPage.css";
@@ -17,22 +17,33 @@ interface Sport {
 
 const SportPage: React.FC = () => {
   const { sport } = useParams<{ sport: string }>();
+  const navigate = useNavigate();
   const [currentSport, setCurrentSport] = useState<Sport | null>(null);
 
   useEffect(() => {
+    if (!sport) {
+      navigate("/404", { replace: true });
+      return;
+    }
+
     const foundSport = sportsData.find(
-      (s) => s.title.toLowerCase() === sport?.toLowerCase()
+      (s) => s.title.toLowerCase() === sport.toLowerCase()
     );
-    setCurrentSport(foundSport || null);
-  }, [sport]);
+
+    if (!foundSport) {
+      console.warn(`⚠️ Sport "${sport}" not found. Redirecting to 404.`);
+      navigate("/404", { replace: true });
+      return;
+    }
+
+    setCurrentSport(foundSport);
+  }, [sport, navigate]);
 
   if (!currentSport) {
+    // Optional: can render a spinner or loading skeleton here
     return (
       <div className="sport-page">
-        <h2 className="sport-page-not-found">Sport Not Found</h2>
-        <p className="sport-page-not-found-text">
-          We couldn't find information on this sport. Try another!
-        </p>
+        <h2 className="sport-page-not-found">Loading...</h2>
       </div>
     );
   }
@@ -53,10 +64,6 @@ const SportPage: React.FC = () => {
           >
             {currentSport.title}
           </motion.h1>
-          {/* <div className="sport-page-buttons">
-            <button className="sport-page-btn primary">Add as Player</button>
-            <button className="sport-page-btn secondary">Follow</button>
-          </div> */}
         </div>
       </div>
 

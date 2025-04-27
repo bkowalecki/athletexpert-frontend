@@ -216,6 +216,25 @@
   color: #ffdd57;
 }
 
+.products-error-container {
+  text-align: center;
+  margin-top: 100px;
+}
+
+.return-home-btn {
+  background-color: #2A6045;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 1rem;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.return-home-btn:hover {
+  background-color: #24523a;
+}
+
 /* 🌟 Responsive Design */
 @media (max-width: 768px) {
   .products-page {
