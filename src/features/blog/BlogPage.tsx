@@ -78,7 +78,7 @@ const BlogPostCard: React.FC<{
 
 const BlogPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const debouncedSearchQuery = useDebounce(searchQuery, 300);
+  const debouncedSearchQuery = useDebounce(searchQuery, 200);
   const [currentPage, setCurrentPage] = useState(0);
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [hasMorePosts, setHasMorePosts] = useState(true);
@@ -222,7 +222,9 @@ const BlogPage: React.FC = () => {
             />
           ))
         ) : (
-          <div className="no-posts-message">No blog posts found.</div>
+          <div className="no-posts-message">
+            No blog posts match your search. Try a different keyword!
+          </div>
         )}
       </div>
 

@@ -64,7 +64,13 @@ const Community: React.FC = () => {
 
   const handleNavigation = useCallback(
     (sportTitle: string) => {
-      navigate(`${sportTitle.toLowerCase()}`);
+      const slugify = (str: string) =>
+        str
+          .toLowerCase()
+          .replace(/\s+/g, "-")
+          .replace(/[^\w\-]+/g, "");
+
+      navigate(slugify(sportTitle));
     },
     [navigate]
   );
@@ -85,6 +91,15 @@ const Community: React.FC = () => {
         />
       </Helmet>
       {/* (Optional) You could add a search bar here if you want */}
+      <div className="community-search-container">
+        <input
+          type="text"
+          placeholder="Search sports..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="community-search-input"
+        />
+      </div>
       <div className="sports-masonry">
         {filteredSports.map((sport: Sport, index: number) => (
           <SportCard

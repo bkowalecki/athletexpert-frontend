@@ -45,7 +45,11 @@ const AuthCallback: React.FC = () => {
     handleAuth();
   }, [isAuthenticated, auth0User, getAccessTokenSilently, setUser, navigate]);
 
-  return <div>Loading...</div>; // ✅ Simple loading indicator
+  return (
+    <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
+      <h2>Authenticating...</h2>
+    </div>
+  );
 };
 
 export default AuthCallback;

@@ -94,6 +94,7 @@ input::placeholder {
   transform: scale(1.02);
 }
 
+
 /* 🔥 Live Search Suggestions */
 .search-suggestions {
   position: absolute;
@@ -144,6 +145,11 @@ input::placeholder {
   border-bottom-left-radius: 8px;
   border-bottom-right-radius: 8px;
   border-bottom: none;
+}
+
+.search-suggestion-item.highlighted {
+  background-color: #f0f0f0;
+  color: black;
 }
 
 /* Responsive adjustments */

@@ -17,13 +17,41 @@ const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
   const [searchQuery, setSearchQuery] = useState("");
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [highlightedIndex, setHighlightedIndex] = useState<number>(-1);
+
   const navigate = useNavigate();
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!showDropdown) return;
+
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setHighlightedIndex((prev) => (prev + 1) % suggestions.length);
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setHighlightedIndex((prev) =>
+        prev === 0 ? suggestions.length - 1 : prev - 1
+      );
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      if (highlightedIndex >= 0 && highlightedIndex < suggestions.length) {
+        const selected = suggestions[highlightedIndex];
+        navigate(`/search?query=${encodeURIComponent(selected)}`);
+        setShowDropdown(false);
+        if (onSearchComplete) {
+          onSearchComplete();
+        }
+      } else {
+        handleSearchSubmit(e);
+      }
+    }
+  };
 
   // Handle input changes and filter suggestions
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
     setSearchQuery(query);
-
+    setHighlightedIndex(-1); // ✅ Reset highlight when typing
+  
     if (query.length > 1) {
       const filteredSuggestions = sportsTerms.sportsTerms.filter((term) =>
         term.toLowerCase().startsWith(query.toLowerCase())
@@ -59,6 +87,8 @@ const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
           placeholder="Search"
           value={searchQuery}
           onChange={handleInputChange}
+          onKeyDown={handleKeyDown}
+          onBlur={() => setTimeout(() => setShowDropdown(false), 150)}
           aria-label="Search"
         />
         {showSubmitButton && (
@@ -74,12 +104,13 @@ const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
           {suggestions.map((suggestion, index) => (
             <li
               key={index}
-              className="search-suggestion-item"
+              className={`search-suggestion-item ${
+                highlightedIndex === index ? "highlighted" : ""
+              }`}
+              onMouseEnter={() => setHighlightedIndex(index)}
               onClick={() => {
-                setSearchQuery(suggestion);
                 navigate(`/search?query=${encodeURIComponent(suggestion)}`);
                 setShowDropdown(false);
-                // Close mobile menu if onSearchComplete is provided.
                 if (onSearchComplete) {
                   onSearchComplete();
                 }

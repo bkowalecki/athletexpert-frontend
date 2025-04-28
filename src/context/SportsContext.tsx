@@ -28,7 +28,6 @@ export const SportsProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   useEffect(() => {
     // Preload immediately
     setSports(sportsData);
-    console.log("✅ Sports data preloaded:", sportsData);
   }, []);
 
   return (

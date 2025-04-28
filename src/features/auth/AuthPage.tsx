@@ -97,7 +97,14 @@ const AuthPage: React.FC = () => {
     e.preventDefault();
     setError(null);
     setIsSubmitting(true);
-
+  
+    // ✅ Check confirmPassword match before sending anything
+    if (!isLogin && formData.password !== formData.confirmPassword) {
+      setError("Passwords do not match.");
+      setIsSubmitting(false);
+      return;
+    }
+  
     const endpoint = isLogin ? "login" : "register";
     const payload = isLogin
       ? { email: formData.email, password: formData.password }
@@ -106,7 +113,7 @@ const AuthPage: React.FC = () => {
           email: formData.email,
           password: formData.password,
         };
-
+  
     try {
       const response = await fetch(
         `${process.env.REACT_APP_API_URL}/users/${endpoint}`,
@@ -117,17 +124,18 @@ const AuthPage: React.FC = () => {
           credentials: "include",
         }
       );
-
+  
       if (!response.ok) {
         const data = await response.json().catch(() => null);
         setError(data?.message || "An error occurred. Please try again.");
-        return;
+        return; // ✅ VERY IMPORTANT: if register fails, STOP here
       }
-
+  
       const userData = await response.json();
       setUser({ ...userData.user, authProvider: "local" });
-
-      navigate("/account-setup", { replace: true }); // 👈 Go to onboarding after registration
+  
+      // ✅ Only navigate to onboarding AFTER successful user creation
+      navigate("/account-setup", { replace: true });
     } catch (error) {
       console.error("Error during authentication:", error);
       setError("An unexpected error occurred. Please try again.");
@@ -135,11 +143,12 @@ const AuthPage: React.FC = () => {
       setIsSubmitting(false);
     }
   };
+  
 
   /** Prevent flashing of login page before session check */
-  // if (!isSessionChecked) {
-  //   return <div className="auth-loading">Checking session...</div>;
-  // }
+  if (!isSessionChecked) {
+    return <div className="auth-loading">Checking session...</div>;
+  }
 
   return (
     <div className="auth-page-wrapper">

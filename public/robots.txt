@@ -17,4 +17,4 @@ Allow: /about/
 Allow: /contact/
 
 # Sitemap reference
-Sitemap: https://athletexpert.com/sitemap.xml
+Sitemap: https://athletexpert.org/sitemap.xml

@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useContext } from "react";
+import { Helmet } from "react-helmet";
 import { useUserContext } from "../../context/UserContext";
 import "../../styles/AccountSettings.css";
 
@@ -12,7 +13,7 @@ interface UserProfile {
 }
 
 const AccountSettings: React.FC = () => {
-  const { user, setUser } = useUserContext(); 
+  const { user, setUser } = useUserContext();
   const [formData, setFormData] = useState<UserProfile>({
     username: "",
     firstName: "",
@@ -37,7 +38,9 @@ const AccountSettings: React.FC = () => {
     }
   }, [user]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
@@ -47,7 +50,10 @@ const AccountSettings: React.FC = () => {
       const file = e.target.files[0];
       const reader = new FileReader();
       reader.onloadend = () => {
-        setFormData((prev) => ({ ...prev, profilePictureUrl: reader.result as string }));
+        setFormData((prev) => ({
+          ...prev,
+          profilePictureUrl: reader.result as string,
+        }));
       };
       reader.readAsDataURL(file);
     }
@@ -61,18 +67,24 @@ const AccountSettings: React.FC = () => {
   };
 
   const handleRemoveSport = (sport: string) => {
-    setFormData((prev) => ({ ...prev, sports: prev.sports.filter((s) => s !== sport) }));
+    setFormData((prev) => ({
+      ...prev,
+      sports: prev.sports.filter((s) => s !== sport),
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/users/profile`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(formData),
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/users/profile`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify(formData),
+        }
+      );
 
       if (response.ok) {
         const updatedUser = await response.json();
@@ -89,6 +101,9 @@ const AccountSettings: React.FC = () => {
 
   return (
     <div className="account-settings-container">
+      <Helmet>
+        <title>Account Settings | AthleteXpert</title>
+      </Helmet>
       <h2>Account Settings</h2>
       {message && <div className="account-settings-message">{message}</div>}
       <form onSubmit={handleSubmit}>
@@ -96,7 +111,11 @@ const AccountSettings: React.FC = () => {
           <label>Profile Picture</label>
           <input type="file" accept="image/*" onChange={handleImageChange} />
           {formData.profilePictureUrl && (
-            <img src={formData.profilePictureUrl} alt="Profile" className="account-settings-avatar" />
+            <img
+              src={formData.profilePictureUrl}
+              alt="Profile"
+              className="account-settings-avatar"
+            />
           )}
         </div>
 

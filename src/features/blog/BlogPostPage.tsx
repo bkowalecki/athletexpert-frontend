@@ -28,7 +28,11 @@ const BlogPostPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate(); // ⭐ Add navigate hook
 
-  const { data: post, isLoading, isError } = useQuery<BlogPost, Error>({
+  const {
+    data: post,
+    isLoading,
+    isError,
+  } = useQuery<BlogPost, Error>({
     queryKey: ["blogPost", slug],
     queryFn: () => fetchBlogPost(slug as string),
     enabled: !!slug,
@@ -44,17 +48,24 @@ const BlogPostPage: React.FC = () => {
   }, [isError, isLoading, post, navigate]);
 
   if (isLoading) {
-    return <div className="loading">Loading...</div>;
+    return (
+      <div
+        className="loading"
+        style={{ textAlign: "center", marginTop: "100px" }}
+      >
+        <h2>Loading blog...</h2>
+      </div>
+    );
   }
-
-  // ❌ Remove the old manual error block
-  // if (isError || !post) { return <div className="error">...</div> }
 
   return (
     <div className="blog-post-page">
       <Helmet>
         <title>{post?.title} - AthleteXpert</title>
-        <meta name="description" content="Read the full article on AthleteXpert." />
+        <meta
+          name="description"
+          content={post?.title || "Read the full article on AthleteXpert."}
+        />
       </Helmet>
 
       <div className="back-link-container">
@@ -65,7 +76,11 @@ const BlogPostPage: React.FC = () => {
 
       {post?.imageUrl && (
         <div className="blog-post-image-container">
-          <img src={post.imageUrl} alt={`Image for ${post.title}`} className="blog-post-image" />
+          <img
+            src={post.imageUrl}
+            alt={`Image for ${post.title}`}
+            className="blog-post-image"
+          />
         </div>
       )}
 
@@ -73,13 +88,18 @@ const BlogPostPage: React.FC = () => {
         <h1 className="blog-post-title">{post?.title}</h1>
         <div className="blog-post-author-and-date">
           <p className="blog-post-meta">By {post?.author}</p>
-          <p>{post?.publishedDate && new Date(post.publishedDate).toLocaleDateString()}</p>
+          <p>
+            {post?.publishedDate &&
+              new Date(post.publishedDate).toLocaleDateString()}
+          </p>
         </div>
       </div>
 
       <div
         className="blog-post-content"
-        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post?.content || "") }}
+        dangerouslySetInnerHTML={{
+          __html: DOMPurify.sanitize(post?.content || ""),
+        }}
       />
     </div>
   );

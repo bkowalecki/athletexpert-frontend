@@ -15,22 +15,32 @@
   position: relative;
 }
 
-.progress-bar-container {
+.progress-container {
+  margin: 20px 0;
+}
+
+.progress-text {
+  text-align: center;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.progress-bar-wrapper {
   width: 100%;
-  max-width: 500px;
-  height: 8px;
-  background-color: rgba(255, 255, 255, 0.2);
-  border-radius: 4px;
-  margin-bottom: 2rem;
+  height: 10px;
+  background-color: #ddd;
+  border-radius: 5px;
   overflow: hidden;
 }
 
-.progress-bar {
+.progress-bar-fill {
   height: 100%;
-  background-color: #ffffff;
-  width: 0%;
-  transition: width 0.4s ease;
+  background-color: #4caf50; /* green fill */
+  width: 0;
+  transition: width 0.4s ease-in-out;
 }
+
+
 
 .onboarding-step {
   background: rgba(255, 255, 255, 0.1);
@@ -40,6 +50,20 @@
   max-width: 500px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
   animation: fadeIn 0.8s ease;
+}
+
+.onboarding-skip-btn {
+  margin-top: 15px;
+  background: none;
+  border: none;
+  color: #888;
+  cursor: pointer;
+  font-size: 14px;
+  text-decoration: underline;
+}
+
+.onboarding-skip-btn:hover {
+  color: #555;
 }
 
 .onboarding-step h2 {
@@ -135,6 +159,8 @@
 .onboarding-btn:hover {
   background: #2980b9;
 }
+
+
 
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(20px); }

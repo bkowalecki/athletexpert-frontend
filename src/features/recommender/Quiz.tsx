@@ -162,6 +162,17 @@ const Quiz: React.FC<QuizProps> = ({ isOpen, closeModal }) => {
       };
     }, [isOpen]);
 
+    useEffect(() => {
+      if (step === 0) {
+        const handleKeyDown = (e: KeyboardEvent) => {
+          if (e.key === "ArrowLeft") handleCarousel("left");
+          if (e.key === "ArrowRight") handleCarousel("right");
+        };
+        window.addEventListener("keydown", handleKeyDown);
+        return () => window.removeEventListener("keydown", handleKeyDown);
+      }
+    }, [step]);
+
 
 
   if (!isOpen){

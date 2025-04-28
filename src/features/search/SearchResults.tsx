@@ -75,6 +75,9 @@ const SearchResults: React.FC = () => {
       <h2 className="search-results-page-title">
         Results for: "{searchQuery}"
       </h2>
+      <p className="search-results-count">
+        Found {products.length + blogs.length + matchingSports.length} results
+      </p>
 
       {loading && <p className="search-results-page-loading">Loading...</p>}
       {error && <p className="search-results-page-error">{error}</p>}
@@ -101,9 +104,11 @@ const SearchResults: React.FC = () => {
             <ul className="search-results-page-list">
               {matchingSports.map((sport, index) => (
                 <li
-                  key={sport.title + index}
+                  key={sport.title}
                   className="search-results-page-item"
-                  onClick={() => navigate(`/community/${sport.title.toLowerCase()}`)}
+                  onClick={() =>
+                    navigate(`/community/${sport.title.toLowerCase()}`)
+                  }
                 >
                   <img
                     src={sport.backgroundImage}
@@ -124,7 +129,16 @@ const SearchResults: React.FC = () => {
             <h3 className="search-results-page-section-title">Products</h3>
             <ul className="search-results-page-list">
               {products.map((product) => (
-                <li key={product.id} className="search-results-page-item">
+                <li
+                  key={product.id}
+                  className="search-results-page-item"
+                  role="link"
+                  tabIndex={0}
+                  onClick={() => navigate(`/product/${product.id}`)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") navigate(`/product/${product.id}`);
+                  }}
+                >
                   <img
                     src={product.imgUrl}
                     alt={product.name}

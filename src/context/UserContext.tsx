@@ -1,4 +1,11 @@
-import React, { createContext, useState, useEffect, ReactNode, useContext, useCallback } from "react";
+import React, {
+  createContext,
+  useState,
+  useEffect,
+  ReactNode,
+  useContext,
+  useCallback,
+} from "react";
 
 export type User = {
   username: string;
@@ -8,7 +15,7 @@ export type User = {
   profilePictureUrl?: string;
   bio?: string | null;
   sports?: string[] | null;
-  authProvider?: 'local' | 'auth0';
+  authProvider?: "local" | "auth0";
 };
 
 interface UserContextProps {
@@ -20,27 +27,28 @@ interface UserContextProps {
 
 const UserContext = createContext<UserContextProps | undefined>(undefined);
 
-export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const UserProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
   const [user, setUser] = useState<User | null>(null);
   const [isSessionChecked, setIsSessionChecked] = useState(false);
 
   const checkSession = useCallback(async () => {
     try {
-      console.log("🔍 Checking session...");
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/users/session`, {
-        credentials: "include",
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/users/session`,
+        {
+          credentials: "include",
+        }
+      );
 
       if (response.ok) {
         const userData = await response.json();
-        setUser({ ...userData, authProvider: 'auth0' });
-        console.log("✅ Session valid:", userData);
+        setUser({ ...userData });
       } else {
-        console.warn("⚠️ No active session detected. Clearing user.");
         setUser(null);
       }
     } catch (error) {
-      console.error("❌ Error checking session:", error);
       setUser(null);
     } finally {
       setIsSessionChecked(true);
@@ -52,7 +60,9 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }, [checkSession]);
 
   return (
-    <UserContext.Provider value={{ user, setUser, isSessionChecked, checkSession }}>
+    <UserContext.Provider
+      value={{ user, setUser, isSessionChecked, checkSession }}
+    >
       {children}
     </UserContext.Provider>
   );

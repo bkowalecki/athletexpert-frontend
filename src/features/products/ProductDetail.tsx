@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Helmet } from "react-helmet";
 import { useParams, useNavigate } from "react-router-dom";
 import "../../styles/ProductDetail.css";
 
@@ -24,9 +25,12 @@ const ProductDetail: React.FC = () => {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/products/${id}`, {
-          credentials: "include",
-        });
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/products/${id}`,
+          {
+            credentials: "include",
+          }
+        );
 
         if (!response.ok) {
           console.warn(`⚠️ Product ID "${id}" not found. Redirecting to /404.`);
@@ -57,23 +61,34 @@ const ProductDetail: React.FC = () => {
   }, [id, navigate]);
 
   if (loading) return <div className="product-detail-loading">Loading...</div>;
-  if (!product) return <div className="product-detail-error">Product not found.</div>;
+  if (!product)
+    return <div className="product-detail-error">Product not found.</div>;
 
   return (
     <div className="product-detail-container">
+      <Helmet>
+        <title>{product?.name} | AthleteXpert</title>
+        <meta name="description" content={product?.description} />
+      </Helmet>
       <div className="product-detail-main">
         <div className="product-detail-images">
-          {product.images.map((image, index) => (
-            <div key={index} className="product-detail-image-wrapper">
-              <img src={image} alt={`${product.name} Image ${index + 1}`} />
-            </div>
-          ))}
+          {product.images?.length ? (
+            product.images.map((image, index) => (
+              <div key={index} className="product-detail-image-wrapper">
+                <img src={image} alt={`${product.name} Image ${index + 1}`} />
+              </div>
+            ))
+          ) : (
+            <p>No images available.</p>
+          )}
         </div>
         <div className="product-detail-info">
           <h1 className="product-detail-name">{product.name}</h1>
           <p className="product-detail-description">{product.description}</p>
           <p className="product-detail-price">${product.price.toFixed(2)}</p>
-          <button className="product-detail-add-to-cart-button">Add to Cart</button>
+          <button className="product-detail-add-to-cart-button">
+            Add to Cart
+          </button>
         </div>
       </div>
 
@@ -83,7 +98,9 @@ const ProductDetail: React.FC = () => {
           product.reviews.map((review, index) => (
             <div key={index} className="product-detail-review-item">
               <div className="product-detail-review-header">
-                <span className="product-detail-reviewer-name">{review.reviewer}</span>
+                <span className="product-detail-reviewer-name">
+                  {review.reviewer}
+                </span>
                 <span className="product-detail-review-rating">
                   {"★".repeat(review.rating)}
                   {"☆".repeat(5 - review.rating)}

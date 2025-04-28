@@ -1,10 +1,12 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import "../styles/four0fourPage.css";
 import { Helmet } from "react-helmet";
 
 const NotFoundPage: React.FC = () => {
+  const navigate = useNavigate();
+
   return (
     <motion.div
       className="not-found-container"
@@ -24,9 +26,9 @@ const NotFoundPage: React.FC = () => {
       <p className="not-found-message">
         Oops! It looks like you've dribbled out of bounds.
       </p>
-      <Link to="/" className="home-link">
-        <button className="go-home-button">Go Back Home</button>
-      </Link>
+      <button className="go-home-button" onClick={() => navigate("/")}>
+        Go Back Home
+      </button>
     </motion.div>
   );
 };

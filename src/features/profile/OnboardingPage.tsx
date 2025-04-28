@@ -1,13 +1,39 @@
-import React, { useState, ChangeEvent } from "react";
+import ReactCanvasConfetti from "react-canvas-confetti";
+import { useRef } from "react";
+import React, { useState, ChangeEvent, useEffect } from "react";
 import axios from "axios";
+import { Helmet } from "react-helmet";
+
+import { toast } from "react-toastify"; // 👈 Add this at top if you want a nice popup
 import { useNavigate } from "react-router-dom";
 import "../../styles/OnboardingPage.css";
+import { useUserContext } from "../../context/UserContext";
 
 const sportsOptions = [
-  "Running", "Basketball", "Soccer", "Swimming", "Cycling", "Tennis", "Yoga", "Weightlifting", "Climbing", "Hiking"
+  "Running",
+  "Basketball",
+  "Soccer",
+  "Swimming",
+  "Cycling",
+  "Tennis",
+  "Yoga",
+  "Weightlifting",
+  "Climbing",
+  "Hiking",
 ];
 
-const favoriteColors = ["Red", "Blue", "Green", "Orange", "Purple", "Black", "White", "Pink", "Yellow", "Teal"];
+const favoriteColors = [
+  "Red",
+  "Blue",
+  "Green",
+  "Orange",
+  "Purple",
+  "Black",
+  "White",
+  "Pink",
+  "Yellow",
+  "Teal",
+];
 
 type FormDataType = {
   firstName: string;
@@ -25,10 +51,45 @@ const OnboardingPage = () => {
     lastName: "",
     favoriteColor: "",
     sports: [],
-    bio: ""
+    bio: "",
   });
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const confettiRef = useRef<any>(null);
+
+  const getInstance = (instance: any) => {
+    confettiRef.current = instance;
+  };
+
+  const fireConfetti = () => {
+    if (confettiRef.current) {
+      confettiRef.current.confetti({
+        particleCount: 150,
+        spread: 90,
+        startVelocity: 45,
+        gravity: 0.9,
+        ticks: 200,
+        scalar: 1.2,
+        origin: { y: 0.6 },
+        shapes: ["circle"], // ✅ Force simple circle shapes
+      });
+    }
+  };
+
+  const totalSteps = 4;
+  const progressPercentage = Math.round((step / totalSteps) * 100);
+
+  const { user, isSessionChecked } = useUserContext();
+
+  useEffect(() => {
+    if (isSessionChecked && (!user || !user.username)) {
+      toast.error("Session error. Please log in again.");
+      navigate("/auth", { replace: true });
+    }
+  }, [user, isSessionChecked, navigate]);
+
+  const handleChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
@@ -44,28 +105,38 @@ const OnboardingPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-  
+
     if (!formData.firstName.trim() || !formData.lastName.trim()) {
       alert("⚠️ Please enter both your first name and last name.");
       return;
     }
-  
+
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/users/account-setup`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          bio: formData.bio,
-          sports: formData.sports,
-        }),
-      });
-  
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/users/account-setup`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+            favoriteColor: formData.favoriteColor,
+            bio: formData.bio,
+            sports: formData.sports,
+          }),
+        }
+      );
+
       if (response.ok) {
         console.log("✅ Account setup complete!");
-        navigate("/profile");
+        setTimeout(() => {
+          fireConfetti(); // 🎉 Slight delay ensures canvas and confetti instance are ready
+          toast.success(`🎉 Welcome to AthleteXpert, ${formData.firstName}!`, {
+            position: "top-center",
+          });
+          navigate("/profile");
+        }, 300); // 300ms is plenty
       } else {
         console.error("❌ Failed to submit onboarding form");
       }
@@ -73,8 +144,6 @@ const OnboardingPage = () => {
       console.error("❌ Error submitting onboarding:", error);
     }
   };
-  
-  
 
   const renderStep = () => {
     switch (step) {
@@ -98,7 +167,22 @@ const OnboardingPage = () => {
               onChange={handleChange}
               required
             />
-            <button className="onboarding-btn" onClick={() => setStep(2)}>Next ➔</button>
+            <button className="onboarding-btn" onClick={() => setStep(2)}>
+              Next ➔
+            </button>
+            <button
+              className="onboarding-skip-btn"
+              onClick={() => navigate("/profile")}
+              style={{
+                marginTop: "15px",
+                background: "transparent",
+                color: "#555",
+                border: "none",
+                cursor: "pointer",
+              }}
+            >
+              Skip and finish later
+            </button>
           </div>
         );
 
@@ -110,15 +194,23 @@ const OnboardingPage = () => {
               {favoriteColors.map((color) => (
                 <div
                   key={color}
-                  className={`color-option ${formData.favoriteColor === color ? "selected" : ""}`}
+                  className={`color-option ${
+                    formData.favoriteColor === color ? "selected" : ""
+                  }`}
                   style={{ backgroundColor: color.toLowerCase() }}
-                  onClick={() => setFormData({ ...formData, favoriteColor: color })}
+                  onClick={() =>
+                    setFormData({ ...formData, favoriteColor: color })
+                  }
                 ></div>
               ))}
             </div>
             <div className="button-group">
-              <button className="onboarding-btn" onClick={() => setStep(1)}>← Back</button>
-              <button className="onboarding-btn" onClick={() => setStep(3)}>Next ➔</button>
+              <button className="onboarding-btn" onClick={() => setStep(1)}>
+                ← Back
+              </button>
+              <button className="onboarding-btn" onClick={() => setStep(3)}>
+                Next ➔
+              </button>
             </div>
           </div>
         );
@@ -131,7 +223,9 @@ const OnboardingPage = () => {
               {sportsOptions.map((sport) => (
                 <div
                   key={sport}
-                  className={`sport-option ${formData.sports.includes(sport) ? "selected" : ""}`}
+                  className={`sport-option ${
+                    formData.sports.includes(sport) ? "selected" : ""
+                  }`}
                   onClick={() => toggleSport(sport)}
                 >
                   {sport}
@@ -139,8 +233,12 @@ const OnboardingPage = () => {
               ))}
             </div>
             <div className="button-group">
-              <button className="onboarding-btn" onClick={() => setStep(2)}>← Back</button>
-              <button className="onboarding-btn" onClick={() => setStep(4)}>Next ➔</button>
+              <button className="onboarding-btn" onClick={() => setStep(2)}>
+                ← Back
+              </button>
+              <button className="onboarding-btn" onClick={() => setStep(4)}>
+                Next ➔
+              </button>
             </div>
           </div>
         );
@@ -156,8 +254,12 @@ const OnboardingPage = () => {
               onChange={handleChange}
             ></textarea>
             <div className="button-group">
-              <button className="onboarding-btn" onClick={() => setStep(3)}>← Back</button>
-              <button className="onboarding-btn" onClick={handleSubmit}>Finish ✅</button>
+              <button className="onboarding-btn" onClick={() => setStep(3)}>
+                ← Back
+              </button>
+              <button className="onboarding-btn" onClick={handleSubmit}>
+                Finish ✅
+              </button>
             </div>
           </div>
         );
@@ -169,7 +271,37 @@ const OnboardingPage = () => {
 
   return (
     <div className="onboarding-container">
+      <Helmet>
+        <title>Welcome | AthleteXpert</title>
+        <meta
+          name="description"
+          content="Set up your AthleteXpert profile and start your athletic journey!"
+        />
+      </Helmet>
+
+      <div className="progress-container">
+        <div className="progress-text">
+          Step {step} of {totalSteps}
+        </div>
+        <div className="progress-bar-wrapper">
+          <div
+            className="progress-bar-fill"
+            style={{ width: `${progressPercentage}%` }}
+          ></div>
+        </div>
+      </div>
       {renderStep()}
+      <ReactCanvasConfetti
+        onInit={getInstance}
+        style={{
+          position: "fixed",
+          pointerEvents: "none",
+          width: "100%",
+          height: "100%",
+          top: 0,
+          left: 0,
+        }}
+      />
     </div>
   );
 };

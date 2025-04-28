@@ -54,7 +54,8 @@ const TrendingProductList: React.FC = () => {
   }
 
   // Get the current product safely.
-  const currentProduct = products[currentIndex];
+  const currentProduct = products[currentIndex] || products[0];
+
 
   return (
     <section className="trending-products-section">

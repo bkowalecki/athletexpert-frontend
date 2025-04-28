@@ -56,7 +56,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ openQuiz }) => {
   }, []);
 
   return (
-    <div className="hero-section">
+    <div className="hero-section" role="banner">
       <video
         ref={videoRef}
         autoPlay

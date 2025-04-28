@@ -1,10 +1,7 @@
-
-
-
-
 /* Latest Blog Section Container */
 .latest-blog-section-container {
   background-color: #a23c20;
+  /* color: #f9f9f9; */
   text-align: center;
   /* margin-bottom: 3rem; */
 }
@@ -17,10 +14,10 @@
 /* Latest Blog Heading */
 .latest-blog-heading {
   font-size: clamp(2.4rem, 4vw, 3.5rem);
-  color: #fff;
+  color: #f9f9f9;
   text-transform: uppercase;
   font-weight: 900;
-  font-family: 'Oswald', sans-serif;
+  font-family: "Oswald", sans-serif;
   letter-spacing: 3px;
   margin-bottom: 3rem;
   margin-top: 3rem;
@@ -34,8 +31,6 @@
   margin: 0 2rem;
   margin-bottom: 3rem;
 }
-
-
 
 /* Blog Card (common styles) */
 .latest-blog-card {
@@ -90,7 +85,7 @@
   color: #bbb;
   margin-bottom: 1.5rem;
   display: -webkit-box;
-  -webkit-line-clamp: 3;      /* Limit to 3 lines */
+  -webkit-line-clamp: 3; /* Limit to 3 lines */
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -101,7 +96,7 @@
 }
 
 .latest-blog-cta-button {
-  background-color: #A23C20;
+  background-color: #a23c20;
   color: white;
   padding: 0.8rem 2rem;
   border-radius: 5px;

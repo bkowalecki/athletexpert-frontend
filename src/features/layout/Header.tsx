@@ -90,6 +90,9 @@ const Header: React.FC = () => {
       <div
         className={`hamburger-menu ${isMobileMenuOpen ? "open" : ""}`}
         onClick={toggleMobileMenu}
+        role="button"
+        aria-label="Toggle navigation menu"
+        aria-expanded={isMobileMenuOpen}
       >
         <div className={`bar ${isMobileMenuOpen ? "open" : ""}`}></div>
         <div className={`bar ${isMobileMenuOpen ? "open" : ""}`}></div>

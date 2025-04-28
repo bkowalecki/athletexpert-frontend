@@ -16,6 +16,8 @@ interface Sport {
 }
 
 const SportPage: React.FC = () => {
+  const slugify = (str: string) =>
+    str.toLowerCase().replace(/\s+/g, '-').replace(/[^\w\-]+/g, '');
   const { sport } = useParams<{ sport: string }>();
   const navigate = useNavigate();
   const [currentSport, setCurrentSport] = useState<Sport | null>(null);
@@ -27,7 +29,7 @@ const SportPage: React.FC = () => {
     }
 
     const foundSport = sportsData.find(
-      (s) => s.title.toLowerCase() === sport.toLowerCase()
+      (s) => slugify(s.title) === sport?.toLowerCase()
     );
 
     if (!foundSport) {
