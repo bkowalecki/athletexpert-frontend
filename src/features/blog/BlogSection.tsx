@@ -18,7 +18,7 @@ interface BlogPost {
 // API call to fetch the latest blogs (limit=3)
 const fetchLatestBlogs = async (): Promise<BlogPost[]> => {
   const response = await axios.get(
-    `${process.env.REACT_APP_API_URL}/blogs/latest?limit=3`
+    `${process.env.REACT_APP_API_URL}/blog/latest?limit=3`
   );
   // Ensure only 3 posts are returned even if more are provided.
   return response.data.slice(0, 3);
