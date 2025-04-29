@@ -65,7 +65,7 @@ The frontend interacts with the backend using REST API endpoints:
 - `GET /products/search?query=xyz` → Search for products
 
 ### **Blogs**
-- `GET /blogs/latest` → Fetch latest blog posts
+- `GET /blog/latest` → Fetch latest blog posts
 
 ### **User Authentication**
 - `POST /users/login` → Log in with email/password

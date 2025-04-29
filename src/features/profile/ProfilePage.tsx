@@ -91,7 +91,7 @@ const ProfilePage: React.FC = () => {
   const fetchSavedBlogs = async (blogIds: number[]) => {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/blogs/bulk-fetch`,
+        `${process.env.REACT_APP_API_URL}/blog/bulk-fetch`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

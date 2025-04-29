@@ -53,7 +53,7 @@ const SearchResults: React.FC = () => {
             params: { query: searchQuery },
             withCredentials: true,
           }),
-          axios.get(`${process.env.REACT_APP_API_URL}/blogs/search`, {
+          axios.get(`${process.env.REACT_APP_API_URL}/blog/search`, {
             params: { query: searchQuery },
             withCredentials: true,
           }),

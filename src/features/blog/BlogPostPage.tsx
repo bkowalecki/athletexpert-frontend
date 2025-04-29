@@ -19,7 +19,7 @@ interface BlogPost {
 // Function to fetch a blog post by its slug
 const fetchBlogPost = async (slug: string): Promise<BlogPost> => {
   const response = await axios.get(
-    `${process.env.REACT_APP_API_URL}/blogs/slug/${slug}`
+    `${process.env.REACT_APP_API_URL}/blog/slug/${slug}`
   );
   return response.data;
 };

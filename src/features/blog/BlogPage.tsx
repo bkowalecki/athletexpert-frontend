@@ -34,7 +34,7 @@ const fetchPosts = async (
   searchQuery: string,
   page: number
 ): Promise<BlogPost[]> => {
-  const response = await axios.get(`${process.env.REACT_APP_API_URL}/blogs`, {
+  const response = await axios.get(`${process.env.REACT_APP_API_URL}/blog`, {
     params: { searchQuery, page, size: 9 },
   });
   return response.data.content;
