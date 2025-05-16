@@ -71,6 +71,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ openQuiz }) => {
         <source src="/video/hero-video.mp4" type="video/mp4" />
         Your browser does not support the video tag.
       </video>
+      <div className="video-overlay"></div>
 
       <div className="hero-content">
         <h1>Where Athletes Find Their Edge.</h1>

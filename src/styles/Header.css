@@ -6,17 +6,18 @@
   justify-content: space-between;
   align-items: center;
   height: 4.5rem;
-  padding: 15px 30px;
+  padding: var(--space-sm) var(--space-lg);
   background-color: rgba(0, 0, 0, 0.9);
   position: fixed;
   width: 100%;
   top: 0;
   z-index: 1000;
   box-sizing: border-box;
-  transition: background-color 0.3s ease;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: background-color var(--transition-fast);
+  box-shadow: var(--shadow-md);
 }
 
+/* Logo */
 .logo {
   flex: 1;
   display: flex;
@@ -24,62 +25,80 @@
 }
 
 .logo h1 {
-  font-size: 28px;
-  color: white;
+  font-family: var(--font-heading);
+  font-size: 1.75rem;
+  font-weight: 600;
   letter-spacing: 1.2px;
+  color: var(--color-light-gray);
+  transition: transform 0.2s ease;
+}
+
+.logo h1:hover {
+  transform: scale(1.05);
 }
 
 a:-webkit-any-link {
   text-decoration: none;
 }
 
-/* Container for the search bar in the header */
-.search-bar-container {
-  flex: 2;
-  display: flex;
-  justify-content: center;
-}
-
-/* Desktop search wrapper */
+/* Search Bar Containers */
+.search-bar-container,
 .desktop-search {
   flex: 2;
   display: flex;
   justify-content: center;
 }
 
-/* Mobile search wrapper (inside the mobile menu) */
 .mobile-search {
-  margin: 15px auto 0;
+  margin: var(--space-sm) auto 0;
   width: 95vw;
-  /* margin-bottom: 15px; */
 }
 
-/* Nav links styling */
+/* Navigation Links */
 .nav-links {
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  gap: 20px;
+  gap: var(--space-md);
   flex-grow: 1;
-  max-width: 100%;
   flex: 1;
+  max-width: 100%;
 }
 
 .nav-links a {
-  color: white;
-  text-decoration: none;
-  font-size: 18px;
-  padding: 10px 20px;
-  border-radius: 30px;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  font-family: var(--font-body); /* Poppins or Inter */
+  font-size: 1.2rem;
+  font-weight: 500;
+  letter-spacing: 0.4px;
+  padding: var(--space-xs) var(--space-md);
+  color: var(--color-white);
+  position: relative;
+  border-radius: var(--radius-sm);
+  transition: color var(--transition-fast), background var(--transition-fast);
+  text-transform: none; /* ✅ no more forced uppercase */
+}
+
+.nav-links a::after {
+  content: "";
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  height: 2px;
+  width: 0;
+  background-color: var(--color-accent);
+  transition: width 0.3s ease;
 }
 
 .nav-links a:hover {
-  background-color: rgba(255, 255, 255, 0.2);
-  color: #C1440E;
+  color: var(--color-accent);
 }
 
-/* Hamburger menu styling */
+.nav-links a:hover::after {
+  width: 100%;
+}
+
+
+/* Hamburger Menu */
 .hamburger-menu {
   display: none;
   flex-direction: column;
@@ -89,9 +108,10 @@ a:-webkit-any-link {
 .hamburger-menu .bar {
   width: 40px;
   height: 3px;
-  background-color: white;
-  margin: 2px;
-  transition: all 0.3s ease;
+  background-color: var(--color-white);
+  margin: 2px 0;
+  border-radius: 2px;
+  transition: transform var(--transition-fast), opacity var(--transition-fast);
 }
 
 .hamburger-menu .bar.open:nth-child(1) {
@@ -106,31 +126,31 @@ a:-webkit-any-link {
   transform: rotate(-45deg) translate(6px, -6px);
 }
 
-/* Mobile menu styles */
+/* Responsive Mobile Menu */
 @media (max-width: 875px) {
   .nav-links {
     display: none;
     position: absolute;
-    top: 60px;
+    top: 4.5rem;
     right: 0;
-    background-color: rgba(0, 0, 0, 0.9);
+    background-color: rgba(0, 0, 0, 0.95);
     flex-direction: column;
     width: 100%;
-    padding: 10px 20px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-    border-radius: 8px;
+    padding: var(--space-sm) var(--space-md);
+    box-shadow: var(--shadow-lg);
+    border-radius: var(--radius-sm);
     z-index: 1001;
   }
 
   .nav-links a {
-    font-size: 20px;
+    font-size: 1.2rem;
+    width: 100%;
+    text-align: right;
   }
 
   .nav-links.mobile-menu-open {
     display: flex;
     animation: slideIn 0.3s ease-out forwards;
-    padding: 10px 0;
-    align-items: end;
   }
 
   @keyframes slideIn {
@@ -147,25 +167,19 @@ a:-webkit-any-link {
   }
 
   .app-header {
-    padding: 10px 20px;
+    padding: var(--space-xs) var(--space-sm);
   }
 
   .logo h1 {
-    font-size: 24px;
+    font-size: 1.5rem;
   }
 
-  /* Hide the desktop search on mobile */
   .desktop-search {
     display: none;
   }
 }
 
-/* Ensure no horizontal scrolling */
-body, html {
-  overflow-x: hidden;
-}
-
-/* Hide the mobile search on desktop */
+/* Hide mobile search on desktop */
 @media (min-width: 876px) {
   .mobile-search {
     display: none;

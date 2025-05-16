@@ -1,0 +1,35 @@
+:root {
+    /* 🎨 Brand Colors */
+    --color-bg-primary: #000000;
+    --color-bg-secondary: #1c1c1c;
+    --color-accent: #A23C20;
+    --color-accent-light: #FF8C00;
+    --color-accent-alt: #2A6045;
+    --color-white: #ffffff;
+    --color-gray: #ccc;
+    --color-light-gray: #eee;
+  
+    /* 🔤 Typography */
+    --font-heading: 'Poppins', sans-serif;
+    --font-body: 'Inter', sans-serif; /* Or 'Montserrat', depending on your vibe */
+  
+    /* 📐 Spacing */
+    --space-xs: 4px;
+    --space-sm: 8px;
+    --space-md: 16px;
+    --space-lg: 32px;
+    --space-xl: 64px;
+  
+    /* 📏 Radius & Elevation */
+    --radius-sm: 6px;
+    --radius-md: 12px;
+    --radius-lg: 20px;
+  
+    --shadow-sm: 0 2px 5px rgba(0, 0, 0, 0.2);
+    --shadow-md: 0 5px 15px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 8px 20px rgba(0, 0, 0, 0.6);
+  
+    /* 🚀 Motion */
+    --transition-fast: 0.2s ease;
+    --transition-medium: 0.4s ease;
+  }

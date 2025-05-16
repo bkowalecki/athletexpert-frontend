@@ -1,15 +1,12 @@
-/* FEATURED SECTION WITH BUBBLE BACKGROUND */
 .featured-products-section {
   position: relative;
   overflow: hidden;
   width: 100%;
   color: #fff;
-  /* Create a gradient background similar to your about page hero */
   background: linear-gradient(135deg, #A23C20, #d45330);
-  /* padding: 3rem 1rem; */
 }
 
-/* Bubbles (pseudo-elements) */
+/* Bubble effects */
 .featured-products-section::before,
 .featured-products-section::after {
   content: "";
@@ -34,17 +31,13 @@
   background-color: rgba(255, 255, 255, 0.1);
 }
 
-/* Container above the bubbles */
 .featured-products-container {
   position: relative;
-  z-index: 1; /* Ensures this content is above the pseudo-elements */
-  margin-bottom: 5rem;
+  z-index: 1;
+  margin: 0 auto 5rem;
   max-width: 1200px;
-  margin-left: auto;
-  margin-right: auto;
 }
 
-/* Section Heading */
 .featured-products-heading {
   font-size: clamp(2.4rem, 4vw, 3.5rem);
   text-align: center;
@@ -56,7 +49,7 @@
   margin: 3rem 0;
 }
 
-/* Desktop Grid View */
+/* Grid for desktop */
 .desktop-view {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(275px, 1fr));
@@ -115,7 +108,6 @@
   color: #fff;
 }
 
-/* CTA Button */
 .featured-product-cta-button {
   font-size: 1.2rem;
   display: inline-block;
@@ -134,7 +126,7 @@
   background: #e68a00;
 }
 
-/* MOBILE CAROUSEL */
+/* Mobile carousel mode */
 .mobile-view {
   display: none;
 }
@@ -143,6 +135,7 @@
   .desktop-view {
     display: none;
   }
+
   .mobile-view {
     display: block;
     position: relative;
@@ -159,25 +152,30 @@
     height: 200px;
     width: 200px;
   }
+
   .featured-products-section::after {
     bottom: -80px;
     left: -80px;
     height: 200px;
     width: 200px;
   }
+
   .featured-carousel {
     display: flex;
   }
+
   .featured-carousel-item {
     min-width: 100%;
     padding: 0 1rem;
     box-sizing: border-box;
   }
+
   .carousel-dots {
     display: flex;
     justify-content: center;
     margin-top: 1rem;
   }
+
   .carousel-dots .dot {
     width: 10px;
     height: 10px;
@@ -187,9 +185,15 @@
     cursor: pointer;
     transition: background 0.3s;
   }
+
   .carousel-dots .dot.active {
     background: #ff9900;
   }
+
+  .carousel-dots .dot:focus-visible {
+    outline: 2px solid white;
+  }
+
   .featured-carousel-button {
     background: rgba(0, 0, 0, 0.3);
     border: none;
@@ -204,15 +208,19 @@
     z-index: 2;
     transition: background 0.3s;
   }
+
   .featured-carousel-button.left {
     left: 10px;
   }
+
   .featured-carousel-button.right {
     right: 10px;
   }
+
   .featured-carousel-button:hover {
     background: #ff9900;
   }
+
   .featured-carousel-button svg {
     width: 24px;
     height: 24px;

@@ -1,57 +1,43 @@
-
-html{
-  overflow-y: scroll;
-}
-
-/* === Global Styles === */
-body {
-  margin: 0;
-  padding: 0;
-  font-family: 'Poppins', sans-serif; /* Use a sports-inspired font */
-  background-color: #000;
-  /* height: 100%; */
-  overflow-x: hidden; /* Prevents horizontal scroll without affecting vertical scroll */
-}
-
-/* App Container */
-.App {
-  display: flex;
-  flex-direction: column;
+.app {
   min-height: 100vh;
-  background-color: #000;
-  overflow-x: hidden; /* Keeps layout clean horizontally */
-}
-
-/* Main Content Area */
-main {
-  flex: 1;
   display: flex;
   flex-direction: column;
-  width: 100%; /* Use 100% instead of 100vw for better responsiveness */
-  background-color: #000;
-  /* padding: 1rem; Adds breathing room */
-  box-sizing: border-box; /* Ensures padding doesn’t overflow */
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  overflow-x: hidden; /* ✅ Enforce horizontal overflow clamp */
 }
 
-/* Footer */
-footer {
-  padding: 20px;
-  background-color: #333;
-  color: #fff;
-  text-align: center;
-  width: 100%;
+.page-content {
+  flex: 1;
+  padding-top: 4.5rem;
+  overflow-x: hidden; /* ✅ Apply here too, in case children push out */
 }
 
-/* Optional: Subtle Custom Scrollbar for Better UX */
-::-webkit-scrollbar {
-  width: 8px; /* Show scrollbar but make it minimal */
+/* Spinner utility (could move this to utilities later) */
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 4px solid rgba(255, 255, 255, 0.2);
+  border-top-color: var(--color-accent);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto;
 }
 
-::-webkit-scrollbar-thumb {
-  background: #555;
-  border-radius: 4px;
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #777;
+/* General fade-in transition */
+.fade-in {
+  opacity: 0;
+  animation: fadeIn 0.6s ease forwards;
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
 }

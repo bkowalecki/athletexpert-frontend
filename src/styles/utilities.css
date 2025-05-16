@@ -1,0 +1,45 @@
+/* Buttons */
+.btn {
+    display: inline-block;
+    font-weight: bold;
+    padding: var(--space-sm) var(--space-lg);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: background var(--transition-fast), transform var(--transition-fast);
+  }
+  
+  .btn-primary {
+    background: var(--color-accent);
+    color: var(--color-white);
+    border: none;
+  }
+  
+  .btn-primary:hover {
+    background: #872d1a;
+    transform: scale(1.05);
+  }
+  
+  .btn-secondary {
+    background: var(--color-white);
+    color: var(--color-accent);
+    border: 2px solid var(--color-accent);
+  }
+  
+  .btn-secondary:hover {
+    background: var(--color-accent);
+    color: var(--color-white);
+  }
+  
+  /* Cards */
+  .card {
+    background: var(--color-bg-secondary);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    transition: transform var(--transition-medium), box-shadow var(--transition-medium);
+  }
+  
+  .card:hover {
+    transform: scale(1.03);
+    box-shadow: var(--shadow-lg);
+  }
+  
