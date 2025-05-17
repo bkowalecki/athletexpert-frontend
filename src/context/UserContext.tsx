@@ -16,6 +16,7 @@ export type User = {
   bio?: string | null;
   sports?: string[] | null;
   authProvider?: "local" | "auth0";
+  role: string; // "admin", "user", etc.
 };
 
 interface UserContextProps {

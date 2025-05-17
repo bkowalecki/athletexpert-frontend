@@ -29,6 +29,7 @@ import { UserProvider, useUserContext } from "./context/UserContext";
 import { Auth0Provider } from "@auth0/auth0-react";
 import { Navigate } from "react-router-dom";
 import { SportsProvider } from "./context/SportsContext";
+import NewBlogPost from "./features/blog/NewBlogPost"; // ✅ Import NewBlogPost
 import ScrollToTop from "./util/ScrollToTop";
 import RequireAuth from "./features/auth/RequireAuth"; // ✅ Import RequireAuth
 import ErrorBoundary from "./components/common/ErrorBoundary"; // ⭐ Add this import
@@ -142,6 +143,7 @@ const AppContent: React.FC = () => {
                     </PageWrapper>
                   }
                 />
+                <Route path="/admin/new-blog" element={<NewBlogPost />} />
                 <Route
                   path="/products"
                   element={
