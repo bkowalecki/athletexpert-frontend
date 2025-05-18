@@ -1,0 +1,79 @@
+.product-card {
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    min-height: 420px; /* adjustable */
+  }
+  
+  .product-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(162, 60, 32, 0.2); /* Branded glow */
+  }
+  
+  /* image section */
+  .product-image-wrapper {
+    /* aspect-ratio: 4 / 5; */
+    height: 375px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* margin-bottom: 1rem; */
+  }
+  
+  /* slightly tighter spacing */
+  .product-image {
+    max-width: 85%;
+    max-height: 85%;
+    object-fit: contain;
+  }
+  
+  /* text */
+  .product-details {
+    text-align: center;
+    flex-grow: 1;
+  }
+  
+  .product-name {
+    font-size: 2.2rem;
+    font-weight: 600;
+    color: #111;
+    margin-bottom: 0.4rem;
+  }
+  
+  .product-brand {
+    font-size: 0.85rem;
+    color: #666;
+    text-transform: uppercase;
+    margin-bottom: 0.4rem;
+  }
+  
+  .product-price {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #A23C20; /* match your brand */
+    margin-bottom: 0.8rem;
+  }
+  
+  /* CTA Button */
+  .product-button {
+    margin: 0 auto 0.75rem auto;
+    width: 90%;
+    padding: 0.65rem;
+    text-align: center;
+    background: #ff9900;
+    color: #111;
+    font-weight: 600;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: background 0.3s ease, transform 0.2s ease;
+  }
+  
+  .product-button:hover {
+    background: #e68a00;
+    transform: scale(1.02);
+  }
+  

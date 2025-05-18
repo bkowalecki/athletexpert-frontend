@@ -7,6 +7,7 @@
       "category": "Racquet Sport",
       "type": "Indoor/Outdoor",
       "popularity": "Moderate",
+      "fun_fact": "The fastest recorded badminton smash was 493 km/h (306 mph) by Lee Chong Wei in 2009, making it one of the fastest racquet sports in the world.",
       "summary": "Badminton is a fast-paced racquet sport that requires agility, precision, and strategic thinking. Played either in singles or doubles, the game involves hitting a shuttlecock over a net using lightweight racquets, with the goal of landing it in the opponent's court while preventing a return. Unlike other racquet sports, badminton is unique in its reliance on a shuttlecock, which is aerodynamically designed to slow down mid-air, leading to rapid exchanges and quick reflex-based rallies. It is popular worldwide, particularly in Asia and Europe, and is an Olympic sport known for its intense speed and endurance demands. Whether played recreationally or professionally, badminton offers an excellent cardiovascular workout while enhancing hand-eye coordination and reaction time."
     }
   },
@@ -18,6 +19,7 @@
       "category": "Team Sport",
       "type": "Outdoor",
       "popularity": "High",
+      "fun_fact": "Baseball is often referred to as \"America's pastime,\" but it has a rich history in countries like Japan, Cuba, and the Dominican Republic, where it is also immensely popular.",
       "summary": "Baseball is a bat-and-ball sport that combines strategy, skill, and teamwork. Played between two teams of nine players, the game consists of innings where one team bats while the other fields, aiming to score runs by hitting the ball and running around four bases. Pitchers use a variety of throws to outsmart batters, while fielders work to catch, throw, and tag out runners. Known as \"America’s pastime,\" baseball has a deep-rooted history in the United States but is also widely popular in countries like Japan, the Dominican Republic, and South Korea. With its mix of power, precision, and endurance, baseball requires both individual excellence and seamless coordination, making it an exciting sport for players and fans alike."
     }
   },
@@ -29,6 +31,7 @@
       "category": "Team Sport",
       "type": "Indoor/Outdoor",
       "popularity": "Very High",
+      "fun_fact": "The first basketball game was played in 1891 with a soccer ball and two peach baskets as goals, leading to the sport's evolution into the fast-paced game we know today.",
       "summary": "Basketball is a dynamic, high-intensity sport that combines speed, skill, and teamwork. Played between two teams of five players, the objective is to score points by shooting the ball into the opponent's hoop while defending your own. With constant movement, fast breaks, and strategic plays, basketball demands agility, endurance, and sharp decision-making. The game is played on a rectangular court, where players dribble, pass, and shoot while maneuvering around defenders. Originating in 1891, basketball has grown into a global phenomenon, with the NBA being the most prestigious professional league. Whether played on city streets or in professional arenas, basketball is a thrilling sport that fosters athleticism, coordination, and competitive spirit."
     }
   },
@@ -40,6 +43,7 @@
       "category": "Combat Sport",
       "type": "Indoor",
       "popularity": "High",
+      "fun_fact": "Boxing has ancient origins, with evidence of similar combat sports dating back to the Sumerians in 3000 BC. The modern sport was formalized in the 19th century with the introduction of the Marquess of Queensberry rules.",
       "summary": "Boxing is a combat sport that tests strength, strategy, and endurance, as two opponents face off in a ring, aiming to land punches while avoiding their opponent’s strikes. Fighters compete in timed rounds, using footwork, head movement, and defensive techniques to outmaneuver their adversary. Victory can be achieved through knockout (KO), technical knockout (TKO), or by accumulating more points based on clean, effective punches. Boxing demands intense physical conditioning, mental toughness, and discipline, making it one of the most physically demanding sports. With a rich history dating back to ancient civilizations, boxing remains a globally popular sport, producing legendary fighters and thrilling matches that captivate audiences worldwide."
     }
   },
@@ -51,6 +55,7 @@
       "category": "Team Sport",
       "type": "Outdoor",
       "popularity": "High",
+      "fun_fact": "Cricket is one of the oldest team sports, with origins tracing back to 16th-century England. The first recorded match took place in 1646, and the sport has since evolved into a global phenomenon.",
       "summary": "Cricket is a bat-and-ball sport that emphasizes strategy, endurance, and teamwork. Played between two teams of 11 players, the game revolves around one team batting to score runs while the other bowls and fields to restrict scoring and take wickets. Matches can range from fast-paced T20 games to multi-day Test matches, offering different formats for players and fans. The sport is especially popular in countries like India, England, Australia, and Pakistan, with international tournaments like the ICC Cricket World Cup drawing massive audiences. Cricket requires a blend of skill, patience, and tactical decision-making, making it one of the most complex yet captivating sports in the world."
     }
   },
@@ -62,6 +67,7 @@
       "category": "Individual Sport",
       "type": "Outdoor",
       "popularity": "High",
+      "fun_fact": "The longest tandem bicycle ever built was over 20 meters (67 feet) long and could seat 35 people, showcasing the creative side of cycling enthusiasts.",
       "summary": "Cycling emerged in the 19th century with the invention of the bicycle. It quickly grew into a competitive sport and recreational activity, highlighted by events like the Tour de France."
     }
   },
@@ -73,6 +79,7 @@
       "category": "Competitive Gaming",
       "type": "Indoor/Online",
       "popularity": "Very High",
+      "fun_fact": "The first known e-sports tournament took place in 1972 at Stanford University, featuring the game 'Spacewar!' and offering a prize of a year's subscription to Rolling Stone magazine.",
       "summary": "E-sports originated from early computer competitions in the 1970s and 80s, evolving into a global phenomenon with professional leagues and international tournaments across various game genres."
     }
   },
@@ -139,6 +146,7 @@
       "category": "Racquet Sport",
       "type": "Indoor/Outdoor",
       "popularity": "Very High",
+      "fun_fact":"The name “Pickleball” didn’t come from pickles — it came from the family dog, Pickles, who kept running off with the ball.",
       "summary": "Pickleball is a fast-growing paddle sport that combines elements of tennis, badminton, and ping-pong. Played on a smaller court with a perforated plastic ball and solid paddles, it is easy to learn but offers plenty of competitive depth. The game can be played in singles or doubles, with the objective of hitting the ball over a net and into the opponent’s court without committing faults. Due to its smaller court size and slower ball speed compared to tennis, pickleball is accessible to players of all ages and skill levels. Its popularity has surged in recent years, especially in the U.S., as a fun and social sport that provides both cardio exercise and strategic gameplay."
     }
   },

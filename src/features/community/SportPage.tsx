@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import sportsData from "../../data/sports.json";
+import EsportExperience from "./EsportsExperience"; // make sure this matches the actual filename
 import "../../styles/SportPage.css";
 
 interface Sport {
@@ -12,12 +13,14 @@ interface Sport {
     type: string;
     popularity: string;
     summary?: string;
+    fun_fact?: string;
   };
 }
 
 const SportPage: React.FC = () => {
   const slugify = (str: string) =>
-    str.toLowerCase().replace(/\s+/g, '-').replace(/[^\w\-]+/g, '');
+    str.toLowerCase().replace(/\s+/g, "-").replace(/[^\w\-]+/g, "");
+
   const { sport } = useParams<{ sport: string }>();
   const navigate = useNavigate();
   const [currentSport, setCurrentSport] = useState<Sport | null>(null);
@@ -29,7 +32,7 @@ const SportPage: React.FC = () => {
     }
 
     const foundSport = sportsData.find(
-      (s) => slugify(s.title) === sport?.toLowerCase()
+      (s) => slugify(s.title) === sport.toLowerCase()
     );
 
     if (!foundSport) {
@@ -42,12 +45,17 @@ const SportPage: React.FC = () => {
   }, [sport, navigate]);
 
   if (!currentSport) {
-    // Optional: can render a spinner or loading skeleton here
     return (
       <div className="sport-page">
         <h2 className="sport-page-not-found">Loading...</h2>
       </div>
     );
+  }
+
+  const isEsport = currentSport.title.toLowerCase() === "e-sports";
+
+  if (isEsport) {
+    return <EsportExperience sport={currentSport} />;
   }
 
   return (
@@ -87,7 +95,8 @@ const SportPage: React.FC = () => {
           className="sport-page-funfact-box"
         >
           <p className="sport-page-funfact-text">
-            This sport originally had wildly different rules that evolved over time!
+            {currentSport.extra_data.fun_fact ||
+              "This sport originally had wildly different rules that evolved over time!"}
           </p>
         </motion.div>
       </section>

@@ -20,6 +20,7 @@ body {
   min-height: 100vh;
   background-color: #000;
   overflow-x: hidden; /* Keeps layout clean horizontally */
+  min-height: 100vh;
 }
 
 /* Main Content Area */

@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
+import ProductCard from "../products/ProductCard";
 import "../../styles/FeaturedProductList.css";
 
 interface Product {
@@ -73,35 +74,22 @@ const FeaturedProductList: React.FC = () => {
         {/* Desktop Grid View */}
         <div className="featured-products-grid desktop-view">
           {products.map((product) => (
-            <div key={product.id} className="featured-product-item">
-              <div className="featured-product-image-container">
-                <img
-                  src={product.imgUrl}
-                  alt={product.name}
-                  className="featured-product-image"
-                />
-              </div>
-              <div className="featured-product-info">
-                <h3 className="featured-product-name">{product.name}</h3>
-                <p className="featured-product-brand">{product.brand}</p>
-                <p className="featured-product-price">
-                  {product.price ? `$${product.price.toFixed(2)}` : "N/A"}
-                </p>
-              </div>
-              <a
-                href={product.affiliateLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="featured-product-cta-button"
-              >
-                View on Amazon
-              </a>
-            </div>
+            <ProductCard
+              key={product.id}
+              name={product.name}
+              brand={product.brand}
+              price={product.price}
+              imgUrl={product.imgUrl}
+              affiliateLink={product.affiliateLink}
+            />
           ))}
         </div>
 
         {/* Mobile Carousel */}
-        <div className="featured-carousel-wrapper mobile-view" ref={carouselRef}>
+        <div
+          className="featured-carousel-wrapper mobile-view"
+          ref={carouselRef}
+        >
           <motion.div
             className="featured-carousel"
             drag="x"
@@ -114,32 +102,13 @@ const FeaturedProductList: React.FC = () => {
           >
             {products.map((product) => (
               <div key={product.id} className="featured-carousel-item">
-                <div className="featured-product-item">
-                  <div className="featured-product-image-container">
-                    <img
-                      src={product.imgUrl}
-                      alt={product.name}
-                      className="featured-product-image"
-                    />
-                  </div>
-                  <div className="featured-product-info">
-                    <h3 className="featured-product-name">{product.name}</h3>
-                    <p className="featured-product-brand">{product.brand}</p>
-                    <p className="featured-product-price">
-                      {product.price != null
-                        ? `$${product.price.toFixed(2)}`
-                        : "N/A"}
-                    </p>
-                  </div>
-                  <a
-                    href={product.affiliateLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="featured-product-cta-button"
-                  >
-                    View on Amazon
-                  </a>
-                </div>
+                <ProductCard
+                  name={product.name}
+                  brand={product.brand}
+                  price={product.price}
+                  imgUrl={product.imgUrl}
+                  affiliateLink={product.affiliateLink}
+                />
               </div>
             ))}
           </motion.div>
@@ -168,7 +137,10 @@ const FeaturedProductList: React.FC = () => {
               />
             </svg>
           </button>
-          <button className="featured-carousel-button right" onClick={nextSlide}>
+          <button
+            className="featured-carousel-button right"
+            onClick={nextSlide}
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 50 100"

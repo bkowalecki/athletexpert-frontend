@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUserContext } from "../../context/UserContext";
 import { toast } from "react-toastify";
-import { useAuth0 } from "@auth0/auth0-react"; // ⭐️ Add this!
+import { useAuth0 } from "@auth0/auth0-react";
 import { Helmet } from "react-helmet";
+import SportStatsModal from "./SportStatsModal"; // adjust path
+
 import "react-toastify/dist/ReactToastify.css";
 import "../../styles/Globals.css";
 import "../../styles/ProfilePage.css";
@@ -46,6 +48,7 @@ const ProfilePage: React.FC = () => {
   const [savedBlogs, setSavedBlogs] = useState<BlogPost[]>([]);
   const [savedProducts, setSavedProducts] = useState<Product[]>([]);
   const [savingProductIds, setSavingProductIds] = useState<number[]>([]);
+  const [activeSport, setActiveSport] = useState<string | null>(null);
   const navigate = useNavigate();
   const { user, setUser, isSessionChecked, checkSession } = useUserContext();
   const { logout: auth0Logout } = useAuth0();
@@ -70,7 +73,6 @@ const ProfilePage: React.FC = () => {
         if (!response.ok) throw new Error("❌ Failed to fetch profile");
 
         const data: Profile = await response.json();
-        console.log("✅ Full Profile Data:", data);
         setProfile(data);
 
         if (data.savedBlogIds?.length) {
@@ -263,7 +265,11 @@ const ProfilePage: React.FC = () => {
       <div className="profile-sports">
         {profile.sports?.length ? (
           profile.sports.map((sport, index) => (
-            <div key={index} className="sport-item">
+            <div
+              key={index}
+              className="sport-item"
+              onClick={() => setActiveSport(sport)}
+            >
               {sport}
             </div>
           ))
@@ -317,7 +323,7 @@ const ProfilePage: React.FC = () => {
       <h2 className="profile-subsection-header-text">Saved Products</h2>
       <div className="profile-saved-products">
         {savedProducts.length > 0 ? (
-          <div className="saved-products-grid">
+          <>
             {savedProducts.map((product) => (
               <div key={product.id} className="saved-product-card">
                 <img
@@ -326,7 +332,7 @@ const ProfilePage: React.FC = () => {
                   className="saved-product-image"
                 />
                 <div className="saved-product-details">
-                  <h3 className="product-name">{product.name}</h3>
+                  <h3 className="profile-product-name">{product.name}</h3>
                   <a
                     href={product.affiliateLink}
                     target="_blank"
@@ -353,7 +359,7 @@ const ProfilePage: React.FC = () => {
                 </div>
               </div>
             ))}
-          </div>
+          </>
         ) : (
           <p className="profile-no-products-text">No saved products yet.</p>
         )}
@@ -376,6 +382,12 @@ const ProfilePage: React.FC = () => {
           Settings
         </button>
       </div>
+      {activeSport && (
+        <SportStatsModal
+          sport={activeSport}
+          onClose={() => setActiveSport(null)}
+        />
+      )}
     </div>
   );
 };
