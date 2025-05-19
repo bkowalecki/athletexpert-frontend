@@ -245,7 +245,10 @@ const ProfilePage: React.FC = () => {
       <div className="profile-banner">
         <div className="profile-image-wrapper">
           <img
-            src={profile.profilePictureUrl || "https://via.placeholder.com/150"}
+            src={
+              profile.profilePictureUrl ||
+              "https://athletexpertbucket.s3.us-east-1.amazonaws.com/avatars/default_avatar.png"
+            }
             alt="Profile"
             className="profile-image"
           />

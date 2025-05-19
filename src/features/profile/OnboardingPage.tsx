@@ -8,19 +8,10 @@ import { toast } from "react-toastify"; // 👈 Add this at top if you want a ni
 import { useNavigate } from "react-router-dom";
 import "../../styles/OnboardingPage.css";
 import { useUserContext } from "../../context/UserContext";
+import sportsData from "../../data/sports.json";
 
-const sportsOptions = [
-  "Running",
-  "Basketball",
-  "Soccer",
-  "Swimming",
-  "Cycling",
-  "Tennis",
-  "Yoga",
-  "Weightlifting",
-  "Climbing",
-  "Hiking",
-];
+
+const sportsOptions = sportsData.map((s) => s.title);
 
 const favoriteColors = [
   "Red",
@@ -41,6 +32,11 @@ type FormDataType = {
   favoriteColor: string;
   sports: string[];
   bio: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  dob?: string;
+  gender?: string;
 };
 
 const OnboardingPage = () => {
@@ -75,7 +71,7 @@ const OnboardingPage = () => {
     }
   };
 
-  const totalSteps = 4;
+  const totalSteps = 6;
   const progressPercentage = Math.round((step / totalSteps) * 100);
 
   const { user, isSessionChecked } = useUserContext();
@@ -124,7 +120,13 @@ const OnboardingPage = () => {
             favoriteColor: formData.favoriteColor,
             bio: formData.bio,
             sports: formData.sports,
-          }),
+            city: formData.city,
+            state: formData.state,
+            country: formData.country,
+            dob: formData.dob,
+            gender: formData.gender,
+          })
+          ,
         }
       );
 
@@ -185,7 +187,7 @@ const OnboardingPage = () => {
             </button>
           </div>
         );
-
+  
       case 2:
         return (
           <div className="onboarding-step">
@@ -214,7 +216,7 @@ const OnboardingPage = () => {
             </div>
           </div>
         );
-
+  
       case 3:
         return (
           <div className="onboarding-step">
@@ -242,11 +244,79 @@ const OnboardingPage = () => {
             </div>
           </div>
         );
-
+  
       case 4:
         return (
           <div className="onboarding-step">
-            <h2>Write your story!</h2>
+            <h2>Where are you located?</h2>
+            <input
+              type="text"
+              name="city"
+              placeholder="City"
+              value={formData.city || ""}
+              onChange={handleChange}
+            />
+            <input
+              type="text"
+              name="state"
+              placeholder="State"
+              value={formData.state || ""}
+              onChange={handleChange}
+            />
+            <input
+              type="text"
+              name="country"
+              placeholder="Country"
+              value={formData.country || ""}
+              onChange={handleChange}
+            />
+            <div className="button-group">
+              <button className="onboarding-btn" onClick={() => setStep(3)}>
+                ← Back
+              </button>
+              <button className="onboarding-btn" onClick={() => setStep(5)}>
+                Next ➔
+              </button>
+            </div>
+          </div>
+        );
+  
+      case 5:
+        return (
+          <div className="onboarding-step">
+            <h2>Tell us a bit more</h2>
+            <select
+              name="gender"
+              value={formData.gender || ""}
+              onChange={handleChange}
+            >
+              <option value="">Select your gender</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Non-Binary">Non-Binary</option>
+              <option value="Prefer Not to Say">Prefer Not to Say</option>
+            </select>
+            <input
+              type="date"
+              name="dob"
+              value={formData.dob || ""}
+              onChange={handleChange}
+            />
+            <div className="button-group">
+              <button className="onboarding-btn" onClick={() => setStep(4)}>
+                ← Back
+              </button>
+              <button className="onboarding-btn" onClick={() => setStep(6)}>
+                Next ➔
+              </button>
+            </div>
+          </div>
+        );
+  
+      case 6:
+        return (
+          <div className="onboarding-step">
+            <h2>Bio</h2>
             <textarea
               name="bio"
               placeholder="Tell us about yourself (Optional)"
@@ -254,7 +324,7 @@ const OnboardingPage = () => {
               onChange={handleChange}
             ></textarea>
             <div className="button-group">
-              <button className="onboarding-btn" onClick={() => setStep(3)}>
+              <button className="onboarding-btn" onClick={() => setStep(5)}>
                 ← Back
               </button>
               <button className="onboarding-btn" onClick={handleSubmit}>
@@ -263,11 +333,12 @@ const OnboardingPage = () => {
             </div>
           </div>
         );
-
+  
       default:
         return null;
     }
   };
+  
 
   return (
     <div className="onboarding-container">

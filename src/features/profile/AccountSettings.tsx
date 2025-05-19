@@ -1,6 +1,7 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState } from "react";
 import { Helmet } from "react-helmet";
 import { useUserContext } from "../../context/UserContext";
+import sportsList from "../../data/sports.json";
 import "../../styles/AccountSettings.css";
 
 interface UserProfile {
@@ -24,6 +25,7 @@ const AccountSettings: React.FC = () => {
   });
   const [newSport, setNewSport] = useState("");
   const [message, setMessage] = useState<string | null>(null);
+  const allowedSports = sportsList.map((s) => s.title);
 
   useEffect(() => {
     if (user) {
@@ -61,7 +63,10 @@ const AccountSettings: React.FC = () => {
 
   const handleAddSport = () => {
     if (newSport && !formData.sports.includes(newSport)) {
-      setFormData((prev) => ({ ...prev, sports: [...prev.sports, newSport] }));
+      setFormData((prev) => ({
+        ...prev,
+        sports: [...prev.sports, newSport],
+      }));
       setNewSport("");
     }
   };
@@ -172,15 +177,24 @@ const AccountSettings: React.FC = () => {
               </span>
             ))}
           </div>
-          <input
-            type="text"
-            value={newSport}
-            onChange={(e) => setNewSport(e.target.value)}
-            placeholder="Add a sport"
-          />
-          <button type="button" onClick={handleAddSport}>
-            Add Sport
-          </button>
+          <div className="account-settings-sport-picker">
+            <select
+              value={newSport}
+              onChange={(e) => setNewSport(e.target.value)}
+            >
+              <option value="">-- Select a sport --</option>
+              {allowedSports
+                .filter((sport) => !formData.sports.includes(sport))
+                .map((sport) => (
+                  <option key={sport} value={sport}>
+                    {sport}
+                  </option>
+                ))}
+            </select>
+            <button type="button" onClick={handleAddSport} disabled={!newSport}>
+              Add Sport
+            </button>
+          </div>
         </div>
 
         <button type="submit" className="account-settings-save-button">
