@@ -1,16 +1,18 @@
 {
   "rewrites": [
-    { "source": "/video/:path*", "destination": "/public/video/:path*" }
+    { "source": "/video/:path*", "destination": "/public/video/:path*" },
+
+    {
+      "source": "/sitemap.xml",
+      "destination": "https://api.athletexpert.org/sitemap.xml"
+    }
   ],
 
   "headers": [
     {
       "source": "/video/:path*",
       "headers": [
-        {
-          "key": "Content-Type",
-          "value": "video/mp4"
-        }
+        { "key": "Content-Type", "value": "video/mp4" }
       ]
     }
   ],
