@@ -1,16 +1,25 @@
 {
-    "rewrites": [
-      { "source": "/video/:path*", "destination": "/public/video/:path*" }
-    ],
-    "headers": [
-      {
-        "source": "/video/:path*",
-        "headers": [
-          {
-            "key": "Content-Type",
-            "value": "video/mp4"
-          }
-        ]
-      }
-    ]
-  }
+  "rewrites": [
+    { "source": "/video/:path*", "destination": "/public/video/:path*" }
+  ],
+
+  "headers": [
+    {
+      "source": "/video/:path*",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "video/mp4"
+        }
+      ]
+    }
+  ],
+
+  "redirects": [
+    {
+      "source": "http://athletexpert.org/:path*",
+      "destination": "https://athletexpert.org/:path*",
+      "permanent": true
+    }
+  ]
+}
