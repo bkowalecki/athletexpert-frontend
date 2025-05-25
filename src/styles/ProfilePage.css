@@ -594,32 +594,23 @@
 }
 
 .clickable-card {
-  cursor: pointer;
   position: relative;
 }
 
-.unsave-icon-button {
+.saved-blog-card-overlay {
   position: absolute;
-  top: 8px;
-  right: 8px;
-  background: rgba(162, 60, 32, 0.9);
-  border: none;
-  color: white;
-  font-weight: bold;
-  border-radius: 50%;
-  width: 26px;
-  height: 26px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1rem;
-  transition: background 0.3s ease;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  content: "";
+}
+.saved-blog-actions button {
   z-index: 2;
+  position: relative;
 }
 
-.unsave-icon-button:hover {
-  background: #842d14;
-}
 
 
 @media (max-width: 768px) {
