@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import { useAuth0 } from "@auth0/auth0-react";
 import { Helmet } from "react-helmet";
 import SportStatsModal from "./SportStatsModal";
+import ProductCard from "../products/ProductCard";
 
 import "react-toastify/dist/ReactToastify.css";
 import "../../styles/Globals.css";
@@ -304,33 +305,17 @@ const ProfilePage: React.FC = () => {
       <div className="profile-saved-products">
         {savedProducts.length > 0 ? (
           savedProducts.map((product) => (
-            <div key={product.id} className="saved-product-card">
-              <img
-                src={product.imgUrl}
-                alt={product.name}
-                className="saved-product-image"
-              />
-              <div className="saved-product-details">
-                <h3 className="profile-product-name">{product.name}</h3>
-                <a
-                  href={product.affiliateLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="buy-now-btn"
-                >
-                  View on Amazon
-                </a>
-                <button
-                  className="save-product-btn unsave"
-                  onClick={() => toggleSaveProduct(product.id)}
-                  disabled={savingProductIds.includes(product.id)}
-                >
-                  {savingProductIds.includes(product.id)
-                    ? "Saving..."
-                    : "Unsave"}
-                </button>
-              </div>
-            </div>
+            <ProductCard
+              key={product.id}
+              name={product.name}
+              brand={product.brand}
+              price={product.price}
+              imgUrl={product.imgUrl}
+              affiliateLink={product.affiliateLink}
+              isSaved={true}
+              isSaving={savingProductIds.includes(product.id)}
+              onToggleSave={() => toggleSaveProduct(product.id)}
+            />
           ))
         ) : (
           <p className="profile-no-products-text">No saved products yet.</p>

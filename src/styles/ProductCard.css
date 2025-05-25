@@ -1,79 +1,160 @@
+/* Unified Product Card Styles */
 .product-card {
-    display: flex;
-    flex-direction: column;
-    background-color: white;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
-    min-height: 420px; /* adjustable */
-  }
-  
-  .product-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 30px rgba(162, 60, 32, 0.2); /* Branded glow */
-  }
-  
-  /* image section */
-  .product-image-wrapper {
-    /* aspect-ratio: 4 / 5; */
-    height: 375px;
-    display: flex;
+  background: #1c1c1c;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  text-align: left;
+  max-width: 300px;
+  border: 2px solid #a23c20;
+}
+
+.product-card:hover {
+  transform: scale(1.03);
+}
+
+.product-image-wrapper {
+  width: 100%;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #111;
+}
+
+.product-image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: cover;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.product-details {
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: center;
+}
+
+.product-name {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.product-brand {
+  font-size: 0.9rem;
+  color: #bbb;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.product-price {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #ff9900;
+  margin: 0;
+}
+
+.product-button {
+  font-size: 1rem;
+  display: inline-block;
+  margin: 10px auto 15px;
+  padding: 0.65rem 1.25rem;
+  background: #ff9900;
+  color: #111;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: bold;
+  transition: background 0.3s ease;
+  text-align: center;
+  width: fit-content;
+}
+
+.product-button:hover {
+  background: #e68a00;
+}
+
+.product-save-button {
+  background: transparent;
+  border: 2px solid #a23c20;
+  color: #a23c20;
+  font-size: 0.9rem;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+  margin-top: 6px;
+  align-self: flex-start;
+}
+
+.product-save-button:hover {
+  background: #a23c20;
+  color: #fff;
+}
+
+.product-save-button.unsave {
+  font-weight: bold;
+}
+
+
+@media (max-width: 768px) {
+  .product-card {
+    flex-direction: row-reverse;
     align-items: center;
-    justify-content: center;
-    /* margin-bottom: 1rem; */
+    gap: 1rem;
+    padding: 0.75rem;
+    max-width: 100%;
   }
-  
-  /* slightly tighter spacing */
+
+  .product-image-wrapper {
+    width: 100px;
+    height: 100px;
+    border-radius: 8px;
+    flex-shrink: 0;
+    overflow: hidden;
+    background: #000;
+    margin-left: 0.75rem;
+  }
+
   .product-image {
-    max-width: 85%;
-    max-height: 85%;
-    object-fit: contain;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-bottom: none;
   }
-  
-  /* text */
+
   .product-details {
-    text-align: center;
-    flex-grow: 1;
+    padding: 0;
+    gap: 6px;
+    flex: 1;
+    text-align: left;
   }
-  
+
   .product-name {
-    font-size: 2.2rem;
-    font-weight: 600;
-    color: #111;
-    margin-bottom: 0.4rem;
+    font-size: 1rem;
   }
-  
+
   .product-brand {
-    font-size: 0.85rem;
-    color: #666;
-    text-transform: uppercase;
-    margin-bottom: 0.4rem;
+    font-size: 0.75rem;
   }
-  
+
   .product-price {
-    font-size: 1.1rem;
-    font-weight: bold;
-    color: #A23C20; /* match your brand */
-    margin-bottom: 0.8rem;
+    font-size: 0.95rem;
   }
-  
-  /* CTA Button */
+
   .product-button {
-    margin: 0 auto 0.75rem auto;
-    width: 90%;
-    padding: 0.65rem;
-    text-align: center;
-    background: #ff9900;
-    color: #111;
-    font-weight: 600;
-    border-radius: 6px;
-    text-decoration: none;
-    transition: background 0.3s ease, transform 0.2s ease;
+    font-size: 0.75rem;
+    padding: 6px 10px;
+    margin-top: 6px;
+    align-self: flex-start;
   }
-  
-  .product-button:hover {
-    background: #e68a00;
-    transform: scale(1.02);
-  }
-  
+}

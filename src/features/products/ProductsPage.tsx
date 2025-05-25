@@ -4,9 +4,9 @@ import { useUserContext } from "../../context/UserContext";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import "react-toastify/dist/ReactToastify.css";
-import "../../styles/ProductsPage.css";
 import { Helmet } from "react-helmet";
+import ProductCard from "../products/ProductCard";
+import "../../styles/ProductsPage.css";
 
 interface Product {
   id: number;
@@ -21,13 +21,11 @@ interface Product {
   featured: boolean;
 }
 
-// Fetch all products via react-query
 const fetchProducts = async (): Promise<Product[]> => {
   const response = await axios.get(`${process.env.REACT_APP_API_URL}/products`);
   return response.data;
 };
 
-// Fetch saved product IDs for the logged-in user
 const fetchSavedProducts = async (): Promise<number[]> => {
   const response = await axios.get(
     `${process.env.REACT_APP_API_URL}/users/saved-products`,
@@ -56,7 +54,6 @@ const ProductsPage: React.FC = () => {
     staleTime: 5000,
   });
 
-  // Fetch saved products if user is logged in
   useEffect(() => {
     if (user) {
       fetchSavedProducts()
@@ -65,7 +62,6 @@ const ProductsPage: React.FC = () => {
     }
   }, [user]);
 
-  // Filter & sort products based on search/filter state
   const filteredProducts = products
     .filter((product) => {
       let matches = true;
@@ -88,7 +84,6 @@ const ProductsPage: React.FC = () => {
       return 0;
     });
 
-  // Handle save/unsave product
   const toggleSaveProduct = async (productId: number) => {
     if (!user) {
       toast.warn("⚠️ You need to log in to save products!", {
@@ -131,7 +126,6 @@ const ProductsPage: React.FC = () => {
       </Helmet>
       <h1>Explore</h1>
 
-      {/* Search & Filters */}
       <div className="filters-container">
         <input
           type="text"
@@ -154,7 +148,6 @@ const ProductsPage: React.FC = () => {
               )
           )}
         </select>
-        {/* Optionally include retailer filtering */}
         <select
           value={sortOption}
           onChange={(e) => setSortOption(e.target.value)}
@@ -165,14 +158,11 @@ const ProductsPage: React.FC = () => {
         </select>
       </div>
 
-      {/* Loading & Error */}
       {isLoading && <p className="loading-text">Loading products...</p>}
       {error && (
         <div className="products-error-container">
           <h2>😵 Oops! Something went wrong.</h2>
-          <p>
-            We couldn't load the products right now. Please try again later.
-          </p>
+          <p>We couldn't load the products right now. Please try again later.</p>
           <button
             className="return-home-btn"
             onClick={() => navigate("/")}
@@ -183,54 +173,24 @@ const ProductsPage: React.FC = () => {
         </div>
       )}
 
-      {/* Product Grid */}
       <div className="product-grid">
         {filteredProducts.length > 0
-          ? filteredProducts.map((product, index) => (
-              <div
-                key={product.id || `product-${index}`}
-                className="product-card"
-              >
-                {product.trending && (
-                  <span className="trending-badge">🔥 Trending</span>
-                )}
-                {product.featured && (
-                  <span className="featured-badge">⭐ Featured</span>
-                )}
-                <img
-                  src={product.imgUrl}
-                  alt={`${product.name}`}
-                  className="product-image"
-                />
-
-                <div className="products-page-product-card-info">
-                  <h3>{product.name}</h3>
-                  <p className="product-price">${product.price.toFixed(2)}</p>
-                  <a
-                    href={product.affiliateLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="products-page-product-buy-button"
-                  >
-                    🛒 View on Amazon
-                  </a>
-                  {user && (
-                    <button
-                      className={`save-button ${
-                        savedProductIds.includes(product.id) ? "unsave" : ""
-                      }`}
-                      onClick={() => toggleSaveProduct(product.id)}
-                      disabled={saving === product.id}
-                    >
-                      {saving === product.id
-                        ? "Saving..."
-                        : savedProductIds.includes(product.id)
-                        ? "Unsave"
-                        : "Save"}
-                    </button>
-                  )}
-                </div>
-              </div>
+          ? filteredProducts.map((product) => (
+              <ProductCard
+                key={product.id}
+                name={product.name}
+                brand={product.brand}
+                price={product.price}
+                imgUrl={product.imgUrl}
+                affiliateLink={product.affiliateLink}
+                isSaved={savedProductIds.includes(product.id)}
+                isSaving={saving === product.id}
+                onToggleSave={() => toggleSaveProduct(product.id)}
+                // badges={[
+                //   ...(product.trending ? ["Trending"] : []),
+                //   ...(product.featured ? ["Featured"] : []),
+                // ]}
+              />
             ))
           : !isLoading && (
               <p className="no-products-text">No products match your search.</p>

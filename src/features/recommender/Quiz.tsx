@@ -1,6 +1,7 @@
 import React, { useState, useContext, useEffect } from "react";
 import "../../styles/Quiz.css";
 import sportsData from "../../data/sports.json";
+import ProductCard from "../products/ProductCard"; // Adjust path if needed
 import { QuizContext } from "../../context/QuizContext";
 import LoadingSpinner from "../../components/LoadingSpinner";
 
@@ -35,7 +36,7 @@ const initialAnswers = {
   favoriteColor: "",
 };
 
-const AMAZON_ASSOCIATE_TAG = "athletexpert-20";
+const AMAZON_ASSOCIATE_TAG = "athletexper0b-20";
 
 const appendAffiliateTag = (url: string, tag: string) => {
   const urlObj = new URL(url);
@@ -81,7 +82,9 @@ const Quiz: React.FC<QuizProps> = ({ isOpen, closeModal }) => {
   // Define quizQuestions with proper typing
   const quizQuestions: QuizQuestion[] = [
     {
-      question: `What's your skill level in ${initialAnswers.sport ? initialAnswers.sport : 'your sport'} ?`,
+      question: `What's your skill level in ${
+        initialAnswers.sport ? initialAnswers.sport : "your sport"
+      } ?`,
       field: "skillLevel",
       options: ["Beginner", "Intermediate", "Advanced", "Professional"],
     },
@@ -146,50 +149,46 @@ const Quiz: React.FC<QuizProps> = ({ isOpen, closeModal }) => {
     closeModal(); // Closes the modal
   };
 
-    // Use useEffect to control overflow based on modal visibility
-    useEffect(() => {
-      if (isOpen) {
-        // Prevent scrolling when modal is open
-        document.body.style.overflow = "hidden";
-      } else {
-        // Re-enable scrolling when modal is closed
-        document.body.style.overflow = "auto";
-      }
-  
-      // Cleanup when the component unmounts or modal closes
-      return () => {
-        document.body.style.overflow = "auto";
+  // Use useEffect to control overflow based on modal visibility
+  useEffect(() => {
+    if (isOpen) {
+      // Prevent scrolling when modal is open
+      document.body.style.overflow = "hidden";
+    } else {
+      // Re-enable scrolling when modal is closed
+      document.body.style.overflow = "auto";
+    }
+
+    // Cleanup when the component unmounts or modal closes
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (step === 0) {
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === "ArrowLeft") handleCarousel("left");
+        if (e.key === "ArrowRight") handleCarousel("right");
       };
-    }, [isOpen]);
+      window.addEventListener("keydown", handleKeyDown);
+      return () => window.removeEventListener("keydown", handleKeyDown);
+    }
+  }, [step]);
 
-    useEffect(() => {
-      if (step === 0) {
-        const handleKeyDown = (e: KeyboardEvent) => {
-          if (e.key === "ArrowLeft") handleCarousel("left");
-          if (e.key === "ArrowRight") handleCarousel("right");
-        };
-        window.addEventListener("keydown", handleKeyDown);
-        return () => window.removeEventListener("keydown", handleKeyDown);
-      }
-    }, [step]);
-
-
-
-  if (!isOpen){
-    
-    return null;}
+  if (!isOpen) {
+    return null;
+  }
 
   return (
     <div className="quiz-modal" onClick={handleClose}>
-
-<button className="close-button" onClick={handleClose}>
-          <svg viewBox="0 0 24 24">
-            <path d="M18.3 5.71a1 1 0 0 0-1.42-1.42L12 9.17 7.11 4.29A1 1 0 0 0 5.7 5.71L10.58 10.6 5.7 15.48a1 1 0 0 0 1.41 1.41L12 11.99l4.89 4.89a1 1 0 0 0 1.42-1.41l-4.88-4.89 4.88-4.89Z" />
-          </svg>
-        </button>
+      <button className="close-button" onClick={handleClose}>
+        <svg viewBox="0 0 24 24">
+          <path d="M18.3 5.71a1 1 0 0 0-1.42-1.42L12 9.17 7.11 4.29A1 1 0 0 0 5.7 5.71L10.58 10.6 5.7 15.48a1 1 0 0 0 1.41 1.41L12 11.99l4.89 4.89a1 1 0 0 0 1.42-1.41l-4.88-4.89 4.88-4.89Z" />
+        </svg>
+      </button>
 
       <div className="quiz-modal-content" onClick={(e) => e.stopPropagation()}>
-
         <div className="quiz-container">
           {isLoading ? (
             <LoadingSpinner />
@@ -261,7 +260,10 @@ const Quiz: React.FC<QuizProps> = ({ isOpen, closeModal }) => {
                     <button
                       className="quiz-nav-button"
                       onClick={() =>
-                        handleNext("sport", sportsData[carouselIndex].title.toLowerCase())
+                        handleNext(
+                          "sport",
+                          sportsData[carouselIndex].title.toLowerCase()
+                        )
                       }
                     >
                       Next
@@ -272,16 +274,15 @@ const Quiz: React.FC<QuizProps> = ({ isOpen, closeModal }) => {
 
               {step > 0 && step <= 4 && (
                 <QuizStep
-                question={
-                  step === 1
-                    ? `What's your skill level in ${answers.sport}?`
-                    : quizQuestions[step - 1].question
-                }
+                  question={
+                    step === 1
+                      ? `What's your skill level in ${answers.sport}?`
+                      : quizQuestions[step - 1].question
+                  }
                   options={quizQuestions[step - 1].options}
                   selectedOption={answers[quizQuestions[step - 1].field]}
                   onNext={(option) =>
                     handleNext(quizQuestions[step - 1].field, option)
-                    
                   }
                 />
               )}
@@ -311,33 +312,18 @@ const Quiz: React.FC<QuizProps> = ({ isOpen, closeModal }) => {
                 <div className="recommended-products">
                   <h3>Recommended For You</h3>
                   <div className="quiz-product-grid">
-                    {recommendedProducts.map((product, index) => (
-                      <div key={index} className="quiz-product-card animate-product">
-                        <a
-                          href={product.affiliateLink}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          <img
-                            src={product.imgUrl}
-                            alt={product.name}
-                            className="quiz-product-image"
-                          />
-                        </a>
-                        <h4>{product.name}</h4>
-                        {/* <p>${product.price.toFixed(2)}</p> */}
-                        <a
-                          href={appendAffiliateTag(
-                            product.affiliateLink,
-                            AMAZON_ASSOCIATE_TAG
-                          )}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="buy-button"
-                        >
-                          View on Amazon
-                        </a>
-                      </div>
+                    {recommendedProducts.map((product) => (
+                      <ProductCard
+                        key={product.id}
+                        name={product.name}
+                        brand={product.brand}
+                        price={product.price}
+                        imgUrl={product.imgUrl}
+                        affiliateLink={appendAffiliateTag(
+                          product.affiliateLink,
+                          AMAZON_ASSOCIATE_TAG
+                        )}
+                      />
                     ))}
                   </div>
                 </div>

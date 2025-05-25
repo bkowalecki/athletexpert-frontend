@@ -1,7 +1,6 @@
-// NEW ProductCard.tsx
+// ProductCard.tsx
 import React from "react";
 import "../../styles/ProductCard.css";
-import TransparentImage from "../../components/common/TransparentImage"; // Adjust the path as needed
 
 interface ProductCardProps {
   name: string;
@@ -9,6 +8,9 @@ interface ProductCardProps {
   price: number | null;
   imgUrl: string;
   affiliateLink: string;
+  isSaved?: boolean;
+  onToggleSave?: () => void;
+  isSaving?: boolean;
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({
@@ -17,6 +19,9 @@ const ProductCard: React.FC<ProductCardProps> = ({
   price,
   imgUrl,
   affiliateLink,
+  isSaved,
+  onToggleSave,
+  isSaving = false,
 }) => {
   return (
     <div className="product-card">
@@ -29,15 +34,24 @@ const ProductCard: React.FC<ProductCardProps> = ({
         <p className="product-price">
           {price != null ? `$${price.toFixed(2)}` : "N/A"}
         </p>
+        <a
+          href={affiliateLink}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="product-button"
+        >
+          View on Amazon →
+        </a>
+        {onToggleSave !== undefined && (
+          <button
+            className={`product-save-button ${isSaved ? "unsave" : ""}`}
+            onClick={onToggleSave}
+            disabled={isSaving}
+          >
+            {isSaving ? "Saving..." : isSaved ? "Unsave" : "Save"}
+          </button>
+        )}
       </div>
-      <a
-        href={affiliateLink}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="product-button"
-      >
-        Check Price →
-      </a>
     </div>
   );
 };

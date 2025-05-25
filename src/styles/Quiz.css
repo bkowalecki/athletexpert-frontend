@@ -1,4 +1,3 @@
-/* Opening animation (already defined) */
 @keyframes fadeInScale {
   0% {
     opacity: 0;
@@ -10,7 +9,6 @@
   }
 }
 
-/* Closing animation */
 @keyframes fadeOutScale {
   0% {
     opacity: 1;
@@ -22,49 +20,37 @@
   }
 }
 
-/* Main Modal Container */
 .quiz-modal {
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 60vw;
-  /* height: 65vh; */
+  width: 90vw;
   max-width: 1200px;
-  /* height: 57vh; Set a fixed height */
-  background-color: rgba(255, 255, 255, 1);
-  /* padding: 30px 0px 0px 0px; */
+  background-color: #fff;
   border-radius: 20px;
   z-index: 50000;
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
   text-align: center;
   overflow: hidden;
   box-sizing: border-box;
-
-  
-  /* Default opening animation */
   opacity: 0;
   animation: fadeInScale 0.4s ease-out forwards;
 }
 
-/* Apply the closing animation when the modal has the 'closing' class */
 .quiz-modal.closing {
   animation: fadeOutScale 0.3s ease-out forwards;
 }
 
-/* Modal Content */
 .quiz-modal-content {
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
   min-height: 40vh;
   padding: 10px;
-  /* padding-top: 2vh; */
-  overflow-y: auto; /* Allow vertical scrolling for content */
+  overflow-y: auto;
 }
 
-/* Close Button */
-/* Close Button */
 .close-button {
   position: absolute;
   top: 10px;
@@ -88,36 +74,27 @@
 }
 
 .close-button:hover {
-  transform: rotate(90deg) scale(1.1); /* Rotate and scale on hover */
-  background-color: rgba(255, 0, 0, 0.1); /* Add a subtle background color */
+  transform: rotate(90deg) scale(1.1);
+  background-color: rgba(255, 0, 0, 0.1);
 }
 
-/* Quiz Container */
-/* Quiz Container */
 .quiz-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
   text-align: center;
-  /* padding-top: 5vh; */
-  /* height: 100%; */
 }
 
-.quiz-container h2{
-  /* margin-bottom: 5vh; */
+.quiz-container h2 {
   font-size: 2.4rem;
   padding-top: 10px;
 }
 
-/* Progress Bar */
-/* Progress Bar */
 .progress-bar {
   width: 100%;
   height: 10px;
   background-color: #e0e0e0;
   border-radius: 5px;
-  /* margin-bottom: 20px; */
 }
 
 .progress-bar div {
@@ -127,8 +104,7 @@
   border-radius: 5px;
 }
 
-/* Carousel Container */
-/* Carousel Container */
+/* Carousel for sport selection */
 .carousel-container {
   display: flex;
   align-items: center;
@@ -137,7 +113,7 @@
   overflow: hidden;
   margin-bottom: 20px;
   position: relative;
-  height: 180px; /* Fix height for consistency */
+  height: 180px;
 }
 
 .carousel-item-container {
@@ -177,9 +153,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  /* width: 60px; */
   height: 100px;
-  background-color: rgba(0, 0, 0, 0.3); /* Semi-transparent background */
+  background-color: rgba(0, 0, 0, 0.3);
   border-radius: 10px;
   transition: background-color 0.3s ease;
 }
@@ -193,24 +168,23 @@
 }
 
 .carousel-button:hover {
-  background-color: #A23C20 ; /* Slightly darker on hover */
+  background-color: #a23c20;
 }
 
 .carousel-button svg {
-  stroke: white; /* Set default arrow color */
+  stroke: white;
   width: 24px;
   color: #fff;
-  height: 80px; /* Taller arrow */
+  height: 80px;
 }
 
 .carousel-button:hover svg {
-  stroke: #ffcc00; /* Arrow color on hover */
+  stroke: #ffcc00;
 }
 
 .carousel-button path {
-  stroke-width: 5; /* Thicker stroke for the custom arrow */
+  stroke-width: 5;
 }
-
 
 .quiz-options {
   display: flex;
@@ -219,41 +193,36 @@
   align-items: center;
   width: 100%;
   margin-bottom: 20px;
-  gap: 20px; /* Spacing between buttons */
+  gap: 20px;
 }
 
-/* Individual buttons */
 .quiz-option {
-  flex: 0 1 calc(50% - 20px); /* Two columns with spacing */
+  flex: 0 1 calc(50% - 20px);
   padding: 15px 20px;
   font-size: 1.2rem;
-  background-color: #F5F5F5; /* Light neutral background */
-  border: 2px solid #ddd; /* Soft grey border */
+  background-color: #f5f5f5;
+  border: 2px solid #ddd;
   border-radius: 10px;
-  color: #333; /* Dark grey text for readability */
+  color: #333;
   cursor: pointer;
   text-align: center;
   transition: background-color 0.3s, color 0.3s, transform 0.2s ease;
 }
 
-/* Hover effect */
 .quiz-option:hover {
-  background-color: #A23C20; /* Warm reddish-brown */
-  color: white; /* White text for good contrast */
-  border-color: #7E2F18; /* Darker shade of the primary color */
-  transform: translateY(-3px); /* Subtle lift effect */
+  background-color: #a23c20;
+  color: white;
+  border-color: #7e2f18;
+  transform: translateY(-3px);
 }
 
-/* Selected option styling */
 .quiz-option.selected {
-  background-color: #7E2F18; /* Darker shade for selected state */
-  color: white; /* White text */
-  border-color: #5C2413; /* Even darker for contrast */
-  transform: translateY(-3px); /* Keep subtle lift */
+  background-color: #7e2f18;
+  color: white;
+  border-color: #5c2413;
+  transform: translateY(-3px);
 }
 
-
-/* Quiz Navigation */
 .quiz-navigation {
   display: flex;
   justify-content: center;
@@ -264,34 +233,32 @@
 }
 
 .quiz-nav-button {
-  padding: 12px 35px;  /* Slightly longer for emphasis */
+  padding: 12px 35px;
   font-size: 1rem;
-  color: #ffffff;  /* White text for contrast */
-  background-color: #A23C20;  /* New background color */
-  border: none;  /* Remove borders for simplicity */
-  border-radius: 4px;  /* Subtle rounding for sleekness */
+  color: #ffffff;
+  background-color: #a23c20;
+  border: none;
+  border-radius: 4px;
   cursor: pointer;
-  transition: background-color 0.3s, transform 0.2s;  /* Smooth hover effects */
-  font-family: 'Arial', sans-serif;  /* Simple and clean font */
+  transition: background-color 0.3s, transform 0.2s;
+  font-family: 'Arial', sans-serif;
 }
 
 .quiz-nav-button:hover {
-  background-color: #8C341C;  /* Slightly darker on hover */
-  transform: translateY(-2px);  /* Lift the button slightly on hover */
+  background-color: #8c341c;
+  transform: translateY(-2px);
 }
 
 .quiz-nav-button:focus {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(162, 60, 32, 0.4);  /* Subtle focus shadow */
+  box-shadow: 0 0 0 3px rgba(162, 60, 32, 0.4);
 }
 
 .quiz-nav-button:active {
-  background-color: #732A17;  /* Darker for active state */
-  transform: translateY(0);  /* Remove lift on click */
+  background-color: #732a17;
+  transform: translateY(0);
 }
 
-
-/* Recommended Products Section */
 .recommended-products {
   text-align: center;
 }
@@ -302,134 +269,72 @@
   color: #333;
 }
 
+/* Ensure product cards behave like normal cards in grid */
 .quiz-product-grid {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 20px;
+  gap: 1.5rem;
+  padding: 1rem;
 }
 
-.quiz-product-card {
-  background: #ffffff;
-  border-radius: 15px;
-  width: 230px;
-  height: 370px; /* fixed same height */
-  padding: 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+/* Override modal text alignment for embedded product cards */
+.quiz-product-grid .product-card {
+  text-align: left;
+  max-width: 300px;
+  background-color: #1c1c1c; /* match main site background */
 }
 
-.quiz-product-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+.quiz-product-grid .product-name,
+.quiz-product-grid .product-brand,
+.quiz-product-grid .product-price {
+  color: #fff !important;
 }
 
-.quiz-product-image {
-  width: 100%;
-  height: 160px;
-  object-fit: contain;
-  margin-bottom: 10px;
-}
-
-.quiz-product-card h4 {
-  font-size: 1rem;
+.quiz-product-grid .product-button {
   color: #111;
-  text-align: center;
-  margin-top: 5px;
-  max-height: 48px; /* clamp title area */
-  overflow: hidden;
-  text-overflow: ellipsis;
+  background: #ff9900;
+  border: none;
 }
 
-.buy-button {
-  display: inline-block;
-  padding: 12px 16px;
-  background: #FF9900; /* Amazon Orange */
-  color: #111; /* Amazon uses dark text */
-  font-size: 1rem;
-  font-weight: bold;
-  font-family: Arial, sans-serif;
-  text-align: center;
-  text-decoration: none;
-  border: 2px solid #E68A00; /* Slight darker border */
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-}
-
-.buy-button:hover {
-  background: #E68A00; /* Darker Amazon orange */
-  border-color: #D57900; /* Even darker border */
-  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.15);
-}
-
-.buy-button:active {
-  background: #D57900; /* Slightly darker when clicked */
-  box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.2);
-}
-
-
-@media (max-width: 1024px) {
-
-.quiz-modal{
-  width: 95vw; /* Maintain spacing between items on smaller screens */
-
-}
-
-}
-
-@media (max-width: 480px) {
-  .quiz-modal {
-    /* max-height: 60vh; */
-    /* overflow-y: scroll; */
-    /* height:60vh; */
-    width: 95vw; /* Maintain spacing between items on smaller screens */
-    max-width: 98vw;
-    background-color: #fff;
-    color: white;
-    /* height:48vh; */
+/* Fix mobile product card scaling inside modal */
+@media (max-width: 768px) {
+  .quiz-product-grid .product-card {
+    flex-direction: row-reverse;
+    padding: 0.75rem;
+    align-items: center;
   }
 
-  /* .close-button svg {
-    width: 50px;
-    height: 50px;
-    fill: #111;
-  } */
-
-  /* .carousel-text {
-    color: #111;
-  } */
-/* 
-  .quiz-nav-button {
-    background-color: #ddd;
-    color: #8C341C;
+  .quiz-product-grid .product-image-wrapper {
+    width: 100px;
+    height: 100px;
+    border-radius: 8px;
+    flex-shrink: 0;
+    margin-left: 0.75rem;
   }
 
-  .recommended-products h3 {
-    font-size: 1.8rem;
-    color: #fff;
+  .quiz-product-grid .product-details {
+    padding: 0;
+    flex: 1;
+    text-align: left;
   }
 
-   */
-
-  .quiz-modal-content{
-    padding-top: 4vh;
-    max-height: 500px;
+  .quiz-product-grid .product-name {
+    font-size: 1rem;
   }
-.quiz-container h2 {
-    font-size: 1.8rem;
-   
-    color: #111;
-  }
-  .quiz-option {
-    font-size: 1rem; /* Adjust font size for small screens */
-    padding: 12px 15px;
 
-    flex: 0 1 100%; /* Full width on smaller screens */
-    max-width: 100%;
+  .quiz-product-grid .product-brand {
+    font-size: 0.75rem;
+  }
+
+  .quiz-product-grid .product-price {
+    font-size: 0.95rem;
+  }
+
+  .quiz-product-grid .product-button {
+    font-size: 0.75rem;
+    padding: 6px 10px;
+    margin-top: 6px;
+    align-self: flex-start;
   }
 }

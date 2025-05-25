@@ -1,16 +1,12 @@
-/* FEATURED SECTION WITH BUBBLE BACKGROUND */
+/* 🌟 General Styles */
 .featured-products-section {
   position: relative;
   overflow: hidden;
   width: 100%;
   color: black;
   background: #fff;
-  /* Create a gradient background similar to your about page hero */
-  /* background: linear-gradient(135deg, #A23C20, #d45330); */
-  /* padding: 3rem 1rem; */
 }
 
-/* Bubbles (pseudo-elements) */
 .featured-products-section::before,
 .featured-products-section::after {
   content: "";
@@ -35,17 +31,15 @@
   background-color: #A23C20;
 }
 
-/* Container above the bubbles */
 .featured-products-container {
   position: relative;
-  z-index: 1; /* Ensures this content is above the pseudo-elements */
+  z-index: 1;
   margin-bottom: 5rem;
   max-width: 1200px;
   margin-left: auto;
   margin-right: auto;
 }
 
-/* Section Heading */
 .featured-products-heading {
   font-size: clamp(2.4rem, 4vw, 3.5rem);
   text-align: center;
@@ -57,104 +51,27 @@
   margin: 3rem 0;
 }
 
-/* Desktop Grid View */
-.desktop-view {
+.featured-products-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(275px, 1fr));
   gap: 2rem;
   margin: 0 2rem;
 }
 
-.featured-product-item {
-  background: #1e1e1e;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding-bottom: 1rem;
-  transition: transform 0.3s ease;
-}
-
-.featured-product-item:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 0 12px rgba(255, 153, 0, 0.4);
-}
-
-
-.featured-product-image-container {
-  aspect-ratio: 4 / 5;
-  background-color: #111;
-  padding: 0.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  background: #000;
-}
-
-.featured-product-image {
-  max-height: 100%;
-  max-width: 100%;
-  object-fit: contain;
-}
-
-
-.featured-product-info {
-  padding: 1rem;
-  text-align: center;
-}
-
-.featured-product-name {
-  font-size: 1.6rem;
-  margin: 0.5rem 0;
-}
-
-.featured-product-brand {
-  font-size: 1.4rem;
-  color: #ccc;
-  margin-bottom: 0.5rem;
-}
-
-.featured-product-price {
-  font-size: 1.2rem;
-  font-weight: bold;
-  color: #fff;
-}
-
-/* CTA Button */
-.featured-product-cta-button {
-  font-size: 1.2rem;
-  display: inline-block;
-  margin-top: auto;
-  margin-bottom: 1rem;
-  padding: 0.75rem 1.5rem;
-  background: #ff9900;
-  color: #111;
-  text-decoration: none;
-  border-radius: 6px;
-  font-weight: bold;
-  transition: background 0.3s ease;
-}
-
-.featured-product-cta-button:hover {
-  background: #e68a00;
-}
-
-/* MOBILE CAROUSEL */
-.mobile-view {
-  display: none;
+/* Remove mobile carousel styles */
+.featured-carousel-wrapper,
+.featured-carousel,
+.featured-carousel-item,
+.carousel-dots,
+.featured-carousel-button {
+  display: none !important;
 }
 
 @media (max-width: 768px) {
-  .desktop-view {
-    display: none;
-  }
-  .mobile-view {
-    display: block;
-    position: relative;
-    overflow: hidden;
+  .featured-products-grid {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.5rem;
+    margin: 0 1rem;
   }
 
   .featured-products-container {
@@ -172,58 +89,5 @@
     left: -80px;
     height: 200px;
     width: 200px;
-  }
-  .featured-carousel {
-    display: flex;
-  }
-  .featured-carousel-item {
-    min-width: 100%;
-    padding: 0 1rem;
-    box-sizing: border-box;
-  }
-  .carousel-dots {
-    display: flex;
-    justify-content: center;
-    margin-top: 1rem;
-  }
-  .carousel-dots .dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: #ccc;
-    margin: 0 5px;
-    cursor: pointer;
-    transition: background 0.3s;
-  }
-  .carousel-dots .dot.active {
-    background: #ff9900;
-  }
-  .featured-carousel-button {
-    background: rgba(0, 0, 0, 0.3);
-    border: none;
-    padding: 10px;
-    cursor: pointer;
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    z-index: 2;
-    transition: background 0.3s;
-  }
-  .featured-carousel-button.left {
-    left: 10px;
-  }
-  .featured-carousel-button.right {
-    right: 10px;
-  }
-  .featured-carousel-button:hover {
-    background: #ff9900;
-  }
-  .featured-carousel-button svg {
-    width: 24px;
-    height: 24px;
-    color: #fff;
   }
 }

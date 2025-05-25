@@ -3,11 +3,10 @@
   position: relative;
   overflow: hidden;
   width: 100vw;
-  background: #000; /* Keeping the black background */
+  background: #000;
   color: #fff;
 }
 
-/* Bubbles (pseudo-elements) */
 .trending-products-section::before,
 .trending-products-section::after {
   content: "";
@@ -32,7 +31,6 @@
   background-color: rgba(255, 255, 255, 0.1);
 }
 
-/* Container above the bubbles */
 .trending-products-container {
   position: relative;
   z-index: 1;
@@ -42,7 +40,6 @@
   margin-right: auto;
 }
 
-/* Section Heading */
 .trending-products-heading {
   font-size: clamp(2.4rem, 4vw, 3.5rem);
   text-align: center;
@@ -54,7 +51,6 @@
   margin: 3rem 0;
 }
 
-/* Desktop Grid View */
 .trending-products-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(275px, 1fr));
@@ -64,97 +60,13 @@
   align-items: center;
 }
 
-/* Trending Product Card */
-.trending-product-item {
-  background: #1e1e1e;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding-bottom: 1rem;
-  transition: transform 0.3s ease;
-  cursor: pointer;
-}
-
-.trending-product-item:hover {
-  transform: translateY(-4px);
-}
-
-/* Trending Product Image */
-.trending-product-image-container {
-  width: 100%;
-  height: 250px;
-  overflow: hidden;
-  background: #000;
-}
-
-.trending-product-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-/* Trending Product Info */
-.trending-product-info {
-  padding: 1rem;
-  text-align: center;
-}
-
-.trending-product-name {
-  font-size: 1.6rem;
-  margin: 0.5rem 0;
-}
-
-.trending-product-brand {
-  font-size: 1.4rem;
-  color: #ccc;
-  margin-bottom: 0.5rem;
-}
-
-.trending-product-price {
-  font-size: 1.2rem;
-  font-weight: bold;
-  color: #fff;
-}
-
-/* CTA Button */
-.trending-product-cta-button {
-  font-size: 1.2rem;
-  display: inline-block;
-  margin-top: auto;
-  margin-bottom: 1rem;
-  padding: 0.75rem 1.5rem;
-  background: #ff9900;
-  color: #111;
-  text-decoration: none;
-  border-radius: 6px;
-  font-weight: bold;
-  transition: background 0.3s ease;
-  border: 2px solid #e68a00;
-}
-
-.trending-product-cta-button:hover {
-  background: #e68a00;
-}
-
-/* MOBILE CAROUSEL */
-.trending-carousel-wrapper {
-  display: none;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  width: 90%;
-  margin: 0 auto;
-}
-
-/* Hide desktop grid on mobile */
 @media (max-width: 768px) {
   .trending-products-grid {
-    display: none;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.5rem;
+    margin: 0 1rem;
   }
-  
+
   .trending-products-container {
     margin-bottom: 3rem;
   }
@@ -165,59 +77,11 @@
     height: 200px;
     width: 200px;
   }
+
   .trending-products-section::after {
     bottom: -80px;
     left: -80px;
     height: 200px;
     width: 200px;
-  }
-  
-  .trending-carousel-wrapper {
-    display: flex;
-  }
-  
-  .trending-carousel {
-    display: flex;
-    width: 100%;
-    transition: transform 0.5s ease-in-out;
-  }
-  
-  .trending-carousel-item {
-    min-width: 100%;
-    padding: 0 1rem;
-    box-sizing: border-box;
-  }
-  
-  .trending-carousel-button {
-    background: rgba(0, 0, 0, 0.3);
-    border: none;
-    padding: 10px;
-    cursor: pointer;
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    z-index: 2;
-    transition: background 0.3s;
-  }
-  
-  .trending-carousel-button.left {
-    left: 10px;
-  }
-  
-  .trending-carousel-button.right {
-    right: 10px;
-  }
-  
-  .trending-carousel-button:hover {
-    background: #ff9900;
-  }
-  
-  .trending-carousel-button svg {
-    width: 24px;
-    height: 24px;
-    color: #fff;
   }
 }
