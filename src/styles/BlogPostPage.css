@@ -155,6 +155,24 @@
   text-decoration: underline;
 }
 
+.image-wrapper {
+  width: 250px;
+  height: 250px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start; /* 👈 aligns image to the left */
+  overflow: hidden;
+  margin: 0;
+}
+
+.responsive-img {
+  max-height: 100%;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+
+
 /* Responsive Design */
 @media (max-width: 1024px) {
 
@@ -252,6 +270,8 @@
   margin-top: 0;
   color: var(--heading-color);
 }
+
+
 
 .blog-post-content ol.product-list,
 .blog-post-content ul {

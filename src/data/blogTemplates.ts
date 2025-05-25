@@ -10,35 +10,56 @@ export interface BlogTemplate {
 export const blogTemplates = [
   {
     name: "Top 10 Products",
-    html: `
-    <p class="template-intro">Looking for the best kicks to take your running game to the next level? We’ve got you covered. Here's our list of the top 10 running shoes that athletes are raving about this year.</p>
+    html: `<p class="template-intro">
+  Looking for the best kicks to take your running game to the next level? We’ve got you covered.
+  Here's our list of the top 10 running shoes that athletes are raving about this year.
+</p>
 
-    <ol class="product-list">
-      <li>
-        <h3 class="product-title">Nike ZoomX Vaporfly Next% <span class="product-badge">#1 Pick</span></h3>
-        <a href="https://your-affiliate-link.com" target="_blank" rel="noopener noreferrer" aria-label="Buy Nike ZoomX Vaporfly Next%">
-          <img src="https://via.placeholder.com/600x400" alt="Nike ZoomX Running Shoe - lightweight and fast" class="responsive-img" />
-        </a>
-        <p class="product-description">Designed for speed and comfort, this shoe is a marathoner’s dream. Lightweight ZoomX foam and a carbon fiber plate offer maximum energy return.</p>
-      </li>
-      <li>
-        <h3 class="product-title">Adidas Adizero Adios Pro 3</h3>
-        <a href="https://your-affiliate-link.com" target="_blank" rel="noopener noreferrer" aria-label="Buy Adidas Adizero Adios Pro 3">
-          <img src="https://via.placeholder.com/600x400" alt="Adidas Adizero Adios Pro 3 - top for distance runs" class="responsive-img" />
-        </a>
-        <p class="product-description">Built for elite performance and long-distance races. Lightweight and aggressive, it’s a fan favorite among serious racers.</p>
-      </li>
-      <li>
-        <h3 class="product-title">Hoka One One Clifton 9</h3>
-        <a href="https://your-affiliate-link.com" target="_blank" rel="noopener noreferrer" aria-label="Buy Hoka One One Clifton 9">
-          <img src="https://via.placeholder.com/600x400" alt="Hoka Clifton 9 - known for comfort and support" class="responsive-img" />
-        </a>
-        <p class="product-description">Great for everyday runs with unbeatable cushioning. If you want comfort and support, this one’s for you.</p>
-      </li>
-    </ol>
+<ol class="product-list">
+  <li>
+    <h3 class="product-title">Nike ZoomX Vaporfly Next% <span class="product-badge">#1 Pick</span></h3>
+    <a href="https://your-affiliate-link.com" target="_blank" rel="noopener noreferrer" aria-label="Buy Nike ZoomX Vaporfly Next%">
+      <div class="image-wrapper">
+        <img src="https://via.placeholder.com/600x400" alt="Nike ZoomX Running Shoe - lightweight and fast" class="responsive-img" />
+      </div>
+    </a>
+    <p class="product-description">
+      Designed for speed and comfort, this shoe is a marathoner’s dream.
+      Lightweight ZoomX foam and a carbon fiber plate offer maximum energy return.
+    </p>
+  </li>
 
-    <p class="closing-callout">Every athlete has different needs — choose the pair that matches your style and training goals. And don’t forget to break them in before race day!</p>
-  `,
+  <li>
+    <h3 class="product-title">Adidas Adizero Adios Pro 3</h3>
+    <a href="https://your-affiliate-link.com" target="_blank" rel="noopener noreferrer" aria-label="Buy Adidas Adizero Adios Pro 3">
+      <div class="image-wrapper">
+        <img src="https://via.placeholder.com/600x400" alt="Adidas Adizero Adios Pro 3 - top for distance runs" class="responsive-img" />
+      </div>
+    </a>
+    <p class="product-description">
+      Built for elite performance and long-distance races. Lightweight and aggressive,
+      it’s a fan favorite among serious racers.
+    </p>
+  </li>
+
+  <li>
+    <h3 class="product-title">Hoka One One Clifton 9</h3>
+    <a href="https://your-affiliate-link.com" target="_blank" rel="noopener noreferrer" aria-label="Buy Hoka One One Clifton 9">
+      <div class="image-wrapper">
+        <img src="https://via.placeholder.com/600x400" alt="Hoka Clifton 9 - known for comfort and support" class="responsive-img" />
+      </div>
+    </a>
+    <p class="product-description">
+      Great for everyday runs with unbeatable cushioning. If you want comfort and support, this one’s for you.
+    </p>
+  </li>
+</ol>
+
+<p class="closing-callout">
+  Every athlete has different needs — choose the pair that matches your style and training goals.
+  And don’t forget to break them in before race day!
+</p>
+`,
   },
   {
     name: "Training Guide",
