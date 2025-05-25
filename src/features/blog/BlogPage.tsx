@@ -9,16 +9,6 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "../../styles/BlogPage.css";
 
-// Custom hook: Debounce
-function useDebounce(value: string, delay: number) {
-  const [debouncedValue, setDebouncedValue] = useState(value);
-  useEffect(() => {
-    const handler = setTimeout(() => setDebouncedValue(value), delay);
-    return () => clearTimeout(handler);
-  }, [value, delay]);
-  return debouncedValue;
-}
-
 interface BlogPost {
   id: number;
   title: string;
@@ -29,41 +19,28 @@ interface BlogPost {
   slug: string;
 }
 
-// API call to fetch posts with search and pagination
-const fetchPosts = async (
-  searchQuery: string,
-  page: number
-): Promise<BlogPost[]> => {
-  const response = await axios.get(`${process.env.REACT_APP_API_URL}/blog`, {
+const fetchPosts = async (searchQuery: string, page: number): Promise<BlogPost[]> => {
+  if (searchQuery.trim().length > 50 || /[^\w\s-]/.test(searchQuery)) return [];
+  const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/blog`, {
     params: { searchQuery, page, size: 9 },
   });
-  return response.data.content;
+  return data.content;
 };
 
-// Component for rendering individual blog post cards
 const BlogPostCard: React.FC<{
   post: BlogPost;
   isSaved: boolean;
   onToggleSave: (id: number) => void;
   userExists: boolean;
 }> = ({ post, isSaved, onToggleSave, userExists }) => (
-  <div key={post.id} className="blog-post-item">
-    <img
-      src={post.imageUrl}
-      alt={post.title}
-      className="blog-image"
-      loading="lazy"
-    />
+  <div className="blog-post-item">
+    <img src={post.imageUrl} alt={post.title} className="blog-image" loading="lazy" />
     <div className="blog-info">
       <h3 className="blog-title">{post.title}</h3>
       <p className="blog-author">By {post.author}</p>
-      <p className="blog-date">
-        {new Date(post.publishedDate).toLocaleDateString()}
-      </p>
+      <p className="blog-date">{new Date(post.publishedDate).toLocaleDateString()}</p>
       <p className="blog-description">{DOMPurify.sanitize(post.summary)}</p>
-      <Link to={`/blog/${post.slug}`} className="blog-read-more-btn">
-        Read More
-      </Link>
+      <Link to={`/blog/${post.slug}`} className="blog-read-more-btn">Read More</Link>
       {userExists && (
         <button
           className={`save-blog-btn ${isSaved ? "unsave" : ""}`}
@@ -77,134 +54,97 @@ const BlogPostCard: React.FC<{
 );
 
 const BlogPage: React.FC = () => {
+  const [inputQuery, setInputQuery] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-  const debouncedSearchQuery = useDebounce(searchQuery, 200);
   const [currentPage, setCurrentPage] = useState(0);
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [hasMorePosts, setHasMorePosts] = useState(true);
   const { user } = useUserContext();
   const [savedBlogIds, setSavedBlogIds] = useState<number[]>([]);
 
-  const { data, isLoading, isFetching, error } = useQuery<BlogPost[], Error>({
-    queryKey: ["posts", debouncedSearchQuery, currentPage],
-    queryFn: () => fetchPosts(debouncedSearchQuery, currentPage),
+  const {
+    data,
+    isLoading,
+    isFetching,
+    error,
+  } = useQuery<BlogPost[], Error>({
+    queryKey: ["posts", searchQuery, currentPage],
+    queryFn: () => fetchPosts(searchQuery, currentPage),
+    enabled: searchQuery.length < 100,
     staleTime: 5000,
-    retry: 1,
     refetchOnWindowFocus: false,
-    placeholderData: [] as BlogPost[],
   });
 
-  // Watch for errors and display a toast notification if any occur
   useEffect(() => {
-    if (error) {
-      toast.error("❌ Error fetching blog posts. Please try again later.");
-    }
+    if (error) toast.error("❌ Error fetching blog posts.");
   }, [error]);
 
-  // Append or replace posts when new data arrives
   useEffect(() => {
     if (data) {
-      const postsData = data as BlogPost[];
-      setPosts((prevPosts) =>
-        currentPage === 0
-          ? postsData
-          : [
-              ...prevPosts,
-              ...postsData.filter(
-                (post) => !prevPosts.some((p) => p.id === post.id)
-              ),
-            ]
-      );
-      setHasMorePosts(postsData.length >= 9);
+      const newPosts = data.filter(post => !posts.some(p => p.id === post.id));
+      setPosts(currentPage === 0 ? data : [...posts, ...newPosts]);
+      setHasMorePosts(data.length >= 9);
     }
   }, [data, currentPage]);
 
-  // Fetch user's saved blogs if logged in
   useEffect(() => {
     if (!user) return;
-
-    const fetchSavedBlogs = async () => {
-      try {
-        const response = await axios.get(
-          `${process.env.REACT_APP_API_URL}/users/saved-blogs`,
-          { withCredentials: true }
-        );
-        setSavedBlogIds(response.data.map((blog: BlogPost) => blog.id));
-      } catch (error) {
-        console.error("❌ Error fetching saved blogs:", error);
-      }
-    };
-
-    fetchSavedBlogs();
+    axios
+      .get(`${process.env.REACT_APP_API_URL}/users/saved-blogs`, { withCredentials: true })
+      .then(res => setSavedBlogIds(res.data.map((blog: BlogPost) => blog.id)))
+      .catch(err => console.error("❌ Error fetching saved blogs:", err));
   }, [user]);
 
-  const toggleSaveBlog = useCallback(
-    async (blogId: number) => {
-      if (!user) {
-        toast.warn("⚠️ You need to log in to save blogs!", {
-          position: "top-center",
-        });
-        return;
-      }
+  const toggleSaveBlog = useCallback(async (blogId: number) => {
+    if (!user) return toast.warn("⚠️ Log in to save blogs!");
+    const isSaved = savedBlogIds.includes(blogId);
+    try {
+      await axios({
+        method: isSaved ? "DELETE" : "POST",
+        url: `${process.env.REACT_APP_API_URL}/users/saved-blogs/${blogId}`,
+        withCredentials: true,
+      });
+      setSavedBlogIds(prev => isSaved ? prev.filter(id => id !== blogId) : [...prev, blogId]);
+      toast.success(isSaved ? "Removed!" : "Saved!");
+    } catch {
+      toast.error("❌ Couldn't save blog.");
+    }
+  }, [savedBlogIds, user]);
 
-      const isSaved = savedBlogIds.includes(blogId);
-      try {
-        const response = await axios({
-          method: isSaved ? "DELETE" : "POST",
-          url: `${process.env.REACT_APP_API_URL}/users/saved-blogs/${blogId}`,
-          withCredentials: true,
-        });
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputQuery(e.target.value);
+  };
 
-        if (response.status === 200) {
-          setSavedBlogIds((prev) =>
-            isSaved ? prev.filter((id) => id !== blogId) : [...prev, blogId]
-          );
-          toast.success(isSaved ? "Blog removed!" : "Blog saved!", {
-            position: "bottom-center",
-            autoClose: 2000,
-          });
-        }
-      } catch (error) {
-        toast.error("❌ Error saving blog. Try again.");
-      }
-    },
-    [savedBlogIds, user]
-  );
-
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
+  const handleSearchSubmit = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    setSearchQuery(inputQuery);
     setCurrentPage(0);
     setHasMorePosts(true);
   };
 
   const loadMorePosts = () => {
-    if (hasMorePosts && !isFetching) {
-      setCurrentPage((prev) => prev + 1);
-    }
+    if (hasMorePosts && !isFetching) setCurrentPage(prev => prev + 1);
   };
 
   return (
     <div className="blog-page-container">
       <Helmet>
         <title>AthleteXpert | Blog</title>
-        <meta
-          name="description"
-          content="Get the latest athletic tips, guides, and news on the AthleteXpert blog."
-        />
+        <meta name="description" content="Get the latest athletic tips and stories." />
       </Helmet>
 
       <h2 className="blog-heading">Blog</h2>
-
-      <div className="blog-search-container">
+      <form className="blog-search-container" onSubmit={handleSearchSubmit}>
         <input
           type="text"
-          value={searchQuery}
-          onChange={handleSearchChange}
+          value={inputQuery}
+          onChange={handleInputChange}
           placeholder="Search blog posts"
           className="blog-search-input"
           aria-label="Search blog posts"
         />
-      </div>
+        <button type="submit" className="blog-search-button">Search</button>
+      </form>
 
       <div className="blog-post-list">
         {isLoading && posts.length === 0 ? (
@@ -222,9 +162,7 @@ const BlogPage: React.FC = () => {
             />
           ))
         ) : (
-          <div className="no-posts-message">
-            No blog posts match your search. Try a different keyword!
-          </div>
+          <div className="no-posts-message">No blog posts match your search.</div>
         )}
       </div>
 

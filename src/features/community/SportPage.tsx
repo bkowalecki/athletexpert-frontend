@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import axios from "axios";
 import sportsData from "../../data/sports.json";
-import EsportExperience from "./EsportsExperience"; // make sure this matches the actual filename
+import EsportExperience from "./EsportsExperience";
 import "../../styles/SportPage.css";
 
 interface Sport {
@@ -17,13 +18,24 @@ interface Sport {
   };
 }
 
+interface BlogPost {
+  id: number;
+  title: string;
+  summary: string;
+  imageUrl: string;
+  slug: string;
+}
+
 const SportPage: React.FC = () => {
   const slugify = (str: string) =>
     str.toLowerCase().replace(/\s+/g, "-").replace(/[^\w\-]+/g, "");
 
   const { sport } = useParams<{ sport: string }>();
   const navigate = useNavigate();
+
   const [currentSport, setCurrentSport] = useState<Sport | null>(null);
+  const [relatedBlogs, setRelatedBlogs] = useState<BlogPost[]>([]);
+  const [loadingBlogs, setLoadingBlogs] = useState(true);
 
   useEffect(() => {
     if (!sport) {
@@ -42,6 +54,25 @@ const SportPage: React.FC = () => {
     }
 
     setCurrentSport(foundSport);
+
+    const fetchRelatedBlogs = async () => {
+      try {
+        const response = await axios.get(
+          `${process.env.REACT_APP_API_URL}/blog/by-tag`,
+          {
+            params: { tag: foundSport.title },
+            withCredentials: true,
+          }
+        );
+        setRelatedBlogs(response.data);
+      } catch (err) {
+        console.error("❌ Error fetching related blogs:", err);
+      } finally {
+        setLoadingBlogs(false);
+      }
+    };
+
+    fetchRelatedBlogs();
   }, [sport, navigate]);
 
   if (!currentSport) {
@@ -112,9 +143,30 @@ const SportPage: React.FC = () => {
       {/* Blog Section */}
       <section className="sport-page-section">
         <h2 className="sport-page-section-title">Explore More</h2>
-        <p className="sport-page-text">
-          Discover articles, tips, and guides for {currentSport.title}.
-        </p>
+        {loadingBlogs ? (
+          <p className="sport-page-text">Loading related blogs...</p>
+        ) : relatedBlogs.length > 0 ? (
+          <div className="sport-related-blogs">
+            {relatedBlogs.map((post) => (
+              <div key={post.id} className="related-blog-card">
+                <img
+                  src={post.imageUrl}
+                  alt={post.title}
+                  className="related-blog-image"
+                />
+                <div className="related-blog-info">
+                  <h3>{post.title}</h3>
+                  <p>{post.summary}</p>
+                  <Link to={`/blog/${post.slug}`}>Read More →</Link>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="sport-page-text">
+            No blog posts found for {currentSport.title}. Want to write one?
+          </p>
+        )}
       </section>
     </div>
   );

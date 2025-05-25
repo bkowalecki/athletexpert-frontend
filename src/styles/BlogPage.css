@@ -54,6 +54,27 @@
   .blog-search-input:focus {
     box-shadow: 0 0 10px rgba(162, 60, 32, 0.8);
   }
+
+  .blog-search-button {
+    margin-left: 1rem;
+    padding: 0.75rem 1.5rem;
+    background-color: #a23c20;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    font-size: 1rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+  
+  .blog-search-button:hover {
+    background-color: #842d14;
+    transform: translateY(-2px);
+  }
+  
   
   
   .blog-post-item {

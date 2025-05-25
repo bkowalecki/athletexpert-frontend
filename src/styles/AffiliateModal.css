@@ -1,0 +1,86 @@
+/* AffiliateModal.css */
+
+.affiliate-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .affiliate-modal {
+    background-color: #1c1c1c;
+    color: #fff;
+    padding: 2rem;
+    width: 100%;
+    max-width: 480px;
+    border-radius: 12px;
+    box-shadow: 0 0 25px rgba(0, 0, 0, 0.5);
+    font-family: "Poppins", sans-serif;
+  }
+  
+  .affiliate-modal h3 {
+    color: #FFA756;
+    margin-bottom: 1.5rem;
+    font-size: 1.4rem;
+    text-align: center;
+  }
+  
+  .affiliate-modal form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .affiliate-modal input,
+  .affiliate-modal textarea {
+    background-color: #2b2b2b;
+    color: #fff;
+    border: 1px solid #444;
+    border-radius: 6px;
+    padding: 0.6rem 0.9rem;
+    font-size: 1rem;
+  }
+  
+  .affiliate-modal input:focus,
+  .affiliate-modal textarea:focus {
+    outline: none;
+    border-color: #2A6045;
+    box-shadow: 0 0 0 2px rgba(42, 96, 69, 0.5);
+  }
+  
+  .affiliate-modal-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1.2rem;
+  }
+  
+  .affiliate-modal button {
+    background-color: #2A6045;
+    color: #fff;
+    font-weight: 600;
+    padding: 0.6rem 1rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.25s ease;
+  }
+  
+  .affiliate-modal button:hover {
+    background-color: #3e8662;
+  }
+  
+  .affiliate-modal button.cancel {
+    background-color: #444;
+  }
+  
+  .affiliate-modal button.cancel:hover {
+    background-color: #666;
+  }
+  

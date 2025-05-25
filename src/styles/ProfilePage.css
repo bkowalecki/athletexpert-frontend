@@ -9,7 +9,7 @@
   padding-top: 5rem;
   background: linear-gradient(135deg, #1a1a1a, #333333);
   color: #fff;
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
   text-align: center;
   box-sizing: border-box;
@@ -24,31 +24,30 @@
   padding-left: 20px;
 }
 
-.profile-subsection-header-text{
+.profile-subsection-header-text {
   font-size: 2.4rem;
 }
 
 .profile-image-wrapper {
-  width: 175px;        /* Ensure width and height are equal */
+  width: 175px; /* Ensure width and height are equal */
   height: 175px;
-  border-radius: 50%;  /* Makes the container a perfect circle */
-  overflow: hidden;    /* Hides any overflow outside the circle */
+  border-radius: 50%; /* Makes the container a perfect circle */
+  overflow: hidden; /* Hides any overflow outside the circle */
   display: flex;
   justify-content: center;
   align-items: center;
-  border: 4px solid #A23C20; /* Optional: adds a border */
+  border: 4px solid #a23c20; /* Optional: adds a border */
   box-sizing: border-box;
 }
 
 .profile-image {
   width: 100%;
   height: 100%;
-  object-fit: cover;   /* Ensures the image fills the container */
-  border-radius: 50%;  /* Ensures the image stays circular */
+  object-fit: cover; /* Ensures the image fills the container */
+  border-radius: 50%; /* Ensures the image stays circular */
 }
 
-.profile-info{
-    
+.profile-info {
   text-align: left;
   display: flex;
   flex-direction: column;
@@ -65,7 +64,7 @@
   margin: 0;
   display: inline-block;
   padding-bottom: 5px;
-  border-bottom: 3px solid #A23C20; /* Clean underline to anchor the text visually */
+  border-bottom: 3px solid #a23c20; /* Clean underline to anchor the text visually */
   transition: transform 0.2s ease-in-out, letter-spacing 0.2s ease-in-out; /* Subtle dynamic feel */
 }
 
@@ -79,17 +78,17 @@
   font-size: 1.1rem;
   color: #ddd;
   /* font-style: italic; */
-  margin: 10px 0;        /* ✅ Center the bio horizontally */
-  max-width: 50%;           /* ✅ Limit width to half of the container */
-  word-wrap: break-word;    /* ✅ Break long words gracefully */
-  line-height: 1.6;         /* ✅ Improve readability with line spacing */
-  text-align: left;       /* ✅ Keep it visually balanced */
+  margin: 10px 0; /* ✅ Center the bio horizontally */
+  max-width: 50%; /* ✅ Limit width to half of the container */
+  word-wrap: break-word; /* ✅ Break long words gracefully */
+  line-height: 1.6; /* ✅ Improve readability with line spacing */
+  text-align: left; /* ✅ Keep it visually balanced */
 }
 
 .profile-divider {
   border: none;
   height: 2px;
-  background: #A23C20;
+  background: #a23c20;
   margin: 20px 0;
 }
 
@@ -98,8 +97,9 @@
   text-align: left;
 }
 
-.badge-item, .saved-item {
-  background: #A23C20;
+.badge-item,
+.saved-item {
+  background: #a23c20;
   padding: 10px 15px;
   border-radius: 12px;
   color: white;
@@ -110,9 +110,10 @@
   cursor: pointer;
 }
 
-.badge-item:hover, .saved-item:hover {
+.badge-item:hover,
+.saved-item:hover {
   transform: scale(1.1);
-  background: #842D14;
+  background: #842d14;
 }
 
 /* 🔥 Dynamic Flame Effect for OG Badge */
@@ -222,10 +223,9 @@
   }
 }
 
-
 /* Sport Item Styling */
 .sport-item {
-  background: linear-gradient(135deg, #A23C20, #842D14);
+  background: linear-gradient(135deg, #a23c20, #842d14);
   padding: 20px 30px;
   border-radius: 15px;
   color: #fff;
@@ -267,7 +267,7 @@
   padding: 12px 20px;
   margin: 12px;
   font-size: 1rem;
-  background: #A23C20;
+  background: #a23c20;
   border: none;
   border-radius: 8px;
   color: white;
@@ -276,16 +276,14 @@
 }
 
 .profile-signout-button:hover {
-  background: #842D14;
+  background: #842d14;
   transform: scale(1.05);
 }
 
 /* Saved Blogs Grid */
 .profile-saved-blogs-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  justify-items: center;
-  justify-content: center;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 20px;
   padding: 20px;
 }
@@ -346,7 +344,7 @@
   font-size: 1.2rem;
   display: inline-block;
   padding: 0.75rem 1.5rem;
-  background: #A23C20;
+  background: #a23c20;
   color: #fff;
   text-decoration: none;
   border-radius: 6px;
@@ -359,6 +357,15 @@
   background: #842d14;
 }
 
+.read-blog-btn,
+.save-blog-btn {
+  font-size: 0.95rem;
+  padding: 8px 12px;
+  border-radius: 6px;
+  flex: 1;
+  min-width: 100px;
+  text-align: center;
+}
 
 /* Action Button */
 .saved-blog-cta-button {
@@ -378,6 +385,45 @@
 .saved-blog-cta-button:hover {
   background: #e68a00;
 }
+
+.saved-blog-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.pin-blog-btn,
+.save-blog-btn {
+  font-size: 1rem;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s ease;
+}
+
+.pin-blog-btn {
+  background: #333;
+  color: #ffcc00;
+}
+
+.pin-blog-btn:hover {
+  background: #444;
+}
+
+.save-blog-btn.unsave {
+  background: transparent;
+  border: 2px solid #a23c20;
+  color: #a23c20;
+}
+
+.save-blog-btn.unsave:hover {
+  background: #a23c20;
+  color: #fff;
+}
+
 
 .profile-no-sports {
   text-align: center;
@@ -405,13 +451,10 @@
   margin-top: 10px;
 }
 
-
 /* Saved Products Section */
 .profile-saved-products {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  justify-items: center;
-  justify-content: center;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 20px;
   padding: 20px;
 }
@@ -436,7 +479,6 @@
   justify-content: space-between;
   text-align: left;
   max-width: 300px;
-  
 }
 
 .saved-product-card:hover {
@@ -522,8 +564,8 @@
 .save-product-btn.unsave,
 .save-blog-btn.unsave {
   background: transparent;
-  border: 2px solid #A23C20;
-  color: #A23C20;
+  border: 2px solid #a23c20;
+  color: #a23c20;
   font-size: 1rem;
   padding: 6px 10px;
   border-radius: 6px;
@@ -535,7 +577,7 @@
 .save-button.unsave:hover,
 .save-product-btn.unsave:hover,
 .save-blog-btn.unsave:hover {
-  background: #A23C20;
+  background: #a23c20;
   color: #ccc;
 }
 
@@ -545,23 +587,47 @@
   padding: 2rem 1rem;
   margin: 3rem auto 1rem;
   text-align: center;
-  font-family: 'Dancing Script', cursive; /* A less fancy, clean script */
+  font-family: "Dancing Script", cursive; /* A less fancy, clean script */
   font-size: 2.8rem;
   color: #ff9900;
-  border-top: 2px solid #A23C20;
+  border-top: 2px solid #a23c20;
+}
+
+.clickable-card {
+  cursor: pointer;
+  position: relative;
+}
+
+.unsave-icon-button {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(162, 60, 32, 0.9);
+  border: none;
+  color: white;
+  font-weight: bold;
+  border-radius: 50%;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  transition: background 0.3s ease;
+  z-index: 2;
+}
+
+.unsave-icon-button:hover {
+  background: #842d14;
 }
 
 
-
-
 @media (max-width: 768px) {
-
-  .profile-section{
+  .profile-section {
     margin: 0;
   }
 
-  .profile-info{
-    
+  .profile-info {
     text-align: center;
     display: flex;
     flex-direction: column;
@@ -584,14 +650,14 @@
   .profile-name {
     font-size: 2rem;
   }
-  .profile-bio{
+  .profile-bio {
     max-width: 100%;
   }
 
-  .badge-item,.saved-item {
+  .badge-item,
+  .saved-item {
     padding: 8px 12px;
   }
-  
 
   .profile-signout-button {
     padding: 10px 15px;
@@ -603,7 +669,103 @@
     font-size: 1rem;
   }
 
-  /* .saved-blog-card{
-    width:10rem;
-  } */
+  .saved-product-card {
+    flex-direction: row-reverse;
+    justify-content: space-between;
+    align-items: center;
+    height: auto;
+    max-width: 100%;
+  }
+
+  .saved-product-image {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    margin-left: 12px;
+    border-radius: 8px;
+    flex-shrink: 0;
+  }
+
+  .saved-product-details {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 10px;
+    gap: 4px;
+  }
+
+  .profile-product-name {
+    font-size: 1rem;
+    line-height: 1.2;
+  }
+
+  .product-brand {
+    font-size: 0.85rem;
+    color: #bbb;
+  }
+
+  .buy-now-btn,
+  .save-product-btn {
+    font-size: 0.8rem;
+    padding: 6px 10px;
+    width: fit-content;
+    align-self: flex-start;
+  }
+
+  .saved-blog-card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+
+  .saved-blog-card {
+    flex-direction: row-reverse;
+    height: auto;
+    max-width: 100%;
+    align-items: center;
+  }
+
+  .saved-blog-image {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-left: 12px;
+    flex-shrink: 0;
+  }
+
+  .saved-blog-details {
+    padding: 10px;
+    flex: 1;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .saved-blog-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .saved-blog-title {
+    font-size: 1rem;
+    margin-bottom: 4px;
+  }
+
+  .saved-blog-author {
+    font-size: 0.85rem;
+    color: #bbb;
+  }
+
+  .read-blog-btn,
+  .save-blog-btn {
+    font-size: 0.95rem;
+    padding: 8px 12px;
+    border-radius: 6px;
+    flex: 1;
+    min-width: 100px;
+    text-align: center;
+  }
 }

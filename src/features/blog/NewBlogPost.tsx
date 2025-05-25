@@ -1,11 +1,8 @@
-// src/pages/admin/NewBlogPost.tsx
 import React, { useState } from "react";
 import axios from "axios";
-import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css";
 import { useUserContext } from "../../context/UserContext";
 import { useNavigate } from "react-router-dom";
-
+import { blogTemplates, BlogTemplate } from "../../data/blogTemplates";
 import "../../styles/NewBlogPost.css";
 
 const NewBlogPost: React.FC = () => {
@@ -14,19 +11,45 @@ const NewBlogPost: React.FC = () => {
 
   const [formData, setFormData] = useState({
     title: "",
-    author: user?.username || "",
+    author: "",
     imageUrl: "",
     summary: "",
     content: "",
     sport: "",
+    tags: [] as string[],
   });
 
-  console.log("user from context:", user);
+  const [tagInput, setTagInput] = useState("");
+
+  const insertTemplate = (templateHtml: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      content: prev.content + "\n" + templateHtml,
+    }));
+  };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleTagKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && tagInput.trim()) {
+      e.preventDefault();
+      const newTag = tagInput.trim();
+      if (!formData.tags.includes(newTag)) {
+        setFormData((prev) => ({ ...prev, tags: [...prev.tags, newTag] }));
+      }
+      setTagInput("");
+    }
+  };
+
+  const removeTag = (tagToRemove: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      tags: prev.tags.filter((tag) => tag !== tagToRemove),
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -37,56 +60,27 @@ const NewBlogPost: React.FC = () => {
         formData,
         {
           withCredentials: true,
+          headers: { "Content-Type": "application/json" },
         }
       );
       navigate("/blog");
     } catch (err) {
+      console.error("Error creating blog post:", err);
       alert("Error creating blog post");
-      console.error(err);
     }
   };
 
   if (user?.role !== "admin") {
     return (
-<div style={{
-  minHeight: "80vh",
-  display: "flex",
-  flexDirection: "column",
-  justifyContent: "center",
-  alignItems: "center",
-  textAlign: "center",
-  padding: "2rem",
-  color: "#fff",
-  background: "#1a1a1a",
-  fontFamily: "Poppins, sans-serif"
-}}>
-  <h1 style={{ fontSize: "2.4rem", marginBottom: "1rem" }}>🚫 Hold up — this door’s locked!</h1>
-  <p style={{ fontSize: "1.2rem", maxWidth: "650px", lineHeight: "1.6" }}>
-    This page is for official <strong>AthleteXpert</strong> blog writers only.
-    But hey — if you've got sharp insights, spicy takes, or just a weird obsession with foam rollers...
-    <strong> we want to hear from you!</strong>
-  </p>
-  <p style={{ fontSize: "1rem", marginTop: "1.5rem", fontStyle: "italic", opacity: 0.8 }}>
-    Shoot us an email with your pitch — whether it’s deep dives or dad jokes, we’re all ears.
-  </p>
-  <a
-    href="mailto:contact@athletexpert.org"
-    style={{
-      marginTop: "1.5rem",
-      fontSize: "1.1rem",
-      padding: "0.75rem 1.5rem",
-      backgroundColor: "#FFA756",
-      color: "#1a1a1a",
-      borderRadius: "8px",
-      textDecoration: "none",
-      fontWeight: "bold",
-      boxShadow: "0 4px 12px rgba(0,0,0,0.3)"
-    }}
-  >
-    ✉️ Contact Us
-  </a>
-</div>
-
+      <div className="admin-lockout">
+        <h1>🚫 Hold up — this door’s locked!</h1>
+        <p>
+          This page is for official <strong>AthleteXpert</strong> blog writers
+          only. If you've got spicy takes or a foam roller obsession — we want
+          to hear from you!
+        </p>
+        <a href="mailto:contact@athletexpert.org">✉️ Contact Us</a>
+      </div>
     );
   }
 
@@ -94,44 +88,77 @@ const NewBlogPost: React.FC = () => {
     <div className="new-blog-container">
       <h2>Create New Blog Post</h2>
       <form onSubmit={handleSubmit} className="blog-form">
-        <input
-          name="title"
-          value={formData.title}
-          onChange={handleChange}
-          placeholder="Title"
-          required
-        />
-        <input
-          name="imageUrl"
-          value={formData.imageUrl}
-          onChange={handleChange}
-          placeholder="Header Image URL"
-        />
-        <input
-          name="sport"
-          value={formData.sport}
-          onChange={handleChange}
-          placeholder="Sport (optional)"
-        />
+        {[
+          { name: "title", placeholder: "Title" },
+          { name: "author", placeholder: "Author" },
+          { name: "imageUrl", placeholder: "Header Image URL" },
+          { name: "sport", placeholder: "Sport (optional)" },
+        ].map(({ name, placeholder }) => (
+          <input
+            key={name}
+            name={name}
+            value={(formData as any)[name]}
+            onChange={handleChange}
+            placeholder={placeholder}
+            required={name === "title" || name === "author"}
+          />
+        ))}
+
         <textarea
           name="summary"
           value={formData.summary}
           onChange={handleChange}
           placeholder="Summary"
         />
-        <ReactQuill
-          modules={{
-            toolbar: [
-              [{ header: [1, 2, 3, false] }],
-              ["bold", "italic", "underline", "strike"],
-              [{ list: "ordered" }, { list: "bullet" }],
-              ["link", "image"],
-              ["clean"],
-            ],
-          }}
-          value={formData.content}
-          onChange={(value) => setFormData({ ...formData, content: value })}
-        />
+
+        <div>
+          <label className="bold-label">Tags</label>
+          <input
+            type="text"
+            value={tagInput}
+            onChange={(e) => setTagInput(e.target.value)}
+            onKeyDown={handleTagKeyDown}
+            placeholder="Type a tag and press Enter"
+          />
+          <div className="tag-preview">
+            {formData.tags.map((tag) => (
+              <span key={tag} className="tag-chip">
+                {tag} <button onClick={() => removeTag(tag)}>x</button>
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <label className="bold-label">Blog HTML Content</label>
+          <div className="template-buttons">
+            {blogTemplates.map((template: BlogTemplate) => (
+              <button
+                key={template.name}
+                type="button"
+                onClick={() => insertTemplate(template.html)}
+              >
+                ➕ {template.name}
+              </button>
+            ))}
+          </div>
+          <textarea
+            name="content"
+            value={formData.content}
+            onChange={handleChange}
+            placeholder="Enter raw HTML content here..."
+            className="blog-html-input"
+          />
+        </div>
+
+        <div className="live-preview">
+          <h3 className="preview-heading">Live Preview:</h3>
+          <div
+            className="preview-box"
+            dangerouslySetInnerHTML={{ __html: formData.content }}
+          />
+        </div>
+
         <button type="submit">Publish</button>
       </form>
     </div>

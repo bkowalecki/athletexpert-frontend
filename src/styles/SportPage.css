@@ -135,6 +135,69 @@
   color: #ffffff;
 }
 
+.sport-related-blogs {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  margin-top: 1rem;
+}
+
+.related-blog-card {
+  background-color: #1e1e1e;
+  border: 1px solid #333;
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s ease-in-out;
+}
+
+.related-blog-card:hover {
+  transform: translateY(-4px);
+}
+
+.related-blog-image {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+}
+
+.related-blog-info {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex-grow: 1;
+}
+
+.related-blog-info h3 {
+  margin: 0;
+  font-size: 1.15rem;
+  color: #fff;
+}
+
+.related-blog-info p {
+  color: #ccc;
+  font-size: 0.95rem;
+  margin-top: 0.5rem;
+  flex-grow: 1;
+}
+
+.related-blog-info a {
+  margin-top: 0.75rem;
+  align-self: flex-start;
+  font-weight: bold;
+  color: #ffa756;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.related-blog-info a:hover {
+  color: #ff7b00;
+}
+
+
 /* ✅ Mobile Responsiveness */
 @media (max-width: 768px) {
   .sport-page-hero {
