@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../styles/HeaderSearchBar.css";
+import { trackEvent } from "../../util/analytics"; // Import your analytics tracking function
 import sportsTerms from "../../data/sportsTerms.json"; // Import your sports terms JSON
 
 // Define props to conditionally show the submit button and handle search completion
@@ -68,15 +69,20 @@ const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
   const handleSearchSubmit = (e: React.FormEvent | React.MouseEvent) => {
     e.preventDefault();
     if (!searchQuery.trim()) return;
-
+  
+    trackEvent("search_submit", {
+      query: searchQuery,
+      source: "header",
+    });
+  
     navigate(`/search?query=${encodeURIComponent(searchQuery)}`);
     setShowDropdown(false);
-
-    // If provided (mobile version), call onSearchComplete to close the mobile menu.
+  
     if (onSearchComplete) {
       onSearchComplete();
     }
   };
+  
 
   return (
     <div className="search-bar-container">
