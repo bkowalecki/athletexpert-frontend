@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useUserContext } from "../../context/UserContext";
+import { trackEvent } from "../../util/analytics";
+
 import "../../styles/Header.css";
 import HeaderSearchBar from "../search/HeaderSearchBar";
 
@@ -46,7 +48,14 @@ const Header: React.FC = () => {
   return (
     <header className="app-header">
       <div className="logo">
-        <Link to="/">
+        <Link
+          to="/"
+          className="nav-link"
+          onClick={() => {
+            trackEvent("nav_click", { section: "Home" });
+            closeMobileMenu();
+          }}
+        >
           <h1>AthleteXpert</h1>
         </Link>
       </div>
@@ -69,20 +78,48 @@ const Header: React.FC = () => {
           </div>
         )}
 
-        <Link to="/community" className="nav-link" onClick={closeMobileMenu}>
+<Link
+          to="/community"
+          className="nav-link"
+          onClick={() => {
+            trackEvent("nav_click", { section: "Community" });
+            closeMobileMenu();
+          }}
+        >
           Community
         </Link>
 
-        <Link to="/products" className="nav-link" onClick={closeMobileMenu}>
+        <Link
+          to="/products"
+          className="nav-link"
+          onClick={() => {
+            trackEvent("nav_click", { section: "Products" });
+            closeMobileMenu();
+          }}
+        >
           Products
         </Link>
 
-        <Link to="/blog" className="nav-link" onClick={closeMobileMenu}>
+        <Link
+          to="/blog"
+          className="nav-link"
+          onClick={() => {
+            trackEvent("nav_click", { section: "Blog" });
+            closeMobileMenu();
+          }}
+        >
           Blog
         </Link>
 
         {/* 🛠 Updated Profile button */}
-        <Link to="/profile" onClick={handleProfileClick} className="nav-link">
+        <Link
+          to="/profile"
+          className="nav-link"
+          onClick={() => {
+            trackEvent("nav_click", { section: "Profile" });
+            handleProfileClick();
+          }}
+        >
           Profile
         </Link>
       </nav>

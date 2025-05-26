@@ -63,6 +63,7 @@ const OnboardingRoute = ({ children }: { children: React.ReactNode }) => {
 };
 
 const PageWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <main>
   <motion.div
     initial={{ opacity: 0, y: 10 }}
     animate={{ opacity: 1, y: 0 }}
@@ -71,6 +72,7 @@ const PageWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   >
     {children}
   </motion.div>
+  </main>
 );
 
 const AppContent: React.FC = () => {

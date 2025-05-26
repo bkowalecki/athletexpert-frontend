@@ -184,6 +184,13 @@
   text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.8);
 }
 
+.sport-card-members {
+  margin-top: 4px;
+  font-size: 0.95rem;
+  color: #bbb;
+}
+
+
 /* 📱 Mobile Adjustments */
 @media (max-width: 768px) {
   .community-search-bar input {

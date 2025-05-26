@@ -10,25 +10,44 @@ interface Sport {
   backgroundImage: string;
 }
 
-function useDebounce<T>(value: T, delay: number): T {
-  const [debouncedValue, setDebouncedValue] = useState<T>(value);
+export const sportMemberCounts: Record<string, number> = {
+  Badminton: 340,
+  Baseball: 920,
+  Basketball: 1720,
+  Boxing: 610,
+  Cricket: 1110,
+  Cycling: 740,
+  "E-Sports": 2050,
+  Football: 1980,
+  Golf: 490,
+  "Ice Hockey": 860,
+  "Ice Skating": 380,
+  MMA: 1350,
+  Pickleball: 780,
+  Rugby: 450,
+  Running: 1180,
+  Skateboarding: 630,
+  Skiing: 520,
+  Snowboarding: 510,
+  Soccer: 2150,
+  Surfing: 410,
+  Swimming: 970,
+  Tennis: 860,
+  Volleyball: 830,
+  Wrestling: 670,
+  Yoga: 1440,
+};
 
-  useEffect(() => {
-    const handler = setTimeout(() => setDebouncedValue(value), delay);
-    return () => clearTimeout(handler);
-  }, [value, delay]);
-
-  return debouncedValue;
-}
 
 interface SportCardProps {
   sport: Sport;
   index: number;
   navigate: (path: string) => void;
+  memberCount: number; // ✅ Add this
 }
 
 const SportCard: React.FC<SportCardProps> = React.memo(
-  ({ sport, index, navigate }) => (
+  ({ sport, index, navigate, memberCount }) => (
     <div
       className={`sport-card sport-card-${index % 4}`}
       onClick={() => navigate(`${sport.title.toLowerCase()}`)}
@@ -43,6 +62,9 @@ const SportCard: React.FC<SportCardProps> = React.memo(
       </div>
       <div className="sport-card-info">
         <h3>{sport.title}</h3>
+        <p className="sport-card-members">
+          👥 {memberCount.toLocaleString()} members
+        </p>
       </div>
     </div>
   )
@@ -52,14 +74,20 @@ const Community: React.FC = () => {
   const { sports } = useSports(); // ⭐ Use preloaded sports context
   const [searchQuery, setSearchQuery] = useState<string>("");
   const navigate = useNavigate();
-  const debouncedSearchQuery = useDebounce<string>(searchQuery, 300);
+  const [triggeredSearch, setTriggeredSearch] = useState("");
+
+  const handleSearch = () => setTriggeredSearch(searchQuery);
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") handleSearch();
+  };
 
   const filteredSports = useMemo(
     () =>
-      sports.filter((sport: Sport) =>
-        sport.title.toLowerCase().includes(debouncedSearchQuery.toLowerCase())
+      sports.filter((sport) =>
+        sport.title.toLowerCase().includes(triggeredSearch.toLowerCase())
       ),
-    [sports, debouncedSearchQuery]
+    [sports, triggeredSearch]
   );
 
   const handleNavigation = useCallback(
@@ -97,14 +125,19 @@ const Community: React.FC = () => {
           placeholder="Search sports..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
+          onKeyDown={handleKeyPress}
           className="community-search-input"
         />
+        <button onClick={handleSearch} className="community-search-button">
+          Search
+        </button>
       </div>
       <div className="sports-masonry">
         {filteredSports.map((sport: Sport, index: number) => (
           <SportCard
             key={sport.title}
             sport={sport}
+            memberCount={sportMemberCounts[sport.title] || 0}
             index={index}
             navigate={handleNavigation}
           />

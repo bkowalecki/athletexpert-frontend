@@ -1,6 +1,7 @@
 // ProductCard.tsx
 import React from "react";
 import "../../styles/ProductCard.css";
+import { trackEvent } from "../../util/analytics"; // Adjust the import path as necessary
 
 interface ProductCardProps {
   name: string;
@@ -23,6 +24,15 @@ const ProductCard: React.FC<ProductCardProps> = ({
   onToggleSave,
   isSaving = false,
 }) => {
+    const handleProductClick = () => {
+        trackEvent("product_click", {
+          product_name: name,
+          brand,
+          retailer: "Amazon",
+        });
+        window.open(affiliateLink, "_blank", "noopener,noreferrer");
+      };
+    
   return (
     <div className="product-card">
       <div className="product-image-wrapper">

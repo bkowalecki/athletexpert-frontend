@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useUserContext } from "../../context/UserContext";
 import { useNavigate } from "react-router-dom";
+import { trackEvent } from "../../util/analytics";
 import "../../styles/HeroSection.css";
 
 interface HeroSectionProps {
@@ -75,7 +76,13 @@ const HeroSection: React.FC<HeroSectionProps> = ({ openQuiz }) => {
       <div className="hero-content">
         <h1>Where Athletes Find Their Edge.</h1>
         <div className="cta-buttons">
-          <button className="cta-btn" onClick={openQuiz}>
+        <button
+  className="cta-btn"
+  onClick={() => {
+    trackEvent("quiz_start", { location: "hero_section" });
+    openQuiz();
+  }}
+>
             Get Your Gear
           </button>
           <button className="cta-btn cta-btn-secondary" onClick={handleProfileClick}>

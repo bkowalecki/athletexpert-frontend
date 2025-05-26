@@ -1,7 +1,9 @@
 import React, { useState, useContext, useEffect } from "react";
 import "../../styles/Quiz.css";
 import sportsData from "../../data/sports.json";
-import ProductCard from "../products/ProductCard"; // Adjust path if needed
+import ProductCard from "../products/ProductCard"; // Adjust path if needed]
+import cleanProductTitle from "../../util/CleanProductTitle";
+import { trackEvent } from "../../util/analytics";
 import { QuizContext } from "../../context/QuizContext";
 import LoadingSpinner from "../../components/LoadingSpinner";
 
@@ -125,6 +127,12 @@ const Quiz: React.FC<QuizProps> = ({ isOpen, closeModal }) => {
           setIsLoading(false);
         })
         .catch(() => setIsLoading(false));
+
+        trackEvent("quiz_complete", {
+  sport: answers.sport,
+  skillLevel: answers.skillLevel,
+  budget: answers.budget,
+});
     }
   }, [step, answers]);
 
@@ -315,7 +323,8 @@ const Quiz: React.FC<QuizProps> = ({ isOpen, closeModal }) => {
                     {recommendedProducts.map((product) => (
                       <ProductCard
                         key={product.id}
-                        name={product.name}
+                        name={cleanProductTitle(product.name)}
+
                         brand={product.brand}
                         price={product.price}
                         imgUrl={product.imgUrl}

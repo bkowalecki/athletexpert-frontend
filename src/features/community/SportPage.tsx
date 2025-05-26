@@ -116,6 +116,8 @@ const SportPage: React.FC = () => {
         )}
       </section>
 
+      
+
       {/* Fun Fact Section */}
       <section className="sport-page-section sport-page-funfact">
         <h2 className="sport-page-section-title">Fun Fact</h2>
