@@ -14,6 +14,7 @@ interface BlogPost {
   sport: string;
   imageUrl: string;
   content: string;
+  summary: string;
 }
 
 // Function to fetch a blog post by its slug
@@ -64,7 +65,32 @@ const BlogPostPage: React.FC = () => {
         <title>{post?.title} - AthleteXpert</title>
         <meta
           name="description"
-          content={post?.title || "Read the full article on AthleteXpert."}
+          content={
+            post?.summary || post?.title || "Read this blog on AthleteXpert."
+          }
+        />
+        <meta property="og:title" content={post?.title} />
+        <meta
+          property="og:description"
+          content={post?.summary || post?.title}
+        />
+        <meta property="og:image" content={post?.imageUrl} />
+        <meta
+          property="og:url"
+          content={`https://www.athletexpert.org/blog/${slug}`}
+        />
+
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={post?.title} />
+        <meta
+          name="twitter:description"
+          content={post?.summary || post?.title}
+        />
+        <meta name="twitter:image" content={post?.imageUrl} />
+
+        <link
+          rel="canonical"
+          href={`https://www.athletexpert.org/blog/${slug}`}
         />
       </Helmet>
 
