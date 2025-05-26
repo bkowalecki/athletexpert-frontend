@@ -48,6 +48,18 @@
     }
   },
   {
+    "title": "Cheerleading",
+    "logo": "/icons/cheerleading_icon.png",
+    "backgroundImage": "/images/sports/cheerleading_bg.jpg",
+    "extra_data": {
+      "category": "Team Sport",
+      "type": "Indoor/Outdoor",
+      "popularity": "Growing",
+      "fun_fact": "Cheerleading was originally an all-male activity when it started in the 1880s — now it's one of the most female-dominated and physically demanding sports in the U.S.",
+      "summary": "Cheerleading is a dynamic team sport that blends athleticism, dance, acrobatics, and spirit. Whether on the sidelines or performing competitive routines, cheerleaders must master stunts, tumbling, and synchronized choreography. It requires strength, flexibility, coordination, and trust in teammates. From school spirit to national competitions, cheerleading cultivates leadership, resilience, and teamwork. Coaches and athletes alike rely on specialized gear including cheer shoes, practice wear, bows, and safety mats — all essential for peak performance and safety."
+    }
+  },
+  {
     "title": "Cricket",
     "logo": "/icons/cricket_icon.png",
     "backgroundImage": "/images/sports/cricket_bg.jpg",

@@ -1,6 +1,6 @@
 # robots.txt for AthleteXpert
 
-Sitemap: https://athletexpert.org/sitemap.xml
+Sitemap: https://www.athletexpert.org/sitemap.xml
 
 User-agent: *
 Disallow: /admin/
