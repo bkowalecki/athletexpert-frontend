@@ -1,76 +1,47 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-US">
   <head>
     <meta charset="utf-8" />
+    <link rel="preconnect" href="https://api.athletexpert.org" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-
+  
     <link rel="icon" href="%PUBLIC_URL%/favicon.png" />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Dancing+Script&display=swap"
-      rel="stylesheet"
-    />
-
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, maximum-scale=1"
-    />
-
+    
+    <!-- Font Preloading -->
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" onload="this.onload=null;this.rel='stylesheet';" />
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" /></noscript>
+  
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
     <meta name="theme-color" content="#A23C20" />
-    <meta
-      name="description"
-      content="AthleteXpert - The Ultimate Athletic Platform"
-    />
-
-    <meta
-      property="og:title"
-      content="AthleteXpert - The Ultimate Athletic Platform"
-    />
-    <meta
-      property="og:description"
-      content="Find top-rated sports equipment, read expert reviews, and get personalized gear recommendations."
-    />
+    <meta name="description" content="AthleteXpert - The Ultimate Athletic Platform" />
+    <meta name="keywords" content="sports gear, athletes, personalized fitness, workout equipment" />
+  
+    <meta property="og:title" content="AthleteXpert - The Ultimate Athletic Platform" />
+    <meta property="og:description" content="Find top-rated sports equipment, read expert reviews, and get personalized gear recommendations." />
     <meta property="og:image" content="%PUBLIC_URL%/logo.png" />
     <meta property="og:url" content="https://www.athletexpert.org" />
+  
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="AthleteXpert - Gear Finder" />
-    <meta
-      name="twitter:description"
-      content="Compare athletic gear and fitness equipment."
-    />
+    <meta name="twitter:description" content="Compare athletic gear and fitness equipment." />
     <meta name="twitter:image" content="%PUBLIC_URL%/logo.png" />
-
-    <!-- <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" /> -->
-    <!-- <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet"> -->
-
+  
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-
-    <link rel="preconnect" href="https://api.athletexpert.org" />
-
+    <link rel="canonical" href="https://www.athletexpert.org/" />
+  
     <title>AthleteXpert</title>
-
-    <!-- Google tag (gtag.js) -->
-    <script
-      async
-      src="https://www.googletagmanager.com/gtag/js?id=G-MDEBHQKJDK"
-    ></script>
+  
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-MDEBHQKJDK"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag() {
         dataLayer.push(arguments);
       }
       gtag("js", new Date());
-
       gtag("config", "G-MDEBHQKJDK");
     </script>
-
-<link rel="canonical" href="https://www.athletexpert.org/" />
-
-
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>

@@ -10,13 +10,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { Helmet } from "react-helmet";
 import Header from "./features/layout/Header";
 import HeroSection from "./features/layout/HeroSection";
-import FeaturedProductList from "./features/products/FeaturedProductList";
-import TrendingProductList from "./features/products/TrendingProductList";
-import BlogSection from "./features/blog/BlogSection";
-import Quiz from "./features/recommender/Quiz";
 import AboutPage from "./components/AboutPage";
 import NotFoundPage from "./components/four0fourPage";
 import TermsAndConditionsPage from "./features/legal/TermsAndConditions";
@@ -34,6 +29,14 @@ import ScrollToTop from "./util/ScrollToTop";
 import RequireAuth from "./features/auth/RequireAuth"; // ✅ Import RequireAuth
 import ErrorBoundary from "./components/common/ErrorBoundary"; // ⭐ Add this import
 const BlogPage = lazy(() => import("./features/blog/BlogPage"));
+const FeaturedProductList = React.lazy(
+  () => import("./features/products/FeaturedProductList")
+);
+const TrendingProductList = React.lazy(
+  () => import("./features/products/TrendingProductList")
+);
+const BlogSection = React.lazy(() => import("./features/blog/BlogSection"));
+const Quiz = React.lazy(() => import("./features/recommender/Quiz"));
 const CommunityPage = lazy(() => import("./features/community/CommunityPage"));
 const SportPage = lazy(() => import("./features/community/SportPage"));
 const ProductsPage = lazy(() => import("./features/products/ProductsPage"));
@@ -64,14 +67,14 @@ const OnboardingRoute = ({ children }: { children: React.ReactNode }) => {
 
 const PageWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <main>
-  <motion.div
-    initial={{ opacity: 0, y: 10 }}
-    animate={{ opacity: 1, y: 0 }}
-    exit={{ opacity: 0, y: -10 }}
-    transition={{ duration: 0.4, ease: "easeOut" }}
-  >
-    {children}
-  </motion.div>
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -10 }}
+      transition={{ duration: 0.4, ease: "easeOut" }}
+    >
+      {children}
+    </motion.div>
   </main>
 );
 
@@ -107,7 +110,20 @@ const AppContent: React.FC = () => {
                         <TrendingProductList />
                         <BlogSection />
                       </main>
-                      <Quiz isOpen={isQuizModalOpen} closeModal={closeModal} />
+                      {isQuizModalOpen && (
+                        <Suspense
+                          fallback={
+                            <div className="loading-screen">
+                              Loading quiz...
+                            </div>
+                          }
+                        >
+                          <Quiz
+                            isOpen={isQuizModalOpen}
+                            closeModal={closeModal}
+                          />
+                        </Suspense>
+                      )}
                     </>
                   }
                 />
