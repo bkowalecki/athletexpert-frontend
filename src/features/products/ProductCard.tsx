@@ -1,7 +1,6 @@
-// ProductCard.tsx
-import React from "react";
+import React, { useState } from "react";
 import "../../styles/ProductCard.css";
-import { trackEvent } from "../../util/analytics"; // Adjust the import path as necessary
+import { trackEvent } from "../../util/analytics";
 
 interface ProductCardProps {
   name: string;
@@ -24,45 +23,77 @@ const ProductCard: React.FC<ProductCardProps> = ({
   onToggleSave,
   isSaving = false,
 }) => {
-    const handleProductClick = () => {
-        trackEvent("product_click", {
-          product_name: name,
-          brand,
-          retailer: "Amazon",
-        });
-        window.open(affiliateLink, "_blank", "noopener,noreferrer");
-      };
-    
+  const [showModal, setShowModal] = useState(false);
+
+  const handleProductClick = () => {
+    trackEvent("product_view", { product_name: name, brand, retailer: "Amazon" });
+  };
+
+  const toggleModal = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setShowModal(true);
+  };
+
   return (
-    <div className="product-card">
-      <div className="product-image-wrapper">
-        <img src={imgUrl} alt={name} className="product-image" />
+    <>
+      <div className="ax-product-card" onClick={handleProductClick}>
+        <div className="ax-product-card-image-wrapper" onClick={toggleModal}>
+          <img
+            src={imgUrl}
+            alt={name}
+            className="ax-product-card-image"
+            loading="lazy"
+          />
+        </div>
+
+        <div className="ax-product-card-info">
+          <div className="ax-product-card-info-top">
+            <h3 className="ax-product-card-name">{name}</h3>
+            <p className="ax-product-card-brand">{brand}</p>
+            <p className="ax-product-card-price">
+              {price != null ? `$${price.toFixed(2)}` : "N/A"}
+            </p>
+          </div>
+
+          <div className="ax-product-card-cta-row">
+            {onToggleSave && (
+              <button
+                className={`ax-product-card-save-button ${isSaved ? "unsave" : ""}`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggleSave();
+                }}
+                disabled={isSaving}
+                aria-label={isSaved ? "Unsave product" : "Save product"}
+              >
+                {isSaving ? "Saving..." : isSaved ? "Unsave" : "Save"}
+              </button>
+            )}
+            <a
+              href={affiliateLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="ax-product-card-button"
+              aria-label="View product on Amazon"
+              onClick={(e) => e.stopPropagation()}
+            >
+              View on Amazon
+            </a>
+          </div>
+        </div>
       </div>
-      <div className="product-details">
-        <h3 className="product-name">{name}</h3>
-        <p className="product-brand">{brand}</p>
-        <p className="product-price">
-          {price != null ? `$${price.toFixed(2)}` : "N/A"}
-        </p>
-        <a
-          href={affiliateLink}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="product-button"
-        >
-          View on Amazon →
-        </a>
-        {onToggleSave !== undefined && (
-          <button
-            className={`product-save-button ${isSaved ? "unsave" : ""}`}
-            onClick={onToggleSave}
-            disabled={isSaving}
-          >
-            {isSaving ? "Saving..." : isSaved ? "Unsave" : "Save"}
-          </button>
-        )}
-      </div>
-    </div>
+
+      {showModal && (
+        <div className="ax-modal-backdrop" onClick={() => setShowModal(false)}>
+          <div className="ax-modal-content" onClick={(e) => e.stopPropagation()}>
+            <button className="ax-modal-close" onClick={() => setShowModal(false)}>
+              ×
+            </button>
+            <img src={imgUrl} alt={name} className="ax-modal-image" />
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 
