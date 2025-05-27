@@ -1,17 +1,13 @@
 /* Latest Blog Section Container */
 .latest-blog-section-container {
   background-color: #a23c20;
-  /* color: #f9f9f9; */
   text-align: center;
-  /* margin-bottom: 3rem; */
 }
 
-/* Content Wrapper */
 .latest-blog-section-content {
   margin: 0 auto;
 }
 
-/* Latest Blog Heading */
 .latest-blog-heading {
   font-size: clamp(2.4rem, 4vw, 3.5rem);
   color: #f9f9f9;
@@ -19,20 +15,19 @@
   font-weight: 900;
   font-family: "Oswald", sans-serif;
   letter-spacing: 3px;
-  margin-bottom: 3rem;
-  margin-top: 3rem;
+  margin: 3rem 0;
 }
 
-/* Desktop Grid View */
+/* Desktop Grid */
 .latest-blog-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-auto-rows: 1fr;
   gap: 2rem;
-  margin: 0 2rem;
-  margin-bottom: 3rem;
+  margin: 0 2rem 3rem;
 }
 
-/* Blog Card (common styles) */
+/* Blog Card */
 .latest-blog-card {
   display: flex;
   flex-direction: column;
@@ -85,7 +80,7 @@
   color: #bbb;
   margin-bottom: 1.5rem;
   display: -webkit-box;
-  -webkit-line-clamp: 3; /* Limit to 3 lines */
+  -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -112,79 +107,56 @@
   background-color: #8a2a14;
 }
 
-/* Mobile Carousel Styles */
-.latest-blog-carousel-wrapper {
+/* Mobile Scroll Row */
+.latest-blog-scroll-row {
   display: flex;
-  align-items: center;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  gap: 1rem;
+  padding: 1rem 1rem 0;
+  margin-bottom: 1rem;
+  scroll-behavior: smooth;
+}
+
+.latest-blog-scroll-row::-webkit-scrollbar {
+  display: none;
+}
+
+.latest-blog-scroll-item {
+  flex: 0 0 100%;
+  scroll-snap-align: center;
+}
+
+/* Dot indicators */
+.latest-blog-indicators {
+  display: flex;
   justify-content: center;
-  position: relative;
-  width: 95%;
-  margin: 0 auto;
-  margin-bottom: 3rem;
-  overflow: hidden;
+  gap: 8px;
+  margin-bottom: 2rem;
 }
 
-.latest-blog-carousel {
-  width: 100%;
-  position: relative;
-}
-
-/* Carousel Item */
-.latest-blog-carousel-item {
-  width: 100%;
-  display: block;
-}
-
-/* Carousel Navigation Buttons */
-.latest-blog-carousel-button {
-  background: none;
-  border: none;
-  padding: 10px;
-  cursor: pointer;
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 2;
-  width: 40px;
-  height: 40px;
-  background-color: rgba(0, 0, 0, 0.3);
+.latest-blog-indicator-dot {
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
-  transition: background-color 0.3s ease;
+  background: #ffffff44;
+  transition: all 0.3s ease;
 }
 
-.latest-blog-carousel-button.left {
-  left: 10px;
+.latest-blog-indicator-dot.active {
+  background: #ffcc00;
 }
 
-.latest-blog-carousel-button.right {
-  right: 10px;
-}
-
-.latest-blog-carousel-button:hover {
-  background-color: #a23c20;
-}
-
-.latest-blog-carousel-button svg {
-  stroke: white;
-  width: 24px;
-  height: 24px;
-  transition: stroke 0.3s ease;
-}
-
-.latest-blog-carousel-button:hover svg {
-  stroke: #ffcc00;
-}
-
-/* Hide grid view on mobile */
+/* Responsive Handling */
 @media (max-width: 768px) {
   .latest-blog-grid {
     display: none;
   }
 }
 
-/* Hide carousel on desktop */
 @media (min-width: 768px) {
-  .latest-blog-carousel-wrapper {
+  .latest-blog-scroll-row,
+  .latest-blog-indicators {
     display: none;
   }
 }
