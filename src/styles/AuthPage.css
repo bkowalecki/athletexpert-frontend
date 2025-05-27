@@ -1,39 +1,27 @@
 /* AuthPage CSS - Sleek, Sporty, and Responsive */
+  
+.auth-page-wrapper {
+  min-height: calc(100vh - 0px); /* Adjust if your footer height changes */
+  padding: 3rem 1rem 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #2c2c2c, #1a1a1a);
+  box-sizing: border-box;
+}
 
-/* General Page Layout */
-/* html, body {
-    height: 100%;
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    background: linear-gradient(135deg, #2c2c2c, #1a1a1a);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    font-family: 'Poppins', sans-serif;
-  } */
-  
-  .auth-page-wrapper {
-    min-height: 100vh;
-    padding-top: 10rem;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-  }
-  
-  /* Auth Container */
-  .auth-container {
-    width: 100%;
-    max-width: 450px;
-    padding: 30px;
-    color: #fff;
-    border-radius: 12px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
-    box-sizing: border-box;
-    text-align: center;
-  }
+.auth-container {
+  width: 100%;
+  max-width: 450px;
+  padding: 30px;
+  color: #fff;
+  border-radius: 12px;
+  /* box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6); */
+  box-sizing: border-box;
+  text-align: center;
+  /* background: #1e1e1e; */
+}
   
   .auth-container h2 {
     font-size: 2rem;
@@ -92,6 +80,25 @@
   .google-login-btn:hover {
     background: #842D14;
   }
+
+  .auth-divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: #aaa;
+    margin: 1.5rem 0;
+    width: 70%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  .auth-divider::before,
+  .auth-divider::after {
+    content: "";
+    flex: 1;
+    border-bottom: 1px solid #444;
+    margin: 0 0.75rem;
+  }
   
   .google-login-btn {
     background: #ffffff;
@@ -117,24 +124,23 @@
     margin: 10px 0;
   }
   
-  /* Toggle Auth Link */
   .toggle-auth {
     text-align: center;
-    color: #ffffff;
-    margin-top: 15px;
-    cursor: default;
-    font-size: 0.9rem;
+    color: #ccc;
+    font-size: 0.95rem;
+    margin-top: 1rem;
   }
   
-  .toggle-auth a {
-    color: #A23C20;
-    text-decoration: underline;
+  .toggle-auth-link {
+    color: #ff9900;
     cursor: pointer;
-    transition: color 0.3s ease;
+    text-decoration: underline;
+    font-weight: 600;
+    transition: color 0.2s ease;
   }
   
-  .toggle-auth a:hover {
-    color: #842D14;
+  .toggle-auth-link:hover {
+    color: #ffaa33;
   }
   
   /* Responsive Design */

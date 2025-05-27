@@ -97,14 +97,14 @@ const AuthPage: React.FC = () => {
     e.preventDefault();
     setError(null);
     setIsSubmitting(true);
-  
+
     // ✅ Check confirmPassword match before sending anything
     if (!isLogin && formData.password !== formData.confirmPassword) {
       setError("Passwords do not match.");
       setIsSubmitting(false);
       return;
     }
-  
+
     const endpoint = isLogin ? "login" : "register";
     const payload = isLogin
       ? { email: formData.email, password: formData.password }
@@ -113,7 +113,7 @@ const AuthPage: React.FC = () => {
           email: formData.email,
           password: formData.password,
         };
-  
+
     try {
       const response = await fetch(
         `${process.env.REACT_APP_API_URL}/users/${endpoint}`,
@@ -124,16 +124,16 @@ const AuthPage: React.FC = () => {
           credentials: "include",
         }
       );
-  
+
       if (!response.ok) {
         const data = await response.json().catch(() => null);
         setError(data?.message || "An error occurred. Please try again.");
         return; // ✅ VERY IMPORTANT: if register fails, STOP here
       }
-  
+
       const userData = await response.json();
       setUser({ ...userData.user, authProvider: "local" });
-  
+
       // ✅ Only navigate to onboarding AFTER successful user creation
       navigate("/account-setup", { replace: true });
     } catch (error) {
@@ -143,7 +143,6 @@ const AuthPage: React.FC = () => {
       setIsSubmitting(false);
     }
   };
-  
 
   /** Prevent flashing of login page before session check */
   if (!isSessionChecked) {
@@ -202,6 +201,10 @@ const AuthPage: React.FC = () => {
           </button>
         </form>
 
+        <div className="auth-divider">
+          <span>OR</span>
+        </div>
+
         <button
           className="google-login-btn"
           onClick={async () => {
@@ -250,10 +253,28 @@ const AuthPage: React.FC = () => {
           Sign in with Google
         </button>
 
-        <p className="toggle-auth" onClick={() => setIsLogin(!isLogin)}>
-          {isLogin
-            ? "Don't have an account? Register here"
-            : "Already have an account? Login"}
+        <p className="toggle-auth">
+          {isLogin ? (
+            <>
+              Don't have an account?{" "}
+              <span
+                className="toggle-auth-link"
+                onClick={() => setIsLogin(false)}
+              >
+                Register here
+              </span>
+            </>
+          ) : (
+            <>
+              Already have an account?{" "}
+              <span
+                className="toggle-auth-link"
+                onClick={() => setIsLogin(true)}
+              >
+                Login
+              </span>
+            </>
+          )}
         </p>
       </div>
     </div>
