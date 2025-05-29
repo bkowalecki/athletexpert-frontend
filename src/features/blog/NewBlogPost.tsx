@@ -17,6 +17,7 @@ const NewBlogPost: React.FC = () => {
     content: "",
     sport: "",
     tags: [] as string[],
+    publishedDate: new Date().toISOString().slice(0, 10), // 👈 Add this line
   });
 
   const [tagInput, setTagInput] = useState("");

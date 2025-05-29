@@ -10,57 +10,103 @@ export interface BlogTemplate {
 export const blogTemplates = [
   {
     name: "Top 10 Products",
-    html: `<p class="template-intro">
-  Looking for the best kicks to take your running game to the next level? We’ve got you covered.
-  Here's our list of the top 10 running shoes that athletes are raving about this year.
-</p>
-
-<ol class="product-list">
-  <li>
-    <h3 class="product-title">Nike ZoomX Vaporfly Next% <span class="product-badge">#1 Pick</span></h3>
-    <a href="https://your-affiliate-link.com" target="_blank" rel="noopener noreferrer" aria-label="Buy Nike ZoomX Vaporfly Next%">
-      <div class="image-wrapper">
-        <img src="https://via.placeholder.com/600x400" alt="Nike ZoomX Running Shoe - lightweight and fast" class="responsive-img" />
-      </div>
-    </a>
-    <p class="product-description">
-      Designed for speed and comfort, this shoe is a marathoner’s dream.
-      Lightweight ZoomX foam and a carbon fiber plate offer maximum energy return.
+    html: `<section class="top-10-products-section">
+  
+    <!-- Intro -->
+    <p class="template-intro">
+      Looking for the best kicks to take your running game to the next level? We’ve got you covered.
+      Here's our list of the top 10 running shoes that athletes are raving about this year.
     </p>
-  </li>
-
-  <li>
-    <h3 class="product-title">Adidas Adizero Adios Pro 3</h3>
-    <a href="https://your-affiliate-link.com" target="_blank" rel="noopener noreferrer" aria-label="Buy Adidas Adizero Adios Pro 3">
-      <div class="image-wrapper">
-        <img src="https://via.placeholder.com/600x400" alt="Adidas Adizero Adios Pro 3 - top for distance runs" class="responsive-img" />
-      </div>
-    </a>
-    <p class="product-description">
-      Built for elite performance and long-distance races. Lightweight and aggressive,
-      it’s a fan favorite among serious racers.
+  
+    <!-- Product List -->
+    <ol class="product-list">
+  
+      <!-- Product 1 -->
+      <li>
+        <h3 class="product-title">
+          Nike ZoomX Vaporfly Next%
+          <span class="product-badge">#1 Pick</span>
+        </h3>
+        <a
+          href="https://www.amazon.com/dp/YOURID?tag=athletexpert-20"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Buy Nike ZoomX Vaporfly Next%">
+          <div class="image-wrapper">
+            <img
+              src="https://via.placeholder.com/600x400"
+              alt="Nike ZoomX Running Shoe – lightweight and fast"
+              class="responsive-img"
+            />
+          </div>
+        </a>
+        <p class="product-description">
+          Designed for speed and comfort, this shoe is a marathoner’s dream.
+          Lightweight ZoomX foam and a carbon fiber plate offer maximum energy return.
+        </p>
+      </li>
+  
+      <!-- Product 2 -->
+      <li>
+        <h3 class="product-title">Adidas Adizero Adios Pro 3</h3>
+        <a
+          href="https://www.amazon.com/dp/YOURID?tag=athletexpert-20"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Buy Adidas Adizero Adios Pro 3">
+          <div class="image-wrapper">
+            <img
+              src="https://via.placeholder.com/600x400"
+              alt="Adidas Adizero Adios Pro 3 – top for distance runs"
+              class="responsive-img"
+            />
+          </div>
+        </a>
+        <p class="product-description">
+          Built for elite performance and long-distance races. Lightweight and aggressive,
+          it’s a fan favorite among serious racers.
+        </p>
+      </li>
+  
+      <!-- Product 3 -->
+      <li>
+        <h3 class="product-title">Hoka One One Clifton 9</h3>
+        <a
+          href="https://www.amazon.com/dp/YOURID?tag=athletexpert-20"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Buy Hoka One One Clifton 9">
+          <div class="image-wrapper">
+            <img
+              src="https://via.placeholder.com/600x400"
+              alt="Hoka Clifton 9 – known for comfort and support"
+              class="responsive-img"
+            />
+          </div>
+        </a>
+        <p class="product-description">
+          Great for everyday runs with unbeatable cushioning. If you want comfort and support, this one’s for you.
+        </p>
+      </li>
+  
+      <!-- More products go here -->
+  
+    </ol>
+  
+    <!-- Closing Callout -->
+    <p class="closing-callout">
+      Every athlete has different needs — choose the pair that matches your style and training goals.
+      And don’t forget to break them in before race day!
     </p>
-  </li>
 
-  <li>
-    <h3 class="product-title">Hoka One One Clifton 9</h3>
-    <a href="https://your-affiliate-link.com" target="_blank" rel="noopener noreferrer" aria-label="Buy Hoka One One Clifton 9">
-      <div class="image-wrapper">
-        <img src="https://via.placeholder.com/600x400" alt="Hoka Clifton 9 - known for comfort and support" class="responsive-img" />
-      </div>
-    </a>
-    <p class="product-description">
-      Great for everyday runs with unbeatable cushioning. If you want comfort and support, this one’s for you.
+    <!-- Amazon Affiliate Disclaimer -->
+    <p class="affiliate-disclaimer" style="font-style: italic; font-size: 0.95rem; margin-bottom: 2rem;">
+      As an Amazon Associate, I earn from qualifying purchases. This post contains affiliate links.
     </p>
-  </li>
-</ol>
-
-<p class="closing-callout">
-  Every athlete has different needs — choose the pair that matches your style and training goals.
-  And don’t forget to break them in before race day!
-</p>
-`,
-  },
+  
+  </section>`
+  }
+  ,
   {
     name: "Training Guide",
     html: `

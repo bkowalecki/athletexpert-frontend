@@ -92,6 +92,28 @@ const BlogPostPage: React.FC = () => {
           rel="canonical"
           href={`https://www.athletexpert.org/blog/${slug}`}
         />
+
+        {/* ✅ Structured Data JSON-LD */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Article",
+            headline: post?.title || "AthleteXpert Blog",
+            image: post?.imageUrl ? [post.imageUrl] : undefined,
+            datePublished: post?.publishedDate,
+            author: post?.author
+              ? [{ "@type": "Person", name: post.author }]
+              : undefined,
+            publisher: {
+              "@type": "Organization",
+              name: "AthleteXpert",
+              logo: {
+                "@type": "ImageObject",
+                url: "https://www.athletexpert.org/favicon.png",
+              },
+            },
+          })}
+        </script>
       </Helmet>
 
       <div className="back-link-container">

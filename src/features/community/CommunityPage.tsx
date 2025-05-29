@@ -39,7 +39,6 @@ export const sportMemberCounts: Record<string, number> = {
   Yoga: 1440,
 };
 
-
 interface SportCardProps {
   sport: Sport;
   index: number;
@@ -120,18 +119,29 @@ const Community: React.FC = () => {
         />
       </Helmet>
       {/* (Optional) You could add a search bar here if you want */}
-      <div className="community-search-container">
-        <input
-          type="text"
-          placeholder="Search sports..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          onKeyDown={handleKeyPress}
-          className="community-search-input"
-        />
-        <button onClick={handleSearch} className="community-search-button">
-          Search
-        </button>
+      <div className="community-search-wrapper">
+        <form
+          className="community-search-bar-form"
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSearch();
+          }}
+        >
+          <input
+            type="text"
+            className="community-search-bar-input"
+            placeholder="Search sports..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={handleKeyPress}
+            aria-label="Search sports"
+          />
+          <button
+            type="submit"
+            className="community-search-bar-button"
+            aria-label="Search"
+          />
+        </form>
       </div>
       <div className="sports-masonry">
         {filteredSports.map((sport: Sport, index: number) => (
