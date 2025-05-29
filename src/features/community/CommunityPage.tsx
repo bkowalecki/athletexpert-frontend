@@ -48,10 +48,12 @@ interface SportCardProps {
 
 const SportCard: React.FC<SportCardProps> = React.memo(
   ({ sport, index, navigate, memberCount }) => (
-    <div
-      className={`sport-card sport-card-${index % 4}`}
-      onClick={() => navigate(`${sport.title.toLowerCase()}`)}
-    >
+<div
+  className={`sport-card sport-card-${index % 4} ${
+    sport.title.toLowerCase() === "e-sports" ? "esport-preview-card" : ""
+  }`}
+  onClick={() => navigate(`${sport.title.toLowerCase()}`)}
+>
       <div className="sport-card-bg">
         <img
           src={sport.backgroundImage}
@@ -119,7 +121,7 @@ const Community: React.FC = () => {
         />
       </Helmet>
       {/* (Optional) You could add a search bar here if you want */}
-      <div className="community-search-wrapper">
+      {/* <div className="community-search-wrapper">
         <form
           className="community-search-bar-form"
           onSubmit={(e) => {
@@ -142,7 +144,7 @@ const Community: React.FC = () => {
             aria-label="Search"
           />
         </form>
-      </div>
+      </div> */}
       <div className="sports-masonry">
         {filteredSports.map((sport: Sport, index: number) => (
           <SportCard

@@ -4,6 +4,7 @@ import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 import DOMPurify from "dompurify";
 import { Helmet } from "react-helmet";
+import ShareButtons from "../../components/ShareButtons";
 import "../../styles/BlogPostPage.css";
 
 interface BlogPost {
@@ -17,7 +18,6 @@ interface BlogPost {
   summary: string;
 }
 
-// Function to fetch a blog post by its slug
 const fetchBlogPost = async (slug: string): Promise<BlogPost> => {
   const response = await axios.get(
     `${process.env.REACT_APP_API_URL}/blog/slug/${slug}`
@@ -27,7 +27,7 @@ const fetchBlogPost = async (slug: string): Promise<BlogPost> => {
 
 const BlogPostPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
-  const navigate = useNavigate(); // ⭐ Add navigate hook
+  const navigate = useNavigate();
 
   const {
     data: post,
@@ -40,7 +40,6 @@ const BlogPostPage: React.FC = () => {
     retry: 1,
   });
 
-  // ⭐ Automatically redirect to /404 if error or no post
   useEffect(() => {
     if (isError || (!isLoading && !post)) {
       console.warn(`⚠️ Blog post not found. Redirecting to /404.`);
@@ -48,12 +47,9 @@ const BlogPostPage: React.FC = () => {
     }
   }, [isError, isLoading, post, navigate]);
 
-  if (isLoading) {
+  if (isLoading || !post) {
     return (
-      <div
-        className="loading"
-        style={{ textAlign: "center", marginTop: "100px" }}
-      >
+      <div className="loading" style={{ textAlign: "center", marginTop: "100px" }}>
         <h2>Loading blog...</h2>
       </div>
     );
@@ -62,48 +58,25 @@ const BlogPostPage: React.FC = () => {
   return (
     <div className="blog-post-page">
       <Helmet>
-        <title>{post?.title} - AthleteXpert</title>
-        <meta
-          name="description"
-          content={
-            post?.summary || post?.title || "Read this blog on AthleteXpert."
-          }
-        />
-        <meta property="og:title" content={post?.title} />
-        <meta
-          property="og:description"
-          content={post?.summary || post?.title}
-        />
-        <meta property="og:image" content={post?.imageUrl} />
-        <meta
-          property="og:url"
-          content={`https://www.athletexpert.org/blog/${slug}`}
-        />
-
+        <title>{post.title} - AthleteXpert</title>
+        <meta name="description" content={post.summary || post.title || "Read this blog on AthleteXpert."} />
+        <meta property="og:title" content={post.title} />
+        <meta property="og:description" content={post.summary || post.title} />
+        <meta property="og:image" content={post.imageUrl} />
+        <meta property="og:url" content={`https://www.athletexpert.org/blog/${slug}`} />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={post?.title} />
-        <meta
-          name="twitter:description"
-          content={post?.summary || post?.title}
-        />
-        <meta name="twitter:image" content={post?.imageUrl} />
-
-        <link
-          rel="canonical"
-          href={`https://www.athletexpert.org/blog/${slug}`}
-        />
-
-        {/* ✅ Structured Data JSON-LD */}
+        <meta name="twitter:title" content={post.title} />
+        <meta name="twitter:description" content={post.summary || post.title} />
+        <meta name="twitter:image" content={post.imageUrl} />
+        <link rel="canonical" href={`https://www.athletexpert.org/blog/${slug}`} />
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "Article",
-            headline: post?.title || "AthleteXpert Blog",
-            image: post?.imageUrl ? [post.imageUrl] : undefined,
-            datePublished: post?.publishedDate,
-            author: post?.author
-              ? [{ "@type": "Person", name: post.author }]
-              : undefined,
+            headline: post.title || "AthleteXpert Blog",
+            image: post.imageUrl ? [post.imageUrl] : undefined,
+            datePublished: post.publishedDate,
+            author: post.author ? [{ "@type": "Person", name: post.author }] : undefined,
             publisher: {
               "@type": "Organization",
               name: "AthleteXpert",
@@ -122,7 +95,7 @@ const BlogPostPage: React.FC = () => {
         </Link>
       </div>
 
-      {post?.imageUrl && (
+      {post.imageUrl && (
         <div className="blog-post-image-container">
           <img
             src={post.imageUrl}
@@ -133,22 +106,22 @@ const BlogPostPage: React.FC = () => {
       )}
 
       <div className="blog-post-header">
-        <h1 className="blog-post-title">{post?.title}</h1>
+        <h1 className="blog-post-title">{post.title}</h1>
         <div className="blog-post-author-and-date">
-          <p className="blog-post-meta">By {post?.author}</p>
-          <p>
-            {post?.publishedDate &&
-              new Date(post.publishedDate).toLocaleDateString()}
-          </p>
+          <p className="blog-post-meta">By {post.author}</p>
+          <p>{new Date(post.publishedDate).toLocaleDateString()}</p>
         </div>
       </div>
 
-      <div
-        className="blog-post-content"
-        dangerouslySetInnerHTML={{
-          __html: DOMPurify.sanitize(post?.content || ""),
-        }}
-      />
+      <div className="blog-post-content-wrapper">
+        <div
+          className="blog-post-content"
+          dangerouslySetInnerHTML={{
+            __html: DOMPurify.sanitize(post.content || ""),
+          }}
+        />
+        <ShareButtons title={post.title} />
+      </div>
     </div>
   );
 };

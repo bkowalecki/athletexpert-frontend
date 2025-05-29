@@ -1,0 +1,22 @@
+.share-section {
+    margin-top: 2rem;
+    background-color: transparent; /* or match your green section's tone */
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+  }
+  
+  .share-label {
+    color: white;
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .share-icons {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  

@@ -92,29 +92,29 @@ const SportPage: React.FC = () => {
   return (
     <div className="sport-page">
       {/* Hero Section */}
-      <div
+      {/* <div
         className="sport-page-hero"
         style={{ backgroundImage: `url(${currentSport.backgroundImage})` }}
-      >
-        <div className="sport-page-hero-overlay">
-          <motion.h1
+      > */}
+        <div className="sport-page-title">
+          {/* <motion.h1
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             className="sport-page-title"
-          >
+          > */}
             {currentSport.title}
-          </motion.h1>
+          {/* </motion.h1> */}
         </div>
-      </div>
+      {/* </div> */}
 
       {/* About Section */}
-      <section className="sport-page-section">
+      {/* <section className="sport-page-section">
         <h2 className="sport-page-section-title">About</h2>
         {currentSport.extra_data.summary && (
           <p className="sport-page-text">{currentSport.extra_data.summary}</p>
         )}
-      </section>
+      </section> */}
 
       
 

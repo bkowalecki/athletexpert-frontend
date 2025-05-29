@@ -15,7 +15,7 @@ interface EsportExperienceProps {
 }
 
 const popularGames = [
-    { title: "League of Legends", players: "150M+", image: "/images/esports/lol.jpg" },
+    { title: "League of Legends", players: "150M+", image: "/images/esports/league_of_legends.png" },
     { title: "Valorant", players: "30M+", image: "/images/esports/valorant.jpg" },
     { title: "Counter-Strike 2", players: "35M+", image: "/images/esports/cs2.jpg" },
     { title: "Fortnite", players: "250M+", image: "/images/esports/fortnite.jpg" },
@@ -45,11 +45,6 @@ const EsportExperience: React.FC<EsportExperienceProps> = ({ sport }) => {
           </motion.h1>
         </div>
       </div>
-
-      <section className="esport-section">
-        <h2 className="esport-section-title">🎮 What’s {sport.title}?</h2>
-        <p className="esport-section-text">{sport.extra_data.summary}</p>
-      </section>
 
       <section className="esport-section">
         <h2 className="esport-section-title">🔥 Top 10 Esports & Games</h2>
