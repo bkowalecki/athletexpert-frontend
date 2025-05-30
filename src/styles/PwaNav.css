@@ -1,67 +1,65 @@
+/* PwaNav.css */
+
 .pwa-nav {
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
-    height: 72px;
-    background-color: #1a1a1a;
+    height: 64px;
+    background-color: var(--brand-dark);
     display: flex;
     justify-content: space-around;
     align-items: center;
     border-top: 1px solid #444;
     z-index: 9999;
-    box-shadow: 0 -1px 6px rgba(0, 0, 0, 0.4);
-    padding: 0 10px;
+    box-shadow: 0 -1px 6px rgba(0, 0, 0, 0.2);
+    padding: 0 5px;
   }
   
   .pwa-nav a {
-    color: #ffffff;
+    color: var(--brand-light);
     font-size: 1.5rem;
     text-decoration: none;
     display: flex;
     align-items: center;
     justify-content: center;
-    flex: 1;
+    flex-grow: 1;
     height: 100%;
-    transition: color 0.3s;
+    position: relative;
   }
   
   .pwa-nav a.active {
-    color: #f0a500;
+    color: #A23C20;
   }
   
   .pwa-nav-center-button-wrapper {
     position: relative;
-    top: -16px;
+    top: -20px;
     z-index: 10000;
-    flex: 1;
-    display: flex;
-    justify-content: center;
   }
   
   .pwa-nav-center-button {
-    background-color: #f0a500;
-    color: #1a1a1a;
+    background-color: #A23C20;
+    color: #fff !important;
+    width: 58px;
+    height: 58px;
     border-radius: 50%;
-    padding: 16px;
-    font-size: 1.6rem;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
     display: flex;
-    align-items: center;
     justify-content: center;
-    width: 56px;
-    height: 56px;
-    transition: transform 0.2s ease;
+    align-items: center;
+    font-size: 1.5rem;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+    border: 4px solid #000;
   }
   
   .pwa-nav-center-button.active {
-    background-color: #ffca28;
-    color: #000;
+    background-color: #fff;
+    color: #A23C20 !important;
   }
   
   body.pwa-nav-visible::after {
     content: "";
     display: block;
-    height: 72px;
+    height: 64px;
   }
   
