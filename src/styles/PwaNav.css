@@ -1,0 +1,28 @@
+.pwa-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 56px;
+    background-color: var(--brand-dark);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    border-top: 1px solid #444;
+    z-index: 9999;
+  }
+  
+  .pwa-nav a {
+    color: var(--brand-light);
+    font-size: 1.4rem;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+  }
+  
+  .pwa-nav a.active {
+    color: var(--brand-accent);
+  }
+  

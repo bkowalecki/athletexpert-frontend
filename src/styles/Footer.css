@@ -11,6 +11,7 @@
   color: var(--brand-light);
   width: 100%;
   padding: var(--footer-padding) 0;
+  border-top: 1px solid #333;
 }
 
 .footer-container {
@@ -24,10 +25,11 @@
   flex-direction: column;
   align-items: center;
   gap: 20px;
+  text-align: center;
 }
 
 .footer-logo h2 {
-  font-family: 'Arial', sans-serif;
+  font-family: 'Orbitron', sans-serif;
   color: var(--brand-light);
   margin: 0;
   font-size: 1.8rem;
@@ -54,6 +56,7 @@
 .social-media {
   display: flex;
   gap: 15px;
+  justify-content: center;
 }
 
 .social-media a {
@@ -74,16 +77,17 @@
   text-align: center;
 }
 
-/* Responsive layout for wider screens */
 @media (min-width: 768px) {
   .footer-content {
     flex-direction: row;
-    justify-content: center;
-    align-items: center;
+    justify-content: space-between;
+    text-align: left;
   }
+
   .footer-links {
     justify-content: flex-start;
   }
+
   .social-media {
     justify-content: flex-end;
   }

@@ -16,6 +16,7 @@ import AboutPage from "./components/AboutPage";
 import NotFoundPage from "./components/four0fourPage";
 import TermsAndConditionsPage from "./features/legal/TermsAndConditions";
 import SearchResults from "./features/search/SearchResults";
+import PwaNav from "./features/layout/PwaNav";
 import Footer from "./features/layout/Footer";
 import PrivacyPolicy from "./features/legal/PrivacyPolicy";
 import ProductDetail from "./features/products/ProductDetail";
@@ -249,6 +250,9 @@ const AppContent: React.FC = () => {
             </Suspense>
           </ErrorBoundary>
         </AnimatePresence>
+        {typeof window !== "undefined" &&
+          window.matchMedia("(display-mode: standalone)").matches &&
+          window.innerWidth <= 768 && <PwaNav />}
         <Footer />
       </SportsProvider>
     </div>
