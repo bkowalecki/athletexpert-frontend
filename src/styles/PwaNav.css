@@ -1,65 +1,54 @@
-/* PwaNav.css */
-
 .pwa-nav {
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
-    height: 64px;
+    height: 70px;
     background-color: var(--brand-dark);
     display: flex;
     justify-content: space-around;
     align-items: center;
     border-top: 1px solid #444;
     z-index: 9999;
-    box-shadow: 0 -1px 6px rgba(0, 0, 0, 0.2);
-    padding: 0 5px;
+    box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.3);
   }
   
   .pwa-nav a {
     color: var(--brand-light);
-    font-size: 1.5rem;
+    font-size: 1.6rem;
     text-decoration: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     flex-grow: 1;
-    height: 100%;
-    position: relative;
+    text-align: center;
+    transform: translateY(-4px); /* Nudges icons up slightly */
   }
   
   .pwa-nav a.active {
     color: #A23C20;
   }
   
-  .pwa-nav-center-button-wrapper {
+  /* Special center search button */
+  .pwa-nav .search-button {
     position: relative;
     top: -20px;
-    z-index: 10000;
-  }
-  
-  .pwa-nav-center-button {
+    width: 60px;
+    height: 60px;
     background-color: #A23C20;
-    color: #fff !important;
-    width: 58px;
-    height: 58px;
+    color: white;
     border-radius: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 1.5rem;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
-    border: 4px solid #000;
+    font-size: 1.6rem;
+    box-shadow: 0 0 12px #A23C20;
+    transition: transform 0.2s ease;
   }
   
-  .pwa-nav-center-button.active {
+  .pwa-nav .search-button.active {
     background-color: #fff;
-    color: #A23C20 !important;
+    color: #A23C20;
   }
   
-  body.pwa-nav-visible::after {
-    content: "";
-    display: block;
-    height: 64px;
+  .pwa-nav .search-button:hover {
+    transform: scale(1.05);
   }
   

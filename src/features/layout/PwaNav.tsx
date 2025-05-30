@@ -8,8 +8,9 @@ const PwaNav: React.FC = () => {
 
   useEffect(() => {
     const checkPwaAndMobile = () => {
-      const isStandalone = window.matchMedia("(display-mode: standalone)").matches ||
-                           (window.navigator as any).standalone === true;
+      const isStandalone =
+        window.matchMedia("(display-mode: standalone)").matches ||
+        (window.navigator as any).standalone === true;
       const isMobile = window.innerWidth <= 768;
       setShowNav(isStandalone && isMobile);
     };
@@ -30,14 +31,24 @@ const PwaNav: React.FC = () => {
         <i className="fas fa-newspaper" />
       </Link>
       <div className="pwa-nav-center-button-wrapper">
-        <Link to="/search" className={`pwa-nav-center-button ${pathname === "/search" ? "active" : ""}`}>
+        <Link
+          to="/search"
+          className={`search-button ${pathname === "/search" ? "active" : ""}`}
+        >
           <i className="fas fa-search" />
         </Link>
       </div>
       <Link to="/products" className={pathname === "/products" ? "active" : ""}>
         <i className="fas fa-box-open" />
       </Link>
-      <Link to="/profile" className={pathname === "/profile" ? "active" : ""}>
+      <Link
+        to="/profile"
+        className={
+          pathname.startsWith("/profile") || pathname === "/auth"
+            ? "active"
+            : ""
+        }
+      >
         <i className="fas fa-user" />
       </Link>
     </nav>
