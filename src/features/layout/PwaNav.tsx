@@ -1,4 +1,3 @@
-// PwaNav.tsx
 import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import "../../styles/PwaNav.css";
@@ -30,8 +29,13 @@ const PwaNav: React.FC = () => {
       <Link to="/blog" className={pathname.includes("/blog") ? "active" : ""}>
         <i className="fas fa-newspaper" />
       </Link>
-      <Link to="/search" className={pathname === "/search" ? "active" : ""}>
-        <i className="fas fa-search" />
+      <div className="pwa-nav-center-button-wrapper">
+        <Link to="/search" className={`pwa-nav-center-button ${pathname === "/search" ? "active" : ""}`}>
+          <i className="fas fa-search" />
+        </Link>
+      </div>
+      <Link to="/products" className={pathname === "/products" ? "active" : ""}>
+        <i className="fas fa-box-open" />
       </Link>
       <Link to="/profile" className={pathname === "/profile" ? "active" : ""}>
         <i className="fas fa-user" />
