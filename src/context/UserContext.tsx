@@ -16,15 +16,16 @@ export type User = {
   bio?: string | null;
   sports?: string[] | null;
   authProvider?: "local" | "auth0";
-  role: string; // "admin", "user", etc.
+  role: string; // "admin", "user"
 };
 
 interface UserContextProps {
   user: User | null;
   setUser: React.Dispatch<React.SetStateAction<User | null>>;
   isSessionChecked: boolean;
-  checkSession: () => Promise<void>; // ✨ Expose checkSession manually
+  checkSession: () => Promise<void>; 
 }
+
 
 const UserContext = createContext<UserContextProps | undefined>(undefined);
 
@@ -57,7 +58,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
   }, []);
 
   useEffect(() => {
-    checkSession(); // ✅ Only run once on mount
+    checkSession(); 
   }, [checkSession]);
 
   return (

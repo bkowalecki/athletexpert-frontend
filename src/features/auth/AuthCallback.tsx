@@ -29,14 +29,14 @@ const AuthCallback: React.FC = () => {
 
           if (response.ok) {
             const userData = await response.json();
-            setUser({ ...userData, authProvider: 'auth0' }); // ⭐️ Make sure to add authProvider here
+            setUser({ ...userData, authProvider: 'auth0' });
             navigate("/profile", { replace: true });
           } else {
-            console.error("❌ Failed to authenticate with backend:", response.status);
+            console.error(" Failed to authenticate with backend:", response.status);
             navigate("/auth", { replace: true });
           }
         } catch (error) {
-          console.error("❌ Error during Auth0 callback:", error);
+          console.error("Error during Auth0 callback:", error);
           navigate("/auth", { replace: true });
         }
       }

@@ -219,7 +219,7 @@ const AuthPage: React.FC = () => {
 
               const idTokenClaims = await getIdTokenClaims();
               if (!idTokenClaims) {
-                console.error("❌ No ID Token claims received.");
+                console.error("No ID Token claims received.");
                 return;
               }
 
@@ -240,11 +240,11 @@ const AuthPage: React.FC = () => {
                 setUser({ ...userData, authProvider: "auth0" });
                 navigate("/profile");
               } else {
-                console.error("❌ Backend auth failed after SSO.");
+                console.error("Backend auth failed after SSO.");
                 navigate("/auth");
               }
             } catch (error) {
-              console.error("❌ Error during Google SSO Popup:", error);
+              console.error("Error during Google SSO Popup:", error);
               navigate("/auth");
             }
           }}
