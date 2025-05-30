@@ -1,3 +1,4 @@
+// PwaNav.tsx
 import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import "../../styles/PwaNav.css";
@@ -7,12 +8,16 @@ const PwaNav: React.FC = () => {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    const isStandalone = window.matchMedia("(display-mode: standalone)").matches;
-    const isMobile = window.innerWidth <= 768;
+    const checkPwaAndMobile = () => {
+      const isStandalone = window.matchMedia("(display-mode: standalone)").matches ||
+                           (window.navigator as any).standalone === true;
+      const isMobile = window.innerWidth <= 768;
+      setShowNav(isStandalone && isMobile);
+    };
 
-    if (isStandalone && isMobile) {
-      setShowNav(true);
-    }
+    checkPwaAndMobile();
+    window.addEventListener("resize", checkPwaAndMobile);
+    return () => window.removeEventListener("resize", checkPwaAndMobile);
   }, []);
 
   if (!showNav) return null;

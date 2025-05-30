@@ -3,26 +3,34 @@
     bottom: 0;
     left: 0;
     right: 0;
-    height: 56px;
+    height: 64px;
     background-color: var(--brand-dark);
     display: flex;
     justify-content: space-around;
     align-items: center;
     border-top: 1px solid #444;
     z-index: 9999;
+    box-shadow: 0 -1px 6px rgba(0, 0, 0, 0.2);
   }
   
   .pwa-nav a {
     color: var(--brand-light);
-    font-size: 1.4rem;
+    font-size: 1.6rem;
     text-decoration: none;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 100%;
+    flex-grow: 1;
+    height: 100%;
   }
   
   .pwa-nav a.active {
     color: var(--brand-accent);
+  }
+  
+  body::after {
+    content: "";
+    display: block;
+    height: 64px; /* space for fixed nav to prevent overlap */
   }
   

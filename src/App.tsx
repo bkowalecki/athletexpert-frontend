@@ -85,6 +85,16 @@ const AppContent: React.FC = () => {
   const closeModal = () => setQuizModalOpen(false);
   // const location = useLocation();
   const { isSessionChecked } = useUserContext(); // Ensures session is verified before rendering
+  const isStandalone =
+  typeof window !== "undefined" &&
+  (window.matchMedia("(display-mode: standalone)").matches ||
+    (window.navigator as any).standalone === true);
+
+const isMobile = typeof window !== "undefined" && window.innerWidth <= 768;
+
+if (!isSessionChecked) {
+  return <div className="loading-screen">Checking session...</div>;
+}
 
   if (!isSessionChecked) {
     return <div className="loading-screen">Checking session...</div>; // Prevents UI flicker
@@ -250,9 +260,7 @@ const AppContent: React.FC = () => {
             </Suspense>
           </ErrorBoundary>
         </AnimatePresence>
-        {typeof window !== "undefined" &&
-          window.matchMedia("(display-mode: standalone)").matches &&
-          window.innerWidth <= 768 && <PwaNav />}
+        {isStandalone && isMobile && <PwaNav />}
         <Footer />
       </SportsProvider>
     </div>
