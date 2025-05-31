@@ -35,10 +35,12 @@ const fetchSavedProducts = async (): Promise<number[]> => {
 };
 
 const ProductsPage: React.FC = () => {
+  const [inputQuery, setInputQuery] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedBrand, setSelectedBrand] = useState("");
   const [selectedRetailer, setSelectedRetailer] = useState("");
   const [sortOption, setSortOption] = useState("default");
+  const [visibleCount, setVisibleCount] = useState(12);
   const { user } = useUserContext();
   const navigate = useNavigate();
   const [savedProductIds, setSavedProductIds] = useState<number[]>([]);
@@ -66,9 +68,7 @@ const ProductsPage: React.FC = () => {
     .filter((product) => {
       let matches = true;
       if (searchQuery) {
-        matches = product.name
-          .toLowerCase()
-          .includes(searchQuery.toLowerCase());
+        matches = product.name.toLowerCase().includes(searchQuery.toLowerCase());
       }
       if (matches && selectedBrand) {
         matches = product.brand === selectedBrand;
@@ -83,6 +83,8 @@ const ProductsPage: React.FC = () => {
       if (sortOption === "priceHigh") return b.price - a.price;
       return 0;
     });
+
+  const visibleProducts = filteredProducts.slice(0, visibleCount);
 
   const toggleSaveProduct = async (productId: number) => {
     if (!user) {
@@ -130,10 +132,20 @@ const ProductsPage: React.FC = () => {
         <input
           type="text"
           placeholder="Search"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          value={inputQuery}
+          onChange={(e) => setInputQuery(e.target.value)}
           className="search-bar"
         />
+        <button
+          className="search-btn"
+          onClick={() => {
+            setSearchQuery(inputQuery);
+            setVisibleCount(12);
+          }}
+        >
+          Search
+        </button>
+
         <select
           value={selectedBrand}
           onChange={(e) => setSelectedBrand(e.target.value)}
@@ -148,6 +160,7 @@ const ProductsPage: React.FC = () => {
               )
           )}
         </select>
+
         <select
           value={sortOption}
           onChange={(e) => setSortOption(e.target.value)}
@@ -174,8 +187,8 @@ const ProductsPage: React.FC = () => {
       )}
 
       <div className="product-grid">
-        {filteredProducts.length > 0
-          ? filteredProducts.map((product) => (
+        {visibleProducts.length > 0
+          ? visibleProducts.map((product) => (
               <ProductCard
                 key={product.id}
                 name={product.name}
@@ -186,16 +199,21 @@ const ProductsPage: React.FC = () => {
                 isSaved={savedProductIds.includes(product.id)}
                 isSaving={saving === product.id}
                 onToggleSave={() => toggleSaveProduct(product.id)}
-                // badges={[
-                //   ...(product.trending ? ["Trending"] : []),
-                //   ...(product.featured ? ["Featured"] : []),
-                // ]}
               />
             ))
           : !isLoading && (
               <p className="no-products-text">No products match your search.</p>
             )}
       </div>
+
+      {visibleCount < filteredProducts.length && (
+        <button
+          className="load-more-button"
+          onClick={() => setVisibleCount((prev) => prev + 12)}
+        >
+          View More
+        </button>
+      )}
     </div>
   );
 };
