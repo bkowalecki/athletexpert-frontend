@@ -3,7 +3,7 @@
   bottom: 0;
   left: 0;
   right: 0;
-  height: 85px; /* Increased from 70px */
+  height: 80px;
   background-color: var(--brand-dark);
   display: flex;
   justify-content: space-around;
@@ -18,23 +18,27 @@
   font-size: 1.6rem;
   text-decoration: none;
   flex-grow: 1;
-  text-align: center;
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100%;
+  transition: color 0.2s ease;
 }
 
-/* Center Search Button */
+.pwa-nav a.active {
+  color: #fff;
+}
+
+/* Search Button (center) */
 .pwa-nav-center-button-wrapper {
   position: relative;
-  top: -20px;
-  z-index: 1;
+  top: -22px;
+  z-index: 2;
 }
 
 .pwa-nav .search-button {
-  width: 60px;
-  height: 60px;
+  width: 64px;
+  height: 64px;
   background-color: #A23C20;
   color: white;
   border-radius: 50%;
@@ -42,17 +46,35 @@
   justify-content: center;
   align-items: center;
   font-size: 1.6rem;
-  box-shadow: 0 0 12px #A23C20;
-  transition: transform 0.2s ease;
+  box-shadow: 0 0 12px rgba(162, 60, 32, 0.6);
+  transition: all 0.25s ease;
+  border: none;
+  outline: none;
 }
 
+/* Selected state for center button */
 .pwa-nav .search-button.active {
   background-color: #fff;
   color: #A23C20;
-  outline: 3px solid #fff;
-  outline-offset: 2px;
+  box-shadow: 0 0 14px rgba(255, 255, 255, 0.6);
 }
 
-.pwa-nav .search-button:hover {
+/* Remove any default focus outlines */
+.pwa-nav .search-button:focus,
+.pwa-nav a:focus {
+  outline: none;
+}
+
+/* Hover scale effect */
+.pwa-nav .search-button:hover,
+.pwa-nav a:hover {
   transform: scale(1.05);
+}
+
+/* Smooth icon rendering */
+.pwa-nav i {
+  pointer-events: none;
+  font-smooth: always;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
