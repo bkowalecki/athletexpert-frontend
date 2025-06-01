@@ -5,6 +5,7 @@ import axios from "axios";
 import sportsData from "../../data/sports.json";
 import EsportExperience from "./EsportsExperience";
 import "../../styles/SportPage.css";
+import ProductCard from "../products/ProductCard"; // Adjust the path if necessary
 
 interface Sport {
   title: string;
@@ -16,6 +17,16 @@ interface Sport {
     summary?: string;
     fun_fact?: string;
   };
+}
+
+interface Product {
+  id: number;
+  name: string;
+  brand: string;
+  price: number;
+  imgUrl: string;
+  affiliateLink: string;
+  sports?: string[]; // optional, but handy
 }
 
 interface BlogPost {
@@ -36,25 +47,27 @@ const SportPage: React.FC = () => {
   const [currentSport, setCurrentSport] = useState<Sport | null>(null);
   const [relatedBlogs, setRelatedBlogs] = useState<BlogPost[]>([]);
   const [loadingBlogs, setLoadingBlogs] = useState(true);
+  const [recommendedProducts, setRecommendedProducts] = useState<Product[]>([]);
+
 
   useEffect(() => {
     if (!sport) {
       navigate("/404", { replace: true });
       return;
     }
-
+  
     const foundSport = sportsData.find(
       (s) => slugify(s.title) === sport.toLowerCase()
     );
-
+  
     if (!foundSport) {
       console.warn(`⚠️ Sport "${sport}" not found. Redirecting to 404.`);
       navigate("/404", { replace: true });
       return;
     }
-
+  
     setCurrentSport(foundSport);
-
+  
     const fetchRelatedBlogs = async () => {
       try {
         const response = await axios.get(
@@ -71,8 +84,21 @@ const SportPage: React.FC = () => {
         setLoadingBlogs(false);
       }
     };
-
+  
+    const fetchRecommendedProducts = async () => {
+      try {
+        const res = await axios.get(
+          `${process.env.REACT_APP_API_URL}/products/by-sport?sport=${foundSport.title}`,
+          { withCredentials: true }
+        );
+        setRecommendedProducts(res.data);
+      } catch (err) {
+        console.error("❌ Error fetching sport-specific products:", err);
+      }
+    };
+  
     fetchRelatedBlogs();
+    fetchRecommendedProducts();
   }, [sport, navigate]);
 
   if (!currentSport) {
@@ -136,11 +162,27 @@ const SportPage: React.FC = () => {
 
       {/* Gear Section */}
       <section className="sport-page-section">
-        <h2 className="sport-page-section-title">Recommended Gear</h2>
-        <p className="sport-page-text">
-          Top gear recommendations for this sport will appear here.
-        </p>
-      </section>
+  <h2 className="sport-page-section-title">Recommended Gear</h2>
+  {recommendedProducts.length > 0 ? (
+    <div className="recommended-products-grid">
+      {recommendedProducts.map((product) => (
+        <ProductCard
+          key={product.id}
+          name={product.name}
+          brand={product.brand}
+          price={product.price}
+          imgUrl={product.imgUrl}
+          affiliateLink={product.affiliateLink}
+          // ...add save/toggle logic if needed
+        />
+      ))}
+    </div>
+  ) : (
+    <p className="sport-page-text">
+      We're still gathering the best gear for this sport.
+    </p>
+  )}
+</section>
 
       {/* Blog Section */}
       <section className="sport-page-section">

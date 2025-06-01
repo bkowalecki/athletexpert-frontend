@@ -1,4 +1,4 @@
-// ✅ You already have this admin UI code working — this is just a cleaned up and complete implementation for clarity.
+// ✅ Enhanced product admin UI with multi-sport input like blog tags
 
 import React, { useEffect, useState } from "react";
 import axios from "axios";
@@ -13,6 +13,7 @@ interface Product {
   price: string;
   imgUrl: string;
   affiliateLink: string;
+  sports: string[];
 }
 
 const emptyProduct: Product = {
@@ -21,6 +22,7 @@ const emptyProduct: Product = {
   price: "",
   imgUrl: "",
   affiliateLink: "",
+  sports: [],
 };
 
 const AdminProductManager: React.FC = () => {
@@ -31,6 +33,7 @@ const AdminProductManager: React.FC = () => {
   const [formData, setFormData] = useState<Product>(emptyProduct);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
+  const [sportInput, setSportInput] = useState("");
 
   useEffect(() => {
     if (user?.role === "admin") {
@@ -54,6 +57,24 @@ const AdminProductManager: React.FC = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSportKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && sportInput.trim()) {
+      e.preventDefault();
+      const newSport = sportInput.trim();
+      if (!formData.sports.includes(newSport)) {
+        setFormData((prev) => ({ ...prev, sports: [...prev.sports, newSport] }));
+      }
+      setSportInput("");
+    }
+  };
+
+  const removeSport = (sportToRemove: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      sports: prev.sports.filter((s) => s !== sportToRemove),
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -120,6 +141,25 @@ const AdminProductManager: React.FC = () => {
             required={field !== "affiliateLink"}
           />
         ))}
+
+        <div>
+          <label className="bold-label">Sports</label>
+          <input
+            type="text"
+            value={sportInput}
+            onChange={(e) => setSportInput(e.target.value)}
+            onKeyDown={handleSportKeyDown}
+            placeholder="Type a sport and press Enter"
+          />
+          <div className="tag-preview">
+            {formData.sports.map((sport) => (
+              <span key={sport} className="tag-chip">
+                {sport} <button onClick={() => removeSport(sport)}>x</button>
+              </span>
+            ))}
+          </div>
+        </div>
+
         <button type="submit">{editingId ? "Update" : "Create"}</button>
       </form>
 
