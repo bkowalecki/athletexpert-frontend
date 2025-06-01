@@ -10,6 +10,16 @@
   min-height: 100vh;
 }
 
+.products-page-title{
+  font-size: 2.5rem;
+  text-align: center;
+  margin-bottom: 2rem;
+  text-transform: uppercase;
+  color: #fff;
+  border-bottom: 2px solid #a23c20;
+  padding-bottom: 0.5rem;
+}
+
 /* 🌟 Filters & Search */
 .filters-container {
   display: flex;

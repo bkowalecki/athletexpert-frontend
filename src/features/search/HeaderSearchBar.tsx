@@ -1,11 +1,9 @@
-// HeaderSearchBar.tsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../styles/HeaderSearchBar.css";
-import { trackEvent } from "../../util/analytics"; // Import your analytics tracking function
-import sportsTerms from "../../data/sportsTerms.json"; // Import your sports terms JSON
+import { trackEvent } from "../../util/analytics";
+import sportsTerms from "../../data/sportsTerms.json";
 
-// Define props to conditionally show the submit button and handle search completion
 interface HeaderSearchBarProps {
   showSubmitButton?: boolean;
   onSearchComplete?: () => void;
@@ -19,8 +17,44 @@ const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState<number>(-1);
-
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setShowDropdown(false);
+    };
+    window.addEventListener("keydown", handleEsc);
+    return () => window.removeEventListener("keydown", handleEsc);
+  }, []);
+
+  const handleNavigate = (query: string) => {
+    const trimmedQuery = query.trim();
+    navigate(`/search?query=${encodeURIComponent(trimmedQuery)}`);
+    setShowDropdown(false);
+    trackEvent("search_submit", {
+      query: trimmedQuery || "(empty)",
+      source: "header",
+    });
+    if (onSearchComplete) onSearchComplete();
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+    setHighlightedIndex(-1);
+
+    if (query.length > 1) {
+      const filtered = sportsTerms.sportsTerms.filter((term) =>
+        term.toLowerCase().startsWith(query.toLowerCase())
+      );
+      setSuggestions(filtered);
+      setShowDropdown(filtered.length > 0);
+    } else {
+      setSuggestions([]);
+      setShowDropdown(false);
+    }
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (!showDropdown) return;
 
@@ -35,54 +69,17 @@ const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
     } else if (e.key === "Enter") {
       e.preventDefault();
       if (highlightedIndex >= 0 && highlightedIndex < suggestions.length) {
-        const selected = suggestions[highlightedIndex];
-        navigate(`/search?query=${encodeURIComponent(selected)}`);
-        setShowDropdown(false);
-        if (onSearchComplete) {
-          onSearchComplete();
-        }
+        handleNavigate(suggestions[highlightedIndex]);
       } else {
-        handleSearchSubmit(e);
+        handleNavigate(searchQuery);
       }
     }
   };
 
-  // Handle input changes and filter suggestions
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const query = e.target.value;
-    setSearchQuery(query);
-    setHighlightedIndex(-1); // ✅ Reset highlight when typing
-  
-    if (query.length > 1) {
-      const filteredSuggestions = sportsTerms.sportsTerms.filter((term) =>
-        term.toLowerCase().startsWith(query.toLowerCase())
-      );
-      setSuggestions(filteredSuggestions);
-      setShowDropdown(filteredSuggestions.length > 0);
-    } else {
-      setSuggestions([]);
-      setShowDropdown(false);
-    }
-  };
-
-  // Handle search submission (form submit or clicking the button)
   const handleSearchSubmit = (e: React.FormEvent | React.MouseEvent) => {
     e.preventDefault();
-    if (!searchQuery.trim()) return;
-  
-    trackEvent("search_submit", {
-      query: searchQuery,
-      source: "header",
-    });
-  
-    navigate(`/search?query=${encodeURIComponent(searchQuery)}`);
-    setShowDropdown(false);
-  
-    if (onSearchComplete) {
-      onSearchComplete();
-    }
+    handleNavigate(searchQuery);
   };
-  
 
   return (
     <div className="search-bar-container">
@@ -101,26 +98,21 @@ const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
           <button
             type="submit"
             className="search-button"
-            aria-label="Search"
-          ></button>
+            aria-label="Submit search"
+          />
         )}
       </form>
+
       {showDropdown && suggestions.length > 0 && (
         <ul className="search-suggestions show">
           {suggestions.map((suggestion, index) => (
             <li
-              key={index}
+              key={suggestion}
               className={`search-suggestion-item ${
                 highlightedIndex === index ? "highlighted" : ""
               }`}
               onMouseEnter={() => setHighlightedIndex(index)}
-              onClick={() => {
-                navigate(`/search?query=${encodeURIComponent(suggestion)}`);
-                setShowDropdown(false);
-                if (onSearchComplete) {
-                  onSearchComplete();
-                }
-              }}
+              onClick={() => handleNavigate(suggestion)}
             >
               {suggestion}
             </li>

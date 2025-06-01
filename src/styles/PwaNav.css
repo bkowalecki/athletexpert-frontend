@@ -19,11 +19,15 @@
     text-decoration: none;
     flex-grow: 1;
     text-align: center;
-    transform: translateY(-4px); /* Nudges icons up slightly */
+      margin-bottom: 30px; /* push icons higher */
   }
   
-  .pwa-nav a.active {
-    color: #A23C20;
+  .pwa-nav .search-button.active {
+    outline: 3px solid #fff;
+    outline-offset: 2px;
+    background-color: #A23C20;
+    color: #fff;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
   }
   
   /* Special center search button */

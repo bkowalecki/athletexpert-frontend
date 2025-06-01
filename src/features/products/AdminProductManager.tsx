@@ -1,0 +1,148 @@
+// ✅ You already have this admin UI code working — this is just a cleaned up and complete implementation for clarity.
+
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { useUserContext } from "../../context/UserContext";
+import { useNavigate } from "react-router-dom";
+import "../../styles/NewProduct.css";
+
+interface Product {
+  id?: number;
+  name: string;
+  brand: string;
+  price: string;
+  imgUrl: string;
+  affiliateLink: string;
+}
+
+const emptyProduct: Product = {
+  name: "",
+  brand: "",
+  price: "",
+  imgUrl: "",
+  affiliateLink: "",
+};
+
+const AdminProductManager: React.FC = () => {
+  const { user } = useUserContext();
+  const navigate = useNavigate();
+
+  const [products, setProducts] = useState<Product[]>([]);
+  const [formData, setFormData] = useState<Product>(emptyProduct);
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (user?.role === "admin") {
+      fetchProducts();
+    }
+  }, [user]);
+
+  const fetchProducts = async () => {
+    setLoading(true);
+    try {
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}/products`, {
+        withCredentials: true,
+      });
+      setProducts(res.data);
+    } catch (err) {
+      alert("Error loading products.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      if (editingId) {
+        await axios.put(
+          `${process.env.REACT_APP_API_URL}/products/admin/${editingId}`,
+          formData,
+          { withCredentials: true }
+        );
+      } else {
+        await axios.post(
+          `${process.env.REACT_APP_API_URL}/products/admin`,
+          formData,
+          { withCredentials: true }
+        );
+      }
+      setFormData(emptyProduct);
+      setEditingId(null);
+      fetchProducts();
+    } catch (err) {
+      alert("Error saving product.");
+    }
+  };
+
+  const handleEdit = (product: Product) => {
+    setFormData(product);
+    setEditingId(product.id || null);
+    window.scrollTo(0, 0);
+  };
+
+  const handleDelete = async (id: number) => {
+    if (!window.confirm("Are you sure you want to delete this product?")) return;
+    try {
+      await axios.delete(`${process.env.REACT_APP_API_URL}/products/admin/${id}`, {
+        withCredentials: true,
+      });
+      fetchProducts();
+    } catch (err) {
+      alert("Error deleting product.");
+    }
+  };
+
+  if (user?.role !== "admin") {
+    return (
+      <div className="admin-lockout">
+        <h1>🚫 This page is for admins only.</h1>
+      </div>
+    );
+  }
+
+  return (
+    <div className="new-product-container">
+      <h2>{editingId ? "Edit Product" : "Add New Product"}</h2>
+      <form onSubmit={handleSubmit} className="product-form">
+        {["name", "brand", "price", "imgUrl", "affiliateLink"].map((field) => (
+          <input
+            key={field}
+            name={field}
+            value={(formData as any)[field]}
+            onChange={handleChange}
+            placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
+            required={field !== "affiliateLink"}
+          />
+        ))}
+        <button type="submit">{editingId ? "Update" : "Create"}</button>
+      </form>
+
+      <h3>All Products</h3>
+      {loading ? (
+        <p>Loading products...</p>
+      ) : (
+        <div className="product-list">
+          {products.map((p) => (
+            <div key={p.id} className="product-item">
+              <img src={p.imgUrl} alt={p.name} />
+              <div>
+                <strong>{p.name}</strong> – ${p.price} <br />
+                <small>{p.brand}</small>
+              </div>
+              <button onClick={() => handleEdit(p)}>✏️ Edit</button>
+              <button onClick={() => handleDelete(p.id!)}>🗑 Delete</button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default AdminProductManager;

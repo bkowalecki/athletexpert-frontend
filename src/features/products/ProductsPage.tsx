@@ -126,7 +126,7 @@ const ProductsPage: React.FC = () => {
           content="Discover the best gear for your sport on AthleteXpert."
         />
       </Helmet>
-      <h1>Explore</h1>
+      <h1 className="products-page-title">Explore</h1>
 
       <div className="filters-container">
         <input

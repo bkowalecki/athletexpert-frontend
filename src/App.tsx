@@ -26,6 +26,7 @@ import { Auth0Provider } from "@auth0/auth0-react";
 import { Navigate } from "react-router-dom";
 import { SportsProvider } from "./context/SportsContext";
 import NewBlogPost from "./features/blog/NewBlogPost"; // ✅ Import NewBlogPost
+import AdminProductManager from "./features/products/AdminProductManager";
 import ScrollToTop from "./util/ScrollToTop";
 import RequireAuth from "./features/auth/RequireAuth"; // ✅ Import RequireAuth
 import ErrorBoundary from "./components/common/ErrorBoundary"; // ⭐ Add this import
@@ -86,15 +87,15 @@ const AppContent: React.FC = () => {
   // const location = useLocation();
   const { isSessionChecked } = useUserContext(); // Ensures session is verified before rendering
   const isStandalone =
-  typeof window !== "undefined" &&
-  (window.matchMedia("(display-mode: standalone)").matches ||
-    (window.navigator as any).standalone === true);
+    typeof window !== "undefined" &&
+    (window.matchMedia("(display-mode: standalone)").matches ||
+      (window.navigator as any).standalone === true);
 
-const isMobile = typeof window !== "undefined" && window.innerWidth <= 768;
+  const isMobile = typeof window !== "undefined" && window.innerWidth <= 768;
 
-if (!isSessionChecked) {
-  return <div className="loading-screen">Checking session...</div>;
-}
+  if (!isSessionChecked) {
+    return <div className="loading-screen">Checking session...</div>;
+  }
 
   if (!isSessionChecked) {
     return <div className="loading-screen">Checking session...</div>; // Prevents UI flicker
@@ -187,6 +188,16 @@ if (!isSessionChecked) {
                     <PageWrapper>
                       <ProductDetail />
                     </PageWrapper>
+                  }
+                />
+                <Route
+                  path="/admin/products"
+                  element={
+                    <RequireAuth>
+                      <PageWrapper>
+                        <AdminProductManager />
+                      </PageWrapper>
+                    </RequireAuth>
                   }
                 />
                 <Route
