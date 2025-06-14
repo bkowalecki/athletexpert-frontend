@@ -1,26 +1,52 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useUserContext } from "../../context/UserContext";
 import { useNavigate } from "react-router-dom";
 import { blogTemplates, BlogTemplate } from "../../data/blogTemplates";
 import "../../styles/NewBlogPost.css";
 
+interface BlogPost {
+  id?: number;
+  title: string;
+  author: string;
+  imageUrl: string;
+  summary: string;
+  content: string;
+  sport: string;
+  tags: string[];
+  publishedDate: string;
+}
+
+const emptyFormData: BlogPost = {
+  title: "",
+  author: "",
+  imageUrl: "",
+  summary: "",
+  content: "",
+  sport: "",
+  tags: [],
+  publishedDate: new Date().toISOString().slice(0, 10),
+};
+
 const NewBlogPost: React.FC = () => {
   const { user } = useUserContext();
   const navigate = useNavigate();
 
-  const [formData, setFormData] = useState({
-    title: "",
-    author: "",
-    imageUrl: "",
-    summary: "",
-    content: "",
-    sport: "",
-    tags: [] as string[],
-    publishedDate: new Date().toISOString().slice(0, 10), // 👈 Add this line
-  });
-
+  const [formData, setFormData] = useState<BlogPost>(emptyFormData);
   const [tagInput, setTagInput] = useState("");
+  const [blogs, setBlogs] = useState<BlogPost[]>([]);
+  const [editingId, setEditingId] = useState<number | null>(null);
+
+  useEffect(() => {
+    axios
+      .get(`${process.env.REACT_APP_API_URL}/blog/admin/all`, {
+        withCredentials: true,
+      })
+      .then((res) => {
+        if (res.data) setBlogs(res.data);
+      })
+      .catch((err) => console.error("Error loading blogs", err));
+  }, []);
 
   const insertTemplate = (templateHtml: string) => {
     setFormData((prev) => ({
@@ -53,21 +79,73 @@ const NewBlogPost: React.FC = () => {
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleEdit = (blog: BlogPost) => {
+    setEditingId(blog.id ?? null);
+    setFormData({
+      title: blog.title,
+      author: blog.author,
+      imageUrl: blog.imageUrl,
+      summary: blog.summary,
+      content: blog.content,
+      sport: blog.sport,
+      tags: Array.isArray(blog.tags) ? blog.tags : [], 
+      publishedDate: blog.publishedDate,
+    });
+  };
+
+  const handleDelete = async (id: number) => {
+    if (!window.confirm("Are you sure you want to delete this post?")) return;
     try {
-      await axios.post(
-        `${process.env.REACT_APP_API_URL}/blog/admin/blog`,
-        formData,
+      await axios.delete(`${process.env.REACT_APP_API_URL}/blog/${id}`, {
+        withCredentials: true,
+      });
+      setBlogs((prev) => prev.filter((b) => b.id !== id));
+    } catch (err) {
+      console.error("Delete failed", err);
+    }
+  };
+
+  const reloadBlogs = async () => {
+    try {
+      const res = await axios.get(
+        `${process.env.REACT_APP_API_URL}/blog/admin/all`,
         {
           withCredentials: true,
-          headers: { "Content-Type": "application/json" },
         }
       );
-      navigate("/blog");
+      setBlogs(res.data || []);
     } catch (err) {
-      console.error("Error creating blog post:", err);
-      alert("Error creating blog post");
+      console.error("Error reloading blogs", err);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const url = editingId
+      ? `${process.env.REACT_APP_API_URL}/blog/admin/blog/${editingId}`
+      : `${process.env.REACT_APP_API_URL}/blog/admin/blog`;
+    const method = editingId ? "put" : "post";
+
+    try {
+      await axios({
+        url,
+        method,
+        data: formData,
+        withCredentials: true,
+        headers: { "Content-Type": "application/json" },
+      });
+      alert(editingId ? "Blog updated!" : "Blog created!");
+      if (editingId) {
+        setEditingId(null);
+        setFormData(emptyFormData);
+        await reloadBlogs(); // 👈 Optional function to refresh
+      } else {
+        setFormData(emptyFormData);
+        alert("Blog created!");
+      }
+    } catch (err) {
+      console.error("Error submitting blog:", err);
+      alert("Error submitting blog");
     }
   };
 
@@ -87,20 +165,19 @@ const NewBlogPost: React.FC = () => {
 
   return (
     <div className="new-blog-container">
-      <h2>Create New Blog Post</h2>
+      <h2>{editingId ? "Edit Blog Post" : "Create New Blog Post"}</h2>
       <form onSubmit={handleSubmit} className="blog-form">
-        {[
-          { name: "title", placeholder: "Title" },
-          { name: "author", placeholder: "Author" },
-          { name: "imageUrl", placeholder: "Header Image URL" },
-          { name: "sport", placeholder: "Sport (optional)" },
-        ].map(({ name, placeholder }) => (
+        {["title", "author", "imageUrl", "sport"].map((name) => (
           <input
             key={name}
             name={name}
             value={(formData as any)[name]}
             onChange={handleChange}
-            placeholder={placeholder}
+            placeholder={
+              name === "imageUrl"
+                ? "Header Image URL"
+                : name.charAt(0).toUpperCase() + name.slice(1)
+            }
             required={name === "title" || name === "author"}
           />
         ))}
@@ -124,7 +201,10 @@ const NewBlogPost: React.FC = () => {
           <div className="tag-preview">
             {formData.tags.map((tag) => (
               <span key={tag} className="tag-chip">
-                {tag} <button onClick={() => removeTag(tag)}>x</button>
+                {tag}{" "}
+                <button type="button" onClick={() => removeTag(tag)}>
+                  x
+                </button>
               </span>
             ))}
           </div>
@@ -160,8 +240,30 @@ const NewBlogPost: React.FC = () => {
           />
         </div>
 
-        <button type="submit">Publish</button>
+        <button type="submit">{editingId ? "Update" : "Publish"}</button>
+        {editingId && (
+          <button
+            type="button"
+            onClick={() => {
+              setEditingId(null);
+              setFormData(emptyFormData);
+            }}
+          >
+            Cancel Edit
+          </button>
+        )}
       </form>
+
+      <div className="existing-blogs">
+        <h3>Existing Blog Posts</h3>
+        {blogs.map((b) => (
+          <div key={b.id} className="blog-admin-row">
+            <strong>{b.title}</strong> — {b.author}
+            <button onClick={() => handleEdit(b)}>✏️ Edit</button>
+            <button onClick={() => handleDelete(b.id!)}>🗑️ Delete</button>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

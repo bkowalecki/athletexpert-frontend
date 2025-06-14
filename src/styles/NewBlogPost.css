@@ -108,4 +108,22 @@
     margin-left: 6px;
     cursor: pointer;
   }
+
+  .existing-blogs {
+    margin-top: 2rem;
+  }
+  .blog-admin-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #2a2a2a;
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+    border-radius: 4px;
+  }
+  .blog-admin-row button {
+    margin-left: 8px;
+    cursor: pointer;
+  }
+  
   

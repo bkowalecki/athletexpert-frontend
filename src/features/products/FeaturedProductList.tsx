@@ -52,7 +52,7 @@ const FeaturedProductList: React.FC = () => {
   }, [user]);
 
   const toggleSaveProduct = async (productId: number) => {
-    if (!user) return toast.warn("⚠️ Log in to save products!");
+    if (!user) return toast.warn("Log in to save products!");
 
     const isSaved = savedProductIds.includes(productId);
     setSavingProductIds((prev) => [...prev, productId]);

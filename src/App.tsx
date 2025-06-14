@@ -30,6 +30,7 @@ import AdminProductManager from "./features/products/AdminProductManager";
 import ScrollToTop from "./util/ScrollToTop";
 import RequireAuth from "./features/auth/RequireAuth"; // ✅ Import RequireAuth
 import ErrorBoundary from "./components/common/ErrorBoundary"; // ⭐ Add this import
+import ContactPage from "./features/legal/ContactPage"; // ✅ Import ContactPage
 const BlogPage = lazy(() => import("./features/blog/BlogPage"));
 const FeaturedProductList = React.lazy(
   () => import("./features/products/FeaturedProductList")
@@ -217,7 +218,7 @@ const AppContent: React.FC = () => {
                   }
                 />
                 <Route path="/community/:sport" element={<SportPage />} />{" "}
-                {/* ✅ Add this */}
+            
                 <Route
                   path="/auth"
                   element={
@@ -259,6 +260,8 @@ const AppContent: React.FC = () => {
                     </PageWrapper>
                   }
                 />
+                <Route path="/contact" element={<ContactPage />} />
+
                 <Route
                   path="/blog/:slug"
                   element={

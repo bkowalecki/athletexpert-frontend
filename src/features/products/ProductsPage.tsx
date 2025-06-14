@@ -88,7 +88,7 @@ const ProductsPage: React.FC = () => {
 
   const toggleSaveProduct = async (productId: number) => {
     if (!user) {
-      toast.warn("⚠️ You need to log in to save products!", {
+      toast.warn("Log in to save products!", {
         position: "top-center",
       });
       return;

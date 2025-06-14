@@ -167,7 +167,7 @@ const AdminProductManager: React.FC = () => {
       {loading ? (
         <p>Loading products...</p>
       ) : (
-        <div className="product-list">
+        <div className="admin-product-list">
           {products.map((p) => (
             <div key={p.id} className="product-item">
               <img src={p.imgUrl} alt={p.name} />

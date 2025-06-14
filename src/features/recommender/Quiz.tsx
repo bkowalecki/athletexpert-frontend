@@ -159,19 +159,16 @@ const Quiz: React.FC<QuizProps> = ({ isOpen, closeModal }) => {
 
   // Use useEffect to control overflow based on modal visibility
   useEffect(() => {
+    const body = document.body;
     if (isOpen) {
-      // Prevent scrolling when modal is open
-      document.body.style.overflow = "hidden";
+      body.classList.add("scroll-lock");
     } else {
-      // Re-enable scrolling when modal is closed
-      document.body.style.overflow = "auto";
+      body.classList.remove("scroll-lock");
     }
-
-    // Cleanup when the component unmounts or modal closes
-    return () => {
-      document.body.style.overflow = "auto";
-    };
+  
+    return () => body.classList.remove("scroll-lock");
   }, [isOpen]);
+  
 
   useEffect(() => {
     if (step === 0) {
@@ -197,6 +194,7 @@ const Quiz: React.FC<QuizProps> = ({ isOpen, closeModal }) => {
       </button>
 
       <div className="quiz-modal-content" onClick={(e) => e.stopPropagation()}>
+  
         <div className="quiz-container">
           {isLoading ? (
             <LoadingSpinner />
@@ -318,7 +316,7 @@ const Quiz: React.FC<QuizProps> = ({ isOpen, closeModal }) => {
 
               {step === totalSteps && (
                 <div className="recommended-products">
-                  <h3>Recommended For You</h3>
+                  <h3 className="recommended-products-title">Recommended For You</h3>
                   <div className="quiz-product-grid">
                     {recommendedProducts.map((product) => (
                       <ProductCard

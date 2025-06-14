@@ -145,6 +145,7 @@ const Community: React.FC = () => {
           />
         </form>
       </div> */}
+      <h1 className="community-page-title">Community</h1>
       <div className="sports-masonry">
         {filteredSports.map((sport: Sport, index: number) => (
           <SportCard

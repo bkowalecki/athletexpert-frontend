@@ -262,12 +262,11 @@
 .recommended-products {
   text-align: center;
 }
-
-.recommended-products h3 {
-  font-size: 2rem;
-  margin-bottom: 20px;
-  color: #333;
+.recommended-products-title {
+  font-size: 1.8rem;
+  text-align: center;
 }
+
 
 /* Ensure product cards behave like normal cards in grid */
 .quiz-product-grid {

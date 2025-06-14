@@ -110,7 +110,7 @@ const SearchResults: React.FC = () => {
   }, [searchQuery, user]);
 
   const toggleSaveProduct = async (productId: number) => {
-    if (!user) return toast.warn("⚠️ Log in to save products!");
+    if (!user) return toast.warn("Log in to save products!");
     const isSaved = savedProductIds.includes(productId);
     setSavingProductIds((prev) => [...prev, productId]);
 
@@ -171,7 +171,9 @@ const SearchResults: React.FC = () => {
     <div className="search-results-page-container">
       <h1 className="search-results-page-title">Results for: "{searchQuery}"</h1>
 
-      {error && <p className="search-results-page-error">{error}</p>}
+      {error && products.length === 0 && blogs.length === 0 && matchingSports.length === 0 && matchingStaticPages.length === 0 && (
+  <p className="search-results-page-error">{error}</p>
+)}
 
       {!loading && !error && products.length === 0 && blogs.length === 0 && (
         <div className="search-results-page-no-results">

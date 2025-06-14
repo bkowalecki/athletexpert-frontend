@@ -33,7 +33,7 @@ const ProductDetail: React.FC = () => {
         );
 
         if (!response.ok) {
-          console.warn(`⚠️ Product ID "${id}" not found. Redirecting to /404.`);
+          console.warn(`Product ID "${id}" not found. Redirecting to /404.`);
           navigate("/404", { replace: true });
           return;
         }
@@ -41,7 +41,7 @@ const ProductDetail: React.FC = () => {
         const data = await response.json();
 
         if (!data || Object.keys(data).length === 0) {
-          console.warn(`⚠️ No product data returned. Redirecting to /404.`);
+          console.warn(`No product data returned. Redirecting to /404.`);
           navigate("/404", { replace: true });
           return;
         }

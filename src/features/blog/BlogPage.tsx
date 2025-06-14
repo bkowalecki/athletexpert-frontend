@@ -96,7 +96,7 @@ const BlogPage: React.FC = () => {
   }, [user]);
 
   const toggleSaveBlog = useCallback(async (blogId: number) => {
-    if (!user) return toast.warn("⚠️ Log in to save blogs!");
+    if (!user) return toast.warn("Log in to save blogs!");
     const isSaved = savedBlogIds.includes(blogId);
     try {
       await axios({
@@ -133,7 +133,7 @@ const BlogPage: React.FC = () => {
         <meta name="description" content="Get the latest athletic tips and stories." />
       </Helmet>
 
-      <h2 className="blog-heading">Blog</h2>
+      <h1 className="blog-page-title">Blog</h1>
       <form className="blog-search-container" onSubmit={handleSearchSubmit}>
         <input
           type="text"

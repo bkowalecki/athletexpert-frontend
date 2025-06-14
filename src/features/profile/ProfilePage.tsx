@@ -119,7 +119,7 @@ const ProfilePage: React.FC = () => {
   };
 
   const toggleSaveProduct = async (productId: number) => {
-    if (!user) return toast.warn("⚠️ Log in to save products!");
+    if (!user) return toast.warn("Log in to save products!");
 
     const isSaved = savedProducts.some((p) => p.id === productId);
     setSavingProductIds((prev) => [...prev, productId]);
@@ -149,7 +149,7 @@ const ProfilePage: React.FC = () => {
   };
 
   const toggleSaveBlog = async (blogId: number) => {
-    if (!user) return toast.warn("⚠️ Log in to save blogs!");
+    if (!user) return toast.warn("Log in to save blogs!");
 
     const isSaved = savedBlogs.some((b) => b.id === blogId);
     try {

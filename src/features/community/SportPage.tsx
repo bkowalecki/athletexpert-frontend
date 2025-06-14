@@ -61,7 +61,7 @@ const SportPage: React.FC = () => {
     );
   
     if (!foundSport) {
-      console.warn(`⚠️ Sport "${sport}" not found. Redirecting to 404.`);
+      console.warn(`Sport "${sport}" not found. Redirecting to 404.`);
       navigate("/404", { replace: true });
       return;
     }

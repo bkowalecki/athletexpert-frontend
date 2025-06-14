@@ -1,6 +1,6 @@
 # AthleteXpert
 
-Welcome to the **AthleteXpert** front End repository! This is the **React/TypeScript-based** frontend for AthleteXpert, a platform dedicated to helping athletes **shop, learn, and become the best versions of themselves** while engaging with a fitness-focused community.
+Welcome to the **AthleteXpert**! This is the **React/TypeScript-based** frontend for AthleteXpert, a platform dedicated to helping athletes **become the best versions of themselves** while engaging with a fitness-focused community.
 
 ## 🚀 Features
 - 🏋️ **Discover** & search for sports gear from multiple retailers

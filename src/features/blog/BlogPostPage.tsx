@@ -42,7 +42,7 @@ const BlogPostPage: React.FC = () => {
 
   useEffect(() => {
     if (isError || (!isLoading && !post)) {
-      console.warn(`⚠️ Blog post not found. Redirecting to /404.`);
+      console.warn(`Blog post not found. Redirecting to /404.`);
       navigate("/404", { replace: true });
     }
   }, [isError, isLoading, post, navigate]);
@@ -56,10 +56,13 @@ const BlogPostPage: React.FC = () => {
   }
 
   return (
-    <div className="blog-post-page">
+    <main className="blog-post-page" role="main">
       <Helmet>
         <title>{post.title} - AthleteXpert</title>
-        <meta name="description" content={post.summary || post.title || "Read this blog on AthleteXpert."} />
+        <meta
+          name="description"
+          content={post.summary || post.title || "Read this blog on AthleteXpert."}
+        />
         <meta property="og:title" content={post.title} />
         <meta property="og:description" content={post.summary || post.title} />
         <meta property="og:image" content={post.imageUrl} />
@@ -89,11 +92,11 @@ const BlogPostPage: React.FC = () => {
         </script>
       </Helmet>
 
-      <div className="back-link-container">
+      <nav className="back-link-container" aria-label="Breadcrumb">
         <Link to="/blog" className="back-link">
           ← Back to Blog
         </Link>
-      </div>
+      </nav>
 
       {post.imageUrl && (
         <div className="blog-post-image-container">
@@ -101,28 +104,33 @@ const BlogPostPage: React.FC = () => {
             src={post.imageUrl}
             alt={`Image for ${post.title}`}
             className="blog-post-image"
+            loading="lazy"
           />
         </div>
       )}
 
-      <div className="blog-post-header">
+      <header className="blog-post-header">
         <h1 className="blog-post-title">{post.title}</h1>
         <div className="blog-post-author-and-date">
           <p className="blog-post-meta">By {post.author}</p>
-          <p>{new Date(post.publishedDate).toLocaleDateString()}</p>
+          <time dateTime={post.publishedDate}>
+            {new Date(post.publishedDate).toLocaleDateString()}
+          </time>
         </div>
-      </div>
+      </header>
 
-      <div className="blog-post-content-wrapper">
+      <article className="blog-post-content-wrapper">
         <div
           className="blog-post-content"
+          role="article"
+          aria-label={post.title}
           dangerouslySetInnerHTML={{
             __html: DOMPurify.sanitize(post.content || ""),
           }}
         />
         <ShareButtons title={post.title} />
-      </div>
-    </div>
+      </article>
+    </main>
   );
 };
 
