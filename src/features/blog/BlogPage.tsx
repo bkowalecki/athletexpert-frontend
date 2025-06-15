@@ -40,15 +40,15 @@ const BlogPostCard: React.FC<{
       <p className="blog-author">By {post.author}</p>
       <p className="blog-date">{new Date(post.publishedDate).toLocaleDateString()}</p>
       <p className="blog-description">{DOMPurify.sanitize(post.summary)}</p>
-      <Link to={`/blog/${post.slug}`} className="blog-read-more-btn">Read More</Link>
-      {userExists && (
+      <div className="blog-actions">
+        <Link to={`/blog/${post.slug}`} className="blog-read-more-btn">Read More</Link>
         <button
           className={`save-blog-btn ${isSaved ? "unsave" : ""}`}
           onClick={() => onToggleSave(post.id)}
         >
           {isSaved ? "Unsave" : "Save"}
         </button>
-      )}
+      </div>
     </div>
   </div>
 );
@@ -158,7 +158,7 @@ const BlogPage: React.FC = () => {
               post={post}
               isSaved={savedBlogIds.includes(post.id)}
               onToggleSave={toggleSaveBlog}
-              userExists={!!user}
+              userExists={true} // Always show button, handle toast inside toggle
             />
           ))
         ) : (

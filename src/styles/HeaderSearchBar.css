@@ -16,9 +16,14 @@
   background: #222;
   border-radius: 50px;
   /* padding: 8px 12px; */
+  backdrop-filter: blur(8px);
   border: 2px solid #a23c20;
   transition: all 0.3s ease-in-out;
   box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+}
+
+.header-search-bar:hover {
+  box-shadow: 0 0 15px rgba(255, 140, 0, 0.6);
 }
 
 /* 🔹 Input Field */
@@ -105,12 +110,13 @@ input::placeholder {
   box-shadow: 0 6px 12px rgba(255, 255, 255, 0.15);
   z-index: 1000;
   max-height: 250px;
-  overflow-y: hidden;
+  overflow-y: auto;
   overflow-x: hidden;
   padding: 5px 0;
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+  border: #a23c20 5px solid;
 }
 
 .search-suggestions.show {
@@ -148,8 +154,8 @@ input::placeholder {
 }
 
 .search-suggestion-item.highlighted {
-  background-color: #f0f0f0;
-  color: black;
+  background-color: #a23c20;
+  color: white;
 }
 
 /* Responsive adjustments */

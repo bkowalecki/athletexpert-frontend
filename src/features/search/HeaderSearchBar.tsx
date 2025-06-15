@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import "../../styles/HeaderSearchBar.css";
 import { trackEvent } from "../../util/analytics";
@@ -19,6 +20,17 @@ const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
   const [highlightedIndex, setHighlightedIndex] = useState<number>(-1);
   const navigate = useNavigate();
 
+  const location = useLocation();
+
+useEffect(() => {
+  // Clear input if leaving search page
+  if (!location.pathname.startsWith("/search")) {
+    setSearchQuery("");
+    setSuggestions([]);
+    setShowDropdown(false);
+  }
+}, [location.pathname]);
+
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
       if (e.key === "Escape") setShowDropdown(false);
@@ -29,6 +41,7 @@ const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
 
   const handleNavigate = (query: string) => {
     const trimmedQuery = query.trim();
+    setSearchQuery(trimmedQuery); // ✅ Update input to match suggestion
     navigate(`/search?query=${encodeURIComponent(trimmedQuery)}`);
     setShowDropdown(false);
     trackEvent("search_submit", {

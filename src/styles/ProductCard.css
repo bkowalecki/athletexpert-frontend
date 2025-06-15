@@ -12,8 +12,8 @@
 
 .ax-product-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(255, 153, 0, 0.35);
-  border-color: #ff9900;
+  box-shadow: 0 8px 24px #A23C20;
+  border-color: #A23C20;
 }
 
 .ax-product-card-image-wrapper {
@@ -203,16 +203,20 @@
   position: relative;
   max-width: 90vw;
   max-height: 90vh;
-  background: transparent;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
   animation: scaleIn 0.2s ease-in-out;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
 }
 
+
 .ax-modal-image {
-  max-width: 100%;
-  max-height: 100%;
+  max-width: 60vw;
+  max-height: 60vh;
   border-radius: 10px;
   box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
 }
@@ -246,4 +250,11 @@
 
 .ax-product-card-image-wrapper {
   cursor: zoom-in;
+}
+
+@media (max-width: 600px) {
+  .ax-modal-image {
+    max-width: 80vw;
+    max-height: 80vh;
+  }
 }

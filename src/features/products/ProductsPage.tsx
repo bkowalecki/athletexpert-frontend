@@ -19,6 +19,7 @@ interface Product {
   retailer: string;
   trending: boolean;
   featured: boolean;
+  sports?: string[]; 
 }
 
 const fetchProducts = async (): Promise<Product[]> => {
@@ -40,11 +41,24 @@ const ProductsPage: React.FC = () => {
   const [selectedBrand, setSelectedBrand] = useState("");
   const [selectedRetailer, setSelectedRetailer] = useState("");
   const [sortOption, setSortOption] = useState("default");
-  const [visibleCount, setVisibleCount] = useState(12);
   const { user } = useUserContext();
   const navigate = useNavigate();
   const [savedProductIds, setSavedProductIds] = useState<number[]>([]);
   const [saving, setSaving] = useState<number | null>(null);
+  const [selectedSport, setSelectedSport] = useState("");
+
+
+  const rowsPerPage = 3;
+  const [columns, setColumns] = useState(1);
+  const [visibleCount, setVisibleCount] = useState(0);
+
+  const getColumns = () => {
+    const width = window.innerWidth;
+    if (width >= 1200) return 4;
+    if (width >= 900) return 3;
+    if (width >= 600) return 2;
+    return 1;
+  };
 
   const {
     data: products = [],
@@ -64,25 +78,29 @@ const ProductsPage: React.FC = () => {
     }
   }, [user]);
 
+  useEffect(() => {
+    const updateLayout = () => {
+      const currentCols = getColumns();
+      setColumns(currentCols);
+      setVisibleCount(currentCols * rowsPerPage);
+    };
+    updateLayout(); // run once on load
+    window.addEventListener("resize", updateLayout);
+    return () => window.removeEventListener("resize", updateLayout);
+  }, []);
+
   const filteredProducts = products
-    .filter((product) => {
-      let matches = true;
-      if (searchQuery) {
-        matches = product.name.toLowerCase().includes(searchQuery.toLowerCase());
-      }
-      if (matches && selectedBrand) {
-        matches = product.brand === selectedBrand;
-      }
-      if (matches && selectedRetailer) {
-        matches = product.retailer === selectedRetailer;
-      }
-      return matches;
-    })
-    .sort((a, b) => {
-      if (sortOption === "priceLow") return a.price - b.price;
-      if (sortOption === "priceHigh") return b.price - a.price;
-      return 0;
-    });
+  .filter((product) =>
+    (!searchQuery || product.name.toLowerCase().includes(searchQuery.toLowerCase())) &&
+    (!selectedBrand || product.brand === selectedBrand) &&
+    (!selectedRetailer || product.retailer === selectedRetailer) &&
+    (!selectedSport || product.sports?.includes(selectedSport))
+  )
+  .sort((a, b) => {
+    if (sortOption === "priceLow") return a.price - b.price;
+    if (sortOption === "priceHigh") return b.price - a.price;
+    return 0;
+  });
 
   const visibleProducts = filteredProducts.slice(0, visibleCount);
 
@@ -140,7 +158,7 @@ const ProductsPage: React.FC = () => {
           className="search-btn"
           onClick={() => {
             setSearchQuery(inputQuery);
-            setVisibleCount(12);
+            setVisibleCount(columns * rowsPerPage);
           }}
         >
           Search
@@ -160,6 +178,16 @@ const ProductsPage: React.FC = () => {
               )
           )}
         </select>
+
+        <select
+  value={selectedSport}
+  onChange={(e) => setSelectedSport(e.target.value)}
+>
+  <option value="">All Sports</option>
+  {[...new Set(products.flatMap((p) => p.sports || []))].map((sport, i) => (
+    <option key={i} value={sport}>{sport}</option>
+  ))}
+</select>
 
         <select
           value={sortOption}
@@ -187,29 +215,31 @@ const ProductsPage: React.FC = () => {
       )}
 
       <div className="product-grid">
-        {visibleProducts.length > 0
-          ? visibleProducts.map((product) => (
-              <ProductCard
-                key={product.id}
-                name={product.name}
-                brand={product.brand}
-                price={product.price}
-                imgUrl={product.imgUrl}
-                affiliateLink={product.affiliateLink}
-                isSaved={savedProductIds.includes(product.id)}
-                isSaving={saving === product.id}
-                onToggleSave={() => toggleSaveProduct(product.id)}
-              />
-            ))
-          : !isLoading && (
-              <p className="no-products-text">No products match your search.</p>
-            )}
+        {visibleProducts.length > 0 ? (
+          visibleProducts.map((product) => (
+            <ProductCard
+              key={product.id}
+              name={product.name}
+              brand={product.brand}
+              price={product.price}
+              imgUrl={product.imgUrl}
+              affiliateLink={product.affiliateLink}
+              isSaved={savedProductIds.includes(product.id)}
+              isSaving={saving === product.id}
+              onToggleSave={() => toggleSaveProduct(product.id)}
+            />
+          ))
+        ) : (
+          !isLoading && (
+            <p className="no-products-text">No products match your search.</p>
+          )
+        )}
       </div>
 
       {visibleCount < filteredProducts.length && (
         <button
           className="load-more-button"
-          onClick={() => setVisibleCount((prev) => prev + 12)}
+          onClick={() => setVisibleCount((prev) => prev + columns * rowsPerPage)}
         >
           View More
         </button>

@@ -1,17 +1,17 @@
-/* ✅ Updated BlogPostPage.css with UX, a11y, and SEO improvements */
 :root {
   --background-color: #0B3D2E;
   --content-background: linear-gradient(135deg, #f9f9f9, #ececec);
-  --text-color: #1C1C1C;
+  --text-color: #111;
   --heading-color: #0B3D2E;
   --link-color: #a23c20;
   --link-hover-color: #8a2f17;
   --shadow-color: rgba(0, 0, 0, 0.2);
   --accent-green: #2A6045;
-  --font-base: 1rem;
-  --font-md: 1.125rem;
+  --font-base: 1.125rem;
+  --font-md: 1.25rem;
   --font-lg: 1.4rem;
   --font-xl: 1.8rem;
+  --font-2xl: 2.2rem;;
   --spacing-xs: 0.5rem;
   --spacing-sm: 1rem;
   --spacing-md: 1.5rem;
@@ -19,7 +19,7 @@
 }
 
 .blog-post-page {
-  background-color: #0B3D2E;
+  background-color: var(--background-color);
   background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='1' cy='1' r='1' fill='%2355AA88' fill-opacity='0.08' /%3E%3C/svg%3E");
   background-repeat: repeat;
   background-size: 20px 20px;
@@ -33,6 +33,7 @@
   margin-top: 4rem;
 }
 
+/* 🧭 Back Link */
 .back-link-container {
   width: 100%;
   max-width: 1200px;
@@ -59,6 +60,7 @@
   transform: translateX(-5px);
 }
 
+/* 📌 Header Section */
 .blog-post-header {
   text-align: center;
   color: #ccc;
@@ -66,7 +68,7 @@
 }
 
 .blog-post-title {
-  font-size: var(--font-xl);
+  font-size: var(--font-2xl);
   font-weight: bold;
   margin: 0;
   line-height: 1.3;
@@ -86,6 +88,7 @@
   align-items: center;
 }
 
+/* 🖼 Image */
 .blog-post-image-container {
   text-align: center;
   margin-bottom: var(--spacing-md);
@@ -103,6 +106,7 @@
   box-shadow: 0 4px 12px var(--shadow-color);
 }
 
+/* 📝 Content Wrapper */
 .blog-post-content-wrapper {
   display: flex;
   flex-direction: column;
@@ -112,9 +116,10 @@
 
 .blog-post-content {
   padding: var(--spacing-md);
+  font-family: "Inter", "Georgia", serif;
   font-size: var(--font-base);
   width: 100%;
-  max-width: 750px;
+  max-width: 1200px;
   background: var(--content-background);
   border-radius: 12px;
   box-shadow: 0 6px 24px rgba(0, 0, 0, 0.2);
@@ -124,7 +129,7 @@
 .blog-post-content p {
   margin-bottom: var(--spacing-md);
   text-align: justify;
-  line-height: 1.9;
+  line-height: 1.85;
 }
 
 .blog-post-content h2 {
@@ -153,83 +158,38 @@
   text-decoration: underline;
 }
 
-.blog-post-content .affiliate-block {
-  background: #fff;
-  border-left: 4px solid var(--accent-green);
-  padding: var(--spacing-md);
-  margin: var(--spacing-lg) 0;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  transition: transform 0.2s ease;
-}
-
-.blog-post-content .affiliate-block:hover {
-  transform: translateY(-2px);
-}
-
-.blog-post-content .affiliate-block img {
-  width: 100%;
-  max-height: 300px;
-  object-fit: contain;
-  border-radius: 8px;
-  margin: var(--spacing-sm) 0;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-}
-
-.blog-post-content .affiliate-block h3 {
-  margin-top: 0;
-  color: var(--heading-color);
-}
-
-.blog-post-content .affiliate-block a[target="_blank"] {
-  display: inline-block;
-  margin-top: var(--spacing-xs);
-  padding: 0.6rem 1.2rem;
-  background-color: var(--link-color);
-  color: #fff;
-  font-weight: bold;
-  border-radius: 6px;
-  text-decoration: none;
-  transition: background-color 0.2s ease;
-}
-
-.blog-post-content .affiliate-block a[target="_blank"]:hover {
-  background-color: var(--link-hover-color);
-}
-
+/* 📦 Product List – Enhanced Ranking Style */
 .blog-post-content ol.product-list {
-  counter-reset: product;
-  padding-left: var(--spacing-md);
-  margin-bottom: var(--spacing-md);
+  list-style: none;
+  counter-reset: topItem;
+  padding-left: 0;
+  margin-bottom: var(--spacing-lg);
 }
 
 .blog-post-content ol.product-list li {
-  counter-increment: product;
+  counter-increment: topItem;
   position: relative;
-  padding-left: 3rem;
+  background: #fff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  padding-top: 3rem;
   margin-bottom: var(--spacing-md);
-  background-color: #f7f7f7;
-  border-left: 4px solid var(--link-color);
-  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .blog-post-content ol.product-list li::before {
-  content: counter(product);
+  content: "#" counter(topItem);
   position: absolute;
-  left: 1rem;
-  top: 1rem;
-  background-color: var(--accent-green);
-  color: white;
-  font-weight: bold;
-  border-radius: 50%;
-  width: 2rem;
-  height: 2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1rem;
+  top: 0.5rem;
+  left: 1.5rem;
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: var(--accent-green);
+  font-family: 'Montserrat', sans-serif;
+  line-height: 1;
 }
 
+/* 🏷 Product Badge */
 .blog-post-content .product-badge {
   background-color: var(--accent-green);
   color: #fff;
@@ -239,9 +199,32 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-left: 0.5rem;
+  white-space: nowrap;
 }
 
-/* 🖼 Uniform Image Styling for All Images in Blog Content */
+/* 📸 Image + Description */
+.blog-post-content .image-wrapper {
+  margin: 1rem 0;
+  display: flex;
+  justify-content: center;
+}
+
+.blog-post-content .image-wrapper img {
+  max-width: 100%;
+  max-height: 300px;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.blog-post-content .product-description {
+  font-size: 1rem;
+  color: #333;
+  line-height: 1.7;
+  margin-top: 0.5rem;
+}
+
+/* 🖼 Global Content Images */
 .blog-post-content img {
   display: block;
   margin: 1.5rem auto;
@@ -254,17 +237,28 @@
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
-
+/* 📱 Responsive */
 @media (max-width: 768px) {
   .blog-post-content {
     max-width: 90%;
     padding: var(--spacing-sm);
   }
+
   .blog-post-image {
     max-height: 250px;
   }
+
   .blog-post-title {
     font-size: var(--font-lg);
+  }
+
+  .blog-post-content ol.product-list li::before {
+    font-size: 2rem;
+    left: 1rem;
+  }
+
+  .blog-post-content .product-title {
+    font-size: 1.05rem;
   }
 }
 
@@ -273,9 +267,11 @@
     max-width: 95%;
     padding: var(--spacing-sm);
   }
+
   .blog-post-title {
     font-size: var(--font-md);
   }
+
   .blog-post-image {
     max-height: 200px;
   }
