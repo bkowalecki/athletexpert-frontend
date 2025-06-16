@@ -50,21 +50,31 @@ const SearchResults: React.FC = () => {
   const navigate = useNavigate();
 
   const searchQuery = useMemo(
-    () => new URLSearchParams(location.search).get("query")?.trim().toLowerCase() ?? "",
+    () =>
+      new URLSearchParams(location.search).get("query")?.trim().toLowerCase() ??
+      "",
     [location.search]
   );
 
   const isMobile = window.innerWidth <= 768;
-  const isPwa = window.matchMedia("(display-mode: standalone)").matches || (window.navigator as any).standalone;
+  const isPwa =
+    window.matchMedia("(display-mode: standalone)").matches ||
+    (window.navigator as any).standalone;
   const isMobilePwa = isMobile && isPwa;
 
   const sportsData = sportsDataRaw as Sport[];
   const matchingSports = useMemo(
-    () => sportsData.filter((sport) => sport.title.toLowerCase().includes(searchQuery)),
+    () =>
+      sportsData.filter((sport) =>
+        sport.title.toLowerCase().includes(searchQuery)
+      ),
     [searchQuery]
   );
   const matchingStaticPages = useMemo(
-    () => staticPages.filter((page) => page.name.toLowerCase().includes(searchQuery)),
+    () =>
+      staticPages.filter((page) =>
+        page.name.toLowerCase().includes(searchQuery)
+      ),
     [searchQuery]
   );
 
@@ -94,9 +104,12 @@ const SearchResults: React.FC = () => {
         setBlogs(blogRes.data);
 
         if (user) {
-          const savedRes = await axios.get(`${process.env.REACT_APP_API_URL}/users/saved-products`, {
-            withCredentials: true,
-          });
+          const savedRes = await axios.get(
+            `${process.env.REACT_APP_API_URL}/users/saved-products`,
+            {
+              withCredentials: true,
+            }
+          );
           setSavedProductIds(savedRes.data.map((p: Product) => p.id));
         }
       } catch {
@@ -115,10 +128,13 @@ const SearchResults: React.FC = () => {
     setSavingProductIds((prev) => [...prev, productId]);
 
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_URL}/users/saved-products/${productId}`, {
-        method: isSaved ? "DELETE" : "POST",
-        credentials: "include",
-      });
+      const res = await fetch(
+        `${process.env.REACT_APP_API_URL}/users/saved-products/${productId}`,
+        {
+          method: isSaved ? "DELETE" : "POST",
+          credentials: "include",
+        }
+      );
 
       if (res.ok) {
         setSavedProductIds((prev) =>
@@ -148,11 +164,19 @@ const SearchResults: React.FC = () => {
                 if (e.key === "Enter") {
                   const target = e.target as HTMLInputElement;
                   if (target.value.trim()) {
-                    navigate(`/search?query=${encodeURIComponent(target.value.trim())}`);
+                    navigate(
+                      `/search?query=${encodeURIComponent(target.value.trim())}`
+                    );
                   }
                 }
               }}
-              style={{ width: "100%", padding: "0.75rem", fontSize: "1rem", borderRadius: "8px", border: "1px solid #ccc" }}
+              style={{
+                width: "100%",
+                padding: "0.75rem",
+                fontSize: "1rem",
+                borderRadius: "8px",
+                border: "1px solid #ccc",
+              }}
             />
           </div>
         )}
@@ -169,19 +193,29 @@ const SearchResults: React.FC = () => {
 
   return (
     <div className="search-results-page-container">
-      <h1 className="search-results-page-title">Results for: "{searchQuery}"</h1>
+      <h1 className="search-results-page-title">
+        Results for: "{searchQuery}"
+      </h1>
 
-      {error && products.length === 0 && blogs.length === 0 && matchingSports.length === 0 && matchingStaticPages.length === 0 && (
-  <p className="search-results-page-error">{error}</p>
-)}
+      {error &&
+        products.length === 0 &&
+        blogs.length === 0 &&
+        matchingSports.length === 0 &&
+        matchingStaticPages.length === 0 && (
+          <p className="search-results-page-error">{error}</p>
+        )}
 
       {!loading && !error && products.length === 0 && blogs.length === 0 && (
         <div className="search-results-page-no-results">
-          <p className="search-results-page-no-results-text">No results found.</p>
+          <p className="search-results-page-no-results-text">
+            No results found.
+          </p>
           <p className="search-results-page-no-results-suggestion">
             Try different keywords or browse our content.
           </p>
-          <a href="/" className="search-results-page-back-home">Return to Homepage</a>
+          <a href="/" className="search-results-page-back-home">
+            Return to Homepage
+          </a>
         </div>
       )}
 
@@ -194,10 +228,19 @@ const SearchResults: React.FC = () => {
                 <li
                   key={sport.title}
                   className="search-results-page-item"
-                  onClick={() => navigate(`/community/${sport.title.toLowerCase()}`)}
+                  onClick={() =>
+                    navigate(`/community/${sport.title.toLowerCase()}`)
+                  }
+                  aria-label={`Visit ${sport.title} community page`}
                 >
-                  <img src={sport.backgroundImage} alt={sport.title} className="search-results-page-image" />
-                  <h4 className="search-results-page-item-title">{sport.title}</h4>
+                  <img
+                    src={sport.backgroundImage}
+                    alt={sport.title}
+                    className="search-results-page-image"
+                  />
+                  <h4 className="search-results-page-item-title">
+                    {sport.title}
+                  </h4>
                 </li>
               ))}
             </ul>
@@ -234,13 +277,26 @@ const SearchResults: React.FC = () => {
                   key={blog.id}
                   className="search-results-page-item"
                   onClick={() => navigate(`/blog/${blog.slug || blog.id}`)}
+                  aria-label={`Read blog titled ${blog.title}`}
                 >
-                  <img src={blog.imageUrl} alt={blog.title} className="search-results-page-image" />
-                  <h4 className="search-results-page-item-title">{blog.title}</h4>
+                  <img
+                    src={blog.imageUrl}
+                    alt={blog.title}
+                    loading="lazy"
+                    width="300"
+                    height="180"
+                    className="search-results-page-image"
+                  />
+                  <h4 className="search-results-page-item-title">
+                    {blog.title}
+                  </h4>
                   <p className="search-results-page-item-meta">
-                    By {blog.author} on {new Date(blog.publishedDate).toLocaleDateString()}
+                    By {blog.author} on{" "}
+                    {new Date(blog.publishedDate).toLocaleDateString()}
                   </p>
-                  <p className="search-results-page-item-summary">{blog.summary}</p>
+                  <p className="search-results-page-item-summary">
+                    {blog.summary}
+                  </p>
                 </li>
               ))}
             </ul>
@@ -257,7 +313,9 @@ const SearchResults: React.FC = () => {
                   className="search-results-page-item"
                   onClick={() => navigate(page.path)}
                 >
-                  <div className="search-results-page-item-title">{page.name}</div>
+                  <div className="search-results-page-item-title">
+                    {page.name}
+                  </div>
                 </li>
               ))}
             </ul>

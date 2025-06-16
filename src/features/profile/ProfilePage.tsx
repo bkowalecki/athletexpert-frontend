@@ -175,14 +175,19 @@ const ProfilePage: React.FC = () => {
 
   const handleSignOut = async () => {
     try {
+      // Clear cached Auth0 token
+      sessionStorage.removeItem("ax_id_token");
+      sessionStorage.removeItem("ax_token_time");
+  
+      // Call backend logout
       await fetch(`${process.env.REACT_APP_API_URL}/users/logout`, {
         method: "POST",
         credentials: "include",
       });
-
+  
       setUser(null);
       await checkSession();
-
+  
       if (user?.authProvider === "auth0") {
         auth0Logout({
           logoutParams: { returnTo: window.location.origin + "/auth" },
@@ -195,6 +200,7 @@ const ProfilePage: React.FC = () => {
       toast.error("Error signing out.");
     }
   };
+  
 
   if (!isSessionChecked)
     return <div className="profile-loading">Checking session...</div>;

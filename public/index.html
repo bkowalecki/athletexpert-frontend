@@ -1,31 +1,83 @@
 <!DOCTYPE html>
 <html lang="en-US">
   <head>
+    <!-- ✅ Essential Metadata -->
     <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1"
+    />
+    <meta name="theme-color" content="#A23C20" />
+    <meta
+      name="description"
+      content="AthleteXpert is the ultimate athletic platform for finding personalized sports gear, reading expert blogs, and connecting with your community."
+    />
+    <meta
+      name="keywords"
+      content="sports gear, athletes, personalized fitness, workout equipment, athlete community"
+    />
+    <title>AthleteXpert</title>
+
+    <!-- ✅ Canonical URL -->
+    <link rel="canonical" href="https://www.athletexpert.org/" />
+
+    <!-- ✅ Open Graph for Social Sharing -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="AthleteXpert - Find Your Edge" />
+    <meta
+      property="og:description"
+      content="Compare gear, explore expert blogs, and get personalized fitness recommendations at AthleteXpert."
+    />
+    <meta property="og:image" content="%PUBLIC_URL%/logo.png" />
+    <meta property="og:url" content="https://www.athletexpert.org" />
+
+    <!-- ✅ Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="AthleteXpert - Gear Finder" />
+    <meta
+      name="twitter:description"
+      content="Your personal assistant for athletic gear and community."
+    />
+    <meta name="twitter:image" content="%PUBLIC_URL%/logo.png" />
+
+    <!-- ✅ Preconnect & Preload -->
     <link rel="preconnect" href="https://api.athletexpert.org" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
     <link
       rel="preload"
       as="video"
       href="/video/athletexpertheadervideo.webm"
       type="video/webm"
+      fetchpriority="high"
+    />
+    <link
+      rel="preload"
+      as="image"
+      href="/images/hero-poster.png"
+      fetchpriority="high"
     />
 
+    <!-- ✅ Favicon & Manifest -->
     <link rel="icon" href="%PUBLIC_URL%/favicon.png" />
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
 
-    <!-- Font Preloading -->
+    <!-- ✅ Fonts (Great Vibes) -->
     <link
       rel="preload"
       as="style"
       href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap"
       onload="this.onload=null;this.rel='stylesheet';"
     />
-    <noscript
-      ><link
+    <noscript>
+      <link
         rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap"
-    /></noscript>
+      />
+    </noscript>
+
+    <!-- ✅ Font Awesome (Icon Set) -->
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
@@ -34,45 +86,7 @@
       referrerpolicy="no-referrer"
     />
 
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, maximum-scale=1"
-    />
-    <meta name="theme-color" content="#A23C20" />
-    <meta
-      name="description"
-      content="AthleteXpert - The Ultimate Athletic Platform"
-    />
-    <meta
-      name="keywords"
-      content="sports gear, athletes, personalized fitness, workout equipment"
-    />
-
-    <meta
-      property="og:title"
-      content="AthleteXpert - The Ultimate Athletic Platform"
-    />
-    <meta
-      property="og:description"
-      content="Find top-rated sports equipment, read expert reviews, and get personalized gear recommendations."
-    />
-    <meta property="og:image" content="%PUBLIC_URL%/logo.png" />
-    <meta property="og:url" content="https://www.athletexpert.org" />
-
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="AthleteXpert - Gear Finder" />
-    <meta
-      name="twitter:description"
-      content="Compare athletic gear and fitness equipment."
-    />
-    <meta name="twitter:image" content="%PUBLIC_URL%/logo.png" />
-
-    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <link rel="canonical" href="https://www.athletexpert.org/" />
-
-    <title>AthleteXpert</title>
-
-    <!-- Google Analytics -->
+    <!-- ✅ Google Analytics -->
     <script
       async
       src="https://www.googletagmanager.com/gtag/js?id=G-MDEBHQKJDK"
@@ -86,6 +100,7 @@
       gtag("config", "G-MDEBHQKJDK");
     </script>
   </head>
+
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>

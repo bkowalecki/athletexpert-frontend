@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect, useMemo } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import debounce from "lodash.debounce"; // <-- ADD THIS
 import "../../styles/HeaderSearchBar.css";
 import { trackEvent } from "../../util/analytics";
 import sportsTerms from "../../data/sportsTerms.json";
@@ -19,17 +19,15 @@ const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
   const [showDropdown, setShowDropdown] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState<number>(-1);
   const navigate = useNavigate();
-
   const location = useLocation();
 
-useEffect(() => {
-  // Clear input if leaving search page
-  if (!location.pathname.startsWith("/search")) {
-    setSearchQuery("");
-    setSuggestions([]);
-    setShowDropdown(false);
-  }
-}, [location.pathname]);
+  useEffect(() => {
+    if (!location.pathname.startsWith("/search")) {
+      setSearchQuery("");
+      setSuggestions([]);
+      setShowDropdown(false);
+    }
+  }, [location.pathname]);
 
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
@@ -39,9 +37,34 @@ useEffect(() => {
     return () => window.removeEventListener("keydown", handleEsc);
   }, []);
 
+  // 🔥 Debounced logic
+  const updateSuggestions = useMemo(
+    () =>
+      debounce((query: string) => {
+        if (query.length > 1) {
+          const filtered = sportsTerms.sportsTerms.filter((term) =>
+            term.toLowerCase().startsWith(query.toLowerCase())
+          );
+          setSuggestions(filtered);
+          setShowDropdown(filtered.length > 0);
+        } else {
+          setSuggestions([]);
+          setShowDropdown(false);
+        }
+      }, 300),
+    []
+  );
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+    setHighlightedIndex(-1);
+    updateSuggestions(query); // debounced
+  };
+
   const handleNavigate = (query: string) => {
     const trimmedQuery = query.trim();
-    setSearchQuery(trimmedQuery); // ✅ Update input to match suggestion
+    setSearchQuery(trimmedQuery);
     navigate(`/search?query=${encodeURIComponent(trimmedQuery)}`);
     setShowDropdown(false);
     trackEvent("search_submit", {
@@ -51,26 +74,8 @@ useEffect(() => {
     if (onSearchComplete) onSearchComplete();
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const query = e.target.value;
-    setSearchQuery(query);
-    setHighlightedIndex(-1);
-
-    if (query.length > 1) {
-      const filtered = sportsTerms.sportsTerms.filter((term) =>
-        term.toLowerCase().startsWith(query.toLowerCase())
-      );
-      setSuggestions(filtered);
-      setShowDropdown(filtered.length > 0);
-    } else {
-      setSuggestions([]);
-      setShowDropdown(false);
-    }
-  };
-
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (!showDropdown) return;
-
     if (e.key === "ArrowDown") {
       e.preventDefault();
       setHighlightedIndex((prev) => (prev + 1) % suggestions.length);
