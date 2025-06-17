@@ -7,12 +7,13 @@ const PwaNav: React.FC = () => {
   const { pathname } = useLocation();
 
   useEffect(() => {
+    const isPwaMode = () =>
+      window.matchMedia("(display-mode: standalone)").matches ||
+      (window.navigator as any).standalone === true;
+
     const checkPwaAndMobile = () => {
-      const isStandalone =
-        window.matchMedia("(display-mode: standalone)").matches ||
-        (window.navigator as any).standalone === true;
       const isMobile = window.innerWidth <= 768;
-      setShowNav(isStandalone && isMobile);
+      setShowNav(isPwaMode() && isMobile);
     };
 
     checkPwaAndMobile();
@@ -22,33 +23,26 @@ const PwaNav: React.FC = () => {
 
   if (!showNav) return null;
 
+  const getClassName = (path: string) =>
+    pathname === path || pathname.startsWith(path) ? "active" : "";
+
   return (
     <nav className="pwa-nav">
-      <Link to="/" className={pathname === "/" ? "active" : ""}>
+      <Link to="/" className={getClassName("/")}>
         <i className="fas fa-home" />
       </Link>
-      <Link to="/blog" className={pathname.includes("/blog") ? "active" : ""}>
+      <Link to="/blog" className={getClassName("/blog")}>
         <i className="fas fa-newspaper" />
       </Link>
       <div className="pwa-nav-center-button-wrapper">
-        <Link
-          to="/search"
-          className={`search-button ${pathname === "/search" ? "active" : ""}`}
-        >
+        <Link to="/search" className={`search-button ${getClassName("/search")}`}>
           <i className="fas fa-search" />
         </Link>
       </div>
-      <Link to="/products" className={pathname === "/products" ? "active" : ""}>
+      <Link to="/products" className={getClassName("/products")}>
         <i className="fas fa-box-open" />
       </Link>
-      <Link
-        to="/profile"
-        className={
-          pathname.startsWith("/profile") || pathname === "/auth"
-            ? "active"
-            : ""
-        }
-      >
+      <Link to="/profile" className={getClassName("/profile") || getClassName("/auth")}>
         <i className="fas fa-user" />
       </Link>
     </nav>

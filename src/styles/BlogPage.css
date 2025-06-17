@@ -303,7 +303,7 @@
   }
 
   .blog-image {
-    max-height: 150px;
+    max-height: 1px;
     aspect-ratio: 16 / 9;
   }
 }

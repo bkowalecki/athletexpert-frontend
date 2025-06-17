@@ -11,13 +11,15 @@ const TagsInput: React.FC<TagsInputProps> = ({ tags, setTags }) => {
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if ((e.key === "Enter" || e.key === ",") && input.trim()) {
       e.preventDefault();
-      if (!tags.includes(input.trim())) {
-        setTags([...tags, input.trim()]);
-      }
+      if (!tags.includes(input.trim())) setTags([...tags, input.trim()]);
       setInput("");
-    } else if (e.key === "Backspace" && !input && tags.length) {
+    } else if (e.key === "Backspace" && !input) {
       setTags(tags.slice(0, -1));
     }
+  };
+
+  const removeTag = (index: number) => {
+    setTags(tags.filter((_, i) => i !== index));
   };
 
   return (
@@ -25,9 +27,7 @@ const TagsInput: React.FC<TagsInputProps> = ({ tags, setTags }) => {
       {tags.map((tag, i) => (
         <div className="tag" key={i}>
           {tag}
-          <span onClick={() => setTags(tags.filter((_, idx) => idx !== i))}>
-            &times;
-          </span>
+          <span onClick={() => removeTag(i)}>&times;</span>
         </div>
       ))}
       <input

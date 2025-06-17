@@ -23,7 +23,6 @@ main {
   min-height: 100vh;
 }
 
-/* Footer */
 footer {
   padding: 20px;
   background-color: #333;
@@ -32,14 +31,16 @@ footer {
   width: 100%;
 }
 
-/* Optional: Subtle custom scrollbar for dark mode UX */
+/* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
 }
+
 ::-webkit-scrollbar-thumb {
   background: #555;
   border-radius: 4px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
   background: #777;
 }

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import debounce from "lodash.debounce"; // <-- ADD THIS
+import debounce from "lodash.debounce";
 import "../../styles/HeaderSearchBar.css";
 import { trackEvent } from "../../util/analytics";
 import sportsTerms from "../../data/sportsTerms.json";
@@ -18,9 +18,11 @@ const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState<number>(-1);
+
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Reset search state when navigating away from the search page
   useEffect(() => {
     if (!location.pathname.startsWith("/search")) {
       setSearchQuery("");
@@ -29,15 +31,14 @@ const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
     }
   }, [location.pathname]);
 
+  // Close dropdown on Escape key press
   useEffect(() => {
-    const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setShowDropdown(false);
-    };
+    const handleEsc = (e: KeyboardEvent) => e.key === "Escape" && setShowDropdown(false);
     window.addEventListener("keydown", handleEsc);
     return () => window.removeEventListener("keydown", handleEsc);
   }, []);
 
-  // 🔥 Debounced logic
+  // Debounced function to update suggestions
   const updateSuggestions = useMemo(
     () =>
       debounce((query: string) => {
@@ -59,38 +60,49 @@ const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
     const query = e.target.value;
     setSearchQuery(query);
     setHighlightedIndex(-1);
-    updateSuggestions(query); // debounced
+    updateSuggestions(query); // Debounced
   };
 
   const handleNavigate = (query: string) => {
     const trimmedQuery = query.trim();
+    if (!trimmedQuery) return;
+
     setSearchQuery(trimmedQuery);
     navigate(`/search?query=${encodeURIComponent(trimmedQuery)}`);
     setShowDropdown(false);
+
     trackEvent("search_submit", {
       query: trimmedQuery || "(empty)",
       source: "header",
     });
-    if (onSearchComplete) onSearchComplete();
+
+    onSearchComplete?.();
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (!showDropdown) return;
-    if (e.key === "ArrowDown") {
-      e.preventDefault();
-      setHighlightedIndex((prev) => (prev + 1) % suggestions.length);
-    } else if (e.key === "ArrowUp") {
-      e.preventDefault();
-      setHighlightedIndex((prev) =>
-        prev === 0 ? suggestions.length - 1 : prev - 1
-      );
-    } else if (e.key === "Enter") {
-      e.preventDefault();
-      if (highlightedIndex >= 0 && highlightedIndex < suggestions.length) {
-        handleNavigate(suggestions[highlightedIndex]);
-      } else {
-        handleNavigate(searchQuery);
-      }
+
+    switch (e.key) {
+      case "ArrowDown":
+        e.preventDefault();
+        setHighlightedIndex((prev) => (prev + 1) % suggestions.length);
+        break;
+      case "ArrowUp":
+        e.preventDefault();
+        setHighlightedIndex((prev) =>
+          prev === 0 ? suggestions.length - 1 : prev - 1
+        );
+        break;
+      case "Enter":
+        e.preventDefault();
+        if (highlightedIndex >= 0 && highlightedIndex < suggestions.length) {
+          handleNavigate(suggestions[highlightedIndex]);
+        } else {
+          handleNavigate(searchQuery);
+        }
+        break;
+      default:
+        break;
     }
   };
 

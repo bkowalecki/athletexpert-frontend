@@ -1,28 +1,17 @@
-// QuizContext.tsx - Adding Types to fix errors
-import React, { createContext, useReducer, ReactNode } from 'react';
+import React, { createContext, useReducer, ReactNode } from "react";
 
 interface QuizState {
   favoriteColor: string | null;
 }
 
-interface QuizAction {
-  type: 'SET_FAVORITE_COLOR';
-  color: string;
-  
-}
+type QuizAction = { type: "SET_FAVORITE_COLOR"; color: string };
 
-const initialState: QuizState = {
-  favoriteColor: null,
-};
+const initialState: QuizState = { favoriteColor: null };
 
-const quizReducer = (state: QuizState, action: QuizAction): QuizState => {
-  switch (action.type) {
-    case 'SET_FAVORITE_COLOR':
-      return { ...state, favoriteColor: action.color };
-    default:
-      return state;
-  }
-};
+const quizReducer = (state: QuizState, action: QuizAction): QuizState =>
+  action.type === "SET_FAVORITE_COLOR"
+    ? { ...state, favoriteColor: action.color }
+    : state;
 
 export const QuizContext = createContext<{
   state: QuizState;
@@ -32,11 +21,7 @@ export const QuizContext = createContext<{
   dispatch: () => undefined,
 });
 
-interface QuizProviderProps {
-  children: ReactNode;
-}
-
-export const QuizProvider: React.FC<QuizProviderProps> = ({ children }) => {
+export const QuizProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [state, dispatch] = useReducer(quizReducer, initialState);
 
   return (
@@ -45,5 +30,3 @@ export const QuizProvider: React.FC<QuizProviderProps> = ({ children }) => {
     </QuizContext.Provider>
   );
 };
-
-export default QuizContext;

@@ -31,8 +31,7 @@ const BlogPostCard: React.FC<{
   post: BlogPost;
   isSaved: boolean;
   onToggleSave: (id: number) => void;
-  userExists: boolean;
-}> = ({ post, isSaved, onToggleSave, userExists }) => (
+}> = ({ post, isSaved, onToggleSave }) => (
   <div className="blog-post-item">
     <img src={post.imageUrl} alt={post.title} className="blog-image" loading="lazy" />
     <div className="blog-info">
@@ -62,12 +61,7 @@ const BlogPage: React.FC = () => {
   const { user } = useUserContext();
   const [savedBlogIds, setSavedBlogIds] = useState<number[]>([]);
 
-  const {
-    data,
-    isLoading,
-    isFetching,
-    error,
-  } = useQuery<BlogPost[], Error>({
+  const { data, isLoading, isFetching, error } = useQuery<BlogPost[], Error>({
     queryKey: ["posts", searchQuery, currentPage],
     queryFn: () => fetchPosts(searchQuery, currentPage),
     enabled: searchQuery.length < 100,
@@ -111,19 +105,11 @@ const BlogPage: React.FC = () => {
     }
   }, [savedBlogIds, user]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputQuery(e.target.value);
-  };
-
   const handleSearchSubmit = (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
+    e?.preventDefault();
     setSearchQuery(inputQuery);
     setCurrentPage(0);
     setHasMorePosts(true);
-  };
-
-  const loadMorePosts = () => {
-    if (hasMorePosts && !isFetching) setCurrentPage(prev => prev + 1);
   };
 
   return (
@@ -138,7 +124,7 @@ const BlogPage: React.FC = () => {
         <input
           type="text"
           value={inputQuery}
-          onChange={handleInputChange}
+          onChange={(e) => setInputQuery(e.target.value)}
           placeholder="Search blog posts"
           className="blog-search-input"
           aria-label="Search blog posts"
@@ -158,7 +144,6 @@ const BlogPage: React.FC = () => {
               post={post}
               isSaved={savedBlogIds.includes(post.id)}
               onToggleSave={toggleSaveBlog}
-              userExists={true} // Always show button, handle toast inside toggle
             />
           ))
         ) : (
@@ -167,7 +152,7 @@ const BlogPage: React.FC = () => {
       </div>
 
       {!isLoading && hasMorePosts && (
-        <button onClick={loadMorePosts} className="load-more-button">
+        <button onClick={() => setCurrentPage(prev => prev + 1)} className="load-more-button">
           {isFetching ? "Loading..." : "Load More"}
         </button>
       )}

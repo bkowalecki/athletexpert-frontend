@@ -5,7 +5,7 @@ import axios from "axios";
 import sportsData from "../../data/sports.json";
 import EsportExperience from "./EsportsExperience";
 import "../../styles/SportPage.css";
-import ProductCard from "../products/ProductCard"; // Adjust the path if necessary
+import ProductCard from "../products/ProductCard";
 
 interface Sport {
   title: string;
@@ -26,7 +26,6 @@ interface Product {
   price: number;
   imgUrl: string;
   affiliateLink: string;
-  sports?: string[]; // optional, but handy
 }
 
 interface BlogPost {
@@ -38,9 +37,6 @@ interface BlogPost {
 }
 
 const SportPage: React.FC = () => {
-  const slugify = (str: string) =>
-    str.toLowerCase().replace(/\s+/g, "-").replace(/[^\w\-]+/g, "");
-
   const { sport } = useParams<{ sport: string }>();
   const navigate = useNavigate();
 
@@ -49,54 +45,53 @@ const SportPage: React.FC = () => {
   const [loadingBlogs, setLoadingBlogs] = useState(true);
   const [recommendedProducts, setRecommendedProducts] = useState<Product[]>([]);
 
-
   useEffect(() => {
     if (!sport) {
       navigate("/404", { replace: true });
       return;
     }
-  
+
+    const slugify = (str: string) =>
+      str.toLowerCase().replace(/\s+/g, "-").replace(/[^\w\-]+/g, "");
+
     const foundSport = sportsData.find(
       (s) => slugify(s.title) === sport.toLowerCase()
     );
-  
+
     if (!foundSport) {
       console.warn(`Sport "${sport}" not found. Redirecting to 404.`);
       navigate("/404", { replace: true });
       return;
     }
-  
+
     setCurrentSport(foundSport);
-  
+
     const fetchRelatedBlogs = async () => {
       try {
-        const response = await axios.get(
+        const { data } = await axios.get(
           `${process.env.REACT_APP_API_URL}/blog/by-tag`,
-          {
-            params: { tag: foundSport.title },
-            withCredentials: true,
-          }
+          { params: { tag: foundSport.title }, withCredentials: true }
         );
-        setRelatedBlogs(response.data);
+        setRelatedBlogs(data);
       } catch (err) {
         console.error("❌ Error fetching related blogs:", err);
       } finally {
         setLoadingBlogs(false);
       }
     };
-  
+
     const fetchRecommendedProducts = async () => {
       try {
-        const res = await axios.get(
+        const { data } = await axios.get(
           `${process.env.REACT_APP_API_URL}/products/by-sport?sport=${foundSport.title}`,
           { withCredentials: true }
         );
-        setRecommendedProducts(res.data);
+        setRecommendedProducts(data);
       } catch (err) {
         console.error("❌ Error fetching sport-specific products:", err);
       }
     };
-  
+
     fetchRelatedBlogs();
     fetchRecommendedProducts();
   }, [sport, navigate]);
@@ -109,42 +104,14 @@ const SportPage: React.FC = () => {
     );
   }
 
-  const isEsport = currentSport.title.toLowerCase() === "e-sports";
-
-  if (isEsport) {
+  if (currentSport.title.toLowerCase() === "e-sports") {
     return <EsportExperience sport={currentSport} />;
   }
 
   return (
     <div className="sport-page">
-      {/* Hero Section */}
-      {/* <div
-        className="sport-page-hero"
-        style={{ backgroundImage: `url(${currentSport.backgroundImage})` }}
-      > */}
-        <div className="sport-page-title">
-          {/* <motion.h1
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="sport-page-title"
-          > */}
-            {currentSport.title}
-          {/* </motion.h1> */}
-        </div>
-      {/* </div> */}
+      <div className="sport-page-title">{currentSport.title}</div>
 
-      {/* About Section */}
-      {/* <section className="sport-page-section">
-        <h2 className="sport-page-section-title">About</h2>
-        {currentSport.extra_data.summary && (
-          <p className="sport-page-text">{currentSport.extra_data.summary}</p>
-        )}
-      </section> */}
-
-      
-
-      {/* Fun Fact Section */}
       <section className="sport-page-section sport-page-funfact">
         <h2 className="sport-page-section-title">Fun Fact</h2>
         <motion.div
@@ -160,31 +127,28 @@ const SportPage: React.FC = () => {
         </motion.div>
       </section>
 
-      {/* Gear Section */}
       <section className="sport-page-section">
-  <h2 className="sport-page-section-title">Recommended Gear</h2>
-  {recommendedProducts.length > 0 ? (
-    <div className="recommended-products-grid">
-      {recommendedProducts.map((product) => (
-        <ProductCard
-          key={product.id}
-          name={product.name}
-          brand={product.brand}
-          price={product.price}
-          imgUrl={product.imgUrl}
-          affiliateLink={product.affiliateLink}
-          // ...add save/toggle logic if needed
-        />
-      ))}
-    </div>
-  ) : (
-    <p className="sport-page-text">
-      We're still gathering the best gear for this sport.
-    </p>
-  )}
-</section>
+        <h2 className="sport-page-section-title">Recommended Gear</h2>
+        {recommendedProducts.length > 0 ? (
+          <div className="recommended-products-grid">
+            {recommendedProducts.map((product) => (
+              <ProductCard
+                key={product.id}
+                name={product.name}
+                brand={product.brand}
+                price={product.price}
+                imgUrl={product.imgUrl}
+                affiliateLink={product.affiliateLink}
+              />
+            ))}
+          </div>
+        ) : (
+          <p className="sport-page-text">
+            We're still gathering the best gear for this sport.
+          </p>
+        )}
+      </section>
 
-      {/* Blog Section */}
       <section className="sport-page-section">
         <h2 className="sport-page-section-title">Explore More</h2>
         {loadingBlogs ? (

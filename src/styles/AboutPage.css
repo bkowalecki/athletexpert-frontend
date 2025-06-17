@@ -23,28 +23,26 @@
   overflow: hidden;
 }
 
-.about-page-hero-section::before {
+.about-page-hero-section::before,
+.about-page-hero-section::after {
   content: '';
   position: absolute;
-  top: -150px;
-  right: -150px;
   height: 400px;
   width: 400px;
-  background-color: rgba(255, 255, 255, 0.2);
   border-radius: 50%;
   z-index: 1;
 }
 
+.about-page-hero-section::before {
+  top: -150px;
+  right: -150px;
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
 .about-page-hero-section::after {
-  content: '';
-  position: absolute;
   bottom: -150px;
   left: -150px;
-  height: 400px;
-  width: 400px;
   background-color: rgba(255, 255, 255, 0.1);
-  border-radius: 50%;
-  z-index: 1;
 }
 
 .about-page-hero-content {

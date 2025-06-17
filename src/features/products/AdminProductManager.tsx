@@ -1,5 +1,3 @@
-// ✅ Enhanced product admin UI with multi-sport input like blog tags
-
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useUserContext } from "../../context/UserContext";
@@ -34,22 +32,26 @@ const AdminProductManager: React.FC = () => {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [sportInput, setSportInput] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (user?.role === "admin") {
       fetchProducts();
+    } else {
+      navigate("/"); // Redirect non-admin users
     }
-  }, [user]);
+  }, [user, navigate]);
 
   const fetchProducts = async () => {
     setLoading(true);
+    setError(null);
     try {
       const res = await axios.get(`${process.env.REACT_APP_API_URL}/products`, {
         withCredentials: true,
       });
       setProducts(res.data);
     } catch (err) {
-      alert("Error loading products.");
+      setError("Error loading products. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -79,6 +81,7 @@ const AdminProductManager: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     try {
       if (editingId) {
         await axios.put(
@@ -97,7 +100,7 @@ const AdminProductManager: React.FC = () => {
       setEditingId(null);
       fetchProducts();
     } catch (err) {
-      alert("Error saving product.");
+      setError("Error saving product. Please try again.");
     }
   };
 
@@ -109,13 +112,14 @@ const AdminProductManager: React.FC = () => {
 
   const handleDelete = async (id: number) => {
     if (!window.confirm("Are you sure you want to delete this product?")) return;
+    setError(null);
     try {
       await axios.delete(`${process.env.REACT_APP_API_URL}/products/admin/${id}`, {
         withCredentials: true,
       });
       fetchProducts();
     } catch (err) {
-      alert("Error deleting product.");
+      setError("Error deleting product. Please try again.");
     }
   };
 
@@ -130,6 +134,7 @@ const AdminProductManager: React.FC = () => {
   return (
     <div className="new-product-container">
       <h2>{editingId ? "Edit Product" : "Add New Product"}</h2>
+      {error && <p className="error-message">{error}</p>}
       <form onSubmit={handleSubmit} className="product-form">
         {["name", "brand", "price", "imgUrl", "affiliateLink"].map((field) => (
           <input
@@ -154,7 +159,14 @@ const AdminProductManager: React.FC = () => {
           <div className="tag-preview">
             {formData.sports.map((sport) => (
               <span key={sport} className="tag-chip">
-                {sport} <button onClick={() => removeSport(sport)}>x</button>
+                {sport}{" "}
+                <button
+                  type="button"
+                  onClick={() => removeSport(sport)}
+                  aria-label={`Remove ${sport}`}
+                >
+                  x
+                </button>
               </span>
             ))}
           </div>
@@ -175,8 +187,15 @@ const AdminProductManager: React.FC = () => {
                 <strong>{p.name}</strong> – ${p.price} <br />
                 <small>{p.brand}</small>
               </div>
-              <button onClick={() => handleEdit(p)}>✏️ Edit</button>
-              <button onClick={() => handleDelete(p.id!)}>🗑 Delete</button>
+              <button onClick={() => handleEdit(p)} aria-label={`Edit ${p.name}`}>
+                ✏️ Edit
+              </button>
+              <button
+                onClick={() => handleDelete(p.id!)}
+                aria-label={`Delete ${p.name}`}
+              >
+                🗑 Delete
+              </button>
             </div>
           ))}
         </div>

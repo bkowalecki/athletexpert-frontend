@@ -38,26 +38,20 @@ const NewBlogPost: React.FC = () => {
   const [editingId, setEditingId] = useState<number | null>(null);
 
   useEffect(() => {
-    axios
-      .get(`${process.env.REACT_APP_API_URL}/blog/admin/all`, {
-        withCredentials: true,
-      })
-      .then((res) => {
-        if (res.data) setBlogs(res.data);
-      })
-      .catch((err) => console.error("Error loading blogs", err));
+    const fetchBlogs = async () => {
+      try {
+        const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/blog/admin/all`, {
+          withCredentials: true,
+        });
+        setBlogs(data || []);
+      } catch (err) {
+        console.error("Error loading blogs", err);
+      }
+    };
+    fetchBlogs();
   }, []);
 
-  const insertTemplate = (templateHtml: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      content: prev.content + "\n" + templateHtml,
-    }));
-  };
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
@@ -81,41 +75,16 @@ const NewBlogPost: React.FC = () => {
 
   const handleEdit = (blog: BlogPost) => {
     setEditingId(blog.id ?? null);
-    setFormData({
-      title: blog.title,
-      author: blog.author,
-      imageUrl: blog.imageUrl,
-      summary: blog.summary,
-      content: blog.content,
-      sport: blog.sport,
-      tags: Array.isArray(blog.tags) ? blog.tags : [], 
-      publishedDate: blog.publishedDate,
-    });
+    setFormData({ ...blog, tags: Array.isArray(blog.tags) ? blog.tags : [] });
   };
 
   const handleDelete = async (id: number) => {
     if (!window.confirm("Are you sure you want to delete this post?")) return;
     try {
-      await axios.delete(`${process.env.REACT_APP_API_URL}/blog/${id}`, {
-        withCredentials: true,
-      });
+      await axios.delete(`${process.env.REACT_APP_API_URL}/blog/${id}`, { withCredentials: true });
       setBlogs((prev) => prev.filter((b) => b.id !== id));
     } catch (err) {
       console.error("Delete failed", err);
-    }
-  };
-
-  const reloadBlogs = async () => {
-    try {
-      const res = await axios.get(
-        `${process.env.REACT_APP_API_URL}/blog/admin/all`,
-        {
-          withCredentials: true,
-        }
-      );
-      setBlogs(res.data || []);
-    } catch (err) {
-      console.error("Error reloading blogs", err);
     }
   };
 
@@ -135,14 +104,12 @@ const NewBlogPost: React.FC = () => {
         headers: { "Content-Type": "application/json" },
       });
       alert(editingId ? "Blog updated!" : "Blog created!");
-      if (editingId) {
-        setEditingId(null);
-        setFormData(emptyFormData);
-        await reloadBlogs(); // 👈 Optional function to refresh
-      } else {
-        setFormData(emptyFormData);
-        alert("Blog created!");
-      }
+      setEditingId(null);
+      setFormData(emptyFormData);
+      const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/blog/admin/all`, {
+        withCredentials: true,
+      });
+      setBlogs(data || []);
     } catch (err) {
       console.error("Error submitting blog:", err);
       alert("Error submitting blog");
@@ -154,9 +121,8 @@ const NewBlogPost: React.FC = () => {
       <div className="admin-lockout">
         <h1>🚫 Hold up — this door’s locked!</h1>
         <p>
-          This page is for official <strong>AthleteXpert</strong> blog writers
-          only. If you've got spicy takes or a foam roller obsession — we want
-          to hear from you!
+          This page is for official <strong>AthleteXpert</strong> blog writers only. If you've got
+          spicy takes or a foam roller obsession — we want to hear from you!
         </p>
         <a href="mailto:contact@athletexpert.org">✉️ Contact Us</a>
       </div>
@@ -217,7 +183,12 @@ const NewBlogPost: React.FC = () => {
               <button
                 key={template.name}
                 type="button"
-                onClick={() => insertTemplate(template.html)}
+                onClick={() =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    content: prev.content + "\n" + template.html,
+                  }))
+                }
               >
                 ➕ {template.name}
               </button>

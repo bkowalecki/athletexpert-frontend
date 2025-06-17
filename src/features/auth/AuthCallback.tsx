@@ -4,57 +4,44 @@ import { useNavigate } from "react-router-dom";
 import { useUserContext } from "../../context/UserContext";
 
 const AuthCallback: React.FC = () => {
-  const {
-    isAuthenticated,
-    user: auth0User,
-    getAccessTokenSilently,
-  } = useAuth0();
+  const { isAuthenticated, user: auth0User, getAccessTokenSilently } = useAuth0();
   const { setUser } = useUserContext();
   const navigate = useNavigate();
 
   useEffect(() => {
     const handleAuth = async () => {
-      if (isAuthenticated && auth0User) {
-        try {
-          let idToken = sessionStorage.getItem("ax_id_token");
+      if (!isAuthenticated || !auth0User) return;
 
-          if (!idToken) {
-            const tokenResponse = await getAccessTokenSilently({
-              authorizationParams: {
-                audience: process.env.REACT_APP_AUTH0_AUDIENCE,
-                scope: "openid profile email",
-              },
-              detailedResponse: true,
-            });
-            idToken = tokenResponse.id_token;
-            sessionStorage.setItem("ax_id_token", idToken);
-          }
+      try {
+        let idToken = sessionStorage.getItem("ax_id_token") || 
+          (await getAccessTokenSilently({
+            authorizationParams: {
+              audience: process.env.REACT_APP_AUTH0_AUDIENCE,
+              scope: "openid profile email",
+            },
+            detailedResponse: true,
+          })).id_token;
 
-          const response = await fetch(
-            `${process.env.REACT_APP_API_URL}/users/auth0-login`,
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              credentials: "include",
-              body: JSON.stringify({ token: idToken }),
-            }
-          );
+        sessionStorage.setItem("ax_id_token", idToken);
 
-          if (response.ok) {
-            const userData = await response.json();
-            setUser({ ...userData, authProvider: "auth0" });
-            navigate("/profile", { replace: true });
-          } else {
-            console.error(
-              " Failed to authenticate with backend:",
-              response.status
-            );
-            navigate("/auth", { replace: true });
-          }
-        } catch (error) {
-          console.error("Error during Auth0 callback:", error);
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/users/auth0-login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ token: idToken }),
+        });
+
+        if (response.ok) {
+          const userData = await response.json();
+          setUser({ ...userData, authProvider: "auth0" });
+          navigate("/profile", { replace: true });
+        } else {
+          console.error("Failed to authenticate with backend:", response.status);
           navigate("/auth", { replace: true });
         }
+      } catch (error) {
+        console.error("Error during Auth0 callback:", error);
+        navigate("/auth", { replace: true });
       }
     };
 
@@ -62,14 +49,7 @@ const AuthCallback: React.FC = () => {
   }, [isAuthenticated, auth0User, getAccessTokenSilently, setUser, navigate]);
 
   return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "100vh",
-      }}
-    >
+    <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
       <h2>Authenticating...</h2>
     </div>
   );

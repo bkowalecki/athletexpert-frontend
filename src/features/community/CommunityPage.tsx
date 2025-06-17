@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { useSports } from "../../context/SportsContext"; // ⭐ Import preloaded sports
+import { useSports } from "../../context/SportsContext";
 import "../../styles/Community.css";
 import { Helmet } from "react-helmet";
 
@@ -43,63 +43,50 @@ interface SportCardProps {
   sport: Sport;
   index: number;
   navigate: (path: string) => void;
-  memberCount: number; // ✅ Add this
+  memberCount: number;
 }
 
 const SportCard: React.FC<SportCardProps> = React.memo(
   ({ sport, index, navigate, memberCount }) => (
-<div
-  className={`sport-card sport-card-${index % 4} ${
-    sport.title.toLowerCase() === "e-sports" ? "esport-preview-card" : ""
-  }`}
-  onClick={() => navigate(`${sport.title.toLowerCase()}`)}
->
+    <div
+      className={`sport-card sport-card-${index % 4} ${
+        sport.title.toLowerCase() === "e-sports" ? "esport-preview-card" : ""
+      }`}
+      onClick={() => navigate(sport.title.toLowerCase())}
+    >
       <div className="sport-card-bg">
         <img
           src={sport.backgroundImage}
-          alt={`Image of ${sport.title}`} // ⭐ Improved alt text
+          alt={`Image of ${sport.title}`}
           className="sport-card-image"
-          loading="lazy" // ⭐ Lazy load images for performance
+          loading="lazy"
         />
       </div>
       <div className="sport-card-info">
         <h3>{sport.title}</h3>
-        <p className="sport-card-members">
-          👥 {memberCount.toLocaleString()} members
-        </p>
+        <p className="sport-card-members">👥 {memberCount.toLocaleString()} members</p>
       </div>
     </div>
   )
 );
 
 const Community: React.FC = () => {
-  const { sports } = useSports(); // ⭐ Use preloaded sports context
-  const [searchQuery, setSearchQuery] = useState<string>("");
+  const { sports } = useSports();
+  const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
-  const [triggeredSearch, setTriggeredSearch] = useState("");
-
-  const handleSearch = () => setTriggeredSearch(searchQuery);
-
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") handleSearch();
-  };
 
   const filteredSports = useMemo(
     () =>
       sports.filter((sport) =>
-        sport.title.toLowerCase().includes(triggeredSearch.toLowerCase())
+        sport.title.toLowerCase().includes(searchQuery.toLowerCase())
       ),
-    [sports, triggeredSearch]
+    [sports, searchQuery]
   );
 
   const handleNavigation = useCallback(
     (sportTitle: string) => {
       const slugify = (str: string) =>
-        str
-          .toLowerCase()
-          .replace(/\s+/g, "-")
-          .replace(/[^\w\-]+/g, "");
-
+        str.toLowerCase().replace(/\s+/g, "-").replace(/[^\w\-]+/g, "");
       navigate(slugify(sportTitle));
     },
     [navigate]
@@ -120,34 +107,9 @@ const Community: React.FC = () => {
           content="Join your sports community on AthleteXpert and connect with other athletes."
         />
       </Helmet>
-      {/* (Optional) You could add a search bar here if you want */}
-      {/* <div className="community-search-wrapper">
-        <form
-          className="community-search-bar-form"
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleSearch();
-          }}
-        >
-          <input
-            type="text"
-            className="community-search-bar-input"
-            placeholder="Search sports..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onKeyDown={handleKeyPress}
-            aria-label="Search sports"
-          />
-          <button
-            type="submit"
-            className="community-search-bar-button"
-            aria-label="Search"
-          />
-        </form>
-      </div> */}
       <h1 className="community-page-title">Community</h1>
       <div className="sports-masonry">
-        {filteredSports.map((sport: Sport, index: number) => (
+        {filteredSports.map((sport, index) => (
           <SportCard
             key={sport.title}
             sport={sport}

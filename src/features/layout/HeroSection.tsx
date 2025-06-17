@@ -15,44 +15,34 @@ const HeroSection: React.FC<HeroSectionProps> = ({ openQuiz }) => {
   const { user, isSessionChecked } = useUserContext();
   const navigate = useNavigate();
 
-  /** ✅ Clicking "Profile" should go to `/profile` if logged in, otherwise `/auth` */
   const handleProfileClick = () => {
     if (!isSessionChecked) return;
-
-    if (user) {
-      navigate("/profile");
-    } else {
-      navigate("/auth");
-    }
+    navigate(user ? "/profile" : "/auth");
   };
 
   useEffect(() => {
     const videoElement = videoRef.current;
-  
+
     if (videoElement) {
       videoElement.muted = true;
       videoElement.setAttribute("playsinline", "true");
-  
-      const playPromise = videoElement.play();
-  
-      if (playPromise !== undefined) {
-        playPromise
-          .then(() => {
-            console.log("Video playing successfully");
-          })
-          .catch((error) => {
-            console.error("Autoplay blocked. Waiting for user interaction to play:", error);
-  
-            const tryPlayOnInteraction = () => {
-              videoElement.play().catch((err) => console.error("Still couldn't play:", err));
-              document.removeEventListener('touchstart', tryPlayOnInteraction);
-              document.removeEventListener('scroll', tryPlayOnInteraction);
-            };
-  
-            document.addEventListener('touchstart', tryPlayOnInteraction);
-            document.addEventListener('scroll', tryPlayOnInteraction);
-          });
-      }
+
+      videoElement.play().catch(() => {
+        const tryPlayOnInteraction = () => {
+          videoElement.play().catch((err) =>
+            console.error("Still couldn't play:", err)
+          );
+          document.removeEventListener("touchstart", tryPlayOnInteraction);
+          document.removeEventListener("scroll", tryPlayOnInteraction);
+        };
+
+        document.addEventListener("touchstart", tryPlayOnInteraction, {
+          once: true,
+        });
+        document.addEventListener("scroll", tryPlayOnInteraction, {
+          once: true,
+        });
+      });
     }
   }, []);
 
@@ -76,16 +66,19 @@ const HeroSection: React.FC<HeroSectionProps> = ({ openQuiz }) => {
       <div className="hero-content">
         <h1>Where Athletes Find Their Edge.</h1>
         <div className="cta-buttons">
-        <button
-  className="cta-btn"
-  onClick={() => {
-    trackEvent("quiz_start", { location: "hero_section" });
-    openQuiz();
-  }}
->
+          <button
+            className="cta-btn"
+            onClick={() => {
+              trackEvent("quiz_start", { location: "hero_section" });
+              openQuiz();
+            }}
+          >
             Get Your Gear
           </button>
-          <button className="cta-btn cta-btn-secondary" onClick={handleProfileClick}>
+          <button
+            className="cta-btn cta-btn-secondary"
+            onClick={handleProfileClick}
+          >
             Profile
           </button>
         </div>

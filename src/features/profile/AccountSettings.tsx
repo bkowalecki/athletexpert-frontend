@@ -40,56 +40,36 @@ const AccountSettings: React.FC = () => {
     }
   }, [user]);
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
+    if (e.target.files?.[0]) {
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setFormData((prev) => ({
-          ...prev,
-          profilePictureUrl: reader.result as string,
-        }));
-      };
-      reader.readAsDataURL(file);
+      reader.onloadend = () => setFormData((prev) => ({ ...prev, profilePictureUrl: reader.result as string }));
+      reader.readAsDataURL(e.target.files[0]);
     }
   };
 
-  const handleAddSport = () => {
-    if (newSport && !formData.sports.includes(newSport)) {
-      setFormData((prev) => ({
-        ...prev,
-        sports: [...prev.sports, newSport],
-      }));
-      setNewSport("");
-    }
-  };
-
-  const handleRemoveSport = (sport: string) => {
+  const handleSportChange = (action: "add" | "remove", sport: string) => {
     setFormData((prev) => ({
       ...prev,
-      sports: prev.sports.filter((s) => s !== sport),
+      sports: action === "add" ? [...prev.sports, sport] : prev.sports.filter((s) => s !== sport),
     }));
+    if (action === "add") setNewSport("");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/users/profile`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify(formData),
-        }
-      );
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/users/profile`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(formData),
+      });
 
       if (response.ok) {
         const updatedUser = await response.json();
@@ -116,72 +96,42 @@ const AccountSettings: React.FC = () => {
           <label>Profile Picture</label>
           <input type="file" accept="image/*" onChange={handleImageChange} />
           {formData.profilePictureUrl && (
-            <img
-              src={formData.profilePictureUrl}
-              alt="Profile"
-              className="account-settings-avatar"
-            />
+            <img src={formData.profilePictureUrl} alt="Profile" className="account-settings-avatar" />
           )}
         </div>
 
-        <div className="account-settings-section">
-          <label>Username</label>
-          <input
-            type="text"
-            name="username"
-            value={formData.username}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        <div className="account-settings-section">
-          <label>First Name</label>
-          <input
-            type="text"
-            name="firstName"
-            value={formData.firstName}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div className="account-settings-section">
-          <label>Last Name</label>
-          <input
-            type="text"
-            name="lastName"
-            value={formData.lastName}
-            onChange={handleChange}
-          />
-        </div>
+        {["username", "firstName", "lastName"].map((field) => (
+          <div key={field} className="account-settings-section">
+            <label>{field.replace(/^\w/, (c) => c.toUpperCase())}</label>
+            <input
+              type="text"
+              name={field}
+              value={(formData as any)[field]}
+              onChange={handleChange}
+              required={field === "username"}
+            />
+          </div>
+        ))}
 
         <div className="account-settings-section">
           <label>Bio</label>
-          <textarea
-            name="bio"
-            value={formData.bio}
-            onChange={handleChange}
-            maxLength={200}
-          />
+          <textarea name="bio" value={formData.bio} onChange={handleChange} maxLength={200} />
         </div>
 
         <div className="account-settings-section">
           <label>Sports</label>
           <div className="account-settings-sports">
-            {formData.sports.map((sport, index) => (
-              <span key={index} className="account-settings-sport-tag">
+            {formData.sports.map((sport) => (
+              <span key={sport} className="account-settings-sport-tag">
                 {sport}
-                <button type="button" onClick={() => handleRemoveSport(sport)}>
+                <button type="button" onClick={() => handleSportChange("remove", sport)}>
                   ✕
                 </button>
               </span>
             ))}
           </div>
           <div className="account-settings-sport-picker">
-            <select
-              value={newSport}
-              onChange={(e) => setNewSport(e.target.value)}
-            >
+            <select value={newSport} onChange={(e) => setNewSport(e.target.value)}>
               <option value="">-- Select a sport --</option>
               {allowedSports
                 .filter((sport) => !formData.sports.includes(sport))
@@ -191,7 +141,7 @@ const AccountSettings: React.FC = () => {
                   </option>
                 ))}
             </select>
-            <button type="button" onClick={handleAddSport} disabled={!newSport}>
+            <button type="button" onClick={() => handleSportChange("add", newSport)} disabled={!newSport}>
               Add Sport
             </button>
           </div>

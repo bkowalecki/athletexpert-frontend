@@ -17,15 +17,14 @@
 }
 
 .ax-product-card-image-wrapper {
-  /* width: 100%; */
   height: 220px;
   background-color: #ffffff;
   padding: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  /* border-radius: 0 0 16px 16px; */
   order: 1;
+  cursor: zoom-in;
 }
 
 .ax-product-card-image {
@@ -41,7 +40,7 @@
   justify-content: space-between;
   gap: 8px;
   order: 2;
-  flex: 1; /* ensures it grows to allow pushing CTAs down */
+  flex: 1;
 }
 
 .ax-product-card-info-top {
@@ -49,7 +48,6 @@
   flex-direction: column;
   gap: 6px;
 }
-
 
 .ax-product-card-name {
   font-size: 1.6rem;
@@ -71,7 +69,6 @@
   color: #ff9900;
   font-weight: bold;
   margin: 0.25rem 0;
-
 }
 
 .ax-product-card-cta-row {
@@ -131,7 +128,6 @@
   background: #e68a00;
 }
 
-
 /* 🔁 Mobile: revert button alignment to left */
 @media (max-width: 768px) {
   .ax-product-card {
@@ -188,7 +184,14 @@
   }
 }
 
-/* Modal styles */
+/* 🔒 Modal scroll-lock support (optional helper class) */
+body.modal-open {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+}
+
+/* 🔍 Modal styles */
 .ax-modal-backdrop {
   position: fixed;
   inset: 0;
@@ -196,7 +199,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 9999; /* super high to sit above everything */
+  z-index: 9999;
+  padding: 1rem;
+  overscroll-behavior: contain;
 }
 
 .ax-modal-content {
@@ -212,7 +217,6 @@
   animation: scaleIn 0.2s ease-in-out;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
 }
-
 
 .ax-modal-image {
   max-width: 60vw;
@@ -246,10 +250,6 @@
     transform: scale(1);
     opacity: 1;
   }
-}
-
-.ax-product-card-image-wrapper {
-  cursor: zoom-in;
 }
 
 @media (max-width: 600px) {

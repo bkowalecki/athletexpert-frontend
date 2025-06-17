@@ -19,21 +19,15 @@ interface BlogPost {
 }
 
 const fetchBlogPost = async (slug: string): Promise<BlogPost> => {
-  const response = await axios.get(
-    `${process.env.REACT_APP_API_URL}/blog/slug/${slug}`
-  );
-  return response.data;
+  const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/blog/slug/${slug}`);
+  return data;
 };
 
 const BlogPostPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
 
-  const {
-    data: post,
-    isLoading,
-    isError,
-  } = useQuery<BlogPost, Error>({
+  const { data: post, isLoading, isError } = useQuery<BlogPost, Error>({
     queryKey: ["blogPost", slug],
     queryFn: () => fetchBlogPost(slug as string),
     enabled: !!slug,
@@ -42,7 +36,7 @@ const BlogPostPage: React.FC = () => {
 
   useEffect(() => {
     if (isError || (!isLoading && !post)) {
-      console.warn(`Blog post not found. Redirecting to /404.`);
+      console.warn("Blog post not found. Redirecting to /404.");
       navigate("/404", { replace: true });
     }
   }, [isError, isLoading, post, navigate]);
@@ -59,10 +53,7 @@ const BlogPostPage: React.FC = () => {
     <main className="blog-post-page" role="main">
       <Helmet>
         <title>{post.title} - AthleteXpert</title>
-        <meta
-          name="description"
-          content={post.summary || post.title || "Read this blog on AthleteXpert."}
-        />
+        <meta name="description" content={post.summary || post.title} />
         <meta property="og:title" content={post.title} />
         <meta property="og:description" content={post.summary || post.title} />
         <meta property="og:image" content={post.imageUrl} />
@@ -76,7 +67,7 @@ const BlogPostPage: React.FC = () => {
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "Article",
-            headline: post.title || "AthleteXpert Blog",
+            headline: post.title,
             image: post.imageUrl ? [post.imageUrl] : undefined,
             datePublished: post.publishedDate,
             author: post.author ? [{ "@type": "Person", name: post.author }] : undefined,
@@ -93,9 +84,7 @@ const BlogPostPage: React.FC = () => {
       </Helmet>
 
       <nav className="back-link-container" aria-label="Breadcrumb">
-        <Link to="/blog" className="back-link">
-          ← Back to Blog
-        </Link>
+        <Link to="/blog" className="back-link">← Back to Blog</Link>
       </nav>
 
       {post.imageUrl && (
@@ -124,9 +113,7 @@ const BlogPostPage: React.FC = () => {
           className="blog-post-content"
           role="article"
           aria-label={post.title}
-          dangerouslySetInnerHTML={{
-            __html: DOMPurify.sanitize(post.content || ""),
-          }}
+          dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.content || "") }}
         />
         <ShareButtons title={post.title} />
       </article>

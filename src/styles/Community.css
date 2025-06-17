@@ -175,6 +175,8 @@
   border: 2px solid var(--accent1);
   background: linear-gradient(135deg, var(--secondary-bg), var(--primary-bg));
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+  will-change: transform;
+  transform: translateZ(0)
 }
 
 .sport-card:hover {

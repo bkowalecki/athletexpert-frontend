@@ -20,22 +20,38 @@ const ShareButtons: React.FC<ShareButtonsProps> = ({ title }) => {
   const location = useLocation();
   const url = `https://www.athletexpert.org${location.pathname}`;
 
+  const shareOptions = [
+    {
+      Component: FacebookShareButton,
+      Icon: FacebookIcon,
+      props: { url },
+    },
+    {
+      Component: TwitterShareButton,
+      Icon: TwitterIcon,
+      props: { url, title },
+    },
+    {
+      Component: LinkedinShareButton,
+      Icon: LinkedinIcon,
+      props: { url, title, summary: title, source: "AthleteXpert" },
+    },
+    {
+      Component: EmailShareButton,
+      Icon: EmailIcon,
+      props: { url, subject: title, body: `Check this out: ${url}` },
+    },
+  ];
+
   return (
     <section className="share-section">
       <p className="share-label">Share this post:</p>
       <div className="share-icons">
-        <FacebookShareButton url={url}>
-          <FacebookIcon size={40} round />
-        </FacebookShareButton>
-        <TwitterShareButton url={url} title={title}>
-          <TwitterIcon size={40} round />
-        </TwitterShareButton>
-        <LinkedinShareButton url={url} title={title} summary={title} source="AthleteXpert">
-          <LinkedinIcon size={40} round />
-        </LinkedinShareButton>
-        <EmailShareButton url={url} subject={title} body={`Check this out: ${url}`}>
-          <EmailIcon size={40} round />
-        </EmailShareButton>
+        {shareOptions.map(({ Component, Icon, props }, index) => (
+          <Component key={index} {...props}>
+            <Icon size={40} round />
+          </Component>
+        ))}
       </div>
     </section>
   );

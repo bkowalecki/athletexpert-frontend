@@ -14,7 +14,7 @@
   {
     "title": "Baseball",
     "logo": "/icons/baseball_icon.png",
-    "backgroundImage": "/images/sports/baseball_bg.jpg",
+    "backgroundImage": "/images/sports/baseball_bg.webp",
     "extra_data": {
       "category": "Team Sport",
       "type": "Outdoor",
@@ -131,7 +131,7 @@
   {
     "title": "Ice Skating",
     "logo": "/icons/ice_skating_icon.png",
-    "backgroundImage": "/images/sports/ice_skating_bg.jpg",
+    "backgroundImage": "/images/sports/ice_skating_bg.webp",
     "extra_data": {
       "category": "Winter Sport",
       "type": "Indoor",
@@ -165,7 +165,7 @@
   {
     "title": "Rugby",
     "logo": "/icons/rugby_icon.png",
-    "backgroundImage": "/images/sports/rugby_bg.jpg",
+    "backgroundImage": "/images/sports/rugby_bg.webp",
     "extra_data": {
       "category": "Team Sport",
       "type": "Outdoor",
@@ -176,7 +176,7 @@
   {
     "title": "Running",
     "logo": "/icons/running_icon.png",
-    "backgroundImage": "/images/sports/running_bg.jpg",
+    "backgroundImage": "/images/sports/running_bg.webp",
     "extra_data": {
       "category": "Individual Sport",
       "type": "Outdoor",
@@ -242,7 +242,7 @@
   {
     "title": "Swimming",
     "logo": "/icons/swimming_icon.png",
-    "backgroundImage": "/images/sports/swimming_bg.jpg",
+    "backgroundImage": "/images/sports/swimming_bg.webp",
     "extra_data": {
       "category": "Individual Sport",
       "type": "Indoor/Outdoor",
@@ -253,7 +253,7 @@
   {
     "title": "Tennis",
     "logo": "/icons/tennis_icon.png",
-    "backgroundImage": "/images/sports/tennis_bg.jpg",
+    "backgroundImage": "/images/sports/tennis_bg.webp",
     "extra_data": {
       "category": "Racquet Sport",
       "type": "Outdoor",
@@ -275,7 +275,7 @@
   {
     "title": "Wrestling",
     "logo": "/icons/wrestling_icon.png",
-    "backgroundImage": "/images/sports/wrestling_bg.jpg",
+    "backgroundImage": "/images/sports/wrestling_bg.webp",
     "extra_data": {
       "category": "Combat Sport",
       "type": "Indoor",
