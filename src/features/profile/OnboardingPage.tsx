@@ -77,11 +77,21 @@ const OnboardingPage = () => {
   const { user, isSessionChecked } = useUserContext();
 
   useEffect(() => {
-    if (isSessionChecked && (!user || !user.username)) {
-      toast.error("Session error. Please log in again.");
+    if (!isSessionChecked) return;
+  
+    console.log("🧠 USER FROM CONTEXT:", user);
+  
+    if (!user) {
+      toast.error("Session expired. Please log in again.");
       navigate("/auth", { replace: true });
+      return;
+    }
+  
+    if (user.isActive) {
+      navigate("/profile", { replace: true });
     }
   }, [user, isSessionChecked, navigate]);
+  
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
