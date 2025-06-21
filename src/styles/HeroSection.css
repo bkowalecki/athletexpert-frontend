@@ -144,22 +144,23 @@
 
 @media (max-width: 768px) {
   .cta-btn {
-    font-size: 16px;
+    font-size: 22px;
     padding: 20px 16px;
-    width: 100%;
+    width: 70%;
   }
 
   .cta-buttons {
     flex-direction: column;
-    gap: 10px; /* Stack the buttons on smaller screens */
+    gap: 20px; 
+    align-items: center;
   }
 }
 
 @media (max-width: 480px) {
   .cta-btn {
-    font-size: 14px;
+    font-size: 1rem;
     padding: 20px 12px;
-    width: 100%; /* Make buttons full width */
+    width: 75%; /* Make buttons full width */
   }
 
   .cta-buttons {

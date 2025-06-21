@@ -3,7 +3,7 @@
   bottom: 0;
   left: 0;
   right: 0;
-  height: 88px; /* Slightly taller */
+  height: 88px;
   background-color: var(--brand-dark);
   display: flex;
   justify-content: space-around;
@@ -25,12 +25,13 @@
   transition: color 0.2s ease, filter 0.2s ease;
 }
 
+/* Active Link Styles */
 .pwa-nav a.active {
   color: #fff;
 }
 
 .pwa-nav a.active i {
-  filter: brightness(1.3); /* Boost brightness for non-center icons */
+  filter: brightness(1.4) drop-shadow(0 0 2px rgba(255,255,255,0.4));
 }
 
 /* Center Button Wrapper */
@@ -57,11 +58,21 @@
   outline: none;
 }
 
+/* Ensure search icon stays centered */
+.pwa-nav .search-button i {
+  transform: none !important;
+  margin-top: 1px;
+  font-size: 1.6rem;
+}
+
+/* Active search state */
 .pwa-nav .search-button.active {
   background-color: #fff;
-  color: #A23C20;
   box-shadow: 0 0 14px rgba(255, 255, 255, 0.6);
-  filter: invert(1); /* Prevent fuzziness */
+}
+
+.pwa-nav .search-button.active i {
+  transform: scale(1.15);
 }
 
 /* Smooth Icon Rendering */
@@ -71,17 +82,32 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   transition: transform 0.2s ease, filter 0.2s ease;
-  transform: translateY(-6px); /* lift all icons slightly */
+}
+
+/* Only lift outer nav icons, not the center button icon */
+.pwa-nav a:not(.search-button) i {
+  transform: translateY(-6px);
 }
 
 /* Hover scale effect */
-.pwa-nav .search-button:hover,
+.pwa-nav .search-button:hover i {
+  transform: scale(1.1);
+}
+
 .pwa-nav a:hover i {
   transform: translateY(-6px) scale(1.1);
 }
 
-/* Remove outline */
-.pwa-nav .search-button:focus,
-.pwa-nav a:focus {
+/* Branded focus styles */
+.pwa-nav a:focus-visible,
+.pwa-nav .search-button:focus-visible {
+  outline: 2px solid #A23C20;
+  outline-offset: 4px;
+  border-radius: 8px;
+}
+
+/* Prevent blue outline fallback */
+.pwa-nav a:focus,
+.pwa-nav .search-button:focus {
   outline: none;
 }

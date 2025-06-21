@@ -1,4 +1,4 @@
-import React, { useState, lazy, Suspense } from "react";
+import React, { useState, useEffect, lazy, Suspense } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
@@ -46,9 +46,19 @@ const AppContent: React.FC = () => {
   const { isSessionChecked } = useUserContext();
   const [isQuizModalOpen, setQuizModalOpen] = useState(false);
   const isStandalone = window.matchMedia("(display-mode: standalone)").matches || (navigator as any).standalone;
-  const isMobile = window.innerWidth <= 768;
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
-  if (!isSessionChecked) return <div className="loading-screen">Checking session...</div>;
+useEffect(() => {
+  const handleResize = () => {
+    setIsMobile(window.innerWidth <= 768);
+  };
+
+  window.addEventListener("resize", handleResize);
+  return () => window.removeEventListener("resize", handleResize);
+}, []);
+
+
+  if (!isSessionChecked) return <div className="loading-screen"></div>;
 
   return (
     <div className="App">
@@ -96,7 +106,7 @@ const AppContent: React.FC = () => {
             </Suspense>
           </ErrorBoundary>
         </AnimatePresence>
-        {isStandalone && isMobile && <PwaNav />}
+        {isMobile && <PwaNav />}
         <Footer />
       </SportsProvider>
     </div>

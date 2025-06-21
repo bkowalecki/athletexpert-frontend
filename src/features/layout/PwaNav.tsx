@@ -3,25 +3,18 @@ import { Link, useLocation } from "react-router-dom";
 import "../../styles/PwaNav.css";
 
 const PwaNav: React.FC = () => {
-  const [showNav, setShowNav] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const { pathname } = useLocation();
 
   useEffect(() => {
-    const isPwaMode = () =>
-      window.matchMedia("(display-mode: standalone)").matches ||
-      (window.navigator as any).standalone === true;
-
-    const checkPwaAndMobile = () => {
-      const isMobile = window.innerWidth <= 768;
-      setShowNav(isPwaMode() && isMobile);
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
     };
-
-    checkPwaAndMobile();
-    window.addEventListener("resize", checkPwaAndMobile);
-    return () => window.removeEventListener("resize", checkPwaAndMobile);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  if (!showNav) return null;
+  if (!isMobile) return null;
 
   const getClassName = (path: string) =>
     pathname === path || pathname.startsWith(path) ? "active" : "";

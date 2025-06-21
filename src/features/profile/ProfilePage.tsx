@@ -203,7 +203,7 @@ const ProfilePage: React.FC = () => {
   
 
   if (!isSessionChecked)
-    return <div className="profile-loading">Checking session...</div>;
+    return <div className="profile-loading"></div>;
   if (!profile)
     return <div className="profile-loading">No profile data found.</div>;
 

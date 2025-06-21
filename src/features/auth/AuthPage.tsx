@@ -155,7 +155,7 @@ const AuthPage: React.FC = () => {
     }
   };
 
-  if (!isSessionChecked) return <div className="auth-loading">Checking session...</div>;
+  if (!isSessionChecked) return <div className="auth-loading"></div>;
 
   return (
     <div className="auth-page-wrapper">
