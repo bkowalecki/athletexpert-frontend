@@ -16,10 +16,16 @@ interface BlogPost {
   imageUrl: string;
   content: string;
   summary: string;
+  slug: string;
 }
 
 const fetchBlogPost = async (slug: string): Promise<BlogPost> => {
   const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/blog/slug/${slug}`);
+  return data;
+};
+
+const fetchRelatedBlogs = async (slug: string): Promise<BlogPost[]> => {
+  const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/blog/related/${slug}`);
   return data;
 };
 
@@ -32,6 +38,12 @@ const BlogPostPage: React.FC = () => {
     queryFn: () => fetchBlogPost(slug as string),
     enabled: !!slug,
     retry: 1,
+  });
+
+  const { data: relatedBlogs = [] } = useQuery<BlogPost[]>({
+    queryKey: ["relatedBlogs", slug],
+    queryFn: () => fetchRelatedBlogs(slug as string),
+    enabled: !!slug,
   });
 
   useEffect(() => {
@@ -117,6 +129,38 @@ const BlogPostPage: React.FC = () => {
         />
         <ShareButtons title={post.title} />
       </article>
+
+      {relatedBlogs.length > 0 && (
+        <section className="related-blogs-section">
+          <h2>Related Posts</h2>
+          <div className="related-blogs-grid">
+            {relatedBlogs.map((blog) => (
+              <div key={blog.id} className="blog-card-inline">
+                <Link to={`/blog/${blog.slug}`} className="blog-card-inline-link">
+                  <img
+                    src={blog.imageUrl}
+                    alt={`Thumbnail for ${blog.title}`}
+                    className="blog-card-inline-img"
+                    loading="lazy"
+                  />
+                  <div className="blog-card-inline-content">
+                    <h3 className="blog-card-inline-title">{blog.title}</h3>
+                    <p className="blog-card-inline-meta">
+                      <span>By {blog.author}</span> ·{" "}
+                      <time dateTime={blog.publishedDate}>
+                        {new Date(blog.publishedDate).toLocaleDateString()}
+                      </time>
+                    </p>
+                    <p className="blog-card-inline-summary">
+                      {DOMPurify.sanitize(blog.summary)}
+                    </p>
+                  </div>
+                </Link>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
     </main>
   );
 };

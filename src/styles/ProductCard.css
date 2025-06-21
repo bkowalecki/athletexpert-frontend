@@ -74,7 +74,7 @@
 
 .ax-product-card-price {
   font-size: 1.1rem;
-  color: #ff9900;
+  color: #ccc;
   font-weight: bold;
   margin: 0.25rem 0;
 }
@@ -90,8 +90,8 @@
 
 .ax-product-card-save-button {
   background: transparent;
-  border: 2px solid #ff9900;
-  color: #ff9900;
+  border: 2px solid #a23c20;
+  color: white;
   font-size: 1.2rem;
   padding: 6px 10px;
   border-radius: 6px;
@@ -100,8 +100,8 @@
 }
 
 .ax-product-card-save-button:hover {
-  background: #ff9900;
-  color: #121212;
+  background: #A23C20;
+  color: white;
 }
 
 /* Unsave Variant */
@@ -162,8 +162,8 @@
   }
 
   .ax-product-card-image-wrapper {
-    width: 100px;
-    height: 100px;
+    width: 125px;
+    height: 125px;
     padding: 6px;
     border-radius: 10px;
     flex-shrink: 0;
@@ -182,13 +182,13 @@
   }
 
   .ax-product-card-save-button {
-    font-size: 0.9rem;
+    font-size: 1.2rem;
     padding: 5px 9px;
   }
 
   .ax-product-card-button {
-    font-size: 0.9rem;
-    padding: 6px 10px;
+    font-size: 1rem;
+    padding: 8px 12px;
   }
 }
 
