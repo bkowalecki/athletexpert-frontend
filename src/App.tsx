@@ -106,7 +106,7 @@ useEffect(() => {
             </Suspense>
           </ErrorBoundary>
         </AnimatePresence>
-        {isMobile && <PwaNav />}
+        {isStandalone && isMobile && <PwaNav />}
         <Footer />
       </SportsProvider>
     </div>

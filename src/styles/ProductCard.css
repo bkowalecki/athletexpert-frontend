@@ -1,3 +1,7 @@
+/* ============================
+🌟 Product Card: Desktop Layout
+============================ */
+
 .ax-product-card {
   background: #121212;
   border-radius: 16px;
@@ -6,7 +10,7 @@
   display: flex;
   flex-direction: column;
   max-width: 320px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
   border: 2px solid transparent;
 }
 
@@ -16,6 +20,7 @@
   border-color: #A23C20;
 }
 
+/* Image Wrapper */
 .ax-product-card-image-wrapper {
   height: 220px;
   background-color: #ffffff;
@@ -23,7 +28,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  order: 1;
   cursor: zoom-in;
 }
 
@@ -33,20 +37,24 @@
   object-fit: contain;
 }
 
+/* Info Section */
 .ax-product-card-info {
   padding: 16px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   gap: 8px;
-  order: 2;
   flex: 1;
+  align-items: flex-start; /* ✅ Left-aligned by default */
+  text-align: left;
 }
 
+/* Top Info */
 .ax-product-card-info-top {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  align-items: flex-start;
 }
 
 .ax-product-card-name {
@@ -71,10 +79,11 @@
   margin: 0.25rem 0;
 }
 
+/* CTA Row */
 .ax-product-card-cta-row {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: flex-start;
   gap: 6px;
   margin-top: 8px;
 }
@@ -95,21 +104,17 @@
   color: #121212;
 }
 
+/* Unsave Variant */
 .ax-product-card-save-button.unsave {
   font-weight: 600;
   background-color: transparent;
   color: #a23c20;
   border-color: #a23c20;
-  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .ax-product-card-save-button.unsave:hover {
   background-color: #a23c20;
   color: #fff;
-}
-
-.ax-product-card-save-button.unsave:hover::after {
-  opacity: 1;
 }
 
 .ax-product-card-button {
@@ -128,7 +133,9 @@
   background: #e68a00;
 }
 
-/* 🔁 Mobile: revert button alignment to left */
+/* ================================
+📱 Responsive: Mobile Breakpoint
+=============================== */
 @media (max-width: 768px) {
   .ax-product-card {
     flex-direction: row;
@@ -139,17 +146,22 @@
   }
 
   .ax-product-card-info {
-    order: 1;
-    padding: 0px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    gap: 8px;
+    padding: 0;
     flex: 1;
+    gap: 8px;
+    align-items: flex-end; /* ✅ Right-align on mobile */
+    text-align: right;
+  }
+
+  .ax-product-card-info-top {
+    align-items: flex-end;
+  }
+
+  .ax-product-card-cta-row {
+    align-items: flex-end;
   }
 
   .ax-product-card-image-wrapper {
-    order: 2;
     width: 100px;
     height: 100px;
     padding: 6px;
@@ -157,41 +169,41 @@
     flex-shrink: 0;
   }
 
-  .ax-product-card-cta-row {
-    align-items: flex-start;
-  }
-
   .ax-product-card-name {
-    font-size: 1rem;
+    font-size: 1.3rem;
   }
 
   .ax-product-card-brand {
-    font-size: 0.75rem;
+    font-size: 1rem;
   }
 
   .ax-product-card-price {
-    font-size: 0.9rem;
+    font-size: 1rem;
   }
 
   .ax-product-card-save-button {
-    font-size: 0.75rem;
+    font-size: 0.9rem;
     padding: 5px 9px;
   }
 
   .ax-product-card-button {
-    font-size: 0.75rem;
+    font-size: 0.9rem;
     padding: 6px 10px;
   }
 }
 
-/* 🔒 Modal scroll-lock support (optional helper class) */
+/* ================================
+🛑 Modal Scroll Lock (Optional)
+=============================== */
 body.modal-open {
   overflow: hidden;
   position: fixed;
   width: 100%;
 }
 
-/* 🔍 Modal styles */
+/* ================================
+🔍 Modal Styles
+=============================== */
 .ax-modal-backdrop {
   position: fixed;
   inset: 0;
@@ -241,6 +253,9 @@ body.modal-open {
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
 }
 
+/* ================================
+✨ Modal Animation
+=============================== */
 @keyframes scaleIn {
   from {
     transform: scale(0.8);
