@@ -6,7 +6,7 @@
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  background: linear-gradient(135deg, #2A6045 0%, #1a1a1a 100%);
+  background: linear-gradient(135deg, #A23C20 0%, #1a1a1a 100%);
   color: #fff;
   font-family: "Poppins", sans-serif;
   padding: 2rem;
@@ -62,7 +62,7 @@
 .onboarding-step input,
 .onboarding-step textarea,
 .onboarding-step select {
-  width: 100%;
+  width: 90%;
   padding: 14px;
   margin: 12px 0;
   border: none;
@@ -105,32 +105,42 @@
 
 .sports-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-  gap: 15px;
-  margin: 20px 0;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 14px;
+  margin: 1.5rem 0 0.5rem;
 }
 
 .sport-option {
-  background: #2c2c2c;
-  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 12px;
-  border-radius: 10px;
-  cursor: pointer;
   text-align: center;
+  height: 56px;
+  border-radius: 14px;
+  background-color: #2d2d2d;
+  color: #eee;
+  font-size: 0.95rem;
   font-weight: 500;
-  transition: all 0.2s ease;
-  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.25s ease-in-out;
+  border: 2px solid transparent;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .sport-option:hover {
-  background: #3a3a3a;
+  background-color: #3a3a3a;
+  transform: scale(1.04);
 }
 
 .sport-option.selected {
-  background: #A23C20;
+  background-color: #A23C20;
   color: #fff;
-  transform: scale(1.05);
   border-color: #fff;
+  transform: scale(1.06);
 }
 
 .button-group {
@@ -142,7 +152,7 @@
 }
 
 .onboarding-btn {
-  background: #2A6045;
+  background: #A23C20;
   color: white;
   border: none;
   padding: 14px 20px;
@@ -154,7 +164,8 @@
 }
 
 .onboarding-btn:hover {
-  background: #1e4b36;
+  background: black;
+  color: white;
 }
 
 .onboarding-skip-btn {
@@ -193,5 +204,14 @@
   .onboarding-btn {
     font-size: 1rem;
     padding: 12px 15px;
+  }
+}
+
+
+@media (max-width: 480px) {
+  .sport-option {
+    font-size: 0.85rem;
+    height: 50px;
+    padding: 10px;
   }
 }

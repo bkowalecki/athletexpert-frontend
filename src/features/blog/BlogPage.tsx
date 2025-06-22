@@ -21,11 +21,21 @@ interface BlogPost {
 
 const fetchPosts = async (searchQuery: string, page: number): Promise<BlogPost[]> => {
   if (searchQuery.trim().length > 50 || /[^\w\s-]/.test(searchQuery)) return [];
-  const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/blog`, {
-    params: { searchQuery, page, size: 9 },
-  });
-  return data.content;
+  
+  try {
+    const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/blog`, {
+      params: { searchQuery, page, size: 9 },
+    });
+
+    if (!data?.content || !Array.isArray(data.content)) return [];
+
+    return data.content;
+  } catch (err) {
+    console.warn("⚠️ Failed to fetch posts", err);
+    return []; // gracefully handle failed page fetch (e.g. out of range)
+  }
 };
+
 
 const BlogPostCard: React.FC<{
   post: BlogPost;
@@ -70,8 +80,10 @@ const BlogPage: React.FC = () => {
   });
 
   useEffect(() => {
-    if (error) toast.error("❌ Error fetching blog posts.");
-  }, [error]);
+    if (error && currentPage === 0) {
+      toast.error("❌ Error fetching blog posts.");
+    }
+  }, [error, currentPage]);
 
   useEffect(() => {
     if (data) {
@@ -88,6 +100,21 @@ const BlogPage: React.FC = () => {
       .then(res => setSavedBlogIds(res.data.map((blog: BlogPost) => blog.id)))
       .catch(err => console.error("❌ Error fetching saved blogs:", err));
   }, [user]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (
+        window.innerHeight + window.scrollY >= document.body.offsetHeight - 400 &&
+        !isFetching &&
+        hasMorePosts
+      ) {
+        setCurrentPage((prev) => prev + 1);
+      }
+    };
+  
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [isFetching, hasMorePosts]);
 
   const toggleSaveBlog = useCallback(async (blogId: number) => {
     if (!user) return toast.warn("Log in to save blogs!");
@@ -151,11 +178,7 @@ const BlogPage: React.FC = () => {
         )}
       </div>
 
-      {!isLoading && hasMorePosts && (
-        <button onClick={() => setCurrentPage(prev => prev + 1)} className="load-more-button">
-          {isFetching ? "Loading..." : "Load More"}
-        </button>
-      )}
+      {isFetching && <p className="loading-more">Loading more...</p>}
     </div>
   );
 };

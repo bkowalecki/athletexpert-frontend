@@ -230,7 +230,7 @@ const OnboardingPage = () => {
       case 3:
         return (
           <div className="onboarding-step">
-            <h2>Select your sports squad!</h2>
+            <h2>Select your sports and activities</h2>
             <div className="sports-grid">
               {sportsOptions.map((sport) => (
                 <div
