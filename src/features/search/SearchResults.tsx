@@ -6,6 +6,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import "../../styles/SearchResults.css";
 import ProductCard from "../products/ProductCard";
 import sportsDataRaw from "../../data/sports.json";
+import { useSavedProducts } from "../../hooks/useSavedProducts";
 
 interface Sport {
   title: string;
@@ -42,17 +43,14 @@ const SearchResults: React.FC = () => {
   const [blogs, setBlogs] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [savedProductIds, setSavedProductIds] = useState<number[]>([]);
-  const [savingProductIds, setSavingProductIds] = useState<number[]>([]);
+  const { savedProductIds, toggleSaveProduct } = useSavedProducts();
 
-  const { user } = useUserContext();
   const location = useLocation();
   const navigate = useNavigate();
 
   const searchQuery = useMemo(
     () =>
-      new URLSearchParams(location.search).get("query")?.trim().toLowerCase() ??
-      "",
+      new URLSearchParams(location.search).get("query")?.trim().toLowerCase() ?? "",
     [location.search]
   );
 
@@ -102,16 +100,6 @@ const SearchResults: React.FC = () => {
 
         setProducts(productRes.data);
         setBlogs(blogRes.data);
-
-        if (user) {
-          const savedRes = await axios.get(
-            `${process.env.REACT_APP_API_URL}/users/saved-products`,
-            {
-              withCredentials: true,
-            }
-          );
-          setSavedProductIds(savedRes.data.map((p: Product) => p.id));
-        }
       } catch {
         setError("Failed to load search results. Please try again.");
       } finally {
@@ -120,34 +108,7 @@ const SearchResults: React.FC = () => {
     };
 
     fetchData();
-  }, [searchQuery, user]);
-
-  const toggleSaveProduct = async (productId: number) => {
-    if (!user) return toast.warn("Log in to save products!");
-    const isSaved = savedProductIds.includes(productId);
-    setSavingProductIds((prev) => [...prev, productId]);
-
-    try {
-      const res = await fetch(
-        `${process.env.REACT_APP_API_URL}/users/saved-products/${productId}`,
-        {
-          method: isSaved ? "DELETE" : "POST",
-          credentials: "include",
-        }
-      );
-
-      if (res.ok) {
-        setSavedProductIds((prev) =>
-          isSaved ? prev.filter((id) => id !== productId) : [...prev, productId]
-        );
-        toast.success(isSaved ? "Product removed!" : "Product saved!");
-      }
-    } catch {
-      toast.error("❌ Error saving product.");
-    } finally {
-      setSavingProductIds((prev) => prev.filter((id) => id !== productId));
-    }
-  };
+  }, [searchQuery]);
 
   if (!searchQuery) {
     return (
@@ -260,7 +221,6 @@ const SearchResults: React.FC = () => {
                   imgUrl={product.imgUrl}
                   affiliateLink={product.affiliateLink}
                   isSaved={savedProductIds.includes(product.id)}
-                  isSaving={savingProductIds.includes(product.id)}
                   onToggleSave={() => toggleSaveProduct(product.id)}
                 />
               ))}

@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useUserContext } from "../../context/UserContext";
+import { loginWithAuth0Token } from "../../util/authUtils";
 import "../../styles/AuthPage.css";
 
 const AuthPage: React.FC = () => {
@@ -24,7 +25,7 @@ const AuthPage: React.FC = () => {
   });
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [auth0Attempted, setAuth0Attempted] = useState(false);
+  const hasAttemptedSSO = useRef(false);
 
   useEffect(() => {
     if (isSessionChecked && user) navigate("/profile", { replace: true });
@@ -36,31 +37,18 @@ const AuthPage: React.FC = () => {
       isAuthenticated &&
       auth0User &&
       !user &&
-      !auth0Attempted &&
+      !hasAttemptedSSO.current &&
       window.location.pathname !== "/auth"
     ) {
+      hasAttemptedSSO.current = true;
       handleSSO();
     }
-  }, [isSessionChecked, isAuthenticated, auth0User, user, auth0Attempted]);
+  }, [isSessionChecked, isAuthenticated, auth0User, user]);
 
   const handleSSO = async () => {
     try {
-      setAuth0Attempted(true);
       const accessToken = await getAccessTokenSilently();
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/users/auth0-login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token: accessToken }),
-        credentials: "include",
-      });
-
-      if (response.ok) {
-        const userData = await response.json();
-        setUser({ ...userData.user, authProvider: "auth0" });
-        navigate("/profile", { replace: true });
-      } else {
-        setError("Failed to authenticate with Auth0.");
-      }
+      await loginWithAuth0Token({ token: accessToken, setUser, navigate });
     } catch (error) {
       console.error("Error during Auth0 login:", error);
     }
@@ -94,12 +82,15 @@ const AuthPage: React.FC = () => {
         return;
       }
 
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/users/${endpoint}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-        credentials: "include",
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/users/${endpoint}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+          credentials: "include",
+        }
+      );
 
       if (!response.ok) {
         const message = await response.text();
@@ -112,7 +103,9 @@ const AuthPage: React.FC = () => {
       if (isLogin) {
         navigate("/profile", { replace: true });
       } else {
-        navigate(userData.isActive ? "/profile" : "/account-setup", { replace: true });
+        navigate(userData.isActive ? "/profile" : "/account-setup", {
+          replace: true,
+        });
       }
     } catch (err: any) {
       console.error("❌ Auth error:", err);
@@ -126,7 +119,7 @@ const AuthPage: React.FC = () => {
     try {
       await loginWithPopup({
         authorizationParams: {
-          audience: "https://athletexpert-api",
+          audience: process.env.REACT_APP_AUTH0_AUDIENCE,
           scope: "openid profile email",
           connection: "google-oauth2",
         },
@@ -135,20 +128,7 @@ const AuthPage: React.FC = () => {
       const idToken = (await getIdTokenClaims())?.__raw;
       if (!idToken) throw new Error("No ID Token claims received.");
 
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/users/auth0-login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ token: idToken }),
-      });
-
-      if (response.ok) {
-        const userData = await response.json();
-        setUser({ ...userData, authProvider: "auth0" });
-        navigate("/profile");
-      } else {
-        throw new Error("Backend auth failed after SSO.");
-      }
+      await loginWithAuth0Token({ token: idToken, setUser, navigate });
     } catch (error) {
       console.error("Error during Google SSO Popup:", error);
       navigate("/auth");
@@ -221,32 +201,36 @@ const AuthPage: React.FC = () => {
         >
           <div className="gsi-material-button-content-wrapper">
             <div className="gsi-material-button-icon">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 48 48"
-                className="google-icon"
-                aria-hidden="true"
-              >
-                <path
-                  fill="#EA4335"
-                  d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"
-                ></path>
-                <path
-                  fill="#4285F4"
-                  d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"
-                ></path>
-                <path
-                  fill="#FBBC05"
-                  d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"
-                ></path>
-                <path
-                  fill="#34A853"
-                  d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"
-                ></path>
-                <path fill="none" d="M0 0h48v48H0z"></path>
-              </svg>
+              <div className="gsi-material-button-icon">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 48 48"
+                  className="google-icon"
+                  aria-hidden="true"
+                >
+                  <path
+                    fill="#EA4335"
+                    d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"
+                  ></path>
+                  <path
+                    fill="#4285F4"
+                    d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"
+                  ></path>
+                  <path
+                    fill="#FBBC05"
+                    d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"
+                  ></path>
+                  <path
+                    fill="#34A853"
+                    d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"
+                  ></path>
+                  <path fill="none" d="M0 0h48v48H0z"></path>
+                </svg>
+              </div>
             </div>
-            <span className="gsi-material-button-contents">Sign in with Google</span>
+            <span className="gsi-material-button-contents">
+              Sign in with Google
+            </span>
           </div>
         </button>
 
@@ -254,14 +238,20 @@ const AuthPage: React.FC = () => {
           {isLogin ? (
             <>
               Don't have an account?{" "}
-              <span className="toggle-auth-link" onClick={() => setIsLogin(false)}>
+              <span
+                className="toggle-auth-link"
+                onClick={() => setIsLogin(false)}
+              >
                 Register here
               </span>
             </>
           ) : (
             <>
               Already have an account?{" "}
-              <span className="toggle-auth-link" onClick={() => setIsLogin(true)}>
+              <span
+                className="toggle-auth-link"
+                onClick={() => setIsLogin(true)}
+              >
                 Login
               </span>
             </>

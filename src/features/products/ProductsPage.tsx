@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import ProductCard from "../products/ProductCard";
+import { useSavedProducts } from "../../hooks/useSavedProducts";
 import "../../styles/ProductsPage.css";
 
 interface Product {
@@ -25,36 +26,22 @@ interface Product {
 const fetchProducts = async (): Promise<Product[]> =>
   (await axios.get(`${process.env.REACT_APP_API_URL}/products`)).data;
 
-const fetchSavedProducts = async (): Promise<number[]> =>
-  (await axios.get(`${process.env.REACT_APP_API_URL}/users/saved-products`, { withCredentials: true }))
-    .data.map((product: Product) => product.id);
-
 const ProductsPage: React.FC = () => {
-  const { user } = useUserContext();
   const navigate = useNavigate();
 
   const [inputQuery, setInputQuery] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [filters, setFilters] = useState({ brand: "", sport: "", sortOption: "" });
-  const [savedProductIds, setSavedProductIds] = useState<number[]>([]);
-  const [saving, setSaving] = useState<number | null>(null);
   const [visibleCount, setVisibleCount] = useState(12);
-
   const sentinelRef = useRef<HTMLDivElement | null>(null);
+
+  const { savedProductIds, toggleSaveProduct } = useSavedProducts();
 
   const { data: products = [], isLoading, error } = useQuery<Product[], Error>({
     queryKey: ["products"],
     queryFn: fetchProducts,
     staleTime: 5000,
   });
-
-  useEffect(() => {
-    if (user) {
-      fetchSavedProducts()
-        .then(setSavedProductIds)
-        .catch((err) => console.error("Error fetching saved products", err));
-    }
-  }, [user]);
 
   const filteredProducts = useMemo(() => {
     return products
@@ -71,27 +58,6 @@ const ProductsPage: React.FC = () => {
   }, [products, searchQuery, filters]);
 
   const visibleProducts = useMemo(() => filteredProducts.slice(0, visibleCount), [filteredProducts, visibleCount]);
-
-  const toggleSaveProduct = async (productId: number) => {
-    if (!user) return toast.warn("Log in to save products!", { position: "top-center" });
-    const isSaved = savedProductIds.includes(productId);
-    setSaving(productId);
-    try {
-      const response = await axios({
-        method: isSaved ? "DELETE" : "POST",
-        url: `${process.env.REACT_APP_API_URL}/users/saved-products/${productId}`,
-        withCredentials: true,
-      });
-      if (response.status === 200) {
-        setSavedProductIds((prev) => isSaved ? prev.filter((id) => id !== productId) : [...prev, productId]);
-        toast.success(isSaved ? "Product removed!" : "Product saved!", { position: "bottom-center", autoClose: 2000 });
-      }
-    } catch {
-      toast.error("❌ Error saving product. Try again.");
-    } finally {
-      setSaving(null);
-    }
-  };
 
   const handleFilterChange = (key: string, value: string) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
@@ -175,7 +141,6 @@ const ProductsPage: React.FC = () => {
               imgUrl={product.imgUrl}
               affiliateLink={product.affiliateLink}
               isSaved={savedProductIds.includes(product.id)}
-              isSaving={saving === product.id}
               onToggleSave={() => toggleSaveProduct(product.id)}
             />
           ))

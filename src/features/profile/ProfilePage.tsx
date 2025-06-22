@@ -6,6 +6,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { Helmet } from "react-helmet";
 import SportStatsModal from "./SportStatsModal";
 import ProductCard from "../products/ProductCard";
+import { useSavedProducts } from "../../hooks/useSavedProducts";
 
 import "react-toastify/dist/ReactToastify.css";
 import "../../styles/Globals.css";
@@ -47,9 +48,9 @@ interface Profile {
 const ProfilePage: React.FC = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [savedBlogs, setSavedBlogs] = useState<BlogPost[]>([]);
-  const [savedProducts, setSavedProducts] = useState<Product[]>([]);
-  const [savingProductIds, setSavingProductIds] = useState<number[]>([]);
   const [activeSport, setActiveSport] = useState<string | null>(null);
+  const [savedProducts, setSavedProducts] = useState<Product[]>([]);
+  const { savedProductIds, toggleSaveProduct } = useSavedProducts();
 
   const navigate = useNavigate();
   const { user, setUser, isSessionChecked, checkSession } = useUserContext();
@@ -63,16 +64,13 @@ const ProfilePage: React.FC = () => {
 
     const fetchProfile = async () => {
       try {
-        const res = await fetch(
-          `${process.env.REACT_APP_API_URL}/users/profile`,
-          { credentials: "include" }
-        );
+        const res = await fetch(`${process.env.REACT_APP_API_URL}/users/profile`, {
+          credentials: "include",
+        });
         if (!res.ok) throw new Error("❌ Failed to fetch profile");
         const data: Profile = await res.json();
         setProfile(data);
         if (data.savedBlogIds?.length) fetchSavedBlogs(data.savedBlogIds);
-        if (data.savedProductIds?.length)
-          fetchSavedProducts(data.savedProductIds);
       } catch (err) {
         console.error("❌ Error fetching profile:", err);
         navigate("/auth", { replace: true });
@@ -82,16 +80,31 @@ const ProfilePage: React.FC = () => {
     fetchProfile();
   }, [user, isSessionChecked, navigate]);
 
-  const fetchSavedBlogs = async (ids: number[]) => {
-    try {
-      const res = await fetch(
-        `${process.env.REACT_APP_API_URL}/blog/bulk-fetch`,
-        {
+  useEffect(() => {
+    const fetchSavedProductDetails = async () => {
+      if (!savedProductIds.length) return;
+      try {
+        const res = await fetch(`${process.env.REACT_APP_API_URL}/products/bulk-fetch`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ids }),
-        }
-      );
+          body: JSON.stringify({ ids: savedProductIds }),
+        });
+        const data = await res.json();
+        setSavedProducts(data);
+      } catch (err) {
+        console.error("Error loading saved product details", err);
+      }
+    };
+    fetchSavedProductDetails();
+  }, [savedProductIds]);
+
+  const fetchSavedBlogs = async (ids: number[]) => {
+    try {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/blog/bulk-fetch`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids }),
+      });
       if (!res.ok) throw new Error("❌ Failed to fetch blogs");
       const data: BlogPost[] = await res.json();
       setSavedBlogs(data);
@@ -100,66 +113,15 @@ const ProfilePage: React.FC = () => {
     }
   };
 
-  const fetchSavedProducts = async (ids: number[]) => {
-    try {
-      const res = await fetch(
-        `${process.env.REACT_APP_API_URL}/products/bulk-fetch`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ids }),
-        }
-      );
-      if (!res.ok) throw new Error("❌ Failed to fetch products");
-      const data: Product[] = await res.json();
-      setSavedProducts(data);
-    } catch (err) {
-      console.error("❌ Error fetching products:", err);
-    }
-  };
-
-  const toggleSaveProduct = async (productId: number) => {
-    if (!user) return toast.warn("Log in to save products!");
-
-    const isSaved = savedProducts.some((p) => p.id === productId);
-    setSavingProductIds((prev) => [...prev, productId]);
-
-    try {
-      const res = await fetch(
-        `${process.env.REACT_APP_API_URL}/users/saved-products/${productId}`,
-        {
-          method: isSaved ? "DELETE" : "POST",
-          credentials: "include",
-        }
-      );
-
-      if (res.ok) {
-        setSavedProducts((prev) =>
-          isSaved
-            ? prev.filter((p) => p.id !== productId)
-            : [...prev, { id: productId } as Product]
-        );
-        toast.success(isSaved ? "Product removed!" : "Product saved!");
-      }
-    } catch (err) {
-      toast.error("❌ Error saving product.");
-    } finally {
-      setSavingProductIds((prev) => prev.filter((id) => id !== productId));
-    }
-  };
-
   const toggleSaveBlog = async (blogId: number) => {
     if (!user) return toast.warn("Log in to save blogs!");
 
     const isSaved = savedBlogs.some((b) => b.id === blogId);
     try {
-      const res = await fetch(
-        `${process.env.REACT_APP_API_URL}/users/saved-blogs/${blogId}`,
-        {
-          method: isSaved ? "DELETE" : "POST",
-          credentials: "include",
-        }
-      );
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/users/saved-blogs/${blogId}`, {
+        method: isSaved ? "DELETE" : "POST",
+        credentials: "include",
+      });
       if (res.ok) {
         setSavedBlogs((prev) =>
           isSaved
@@ -175,19 +137,17 @@ const ProfilePage: React.FC = () => {
 
   const handleSignOut = async () => {
     try {
-      // Clear cached Auth0 token
       sessionStorage.removeItem("ax_id_token");
       sessionStorage.removeItem("ax_token_time");
-  
-      // Call backend logout
+
       await fetch(`${process.env.REACT_APP_API_URL}/users/logout`, {
         method: "POST",
         credentials: "include",
       });
-  
+
       setUser(null);
       await checkSession();
-  
+
       if (user?.authProvider === "auth0") {
         auth0Logout({
           logoutParams: { returnTo: window.location.origin + "/auth" },
@@ -200,10 +160,8 @@ const ProfilePage: React.FC = () => {
       toast.error("Error signing out.");
     }
   };
-  
 
-  if (!isSessionChecked)
-    return <div className="profile-loading"></div>;
+  if (!isSessionChecked) return <div className="profile-loading"></div>;
   if (!profile)
     return <div className="profile-loading">No profile data found.</div>;
 
@@ -242,11 +200,7 @@ const ProfilePage: React.FC = () => {
       <div className="profile-sports">
         {profile.sports?.length ? (
           profile.sports.map((sport, idx) => (
-            <div
-              key={idx}
-              className="sport-item"
-              onClick={() => setActiveSport(sport)}
-            >
+            <div key={idx} className="sport-item" onClick={() => setActiveSport(sport)}>
               {sport}
             </div>
           ))
@@ -286,9 +240,7 @@ const ProfilePage: React.FC = () => {
                 <div className="saved-blog-actions">
                   <button
                     className="pin-blog-btn"
-                    onClick={() =>
-                      toast.info("📌 Pin functionality coming soon!")
-                    }
+                    onClick={() => toast.info("📌 Pin functionality coming soon!")}
                   >
                     📌 Pin
                   </button>
@@ -319,7 +271,6 @@ const ProfilePage: React.FC = () => {
               imgUrl={product.imgUrl}
               affiliateLink={product.affiliateLink}
               isSaved={true}
-              isSaving={savingProductIds.includes(product.id)}
               onToggleSave={() => toggleSaveProduct(product.id)}
             />
           ))
@@ -329,18 +280,14 @@ const ProfilePage: React.FC = () => {
       </div>
 
       <div className="motivational-quote">
-        "Every champion was once a contender who refused to give up." - Rocky
-        Balboa
+        "Every champion was once a contender who refused to give up." - Rocky Balboa
       </div>
 
       <div>
         <button onClick={handleSignOut} className="profile-cta-button">
           Sign Out
         </button>
-        <button
-          onClick={() => navigate("/settings")}
-          className="profile-cta-button"
-        >
+        <button onClick={() => navigate("/settings")} className="profile-cta-button">
           Settings
         </button>
       </div>

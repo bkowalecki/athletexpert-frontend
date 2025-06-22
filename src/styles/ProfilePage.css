@@ -639,6 +639,10 @@
     font-size: 1rem;
   }
 
+  .profile-saved-products {
+    padding: 0px;
+  }
+
   /* .saved-product-card {
     flex-direction: row-reverse;
     justify-content: space-between;

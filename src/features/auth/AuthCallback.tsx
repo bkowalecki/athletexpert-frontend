@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useNavigate } from "react-router-dom";
 import { useUserContext } from "../../context/UserContext";
+import { loginWithAuth0Token } from "../../util/authUtils";
 
 const AuthCallback: React.FC = () => {
   const { isAuthenticated, user: auth0User, getAccessTokenSilently } = useAuth0();
@@ -24,21 +25,7 @@ const AuthCallback: React.FC = () => {
 
         sessionStorage.setItem("ax_id_token", idToken);
 
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/users/auth0-login`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({ token: idToken }),
-        });
-
-        if (response.ok) {
-          const userData = await response.json();
-          setUser({ ...userData, authProvider: "auth0" });
-          navigate("/profile", { replace: true });
-        } else {
-          console.error("Failed to authenticate with backend:", response.status);
-          navigate("/auth", { replace: true });
-        }
+        await loginWithAuth0Token({ token: idToken, setUser, navigate });
       } catch (error) {
         console.error("Error during Auth0 callback:", error);
         navigate("/auth", { replace: true });

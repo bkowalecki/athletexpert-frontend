@@ -34,25 +34,40 @@ const AdminProductManager: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [sportInput, setSportInput] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [filter, setFilter] = useState("");
+  const [sortOption, setSortOption] = useState("recent");
 
   useEffect(() => {
-    if (user?.role === "admin") {
-      fetchProducts();
-    } else {
-      navigate("/");
-    }
+    if (user?.role !== "admin") navigate("/");
   }, [user, navigate]);
 
   const fetchProducts = async () => {
     setLoading(true);
-    setError(null);
     try {
       const res = await axios.get(`${process.env.REACT_APP_API_URL}/products`, {
         withCredentials: true,
       });
       setProducts(res.data);
     } catch {
-      setError("Error loading products. Please try again.");
+      setError("Error loading products.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSearchSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!filter.trim()) return;
+
+    setLoading(true);
+    try {
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}/products/search`, {
+        params: { query: filter },
+        withCredentials: true,
+      });
+      setProducts(res.data);
+    } catch {
+      setError("Error searching products.");
     } finally {
       setLoading(false);
     }
@@ -82,7 +97,6 @@ const AdminProductManager: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
     try {
       if (editingId) {
         await axios.put(`${process.env.REACT_APP_API_URL}/products/admin/${editingId}`, formData, {
@@ -98,11 +112,12 @@ const AdminProductManager: React.FC = () => {
       fetchProducts();
       inputRef.current?.focus();
     } catch {
-      setError("Error saving product. Please try again.");
+      setError("Error saving product.");
     }
   };
 
   const handleEdit = (product: Product) => {
+    if (!window.confirm(`Edit "${product.name}"?`)) return;
     setFormData(product);
     setEditingId(product.id || null);
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -110,32 +125,38 @@ const AdminProductManager: React.FC = () => {
   };
 
   const handleDelete = async (id: number) => {
-    if (!window.confirm("Are you sure you want to delete this product?")) return;
-    setError(null);
+    if (!window.confirm("Delete this product?")) return;
     try {
       await axios.delete(`${process.env.REACT_APP_API_URL}/products/admin/${id}`, {
         withCredentials: true,
       });
       fetchProducts();
     } catch {
-      setError("Error deleting product. Please try again.");
+      setError("Error deleting product.");
     }
   };
 
-  if (user?.role !== "admin") {
-    return (
-      <div className="admin-lockout">
-        <h1>🚫 This page is for admins only.</h1>
-      </div>
-    );
-  }
+  const sortedFilteredProducts = products
+    .filter((p) => {
+      const term = filter.toLowerCase();
+      return (
+        p.name.toLowerCase().includes(term) ||
+        p.brand.toLowerCase().includes(term) ||
+        p.sports.join(",").toLowerCase().includes(term)
+      );
+    })
+    .sort((a, b) => {
+      if (sortOption === "priceAsc") return parseFloat(a.price) - parseFloat(b.price);
+      if (sortOption === "priceDesc") return parseFloat(b.price) - parseFloat(a.price);
+      return (b.id || 0) - (a.id || 0); // recent
+    });
 
   return (
-    <div className="new-product-container">
+    <div className="new-product-container" style={{ maxWidth: "100%", padding: "2rem" }}>
       <h2>{editingId ? "Edit Product" : "Add New Product"}</h2>
-      {error && <p className="error-message" role="alert">{error}</p>}
+      {error && <p className="error-message">{error}</p>}
 
-      <form onSubmit={handleSubmit} className="product-form">
+      <form onSubmit={handleSubmit} className="product-form" style={{ position: "sticky", top: 0, background: "#121212", zIndex: 10 }}>
         {["name", "brand", "price", "imgUrl", "affiliateLink"].map((field, i) => (
           <input
             key={field}
@@ -148,66 +169,103 @@ const AdminProductManager: React.FC = () => {
           />
         ))}
 
-        {/* Live Image Preview */}
         {formData.imgUrl && (
           <img
             src={formData.imgUrl}
             alt="Preview"
             style={{
-              maxHeight: "160px",
-              objectFit: "contain",
-              margin: "0.5rem 0",
-              borderRadius: "8px",
+              maxHeight: "140px",
+              marginBottom: "0.5rem",
+              borderRadius: "6px",
               background: "#fff",
-              padding: "0.5rem"
+              padding: "0.5rem",
+              objectFit: "contain",
             }}
           />
         )}
 
-        <div>
-          <label className="bold-label">Sports</label>
-          <input
-            type="text"
-            value={sportInput}
-            onChange={(e) => setSportInput(e.target.value)}
-            onKeyDown={handleSportKeyDown}
-            placeholder="Type a sport and press Enter"
-          />
-          <div className="tag-preview">
-            {formData.sports.map((sport) => (
-              <span key={sport} className="tag-chip">
-                {sport}
-                <button type="button" onClick={() => removeSport(sport)} aria-label={`Remove ${sport}`}>
-                  ✕
-                </button>
-              </span>
-            ))}
-          </div>
+        <input
+          type="text"
+          value={sportInput}
+          onChange={(e) => setSportInput(e.target.value)}
+          onKeyDown={handleSportKeyDown}
+          placeholder="Add sports (Enter to confirm)"
+        />
+        <div className="tag-preview">
+          {formData.sports.map((sport) => (
+            <span key={sport} className="tag-chip">
+              {sport}
+              <button type="button" onClick={() => removeSport(sport)}>✕</button>
+            </span>
+          ))}
         </div>
 
         <button type="submit">{editingId ? "Update Product" : "Create Product"}</button>
       </form>
 
-      <h3>All Products</h3>
-      {loading ? (
-        <p>Loading products...</p>
-      ) : products.length === 0 ? (
-        <p>No products found.</p>
-      ) : (
-        <div className="admin-product-list">
-          {products.map((p) => (
+      <form onSubmit={handleSearchSubmit} style={{ display: "flex", gap: "1rem", flexWrap: "wrap", margin: "1rem 0" }}>
+        <input
+          type="text"
+          placeholder="Search by name, brand, or sport"
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+          style={{ padding: "0.5rem", borderRadius: "6px", flex: 1 }}
+        />
+        <button
+          type="submit"
+          style={{
+            padding: "0.5rem 1rem",
+            borderRadius: "6px",
+            fontWeight: "bold",
+            background: "#ff9900",
+            color: "#121212",
+          }}
+        >
+          Search
+        </button>
+        <select value={sortOption} onChange={(e) => setSortOption(e.target.value)} style={{ padding: "0.5rem" }}>
+          <option value="recent">Sort: Recent</option>
+          <option value="priceAsc">Price: Low → High</option>
+          <option value="priceDesc">Price: High → Low</option>
+        </select>
+      </form>
+
+      <div className="admin-product-list">
+        {loading ? (
+          <p>Loading...</p>
+        ) : sortedFilteredProducts.length === 0 ? (
+          <p>No matching products.</p>
+        ) : (
+          sortedFilteredProducts.map((p) => (
             <div key={p.id} className="product-item">
               <img src={p.imgUrl} alt={p.name} />
               <div>
                 <strong>{p.name}</strong> – ${p.price} <br />
                 <small>{p.brand}</small>
+                <div style={{ marginTop: "0.25rem" }}>
+                  {p.sports.map((sport) => (
+                    <span
+                      key={sport}
+                      style={{
+                        background: "#2a6045",
+                        color: "white",
+                        padding: "0.2rem 0.4rem",
+                        fontSize: "0.75rem",
+                        borderRadius: "6px",
+                        marginRight: "0.25rem",
+                      }}
+                    >
+                      {sport}
+                    </span>
+                  ))}
+                </div>
               </div>
-              <button onClick={() => handleEdit(p)} aria-label={`Edit ${p.name}`}>✏️ Edit</button>
-              <button onClick={() => handleDelete(p.id!)} aria-label={`Delete ${p.name}`}>🗑 Delete</button>
+              <button onClick={() => handleEdit(p)}>✏️ Edit</button>
+              <button onClick={() => handleDelete(p.id!)}>🗑 Delete</button>
             </div>
-          ))}
-        </div>
-      )}
+          ))
+        )}
+      </div>
     </div>
   );
 };
