@@ -1,50 +1,66 @@
 import React from "react";
-import { Link } from "react-router-dom";
-import DOMPurify from "dompurify";
-import "../../styles/BlogCard.css"; // Path depends on where you place it
+import { useNavigate } from "react-router-dom";
+import "../../styles/BlogCard.css";
 
 interface BlogCardProps {
   id: number;
   title: string;
   author: string;
-  publishedDate: string;
-  summary: string;
-  imageUrl: string;
   slug: string;
-  isSaved: boolean;
-  onToggleSave: (id: number) => void;
+  imageUrl: string;
+  publishedDate?: string;
+  summary?: string;
+  showUnsave?: boolean;
+  onUnsave?: () => void;
+  variant?: "default" | "compact" | "profile" | "search";
 }
 
 const BlogCard: React.FC<BlogCardProps> = ({
   id,
   title,
   author,
+  slug,
+  imageUrl,
   publishedDate,
   summary,
-  imageUrl,
-  slug,
-  isSaved,
-  onToggleSave,
+  showUnsave = false,
+  onUnsave,
+  variant = "default",
 }) => {
+  const navigate = useNavigate();
+  const handleClick = () => navigate(`/blog/${slug}`);
+
+  const formattedDate = publishedDate
+    ? new Date(publishedDate).toLocaleDateString(undefined, {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      })
+    : "";
+
   return (
-    <div className="blog-card">
-      <img src={imageUrl} alt={title} className="blog-card-image" loading="lazy" />
-      <div className="blog-card-info">
-        <h3 className="blog-card-title">{title}</h3>
-        <p className="blog-card-author">By {author}</p>
-        <p className="blog-card-date">{new Date(publishedDate).toLocaleDateString()}</p>
-        <p className="blog-card-description">{DOMPurify.sanitize(summary)}</p>
-        <div className="blog-card-actions">
-          <Link to={`/blog/${slug}`} className="blog-read-more-btn">
-            Read More
-          </Link>
+    <div className={`blog-card blog-card-${variant}`} onClick={handleClick} role="article" aria-label={`Read blog: ${title}`}> 
+      <img src={imageUrl} alt={title} className="blog-card-img" loading="lazy" />
+
+      <div className="blog-card-content">
+        <h4 className="blog-card-title">{title}</h4>
+        {publishedDate && (
+          <p className="blog-card-meta">
+            By {author} · {formattedDate}
+          </p>
+        )}
+        {summary && <p className="blog-card-summary">{summary}</p>}
+        {showUnsave && onUnsave && (
           <button
-            className={`save-blog-btn ${isSaved ? "unsave" : ""}`}
-            onClick={() => onToggleSave(id)}
+            className="blog-card-unsave"
+            onClick={(e) => {
+              e.stopPropagation();
+              onUnsave();
+            }}
           >
-            {isSaved ? "Unsave" : "Save"}
+            ✕ Remove
           </button>
-        </div>
+        )}
       </div>
     </div>
   );

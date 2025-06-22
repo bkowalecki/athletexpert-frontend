@@ -3,6 +3,8 @@ import axios from "axios";
 import { useUserContext } from "../../context/UserContext";
 import { useNavigate } from "react-router-dom";
 import { blogTemplates, BlogTemplate } from "../../data/blogTemplates";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "../../styles/NewBlogPost.css";
 
 interface BlogPost {
@@ -36,15 +38,23 @@ const NewBlogPost: React.FC = () => {
   const [tagInput, setTagInput] = useState("");
   const [blogs, setBlogs] = useState<BlogPost[]>([]);
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [showBlogs, setShowBlogs] = useState(false);
+
+  useEffect(() => {
+    const savedDraft = localStorage.getItem("blog-draft");
+    if (savedDraft) setFormData(JSON.parse(savedDraft));
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("blog-draft", JSON.stringify(formData));
+  }, [formData]);
 
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
         const { data } = await axios.get(
           `${process.env.REACT_APP_API_URL}/blog/admin/all`,
-          {
-            withCredentials: true,
-          }
+          { withCredentials: true }
         );
         setBlogs(data || []);
       } catch (err) {
@@ -91,8 +101,10 @@ const NewBlogPost: React.FC = () => {
         withCredentials: true,
       });
       setBlogs((prev) => prev.filter((b) => b.id !== id));
+      toast.success("Blog deleted!");
     } catch (err) {
       console.error("Delete failed", err);
+      toast.error("Error deleting blog.");
     }
   };
 
@@ -112,9 +124,10 @@ const NewBlogPost: React.FC = () => {
         headers: { "Content-Type": "application/json" },
       });
 
-      alert(editingId ? "Blog updated!" : "Blog created!");
+      toast.success(editingId ? "Blog updated!" : "Blog created!");
       setEditingId(null);
       setFormData(emptyFormData);
+      window.scrollTo({ top: 0, behavior: "smooth" });
 
       const { data } = await axios.get(
         `${process.env.REACT_APP_API_URL}/blog/admin/all`,
@@ -125,7 +138,7 @@ const NewBlogPost: React.FC = () => {
       setBlogs(data || []);
     } catch (err) {
       console.error("Error submitting blog:", err);
-      alert("Error submitting blog");
+      toast.error("Error submitting blog");
     }
   };
 
@@ -143,7 +156,6 @@ const NewBlogPost: React.FC = () => {
     <div className="new-blog-container">
       <h2>{editingId ? "Edit Blog Post" : "Create New Blog Post"}</h2>
       <form onSubmit={handleSubmit} className="blog-form">
-        {/* Core Fields */}
         {["title", "author", "imageUrl", "sport"].map((field) => (
           <input
             key={field}
@@ -159,15 +171,24 @@ const NewBlogPost: React.FC = () => {
           />
         ))}
 
-        {/* Summary */}
+        {formData.imageUrl && (
+          <div className="image-preview-wrapper">
+            <img
+              src={formData.imageUrl}
+              alt="Header Preview"
+              className="image-preview"
+            />
+          </div>
+        )}
+
         <textarea
           name="summary"
           value={formData.summary}
           onChange={handleChange}
           placeholder="Summary"
         />
+        <p className="char-count">Characters: {formData.summary.length}/160</p>
 
-        {/* Tags */}
         <div>
           <label className="bold-label">Tags</label>
           <input
@@ -193,7 +214,14 @@ const NewBlogPost: React.FC = () => {
           </div>
         </div>
 
-        {/* Content */}
+        <label className="bold-label">Published Date</label>
+        <input
+          type="date"
+          name="publishedDate"
+          value={formData.publishedDate}
+          onChange={handleChange}
+        />
+
         <div>
           <label className="bold-label">Blog HTML Content</label>
           <div className="template-buttons">
@@ -219,9 +247,11 @@ const NewBlogPost: React.FC = () => {
             placeholder="Enter raw HTML content here..."
             className="blog-html-input"
           />
+          <p className="word-count">
+            Word Count: {formData.content.trim().split(/\s+/).length}
+          </p>
         </div>
 
-        {/* Preview */}
         <div className="live-preview">
           <h3 className="preview-heading">Live Preview</h3>
           <div className="preview-box">
@@ -232,7 +262,6 @@ const NewBlogPost: React.FC = () => {
           </div>
         </div>
 
-        {/* Actions */}
         <div className="button-group">
           <button type="submit">
             {editingId ? "Update Blog" : "Publish Blog"}
@@ -252,10 +281,13 @@ const NewBlogPost: React.FC = () => {
         </div>
       </form>
 
-      {/* Existing Blogs */}
       <div className="existing-blogs">
-        <h3>Manage Existing Blog Posts</h3>
-        {blogs.map((b) => (
+        <h3>
+          <button onClick={() => setShowBlogs(!showBlogs)}>
+            {showBlogs ? "Hide" : "Show"} Existing Blog Posts
+          </button>
+        </h3>
+        {showBlogs && blogs.map((b) => (
           <div key={b.id} className="blog-admin-row">
             <span>
               <strong>{b.title}</strong> – {b.author}

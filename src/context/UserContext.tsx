@@ -17,7 +17,8 @@ export type User = {
   sports?: string[] | null;
   authProvider?: "local" | "auth0";
   role: string;
-  isActive: boolean; // ✅ Add this
+  isActive: boolean;
+  location?: string | null;
 };
 
 

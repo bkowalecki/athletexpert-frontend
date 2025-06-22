@@ -6,6 +6,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { Helmet } from "react-helmet";
 import SportStatsModal from "./SportStatsModal";
 import ProductCard from "../products/ProductCard";
+import BlogCard from "../blog/BlogCard";
 import { useSavedProducts } from "../../hooks/useSavedProducts";
 
 import "react-toastify/dist/ReactToastify.css";
@@ -43,6 +44,7 @@ interface Profile {
   badges?: string[];
   savedBlogIds?: number[];
   savedProductIds?: number[];
+  location?: string | null;
 }
 
 const ProfilePage: React.FC = () => {
@@ -165,6 +167,15 @@ const ProfilePage: React.FC = () => {
   if (!profile)
     return <div className="profile-loading">No profile data found.</div>;
 
+  const formatLocation = (raw: string): string => {
+    const parts = raw.split(",").map((p) => p.trim());
+    if (parts.length === 3) {
+      const [city, state, country] = parts;
+      return country === "United States" ? `${city}, ${state}` : `${city}, ${country}`;
+    }
+    return raw;
+  };
+
   return (
     <div className="profile-container">
       <Helmet>
@@ -191,6 +202,12 @@ const ProfilePage: React.FC = () => {
             {profile.firstName} {profile.lastName}
           </h1>
           <p className="profile-bio">{profile.bio}</p>
+          {profile.location && (
+  <p className="profile-location">
+    📍 {formatLocation(profile.location)}
+  </p>
+)}
+
         </div>
       </div>
 

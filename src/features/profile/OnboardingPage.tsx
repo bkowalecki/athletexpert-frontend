@@ -113,7 +113,7 @@ const OnboardingPage = () => {
     e.preventDefault();
 
     if (!formData.firstName.trim() || !formData.lastName.trim()) {
-      alert("Please enter both your first name and last name.");
+      toast.error("Please enter both your first and last name.");
       return;
     }
 
