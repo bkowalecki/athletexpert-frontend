@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useCallback } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useUserContext } from "../../context/UserContext";
 import { useNavigate } from "react-router-dom";
@@ -11,37 +11,33 @@ interface HeroSectionProps {
 
 const HeroSection: React.FC<HeroSectionProps> = ({ openQuiz }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const { isAuthenticated } = useAuth0();
+  const { isAuthenticated } = useAuth0(); // retained for potential future use
   const { user, isSessionChecked } = useUserContext();
   const navigate = useNavigate();
 
-  const handleProfileClick = () => {
+  const handleProfileClick = useCallback(() => {
     if (!isSessionChecked) return;
     navigate(user ? "/profile" : "/auth");
-  };
+  }, [isSessionChecked, navigate, user]);
 
   useEffect(() => {
-    const videoElement = videoRef.current;
+    const video = videoRef.current;
 
-    if (videoElement) {
-      videoElement.muted = true;
-      videoElement.setAttribute("playsinline", "true");
+    if (video) {
+      video.muted = true;
+      video.setAttribute("playsinline", "true");
 
-      videoElement.play().catch(() => {
-        const tryPlayOnInteraction = () => {
-          videoElement.play().catch((err) =>
-            console.error("Still couldn't play:", err)
+      video.play().catch(() => {
+        const attemptPlay = () => {
+          video.play().catch((err) =>
+            console.error("Video still failed to play:", err)
           );
-          document.removeEventListener("touchstart", tryPlayOnInteraction);
-          document.removeEventListener("scroll", tryPlayOnInteraction);
+          document.removeEventListener("touchstart", attemptPlay);
+          document.removeEventListener("scroll", attemptPlay);
         };
 
-        document.addEventListener("touchstart", tryPlayOnInteraction, {
-          once: true,
-        });
-        document.addEventListener("scroll", tryPlayOnInteraction, {
-          once: true,
-        });
+        document.addEventListener("touchstart", attemptPlay, { once: true });
+        document.addEventListener("scroll", attemptPlay, { once: true });
       });
     }
   }, []);
@@ -78,6 +74,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ openQuiz }) => {
           <button
             className="cta-btn cta-btn-secondary"
             onClick={handleProfileClick}
+            aria-label="Go to your profile or log in"
           >
             Profile
           </button>

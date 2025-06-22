@@ -13,6 +13,19 @@ html {
   background-color: #000;
 }
 
+.page-content {
+  min-height: 70vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.loading-screen {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 main {
   flex: 1;
   display: flex;

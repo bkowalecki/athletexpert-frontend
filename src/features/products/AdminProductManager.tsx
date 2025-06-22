@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { useUserContext } from "../../context/UserContext";
 import { useNavigate } from "react-router-dom";
@@ -26,6 +26,7 @@ const emptyProduct: Product = {
 const AdminProductManager: React.FC = () => {
   const { user } = useUserContext();
   const navigate = useNavigate();
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const [products, setProducts] = useState<Product[]>([]);
   const [formData, setFormData] = useState<Product>(emptyProduct);
@@ -38,7 +39,7 @@ const AdminProductManager: React.FC = () => {
     if (user?.role === "admin") {
       fetchProducts();
     } else {
-      navigate("/"); // Redirect non-admin users
+      navigate("/");
     }
   }, [user, navigate]);
 
@@ -50,7 +51,7 @@ const AdminProductManager: React.FC = () => {
         withCredentials: true,
       });
       setProducts(res.data);
-    } catch (err) {
+    } catch {
       setError("Error loading products. Please try again.");
     } finally {
       setLoading(false);
@@ -84,22 +85,19 @@ const AdminProductManager: React.FC = () => {
     setError(null);
     try {
       if (editingId) {
-        await axios.put(
-          `${process.env.REACT_APP_API_URL}/products/admin/${editingId}`,
-          formData,
-          { withCredentials: true }
-        );
+        await axios.put(`${process.env.REACT_APP_API_URL}/products/admin/${editingId}`, formData, {
+          withCredentials: true,
+        });
       } else {
-        await axios.post(
-          `${process.env.REACT_APP_API_URL}/products/admin`,
-          formData,
-          { withCredentials: true }
-        );
+        await axios.post(`${process.env.REACT_APP_API_URL}/products/admin`, formData, {
+          withCredentials: true,
+        });
       }
       setFormData(emptyProduct);
       setEditingId(null);
       fetchProducts();
-    } catch (err) {
+      inputRef.current?.focus();
+    } catch {
       setError("Error saving product. Please try again.");
     }
   };
@@ -107,7 +105,8 @@ const AdminProductManager: React.FC = () => {
   const handleEdit = (product: Product) => {
     setFormData(product);
     setEditingId(product.id || null);
-    window.scrollTo(0, 0);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    setTimeout(() => inputRef.current?.focus(), 100);
   };
 
   const handleDelete = async (id: number) => {
@@ -118,7 +117,7 @@ const AdminProductManager: React.FC = () => {
         withCredentials: true,
       });
       fetchProducts();
-    } catch (err) {
+    } catch {
       setError("Error deleting product. Please try again.");
     }
   };
@@ -134,11 +133,13 @@ const AdminProductManager: React.FC = () => {
   return (
     <div className="new-product-container">
       <h2>{editingId ? "Edit Product" : "Add New Product"}</h2>
-      {error && <p className="error-message">{error}</p>}
+      {error && <p className="error-message" role="alert">{error}</p>}
+
       <form onSubmit={handleSubmit} className="product-form">
-        {["name", "brand", "price", "imgUrl", "affiliateLink"].map((field) => (
+        {["name", "brand", "price", "imgUrl", "affiliateLink"].map((field, i) => (
           <input
             key={field}
+            ref={i === 0 ? inputRef : undefined}
             name={field}
             value={(formData as any)[field]}
             onChange={handleChange}
@@ -146,6 +147,22 @@ const AdminProductManager: React.FC = () => {
             required={field !== "affiliateLink"}
           />
         ))}
+
+        {/* Live Image Preview */}
+        {formData.imgUrl && (
+          <img
+            src={formData.imgUrl}
+            alt="Preview"
+            style={{
+              maxHeight: "160px",
+              objectFit: "contain",
+              margin: "0.5rem 0",
+              borderRadius: "8px",
+              background: "#fff",
+              padding: "0.5rem"
+            }}
+          />
+        )}
 
         <div>
           <label className="bold-label">Sports</label>
@@ -159,25 +176,23 @@ const AdminProductManager: React.FC = () => {
           <div className="tag-preview">
             {formData.sports.map((sport) => (
               <span key={sport} className="tag-chip">
-                {sport}{" "}
-                <button
-                  type="button"
-                  onClick={() => removeSport(sport)}
-                  aria-label={`Remove ${sport}`}
-                >
-                  x
+                {sport}
+                <button type="button" onClick={() => removeSport(sport)} aria-label={`Remove ${sport}`}>
+                  ✕
                 </button>
               </span>
             ))}
           </div>
         </div>
 
-        <button type="submit">{editingId ? "Update" : "Create"}</button>
+        <button type="submit">{editingId ? "Update Product" : "Create Product"}</button>
       </form>
 
       <h3>All Products</h3>
       {loading ? (
         <p>Loading products...</p>
+      ) : products.length === 0 ? (
+        <p>No products found.</p>
       ) : (
         <div className="admin-product-list">
           {products.map((p) => (
@@ -187,15 +202,8 @@ const AdminProductManager: React.FC = () => {
                 <strong>{p.name}</strong> – ${p.price} <br />
                 <small>{p.brand}</small>
               </div>
-              <button onClick={() => handleEdit(p)} aria-label={`Edit ${p.name}`}>
-                ✏️ Edit
-              </button>
-              <button
-                onClick={() => handleDelete(p.id!)}
-                aria-label={`Delete ${p.name}`}
-              >
-                🗑 Delete
-              </button>
+              <button onClick={() => handleEdit(p)} aria-label={`Edit ${p.name}`}>✏️ Edit</button>
+              <button onClick={() => handleDelete(p.id!)} aria-label={`Delete ${p.name}`}>🗑 Delete</button>
             </div>
           ))}
         </div>

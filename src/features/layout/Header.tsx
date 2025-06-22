@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useUserContext } from "../../context/UserContext";
@@ -14,16 +14,17 @@ const Header: React.FC = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 875);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth <= 875);
-    };
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+  const handleResize = useCallback(() => {
+    setIsMobile(window.innerWidth <= 875);
   }, []);
 
+  useEffect(() => {
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [handleResize]);
+
   const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
+    setIsMobileMenuOpen((prev) => !prev);
   };
 
   const closeMobileMenu = () => {
@@ -32,17 +33,10 @@ const Header: React.FC = () => {
     }
   };
 
-  /** ✅ Clicking "Profile" should go to `/profile` if logged in, otherwise `/auth` */
   const handleProfileClick = () => {
-    if (!isSessionChecked) return; // 🔹 wait until session check finishes
-
-    if (user) {
-      navigate("/profile");
-    } else {
-      navigate("/auth");
-    }
-
-    closeMobileMenu(); // Close mobile menu after clicking
+    if (!isSessionChecked) return;
+    navigate(user ? "/profile" : "/auth");
+    closeMobileMenu();
   };
 
   return (
@@ -68,6 +62,8 @@ const Header: React.FC = () => {
 
       <nav
         className={`nav-links ${isMobileMenuOpen ? "mobile-menu-open" : ""}`}
+        aria-label="Primary Navigation"
+        id="main-navigation"
       >
         {isMobile && (
           <div className="mobile-search">
@@ -78,7 +74,7 @@ const Header: React.FC = () => {
           </div>
         )}
 
-<Link
+        <Link
           to="/community"
           className="nav-link"
           onClick={() => {
@@ -111,17 +107,16 @@ const Header: React.FC = () => {
           Blog
         </Link>
 
-        {/* 🛠 Updated Profile button */}
-        <Link
-          to="/profile"
-          className="nav-link"
+        <button
+          className="nav-link nav-button"
           onClick={() => {
             trackEvent("nav_click", { section: "Profile" });
             handleProfileClick();
           }}
+          aria-label="Go to Profile"
         >
           Profile
-        </Link>
+        </button>
       </nav>
 
       <div
@@ -129,11 +124,12 @@ const Header: React.FC = () => {
         onClick={toggleMobileMenu}
         role="button"
         aria-label="Toggle navigation menu"
+        aria-controls="main-navigation"
         aria-expanded={isMobileMenuOpen}
       >
-        <div className={`bar ${isMobileMenuOpen ? "open" : ""}`}></div>
-        <div className={`bar ${isMobileMenuOpen ? "open" : ""}`}></div>
-        <div className={`bar ${isMobileMenuOpen ? "open" : ""}`}></div>
+        <div className="bar"></div>
+        <div className="bar"></div>
+        <div className="bar"></div>
       </div>
     </header>
   );

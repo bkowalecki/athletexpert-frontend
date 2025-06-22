@@ -69,8 +69,6 @@
 }
 
 .profile-name:hover {
-  transform: scale(1.03); /* Slight enlargement on hover for that extra punch */
-  letter-spacing: 2px; /* Gives a dynamic stretch effect */
   cursor: default; /* Maintains clean interaction since it's not clickable */
 }
 

@@ -16,14 +16,14 @@ interface EsportExperienceProps {
 const popularGames = [
   { title: "League of Legends", players: "150M+", image: "/images/esports/league_of_legends.png" },
   { title: "Valorant", players: "30M+", image: "/images/esports/valorant.png" },
-  { title: "Counter-Strike 2", players: "35M+", image: "/images/esports/cs2.jpg" },
-  { title: "Fortnite", players: "250M+", image: "/images/esports/fortnite.jpg" },
-  { title: "Dota 2", players: "7.6M+", image: "/images/esports/dota2.jpg" },
-  { title: "Call of Duty", players: "110M+", image: "/images/esports/cod.jpg" },
-  { title: "Overwatch 2", players: "25M+", image: "/images/esports/ow2.jpg" },
-  { title: "Apex Legends", players: "130M+", image: "/images/esports/apex.jpg" },
-  { title: "PUBG", players: "400M+", image: "/images/esports/pubg.jpg" },
-  { title: "Rocket League", players: "90M+", image: "/images/esports/rocketleague.jpg" },
+  { title: "Counter-Strike 2", players: "35M+", image: "/images/esports/cs2.png" },
+  { title: "Fortnite", players: "250M+", image: "/images/esports/fortnite.png" },
+  { title: "Dota 2", players: "7.6M+", image: "/images/esports/dota2.png" },
+  { title: "Call of Duty", players: "110M+", image: "/images/esports/cod.png" },
+  { title: "Overwatch 2", players: "25M+", image: "/images/esports/ow2.png" },
+  { title: "Apex Legends", players: "130M+", image: "/images/esports/apex.png" },
+  { title: "PUBG", players: "400M+", image: "/images/esports/pubg.png" },
+  { title: "Rocket League", players: "90M+", image: "/images/esports/rocketleague.png" },
 ];
 
 const EsportExperience: React.FC<EsportExperienceProps> = ({ sport }) => (
@@ -45,7 +45,7 @@ const EsportExperience: React.FC<EsportExperienceProps> = ({ sport }) => (
     </div>
 
     <section className="esport-section">
-      <h2 className="esport-section-title">🔥 Top 10 Esports & Games</h2>
+      <h2 className="esport-section-title">Top 10 Games</h2>
       <div className="esport-overlay-grid">
         {popularGames.map((game, index) => (
           <div key={index} className="esport-overlay-card">

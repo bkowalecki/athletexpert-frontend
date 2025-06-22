@@ -40,60 +40,60 @@ const AppRoutes: React.FC = () => {
   const { isSessionChecked } = useUserContext();
   const [isQuizModalOpen, setQuizModalOpen] = useState(false);
 
-  if (!isSessionChecked) return <div className="loading-screen" />;
+  if (!isSessionChecked) return <div className="loading-screen full-height" />;
 
   return (
-    <Suspense fallback={<div className="loading-screen">Loading...</div>}>
-      <Routes>
-        {/* Home */}
-        <Route
-          path="/"
-          element={
-            <>
-              <HeroSection openQuiz={() => setQuizModalOpen(true)} />
-              <main>
+    <Suspense fallback={<div className="loading-screen full-height"></div>}>
+      <main className="page-content">
+        <Routes>
+          {/* Home */}
+          <Route
+            path="/"
+            element={
+              <>
+                <HeroSection openQuiz={() => setQuizModalOpen(true)} />
                 <FeaturedProductList />
                 <TrendingProductList />
                 <BlogSection />
-              </main>
-              {isQuizModalOpen && (
-                <Quiz isOpen={isQuizModalOpen} closeModal={() => setQuizModalOpen(false)} />
-              )}
-            </>
-          }
-        />
+                {isQuizModalOpen && (
+                  <Quiz isOpen={isQuizModalOpen} closeModal={() => setQuizModalOpen(false)} />
+                )}
+              </>
+            }
+          />
 
-        {/* User */}
-        <Route path="/profile" element={<RequireAuth><ProfilePage /></RequireAuth>} />
-        <Route path="/settings" element={<AccountSettings />} />
-        <Route path="/account-setup" element={<OnboardingPage />} />
-        <Route path="/auth" element={<AuthPage />} />
-        <Route path="/auth/callback" element={<AuthCallback />} />
+          {/* User */}
+          <Route path="/profile" element={<RequireAuth><ProfilePage /></RequireAuth>} />
+          <Route path="/settings" element={<AccountSettings />} />
+          <Route path="/account-setup" element={<OnboardingPage />} />
+          <Route path="/auth" element={<AuthPage />} />
+          <Route path="/auth/callback" element={<AuthCallback />} />
 
-        {/* Products */}
-        <Route path="/products" element={<ProductsPage />} />
-        <Route path="/products/:id" element={<ProductDetail />} />
-        <Route path="/admin/products" element={<RequireAuth><AdminProductManager /></RequireAuth>} />
+          {/* Products */}
+          <Route path="/products" element={<ProductsPage />} />
+          <Route path="/products/:id" element={<ProductDetail />} />
+          <Route path="/admin/products" element={<RequireAuth><AdminProductManager /></RequireAuth>} />
 
-        {/* Blog */}
-        <Route path="/blog" element={<BlogPage />} />
-        <Route path="/blog/:slug" element={<BlogPostPage />} />
-        <Route path="/admin/new-blog" element={<NewBlogPost />} />
+          {/* Blog */}
+          <Route path="/blog" element={<BlogPage />} />
+          <Route path="/blog/:slug" element={<BlogPostPage />} />
+          <Route path="/admin/new-blog" element={<NewBlogPost />} />
 
-        {/* Community */}
-        <Route path="/community" element={<CommunityPage />} />
-        <Route path="/community/:sport" element={<SportPage />} />
+          {/* Community */}
+          <Route path="/community" element={<CommunityPage />} />
+          <Route path="/community/:sport" element={<SportPage />} />
 
-        {/* Misc */}
-        <Route path="/search" element={<SearchResults />} />
-        <Route path="/about" element={<AboutPage />} />
-        <Route path="/contact" element={<ContactPage />} />
-        <Route path="/terms-and-conditions" element={<TermsAndConditionsPage />} />
-        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          {/* Misc */}
+          <Route path="/search" element={<SearchResults />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/contact" element={<ContactPage />} />
+          <Route path="/terms-and-conditions" element={<TermsAndConditionsPage />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
 
-        {/* 404 */}
-        <Route path="*" element={<NotFoundPage />} />
-      </Routes>
+          {/* 404 */}
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
+      </main>
     </Suspense>
   );
 };

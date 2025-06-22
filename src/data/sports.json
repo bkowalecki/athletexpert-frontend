@@ -273,6 +273,17 @@
     }
   },
   {
+    "title": "Weight Training",
+    "logo": "/icons/weight_training_icon.png",
+    "backgroundImage": "/images/sports/weight_training_bg.jpg",
+    "extra_data": {
+      "category": "Strength & Conditioning",
+      "type": "Indoor",
+      "popularity": "High",
+      "summary": "Weight training is a foundational form of strength exercise that uses resistance from weights, machines, or bodyweight to build muscle, improve endurance, and enhance overall fitness. It's suitable for all levels—from beginners to competitive athletes."
+    }
+  },
+  {
     "title": "Wrestling",
     "logo": "/icons/wrestling_icon.png",
     "backgroundImage": "/images/sports/wrestling_bg.webp",

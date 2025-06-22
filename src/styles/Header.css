@@ -51,7 +51,6 @@ a:-webkit-any-link {
 .mobile-search {
   margin: 15px auto 0;
   width: 95vw;
-  /* margin-bottom: 15px; */
 }
 
 /* Nav links styling */
@@ -65,16 +64,22 @@ a:-webkit-any-link {
   flex: 1;
 }
 
-.nav-links a {
+.nav-links a,
+.nav-links button {
   color: white;
+  background: none;
+  border: none;
   text-decoration: none;
   font-size: 18px;
   padding: 10px 20px;
   border-radius: 30px;
   transition: background-color 0.3s ease, color 0.3s ease;
+  font-family: inherit;
+  cursor: pointer;
 }
 
-.nav-links a:hover {
+.nav-links a:hover,
+.nav-links button:hover {
   background-color: rgba(255, 255, 255, 0.2);
   color: #C1440E;
 }
@@ -122,7 +127,8 @@ a:-webkit-any-link {
     z-index: 1001;
   }
 
-  .nav-links a {
+  .nav-links a,
+  .nav-links button {
     font-size: 20px;
   }
 
