@@ -59,11 +59,13 @@ const ProfilePage: React.FC = () => {
   const { logout: auth0Logout } = useAuth0();
 
   useEffect(() => {
-    if (!isSessionChecked || !user) {
-      if (isSessionChecked) navigate("/auth", { replace: true });
+    if (!isSessionChecked) return;
+  
+    if (!user) {
+      navigate("/auth", { replace: true });
       return;
     }
-
+  
     const fetchProfile = async () => {
       try {
         const res = await fetch(`${process.env.REACT_APP_API_URL}/users/profile`, {
@@ -78,19 +80,24 @@ const ProfilePage: React.FC = () => {
         navigate("/auth", { replace: true });
       }
     };
-
+  
     fetchProfile();
   }, [user, isSessionChecked, navigate]);
+  
+    
 
   useEffect(() => {
     const fetchSavedProductDetails = async () => {
       if (!savedProductIds.length) return;
       try {
-        const res = await fetch(`${process.env.REACT_APP_API_URL}/products/bulk-fetch`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ids: savedProductIds }),
-        });
+        const res = await fetch(
+          `${process.env.REACT_APP_API_URL}/products/bulk-fetch`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ ids: savedProductIds }),
+          }
+        );
         const data = await res.json();
         setSavedProducts(data);
       } catch (err) {
@@ -102,11 +109,14 @@ const ProfilePage: React.FC = () => {
 
   const fetchSavedBlogs = async (ids: number[]) => {
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_URL}/blog/bulk-fetch`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ids }),
-      });
+      const res = await fetch(
+        `${process.env.REACT_APP_API_URL}/blog/bulk-fetch`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ids }),
+        }
+      );
       if (!res.ok) throw new Error("❌ Failed to fetch blogs");
       const data: BlogPost[] = await res.json();
       setSavedBlogs(data);
@@ -120,10 +130,13 @@ const ProfilePage: React.FC = () => {
 
     const isSaved = savedBlogs.some((b) => b.id === blogId);
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_URL}/users/saved-blogs/${blogId}`, {
-        method: isSaved ? "DELETE" : "POST",
-        credentials: "include",
-      });
+      const res = await fetch(
+        `${process.env.REACT_APP_API_URL}/users/saved-blogs/${blogId}`,
+        {
+          method: isSaved ? "DELETE" : "POST",
+          credentials: "include",
+        }
+      );
       if (res.ok) {
         setSavedBlogs((prev) =>
           isSaved
@@ -164,14 +177,16 @@ const ProfilePage: React.FC = () => {
   };
 
   if (!isSessionChecked) return <div className="profile-loading"></div>;
-  if (!profile)
-    return <div className="profile-loading">No profile data found.</div>;
+  if (!user) return null;
+  if (!profile) return <div className="profile-loading"></div>;
 
   const formatLocation = (raw: string): string => {
     const parts = raw.split(",").map((p) => p.trim());
     if (parts.length === 3) {
       const [city, state, country] = parts;
-      return country === "United States" ? `${city}, ${state}` : `${city}, ${country}`;
+      return country === "United States"
+        ? `${city}, ${state}`
+        : `${city}, ${country}`;
     }
     return raw;
   };
@@ -203,11 +218,10 @@ const ProfilePage: React.FC = () => {
           </h1>
           <p className="profile-bio">{profile.bio}</p>
           {profile.location && (
-  <p className="profile-location">
-    📍 {formatLocation(profile.location)}
-  </p>
-)}
-
+            <p className="profile-location">
+              📍 {formatLocation(profile.location)}
+            </p>
+          )}
         </div>
       </div>
 
@@ -217,7 +231,11 @@ const ProfilePage: React.FC = () => {
       <div className="profile-sports">
         {profile.sports?.length ? (
           profile.sports.map((sport, idx) => (
-            <div key={idx} className="sport-item" onClick={() => setActiveSport(sport)}>
+            <div
+              key={idx}
+              className="sport-item"
+              onClick={() => setActiveSport(sport)}
+            >
               {sport}
             </div>
           ))
@@ -257,7 +275,9 @@ const ProfilePage: React.FC = () => {
                 <div className="saved-blog-actions">
                   <button
                     className="pin-blog-btn"
-                    onClick={() => toast.info("📌 Pin functionality coming soon!")}
+                    onClick={() =>
+                      toast.info("📌 Pin functionality coming soon!")
+                    }
                   >
                     📌 Pin
                   </button>
@@ -297,14 +317,18 @@ const ProfilePage: React.FC = () => {
       </div>
 
       <div className="motivational-quote">
-        "Every champion was once a contender who refused to give up." - Rocky Balboa
+        "Every champion was once a contender who refused to give up." - Rocky
+        Balboa
       </div>
 
       <div>
         <button onClick={handleSignOut} className="profile-cta-button">
           Sign Out
         </button>
-        <button onClick={() => navigate("/settings")} className="profile-cta-button">
+        <button
+          onClick={() => navigate("/settings")}
+          className="profile-cta-button"
+        >
           Settings
         </button>
       </div>
