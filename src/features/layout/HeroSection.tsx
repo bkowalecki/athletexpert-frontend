@@ -21,21 +21,32 @@ const HeroSection: React.FC<HeroSectionProps> = ({ openQuiz }) => {
 
   useEffect(() => {
     const video = videoRef.current;
-    if (!video) return;
 
-    video.muted = true;
-    video.setAttribute("playsinline", "true");
-    video.setAttribute("fetchpriority", "high");
+    if (video) {
+      video.muted = true;
+      video.setAttribute("muted", ""); // Important for Safari
+      video.setAttribute("playsInline", "true");
+      video.setAttribute("autoplay", "");
+      video.setAttribute("preload", "auto");
 
-    const tryPlay = () => {
-      if (video.readyState >= 3) {
-        video.play().catch((err) => console.error("❌ Video play error:", err));
-      } else {
-        setTimeout(tryPlay, 50);
-      }
-    };
+      const tryPlay = () => {
+        video
+          .play()
+          .catch(() => {
+            const attemptPlay = () => {
+              video.play().catch((err) =>
+                console.error("Video failed to autoplay after user gesture:", err)
+              );
+              document.removeEventListener("click", attemptPlay);
+              document.removeEventListener("touchstart", attemptPlay);
+            };
+            document.addEventListener("click", attemptPlay, { once: true });
+            document.addEventListener("touchstart", attemptPlay, { once: true });
+          });
+      };
 
-    tryPlay();
+      tryPlay();
+    }
   }, []);
 
   return (
@@ -50,9 +61,8 @@ const HeroSection: React.FC<HeroSectionProps> = ({ openQuiz }) => {
         poster="/images/hero-poster.png"
         className="hero-video"
       >
-        <source src="/video/athletexpertheadervideo.webm" type="video/webm" />
-        {/* You can keep MP4 as fallback if you really need it */}
-        {/* <source src="/video/hero-video.mp4" type="video/mp4" /> */}
+        {/* <source src="/video/athletexpertheadervideo.webm" type="video/webm" /> */}
+        <source src="/video/hero-video.mp4" type="video/mp4" />
         Your browser does not support the video tag.
       </video>
 
