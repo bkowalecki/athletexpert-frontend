@@ -11,7 +11,6 @@ interface HeroSectionProps {
 
 const HeroSection: React.FC<HeroSectionProps> = ({ openQuiz }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const { isAuthenticated } = useAuth0(); // retained for potential future use
   const { user, isSessionChecked } = useUserContext();
   const navigate = useNavigate();
 
@@ -22,24 +21,21 @@ const HeroSection: React.FC<HeroSectionProps> = ({ openQuiz }) => {
 
   useEffect(() => {
     const video = videoRef.current;
+    if (!video) return;
 
-    if (video) {
-      video.muted = true;
-      video.setAttribute("playsinline", "true");
+    video.muted = true;
+    video.setAttribute("playsinline", "true");
+    video.setAttribute("fetchpriority", "high");
 
-      video.play().catch(() => {
-        const attemptPlay = () => {
-          video.play().catch((err) =>
-            console.error("Video still failed to play:", err)
-          );
-          document.removeEventListener("touchstart", attemptPlay);
-          document.removeEventListener("scroll", attemptPlay);
-        };
+    const tryPlay = () => {
+      if (video.readyState >= 3) {
+        video.play().catch((err) => console.error("❌ Video play error:", err));
+      } else {
+        setTimeout(tryPlay, 50);
+      }
+    };
 
-        document.addEventListener("touchstart", attemptPlay, { once: true });
-        document.addEventListener("scroll", attemptPlay, { once: true });
-      });
-    }
+    tryPlay();
   }, []);
 
   return (
@@ -55,7 +51,8 @@ const HeroSection: React.FC<HeroSectionProps> = ({ openQuiz }) => {
         className="hero-video"
       >
         <source src="/video/athletexpertheadervideo.webm" type="video/webm" />
-        <source src="/video/hero-video.mp4" type="video/mp4" />
+        {/* You can keep MP4 as fallback if you really need it */}
+        {/* <source src="/video/hero-video.mp4" type="video/mp4" /> */}
         Your browser does not support the video tag.
       </video>
 

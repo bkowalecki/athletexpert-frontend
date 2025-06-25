@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { BrowserRouter as Router } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AnimatePresence } from "framer-motion";
@@ -8,8 +8,6 @@ import "react-toastify/dist/ReactToastify.css";
 import "./styles/App.css";
 
 import Header from "./features/layout/Header";
-import Footer from "./features/layout/Footer";
-import PwaNav from "./features/layout/PwaNav";
 import ScrollToTop from "./util/ScrollToTop";
 import ErrorBoundary from "./components/common/ErrorBoundary";
 
@@ -20,27 +18,38 @@ import { SportsProvider } from "./context/SportsContext";
 import AppRoutes from "./AppRoutes";
 import useIsMobilePWA from "./hooks/useIsMobilePWA";
 
+const Footer = React.lazy(() => import("./features/layout/Footer"));
+const PwaNav = React.lazy(() => import("./features/layout/PwaNav"));
+
 const queryClient = new QueryClient();
 
-const AppContent: React.FC = () => {
+const AppContent: React.FC = React.memo(() => {
   const isMobilePWA = useIsMobilePWA();
 
   return (
     <div className="App">
       <SportsProvider>
-        <ToastContainer position="top-center" autoClose={3000} />
         <Header />
         <AnimatePresence mode="wait">
-          <ErrorBoundary>
-            <AppRoutes />
-          </ErrorBoundary>
+          <Suspense fallback={<div className="app-loading">Loading...</div>}>
+            <ErrorBoundary>
+              <AppRoutes />
+            </ErrorBoundary>
+          </Suspense>
         </AnimatePresence>
-        {isMobilePWA && <PwaNav />}
-        <Footer />
+        {isMobilePWA && (
+          <Suspense fallback={null}>
+            <PwaNav />
+          </Suspense>
+        )}
+        <Suspense fallback={null}>
+          <Footer />
+        </Suspense>
       </SportsProvider>
     </div>
   );
-};
+});
+
 
 const App: React.FC = () => (
   <Auth0Provider
@@ -55,6 +64,7 @@ const App: React.FC = () => (
       <UserProvider>
         <Router>
           <ScrollToTop />
+          <ToastContainer position="top-center" autoClose={3000} />
           <AppContent />
         </Router>
       </UserProvider>

@@ -3,7 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import { useUserContext } from "./context/UserContext";
 import RequireAuth from "./features/auth/RequireAuth";
 
-// ✅ Lazy imports must come after top-level imports for ESLint compliance
+// Lazy imports must come after top-level imports for ESLint compliance
 const HeroSection = React.lazy(() => import("./features/layout/HeroSection"));
 const FeaturedProductList = React.lazy(() => import("./features/products/FeaturedProductList"));
 const TrendingProductList = React.lazy(() => import("./features/products/TrendingProductList"));

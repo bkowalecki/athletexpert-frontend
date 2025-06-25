@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useMemo, useState } from "react";
 import sportsData from "../data/sports.json";
 
 interface Sport {
@@ -20,12 +20,13 @@ const SportsContext = createContext<SportsContextType>({ sports: [] });
 
 export const useSports = () => useContext(SportsContext);
 
-export const SportsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [sports, setSports] = useState<Sport[]>(sportsData);
+export const SportsProvider: React.FC<{ children: React.ReactNode }> = React.memo(({ children }) => {
+  const [sports] = useState<Sport[]>(sportsData);
+  const value = useMemo(() => ({ sports }), [sports]);
 
   return (
-    <SportsContext.Provider value={{ sports }}>
+    <SportsContext.Provider value={value}>
       {children}
     </SportsContext.Provider>
   );
-};
+});

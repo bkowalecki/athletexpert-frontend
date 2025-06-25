@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
@@ -60,6 +60,32 @@ const BlogPostPage: React.FC = () => {
       navigate("/404", { replace: true });
     }
   }, [isError, isLoading, post, navigate]);
+
+  // Patch anchor tags for external links to open in a new tab
+  useEffect(() => {
+    const blogContent = document.querySelector(".blog-post-content");
+    if (!blogContent) return;
+
+    const links = blogContent.querySelectorAll("a[href^='http']");
+    links.forEach((link) => {
+      link.setAttribute("target", "_blank");
+      link.setAttribute("rel", "noopener noreferrer");
+    });
+  }, [post?.content]);
+
+  const formattedDate = useMemo(() => {
+    return post?.publishedDate
+      ? new Date(post.publishedDate).toLocaleDateString(undefined, {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        })
+      : "";
+  }, [post?.publishedDate]);
+
+  const sanitizedContent = useMemo(() => {
+    return DOMPurify.sanitize(post?.content || "");
+  }, [post?.content]);
 
   if (isLoading || !post) {
     return (
@@ -143,7 +169,12 @@ const BlogPostPage: React.FC = () => {
         </Link>
       </nav>
 
-      <div className="blog-post-container">
+      <article
+        className="blog-post-container"
+        itemScope
+        itemType="https://schema.org/Article"
+        aria-labelledby="blog-title"
+      >
         <header className="blog-post-header">
           <h1 id="blog-title" className="blog-post-title">
             {post.title}
@@ -151,13 +182,7 @@ const BlogPostPage: React.FC = () => {
           <div className="blog-post-author-and-date">
             <address className="blog-post-author">{post.author}</address>
             <span className="bullet">•</span>
-            <time dateTime={post.publishedDate}>
-              {new Date(post.publishedDate).toLocaleDateString(undefined, {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
-            </time>
+            <time dateTime={post.publishedDate}>{formattedDate}</time>
           </div>
         </header>
 
@@ -171,21 +196,14 @@ const BlogPostPage: React.FC = () => {
             />
           </div>
         )}
-      </div>
 
-      <article
-        className="blog-post-content blog-post-content-wrapper"
-        aria-labelledby="blog-title"
-      >
-        <div
-          dangerouslySetInnerHTML={{
-            __html: DOMPurify.sanitize(post.content || ""),
-          }}
-        />
-        <div className="share-section">
-          <h3 className="share-heading">Share this post:</h3>
-          <ShareButtons title={post.title} />
-        </div>
+        <section className="blog-post-content blog-post-content-wrapper">
+          <div dangerouslySetInnerHTML={{ __html: sanitizedContent }} />
+          <div className="share-section">
+            <h3 className="share-heading">Share this post:</h3>
+            <ShareButtons title={post.title} />
+          </div>
+        </section>
       </article>
 
       {relatedBlogs.length > 0 && (
