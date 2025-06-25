@@ -45,7 +45,6 @@ const ShareButtons: React.FC<ShareButtonsProps> = ({ title }) => {
 
   return (
     <section className="share-section">
-      <p className="share-label">Share this post:</p>
       <div className="share-icons">
         {shareOptions.map(({ Component, Icon, props }, index) => (
           <Component key={index} {...props}>
