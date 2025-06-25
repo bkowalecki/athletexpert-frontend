@@ -20,12 +20,16 @@ interface BlogPost {
 }
 
 const fetchBlogPost = async (slug: string): Promise<BlogPost> => {
-  const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/blog/slug/${slug}`);
+  const { data } = await axios.get(
+    `${process.env.REACT_APP_API_URL}/blog/slug/${slug}`
+  );
   return data;
 };
 
 const fetchRelatedBlogs = async (slug: string): Promise<BlogPost[]> => {
-  const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/blog/related/${slug}`);
+  const { data } = await axios.get(
+    `${process.env.REACT_APP_API_URL}/blog/related/${slug}`
+  );
   return data;
 };
 
@@ -33,7 +37,11 @@ const BlogPostPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
 
-  const { data: post, isLoading, isError } = useQuery<BlogPost, Error>({
+  const {
+    data: post,
+    isLoading,
+    isError,
+  } = useQuery<BlogPost, Error>({
     queryKey: ["blogPost", slug],
     queryFn: () => fetchBlogPost(slug as string),
     enabled: !!slug,
@@ -55,7 +63,10 @@ const BlogPostPage: React.FC = () => {
 
   if (isLoading || !post) {
     return (
-      <div className="loading" style={{ textAlign: "center", marginTop: "100px" }}>
+      <div
+        className="loading"
+        style={{ textAlign: "center", marginTop: "100px" }}
+      >
         <h2>Loading blog...</h2>
       </div>
     );
@@ -65,16 +76,24 @@ const BlogPostPage: React.FC = () => {
     <main className="blog-post-page" role="main">
       <Helmet>
         <title>{post.title} - AthleteXpert</title>
+        <meta name="author" content={post.author} />
         <meta name="description" content={post.summary || post.title} />
+        <meta property="article:published_time" content={post.publishedDate} />
         <meta property="og:title" content={post.title} />
         <meta property="og:description" content={post.summary || post.title} />
         <meta property="og:image" content={post.imageUrl} />
-        <meta property="og:url" content={`https://www.athletexpert.org/blog/${slug}`} />
+        <meta
+          property="og:url"
+          content={`https://www.athletexpert.org/blog/${slug}`}
+        />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={post.title} />
         <meta name="twitter:description" content={post.summary || post.title} />
         <meta name="twitter:image" content={post.imageUrl} />
-        <link rel="canonical" href={`https://www.athletexpert.org/blog/${slug}`} />
+        <link
+          rel="canonical"
+          href={`https://www.athletexpert.org/blog/${slug}`}
+        />
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
@@ -82,7 +101,9 @@ const BlogPostPage: React.FC = () => {
             headline: post.title,
             image: post.imageUrl ? [post.imageUrl] : undefined,
             datePublished: post.publishedDate,
-            author: post.author ? [{ "@type": "Person", name: post.author }] : undefined,
+            author: post.author
+              ? [{ "@type": "Person", name: post.author }]
+              : undefined,
             publisher: {
               "@type": "Organization",
               name: "AthleteXpert",
@@ -93,41 +114,78 @@ const BlogPostPage: React.FC = () => {
             },
           })}
         </script>
+
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              {
+                "@type": "ListItem",
+                position: 1,
+                name: "Blog",
+                item: "https://www.athletexpert.org/blog",
+              },
+              {
+                "@type": "ListItem",
+                position: 2,
+                name: post.title,
+                item: `https://www.athletexpert.org/blog/${slug}`,
+              },
+            ],
+          })}
+        </script>
       </Helmet>
 
       <nav className="back-link-container" aria-label="Breadcrumb">
-        <Link to="/blog" className="back-link">← Back to Blog</Link>
+        <Link to="/blog" className="back-link">
+          ← Back to Blog
+        </Link>
       </nav>
 
-      {post.imageUrl && (
-        <div className="blog-post-image-container">
-          <img
-            src={post.imageUrl}
-            alt={`Image for ${post.title}`}
-            className="blog-post-image"
-            loading="lazy"
-          />
-        </div>
-      )}
+      <div className="blog-post-container">
+        <header className="blog-post-header">
+          <h1 id="blog-title" className="blog-post-title">
+            {post.title}
+          </h1>
+          <div className="blog-post-author-and-date">
+            <address className="blog-post-author">{post.author}</address>
+            <span className="bullet">•</span>
+            <time dateTime={post.publishedDate}>
+              {new Date(post.publishedDate).toLocaleDateString(undefined, {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
+            </time>
+          </div>
+        </header>
 
-      <header className="blog-post-header">
-        <h1 className="blog-post-title">{post.title}</h1>
-        <div className="blog-post-author-and-date">
-          <p className="blog-post-meta">By {post.author}</p>
-          <time dateTime={post.publishedDate}>
-            {new Date(post.publishedDate).toLocaleDateString()}
-          </time>
-        </div>
-      </header>
+        {post.imageUrl && (
+          <div className="blog-post-image-container">
+            <img
+              src={post.imageUrl}
+              alt={`Image for ${post.title}`}
+              className="blog-post-image"
+              loading="eager"
+            />
+          </div>
+        )}
+      </div>
 
-      <article className="blog-post-content-wrapper">
+      <article
+        className="blog-post-content blog-post-content-wrapper"
+        aria-labelledby="blog-title"
+      >
         <div
-          className="blog-post-content"
-          role="article"
-          aria-label={post.title}
-          dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.content || "") }}
+          dangerouslySetInnerHTML={{
+            __html: DOMPurify.sanitize(post.content || ""),
+          }}
         />
-        <ShareButtons title={post.title} />
+        <div className="share-section">
+          <h3 className="share-heading">Share this post:</h3>
+          <ShareButtons title={post.title} />
+        </div>
       </article>
 
       {relatedBlogs.length > 0 && (
@@ -136,10 +194,14 @@ const BlogPostPage: React.FC = () => {
           <div className="related-blogs-grid">
             {relatedBlogs.map((blog) => (
               <div key={blog.id} className="blog-card-inline">
-                <Link to={`/blog/${blog.slug}`} className="blog-card-inline-link">
+                <Link
+                  to={`/blog/${blog.slug}`}
+                  className="blog-card-inline-link"
+                  aria-label={`Read more: ${blog.title}`}
+                >
                   <img
                     src={blog.imageUrl}
-                    alt={`Thumbnail for ${blog.title}`}
+                    alt={`Thumbnail for blog post: ${blog.title}`}
                     className="blog-card-inline-img"
                     loading="lazy"
                   />
