@@ -62,7 +62,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ openQuiz }) => {
         className="hero-video"
       >
         <source src="/video/New-Hero-Video.webm" type="video/webm" />
-        {/* <source src="/video/hero-video.mp4" type="video/mp4" /> */}
+        <source src="/video/New-Hero-Video-MP4.mp4" type="video/mp4" />
         Your browser does not support the video tag.
       </video>
 
