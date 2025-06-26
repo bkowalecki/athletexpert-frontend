@@ -44,9 +44,24 @@
   /* animation: fadeIn 1s ease-in-out;  */
 }
 
-@keyframes fadeIn {
-  0% { opacity: 0; }
-  100% { opacity: 1; }
+@keyframes fadeUp {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInDelayed {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 .hero-content h1 {
@@ -54,8 +69,9 @@
   margin-bottom: 20px;
   font-family: 'Arial', sans-serif;
   letter-spacing: 1px;
-  animation: slideIn 1.5s ease-in-out;
+  animation: fadeUp 1s ease-out forwards;
 }
+
 @keyframes slideIn {
   0% { transform: translateY(-20px); opacity: 0; }
   100% { transform: translateY(0); opacity: 1; }
@@ -74,11 +90,11 @@
   display: flex;
   justify-content: center;
   gap: 20px;
-  flex-wrap: wrap; /* Ensure buttons wrap on smaller screens */
+  flex-wrap: wrap;
   margin-top: 20px;
-  animation: slideIn 1.5s ease-in-out;
+  opacity: 0;
+  animation: fadeInDelayed 1s ease-out .8s forwards;
 }
-
 .cta-btn {
   padding: 14px 32px;
   font-size: 18px;

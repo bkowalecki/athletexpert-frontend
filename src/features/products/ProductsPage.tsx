@@ -79,7 +79,7 @@ const ProductsPage: React.FC = () => {
     },
     {
       title: "Sport Tech",
-      imageUrl: "/images/categories/sport-tech.jpg", // Update with a real tech-related image
+      imageUrl: "/images/categories/sport-tech.jpg", 
       description: "Track, tune, and train smarter",
       linkTo: "/products/tech",
     },
