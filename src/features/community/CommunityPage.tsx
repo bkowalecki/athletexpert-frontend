@@ -18,7 +18,7 @@ export const sportMemberCounts: Record<string, number> = {
   Cheerleading: 521,
   Cricket: 810,
   Cycling: 740,
-  "E-Sports": 2052,
+  "E-Sports": 0,
   Football: 1980,
   Golf: 993,
   "Ice Hockey": 668,
@@ -48,27 +48,35 @@ interface SportCardProps {
 }
 
 const SportCard: React.FC<SportCardProps> = React.memo(
-  ({ sport, index, navigate, memberCount }) => (
-    <div
-      className={`sport-card sport-card-${index % 4} ${
-        sport.title.toLowerCase() === "e-sports" ? "esport-preview-card" : ""
-      }`}
-      onClick={() => navigate(sport.title.toLowerCase())}
-    >
-      <div className="sport-card-bg">
-        <img
-          src={sport.backgroundImage}
-          alt={`Image of ${sport.title}`}
-          className="sport-card-image"
-          loading="lazy"
-        />
+  ({ sport, index, navigate, memberCount }) => {
+    const isEsports = sport.title.toLowerCase() === "e-sports";
+    return (
+      <div
+        className={`sport-card sport-card-${index % 4} ${isEsports ? "esport-preview-card esport-card-disabled" : ""}`}
+        onClick={isEsports ? undefined : () => navigate(sport.title.toLowerCase())}
+        tabIndex={isEsports ? -1 : 0}
+        aria-disabled={isEsports ? "true" : "false"}
+      >
+        <div className="sport-card-bg">
+          <img
+            src={sport.backgroundImage}
+            alt={`Image of ${sport.title}`}
+            className="sport-card-image"
+            loading="lazy"
+          />
+          {isEsports && (
+            <div className="esport-coming-soon-overlay">
+              <span>Coming soon</span>
+            </div>
+          )}
+        </div>
+        <div className="sport-card-info">
+          <h3>{sport.title}</h3>
+          <p className="sport-card-members">👥 {memberCount.toLocaleString()} members</p>
+        </div>
       </div>
-      <div className="sport-card-info">
-        <h3>{sport.title}</h3>
-        <p className="sport-card-members">👥 {memberCount.toLocaleString()} members</p>
-      </div>
-    </div>
-  )
+    );
+  }
 );
 
 const Community: React.FC = () => {

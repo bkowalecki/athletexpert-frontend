@@ -256,45 +256,28 @@ const ProfilePage: React.FC = () => {
 
       <h2 className="profile-subsection-header-text">My Blogs</h2>
       <div className="profile-saved-blogs-grid">
-        {savedBlogs.length > 0 ? (
-          savedBlogs.map((blog) => (
-            <div key={blog.id} className="saved-blog-card clickable-card">
-              <a
-                href={`/blog/${blog.slug}`}
-                className="saved-blog-card-overlay"
-                aria-label={`Read blog: ${blog.title}`}
-              ></a>
-              <img
-                src={blog.imageUrl}
-                alt={blog.title}
-                className="saved-blog-image"
-              />
-              <div className="saved-blog-details">
-                <h3 className="saved-blog-title">{blog.title}</h3>
-                <p className="saved-blog-author">By {blog.author}</p>
-                <div className="saved-blog-actions">
-                  <button
-                    className="pin-blog-btn"
-                    onClick={() =>
-                      toast.info("📌 Pin functionality coming soon!")
-                    }
-                  >
-                    📌 Pin
-                  </button>
-                  <button
-                    className="save-blog-btn unsave"
-                    onClick={() => toggleSaveBlog(blog.id)}
-                  >
-                    Unsave
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))
-        ) : (
-          <p className="profile-no-blogs-text">No saved blogs yet.</p>
-        )}
-      </div>
+  {savedBlogs.length > 0 ? (
+    savedBlogs.map((blog) => (
+      <BlogCard
+        key={blog.id}
+        id={blog.id}
+        title={blog.title}
+        author={blog.author}
+        slug={blog.slug}
+        imageUrl={blog.imageUrl}
+        variant="profile"
+        isSaved={true}
+        onUnsave={() => toggleSaveBlog(blog.id)}
+        // Add this when pin logic is implemented:
+        onPin={() => toast.info("📌 Pin functionality coming soon!")}
+        isPinned={false} // You can update this when you have pin state
+      />
+    ))
+  ) : (
+    <p className="profile-no-blogs-text">No saved blogs yet.</p>
+  )}
+</div>
+
 
       <h2 className="profile-subsection-header-text">Maybe Later...</h2>
       <div className="profile-saved-products">

@@ -44,6 +44,13 @@ const SportPage: React.FC = () => {
   const [relatedBlogs, setRelatedBlogs] = useState<BlogPost[]>([]);
   const [loadingBlogs, setLoadingBlogs] = useState(true);
   const [recommendedProducts, setRecommendedProducts] = useState<Product[]>([]);
+  const isEsports = currentSport?.title.toLowerCase() === "e-sports";
+
+  useEffect(() => {
+    if (isEsports) {
+      navigate("/404", { replace: true });
+    }
+  }, [isEsports, navigate]);
 
   useEffect(() => {
     if (!sport) {
@@ -52,7 +59,10 @@ const SportPage: React.FC = () => {
     }
 
     const slugify = (str: string) =>
-      str.toLowerCase().replace(/\s+/g, "-").replace(/[^\w\-]+/g, "");
+      str
+        .toLowerCase()
+        .replace(/\s+/g, "-")
+        .replace(/[^\w\-]+/g, "");
 
     const foundSport = sportsData.find(
       (s) => slugify(s.title) === sport.toLowerCase()
@@ -104,8 +114,8 @@ const SportPage: React.FC = () => {
     );
   }
 
-  if (currentSport.title.toLowerCase() === "e-sports") {
-    return <EsportExperience sport={currentSport} />;
+  if (isEsports) {
+    return null;
   }
 
   return (

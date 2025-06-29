@@ -6,6 +6,7 @@ import DOMPurify from "dompurify";
 import { Helmet } from "react-helmet";
 import { useUserContext } from "../../context/UserContext";
 import { toast } from "react-toastify";
+import BlogCard from "./BlogCard";
 import "react-toastify/dist/ReactToastify.css";
 import "../../styles/BlogPage.css";
 
@@ -32,30 +33,6 @@ const fetchPosts = async (searchQuery: string, page: number): Promise<BlogPost[]
   }
 };
 
-const BlogPostCard: React.FC<{
-  post: BlogPost;
-  isSaved: boolean;
-  onToggleSave: (id: number) => void;
-}> = ({ post, isSaved, onToggleSave }) => (
-  <div className="blog-post-item">
-    <img src={post.imageUrl} alt={post.title} className="blog-image" loading="lazy" />
-    <div className="blog-info">
-      <h3 className="blog-title">{post.title}</h3>
-      <p className="blog-author">By {post.author}</p>
-      <p className="blog-date">{new Date(post.publishedDate).toLocaleDateString()}</p>
-      <p className="blog-description">{DOMPurify.sanitize(post.summary)}</p>
-      <div className="blog-actions">
-        <Link to={`/blog/${post.slug}`} className="blog-read-more-btn">Read More</Link>
-        <button
-          className={`save-blog-btn ${isSaved ? "unsave" : ""}`}
-          onClick={() => onToggleSave(post.id)}
-        >
-          {isSaved ? "Unsave" : "Save"}
-        </button>
-      </div>
-    </div>
-  </div>
-);
 
 const BlogPage: React.FC = () => {
   const [inputQuery, setInputQuery] = useState("");
@@ -153,11 +130,19 @@ const BlogPage: React.FC = () => {
           ))
         ) : posts.length ? (
           posts.map(post => (
-            <BlogPostCard
+            <BlogCard
               key={post.id}
-              post={post}
+              id={post.id}
+              title={post.title}
+              author={post.author}
+              slug={post.slug}
+              imageUrl={post.imageUrl}
+              publishedDate={post.publishedDate}
+              summary={post.summary}
+              variant="list"
               isSaved={savedBlogIds.includes(post.id)}
-              onToggleSave={toggleSaveBlog}
+              onSave={() => toggleSaveBlog(post.id)}
+              onUnsave={() => toggleSaveBlog(post.id)}
             />
           ))
         ) : (
