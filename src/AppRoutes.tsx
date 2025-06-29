@@ -3,13 +3,13 @@ import { Routes, Route } from "react-router-dom";
 import { useUserContext } from "./context/UserContext";
 import RequireAuth from "./features/auth/RequireAuth";
 
-// Eager imports (critical components for immediate loading)
+// Critical (non-lazy) imports for instant home rendering
 import HeroSection from "./features/layout/HeroSection";
 import FeaturedProductList from "./features/products/FeaturedProductList";
 import TrendingProductList from "./features/products/TrendingProductList";
 import BlogSection from "./features/blog/BlogSection";
 
-// Lazy imports (secondary components to optimize initial load)
+// Lazy-load everything else
 const Quiz = React.lazy(() => import("./features/recommender/Quiz"));
 const ProductsPage = React.lazy(() => import("./features/products/ProductsPage"));
 const ProductDetail = React.lazy(() => import("./features/products/ProductDetail"));
@@ -42,56 +42,67 @@ const AppRoutes: React.FC = () => {
   const { isSessionChecked } = useUserContext();
   const [isQuizModalOpen, setQuizModalOpen] = useState(false);
 
+  // Wait for session to hydrate to avoid auth flash
   if (!isSessionChecked) return <div className="loading-screen full-height" />;
 
   return (
     <main className="page-content">
       <Suspense fallback={<div className="loading-screen full-height" />}>
         <Routes>
-          {/* Home */}
-          <Route path="/" element={
-            <>
-              <HeroSection openQuiz={() => setQuizModalOpen(true)} />
-              <FeaturedProductList />
-              <TrendingProductList />
-              <BlogSection />
-            </>
-          } />
-
-          {/* Quiz Modal */}
+          {/* Home - "critical path" UI */}
+          <Route
+            path="/"
+            element={
+              <>
+                <HeroSection openQuiz={() => setQuizModalOpen(true)} />
+                <FeaturedProductList />
+                <TrendingProductList />
+                <BlogSection />
+              </>
+            }
+          />
+          {/* Quiz Modal route (optional, can use a modal system if desired) */}
           {isQuizModalOpen && (
-            <Route path="/quiz" element={<Quiz isOpen={isQuizModalOpen} closeModal={() => setQuizModalOpen(false)} />} />
+            <Route
+              path="/quiz"
+              element={
+                <Quiz
+                  isOpen={isQuizModalOpen}
+                  closeModal={() => setQuizModalOpen(false)}
+                />
+              }
+            />
           )}
 
-          {/* User Routes */}
+          {/* Auth & Account */}
           <Route path="/profile" element={<RequireAuth><ProfilePage /></RequireAuth>} />
           <Route path="/settings" element={<AccountSettings />} />
           <Route path="/account-setup" element={<OnboardingPage />} />
           <Route path="/auth" element={<AuthPage />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
 
-          {/* Products Routes */}
+          {/* Products */}
           <Route path="/products" element={<ProductsPage />} />
           <Route path="/products/:id" element={<ProductDetail />} />
           <Route path="/admin/products" element={<RequireAuth><AdminProductManager /></RequireAuth>} />
 
-          {/* Blog Routes */}
+          {/* Blog */}
           <Route path="/blog" element={<BlogPage />} />
           <Route path="/blog/:slug" element={<BlogPostPage />} />
           <Route path="/admin/new-blog" element={<NewBlogPost />} />
 
-          {/* Community Routes */}
+          {/* Community */}
           <Route path="/community" element={<CommunityPage />} />
           <Route path="/community/:sport" element={<SportPage />} />
 
-          {/* Miscellaneous Routes */}
+          {/* Misc */}
           <Route path="/search" element={<SearchResults />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/terms-and-conditions" element={<TermsAndConditionsPage />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
 
-          {/* 404 Fallback Route */}
+          {/* 404 Fallback */}
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Suspense>

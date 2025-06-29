@@ -1,12 +1,10 @@
 .blog-card {
   background: #242424;
-  transition: transform 0.22s cubic-bezier(0.28, 1.25, 0.42, 1),
-    box-shadow 0.22s;
+  transition: transform 0.22s cubic-bezier(0.28, 1.25, 0.42, 1), box-shadow 0.22s;
   display: flex;
   flex-direction: column;
   border-radius: 2rem;
-  box-shadow: 0 6px 40px 0 rgba(44, 44, 44, 0.13),
-    0 1.5px 16px 0 rgba(40, 80, 30, 0.1);
+  box-shadow: 0 6px 40px 0 rgba(44,44,44,0.13), 0 1.5px 16px 0 rgba(40,80,30,0.1);
   border: 1.5px solid #282828;
   width: 100%;
   overflow: hidden;
@@ -16,85 +14,31 @@
 }
 .blog-card:hover {
   transform: translateY(-6px) scale(1.017);
-  box-shadow: 0 16px 40px 0 rgba(44, 44, 44, 0.23),
-    0 2.5px 20px 0 rgba(40, 80, 30, 0.13);
+  box-shadow: 0 16px 40px 0 rgba(44,44,44,0.23), 0 2.5px 20px 0 rgba(40,80,30,0.13);
   border-color: #fff;
 }
 
-/* Variant borders */
-.blog-card-list {
-  border: 2.5px solid #a23c20;
-}
+.blog-card-list,
 .blog-card-profile {
   border: 2.5px solid #a23c20;
 }
 
-/* Bookmark (Save/Unsave) Floating Tab */
-.blog-card-bookmark-container {
-  position: absolute;
-  top: 0;
-  right: 0;
-  z-index: 3;
-  padding: 0;
-  pointer-events: none;
-}
-.blog-card-bookmark-btn {
-  pointer-events: auto;
-  background: #242424;
-  border: none;
-  border-radius: 0 0 0 0.95rem;
-  box-shadow: 0 3px 14px 0 #0003;
-  width: 54px;
-  height: 54px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.18s, box-shadow 0.18s, transform 0.12s;
-  cursor: pointer;
-  outline: none;
-  padding: 0;
-}
-.blog-card-bookmark-btn svg {
-  display: block;
-  margin: 0 auto;
-  width: 34px;
-  height: 34px;
-  transition: filter 0.18s, fill 0.18s, stroke 0.18s;
-}
-.blog-card-bookmark-btn.saved {
-  background: #a23c20;
-  box-shadow: 0 7px 24px 0 #a23c2044;
-}
-.blog-card-bookmark-btn:active {
-  transform: scale(0.96);
-}
-.blog-card-bookmark-btn:hover,
-.blog-card-bookmark-btn:focus {
-  box-shadow: 0 0 0 3px #a23c2040, 0 7px 24px 0 #a23c2022;
-  outline: none;
-}
-.blog-card-bookmark-btn:hover svg,
-.blog-card-bookmark-btn:focus svg {
-  filter: brightness(1.15);
-}
-
-/* Pin (Profile variant only) Floating Tab */
+/* Bookmark Floating Tab */
+.blog-card-bookmark-container,
 .blog-card-pin-container {
   position: absolute;
-  top: 0;
-  left: 0;
   z-index: 3;
   padding: 0;
   pointer-events: none;
 }
+.blog-card-bookmark-container { top: 0; right: 0; }
+.blog-card-pin-container { top: 0; left: 0; }
+.blog-card-bookmark-btn,
 .blog-card-pin-btn {
   pointer-events: auto;
-  background: #a23c20;
   border: none;
-  border-radius: 0 0 0.95rem 0;
+  background: #242424;
   box-shadow: 0 3px 14px 0 #0003;
-  width: 54px;
-  height: 54px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -102,26 +46,40 @@
   outline: none;
   padding: 0;
   transition: background 0.18s, box-shadow 0.18s, transform 0.12s;
+  width: 54px;
+  height: 54px;
+  border-radius: 0 0 0 0.95rem;
 }
+.blog-card-pin-btn {
+  border-radius: 0 0 0.95rem 0;
+  background: #a23c20;
+}
+.blog-card-bookmark-btn svg,
 .blog-card-pin-btn svg {
-  display: block;
-  margin: 0 auto;
   width: 34px;
   height: 34px;
+  display: block;
+  margin: 0 auto;
   transition: filter 0.18s, fill 0.18s, stroke 0.18s;
 }
+.blog-card-bookmark-btn.saved,
 .blog-card-pin-btn.pinned {
   background: #a23c20;
   box-shadow: 0 7px 24px 0 #a23c2044;
 }
+.blog-card-bookmark-btn:active,
 .blog-card-pin-btn:active {
   transform: scale(0.96);
 }
+.blog-card-bookmark-btn:hover,
+.blog-card-bookmark-btn:focus,
 .blog-card-pin-btn:hover,
 .blog-card-pin-btn:focus {
   box-shadow: 0 0 0 3px #a23c2040, 0 7px 24px 0 #a23c2022;
   outline: none;
 }
+.blog-card-bookmark-btn:hover svg,
+.blog-card-bookmark-btn:focus svg,
 .blog-card-pin-btn:hover svg,
 .blog-card-pin-btn:focus svg {
   filter: brightness(1.15);
@@ -136,13 +94,13 @@
   min-height: 180px;
   max-height: 270px;
   border-bottom: none;
-  box-shadow: 0 3px 20px 0 rgba(90, 90, 80, 0.09);
+  box-shadow: 0 3px 20px 0 rgba(90,90,80,0.09);
   transition: box-shadow 0.3s;
 }
 
-/* Card Content & Text Styles */
+/* Card Content */
 .blog-card-content {
-  padding: 1.4rem 1.5rem 1.4rem 1.5rem;
+  padding: 1.4rem 1.5rem;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
@@ -151,11 +109,12 @@
   gap: 0.9rem;
   flex-grow: 1;
   text-align: left;
-  min-width: 0;    /* <-- NEW */
-  width: 100%;     /* <-- NEW */
-  box-sizing: border-box; /* <-- NEW */
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
 }
 
+/* Title, meta, summary */
 .blog-card-title {
   font-size: 2rem;
   color: #fff;
@@ -196,7 +155,7 @@
   color: #fff;
   font-style: italic;
   font-weight: 500;
-  margin: 0 0 0 0;
+  margin: 0;
 }
 .blog-card-summary {
   font-size: 1.2rem;
@@ -211,7 +170,7 @@
   text-overflow: ellipsis;
 }
 
-/* Profile Variant: Smaller Text, Padding, Tighter Layout */
+/* Profile Variant */
 .blog-card-profile {
   font-size: 0.93rem;
 }
@@ -221,6 +180,7 @@
   margin: 0.07em 0 0.14em 0;
   letter-spacing: 0.01em;
   line-height: 1.11;
+  -webkit-line-clamp: 2;
 }
 .blog-card-content.blog-card-content-profile {
   padding: 0.85rem 0.8rem 0.95rem 0.8rem;
@@ -239,63 +199,35 @@
   line-height: 1.5;
 }
 
+/* Related Variant */
+.blog-card-related {
+  min-width: 0;
+  max-width: 355px;
+  margin: 0 auto;
+  border: 2px solid #a23c20;
+  box-shadow: 0 4px 22px 0 rgba(162,60,32,0.06);
+}
+
 /* Responsive */
 @media (max-width: 1024px) {
-  .blog-card-title {
-    font-size: 1.6rem;
-  }
-  .blog-card-content {
-    padding: 1.1rem 0.7rem;
-  }
-  .blog-card-img {
-    min-height: 130px;
-    /* max-height: 200px; */
-  }
+  .blog-card-title { font-size: 1.6rem; }
+  .blog-card-content { padding: 1.1rem 0.7rem; }
+  .blog-card-img { min-height: 130px; }
   .blog-card-pin-btn,
-  .blog-card-bookmark-btn {
-    width: 38px;
-    height: 38px;
-  }
+  .blog-card-bookmark-btn { width: 38px; height: 38px; }
   .blog-card-pin-btn svg,
-  .blog-card-bookmark-btn svg {
-    width: 18px;
-    height: 18px;
-  }
+  .blog-card-bookmark-btn svg { width: 18px; height: 18px; }
 }
 @media (max-width: 768px) {
-  .blog-card {
-    border-radius: 1rem;
-    min-width: 0;
-  }
-  .blog-card-content {
-    padding: 1.18rem 1rem 1.18rem 1rem;
-    gap: 0.75rem;
-  }
-  .blog-card-title {
-    font-size: 1.6rem;
-    line-height: 1.22;
-    margin-bottom: 0.4rem;
-    -webkit-line-clamp: 2;
-  }
-  .blog-card-img {
-    min-height: 130px;
-    /* max-height: 160px; */
-    border-radius: 0;
-  }
-  .blog-card-summary {
-    font-size: 1rem;
-    margin-top: 0.2rem;
-  }
+  .blog-card { border-radius: 1rem; min-width: 0; }
+  .blog-card-content { padding: 1.18rem 1rem; gap: 0.75rem; }
+  .blog-card-title { font-size: 1.6rem; line-height: 1.22; margin-bottom: 0.4rem; -webkit-line-clamp: 2; }
+  .blog-card-img { min-height: 130px; border-radius: 0; }
+  .blog-card-summary { font-size: 1rem; margin-top: 0.2rem; }
   .blog-card-pin-btn,
-  .blog-card-bookmark-btn {
-    width: 32px;
-    height: 32px;
-  }
+  .blog-card-bookmark-btn { width: 32px; height: 32px; }
   .blog-card-pin-btn svg,
-  .blog-card-bookmark-btn svg {
-    width: 13px;
-    height: 13px;
-  }
+  .blog-card-bookmark-btn svg { width: 13px; height: 13px; }
 }
 
 @media (max-width: 600px) {
@@ -311,7 +243,6 @@
     box-shadow: 0 2.5px 24px 0 rgba(44,44,44,0.19);
     border: none;
     margin-bottom: 1.15rem;
-    cursor: pointer;
     touch-action: manipulation;
     user-select: none;
   }
@@ -322,7 +253,7 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    filter: brightness(0.57) saturate(1.09) blur(0px);
+    filter: brightness(0.4) saturate(1.09) blur(0px);
     transition: filter 0.22s;
     border-radius: inherit;
     pointer-events: none;
@@ -366,65 +297,56 @@
     letter-spacing: 0.012em;
   }
   .blog-card-meta-row {
-    gap: 0.49rem;
-    font-size: 0.99rem;
-    opacity: 0.87;
-    margin-bottom: 0.06rem;
+    display: flex !important;
+    gap: 0.42rem;
+    font-size: 0.98rem;
+    color: #fff !important;
+    text-shadow: 0 2px 8px #000a, 0 1.5px 5px #0009;
+    opacity: 0.93;
+    margin-bottom: 0.13rem;
+    width: 100%;
+    align-items: center;
   }
-  .blog-card-author, .blog-card-date {
+  .blog-card-author,
+  .blog-card-date {
     font-size: 0.93rem !important;
     color: #fff;
     font-style: italic;
-    line-height: 1.10;
+    line-height: 1.1;
   }
-  .blog-card-summary {
-    display: none !important;
-    /* font-size: 0.98rem;
-    color: #fff9;
-    line-height: 1.36;
-    margin-top: 0.13rem;
-    -webkit-line-clamp: 2;
-    padding: 0;
-    opacity: 0.97; */
-  }
-
-  /* Pin/Bookmark: Overlaid in corners, visually clear */
+  .blog-card-summary { display: none !important; }
   .blog-card-bookmark-container,
-  .blog-card-pin-container {
-    z-index: 5;
-    top: 0.81rem;
-  }
-  .blog-card-bookmark-container { right: 0.81rem; }
-  .blog-card-pin-container { left: 0.81rem; }
-  .blog-card-bookmark-btn, .blog-card-pin-btn {
+  .blog-card-pin-container { z-index: 5; }
+  .blog-card-bookmark-btn,
+  .blog-card-pin-btn {
     width: 38px;
     height: 38px;
-    border-radius: 0.99rem;
+    /* border-radius: 0.99rem; */
     box-shadow: 0 1.5px 7px 0 #0007;
     background: rgba(36,36,36,0.84);
     backdrop-filter: blur(2.5px);
-    padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
   }
-  .blog-card-bookmark-btn svg, .blog-card-pin-btn svg {
-    width: 22px; height: 22px;
+  .blog-card-bookmark-btn svg,
+  .blog-card-pin-btn svg {
+    width: 34px;
+    height: 34px;
+  }
+  .blog-card-list{
+    border: 3px solid #a23c20;
   }
 }
 
-/* Tighter for small screens */
 @media (max-width: 430px) {
-  .blog-card-content { padding: 1.01rem 0.62rem 1rem 0.7rem; min-height: 92px; }
+  .blog-card-content {
+    padding: 1.01rem 0.62rem 1rem 0.7rem;
+    min-height: 92px;
+  }
   .blog-card-title { font-size: 1.2rem; }
-  .blog-card-summary { font-size: 0.86rem; }
-  .blog-card-bookmark-btn, .blog-card-pin-btn { width: 26px; height: 26px; }
-  .blog-card-bookmark-btn svg, .blog-card-pin-btn svg { width: 14px; height: 14px; }
+  .blog-card-bookmark-btn,
+  .blog-card-pin-btn { width: 55px; height: 55px; }
 }
 
-
-/* Micro-interaction for Apple/Duolingo feel */
 .blog-card:active {
   transform: scale(0.985);
-  box-shadow: 0 1px 6px rgba(40, 40, 40, 0.18);
+  box-shadow: 0 1px 6px rgba(40,40,40,0.18);
 }

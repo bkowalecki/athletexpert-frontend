@@ -1,50 +1,55 @@
-/* ProfilePage CSS - Modern, Sporty, and Responsive */
+/* --- ProfilePage CSS - Modern, Sporty, Responsive --- */
+
+:root {
+  --ax-orange: #a23c20;
+  --ax-orange-dark: #842d14;
+  --ax-gold: #ff9900;
+  --ax-text: #fff;
+  --ax-bg1: #1a1a1a;
+  --ax-bg2: #333333;
+  --ax-divider: #a23c20;
+  --ax-card-radius: 15px;
+  --ax-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+  --ax-font: "Montserrat", sans-serif;
+}
 
 .profile-container {
   width: 100%;
-  max-width: 100%;
   min-height: 100vh;
-  /* margin: 20px auto; */
-  /* padding: 20px; */
   padding-top: 5rem;
-  background: linear-gradient(135deg, #1a1a1a, #333333);
-  color: #fff;
-  font-family: "Montserrat", sans-serif;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+  background: linear-gradient(135deg, var(--ax-bg1), var(--ax-bg2));
+  color: var(--ax-text);
+  font-family: var(--ax-font);
+  box-shadow: var(--ax-shadow);
   text-align: center;
   box-sizing: border-box;
 }
 
 .profile-banner {
   display: flex;
-  flex-direction: row; /* ✅ Changed to row to align picture and text */
-  align-items: center; /* ✅ Center items vertically */
-  gap: 20px; /* ✅ Add space between image and text */
-  justify-content: left; /* ✅ Center the entire banner */
+  flex-direction: row;
+  align-items: center;
+  gap: 20px;
+  justify-content: flex-start;
   padding-left: 20px;
 }
 
-.profile-subsection-header-text {
-  font-size: 2.4rem;
-}
-
 .profile-image-wrapper {
-  width: 175px; /* Ensure width and height are equal */
+  width: 175px;
   height: 175px;
-  border-radius: 50%; /* Makes the container a perfect circle */
-  overflow: hidden; /* Hides any overflow outside the circle */
+  border-radius: 50%;
+  overflow: hidden;
   display: flex;
   justify-content: center;
   align-items: center;
-  border: 4px solid #a23c20; /* Optional: adds a border */
+  border: 4px solid var(--ax-orange);
   box-sizing: border-box;
 }
-
 .profile-image {
   width: 100%;
   height: 100%;
-  object-fit: cover; /* Ensures the image fills the container */
-  border-radius: 50%; /* Ensures the image stays circular */
+  object-fit: cover;
+  border-radius: 50%;
 }
 
 .profile-info {
@@ -56,37 +61,32 @@
 }
 
 .profile-name {
-  font-size: 3.2rem; /* Bold for impact */
-  color: #fff; /* Gold for high contrast and a premium, sporty vibe */
-  font-weight: 900; /* Extra bold for that standout athlete energy */
-  text-transform: uppercase; /* Keeps it strong and consistent with sports aesthetics */
-  letter-spacing: 1.5px; /* Adds a sleek, modern touch */
+  font-size: 3.2rem;
+  color: var(--ax-text);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
   margin: 0;
   display: inline-block;
   padding-bottom: 5px;
-  border-bottom: 3px solid #a23c20; /* Clean underline to anchor the text visually */
-  transition: transform 0.2s ease-in-out, letter-spacing 0.2s ease-in-out; /* Subtle dynamic feel */
-}
-
-.profile-name:hover {
-  cursor: default; /* Maintains clean interaction since it's not clickable */
+  border-bottom: 3px solid var(--ax-divider);
+  transition: transform 0.2s, letter-spacing 0.2s;
 }
 
 .profile-bio {
   font-size: 1.1rem;
   color: #ddd;
-  /* font-style: italic; */
-  margin: 10px 0; /* ✅ Center the bio horizontally */
-  max-width: 50%; /* ✅ Limit width to half of the container */
-  word-wrap: break-word; /* ✅ Break long words gracefully */
-  line-height: 1.6; /* ✅ Improve readability with line spacing */
-  text-align: left; /* ✅ Keep it visually balanced */
+  margin: 10px 0;
+  max-width: 50%;
+  word-wrap: break-word;
+  line-height: 1.6;
+  text-align: left;
 }
 
 .profile-divider {
   border: none;
   height: 2px;
-  background: #a23c20;
+  background: var(--ax-divider);
   margin: 20px 0;
 }
 
@@ -95,169 +95,17 @@
   text-align: left;
 }
 
-.badge-item,
-.saved-item {
-  background: #a23c20;
-  padding: 10px 15px;
-  border-radius: 12px;
-  color: white;
-  font-weight: bold;
-  display: inline-block;
-  margin: 5px;
-  transition: transform 0.3s ease;
-  cursor: pointer;
+.profile-subsection-header-text {
+  font-size: 2.4rem;
 }
 
-.badge-item:hover,
-.saved-item:hover {
-  transform: scale(1.1);
-  background: #842d14;
-}
-
-/* 🔥 Dynamic Flame Effect for OG Badge */
-.badge-item-one-of-a-kind {
-  position: relative;
-  width: 150px;
-  height: 150px;
-  border-radius: 50%;
-  overflow: hidden;
-  /* background: radial-gradient(circle, #ff6b00, #ff0000); */
-  box-shadow: 0 0 40px rgba(255, 69, 0, 0.7);
-  transition: transform 0.5s ease;
-  cursor: pointer;
-  animation: subtlePulse 6s infinite;
-}
-
-.badge-item-one-of-a-kind:hover {
-  transform: scale(1.1);
-  box-shadow: 0 0 80px rgba(255, 70, 0, 1);
-}
-
-.badge-item-one-of-a-kind .badge-image {
-  width: 100%;
-  height: 100%;
-  /* object-fit: cover; */
-  position: relative;
-  z-index: 2;
-  border-radius: 50%;
-}
-
-/* 🔥 Flame Flickers */
-.badge-item-one-of-a-kind::before,
-.badge-item-one-of-a-kind::after {
-  content: "";
-  position: absolute;
-  top: -40%;
-  left: -40%;
-  width: 100%;
-  height: 100%;
-  /* background: radial-gradient(circle, rgba(255, 140, 0, 0.5), transparent 70%); */
-  border-radius: 50%;
-  z-index: 1;
-  pointer-events: none;
-}
-
-.badge-item-one-of-a-kind::before {
-  animation: flameFlicker 3s infinite ease-in-out;
-}
-
-.badge-item-one-of-a-kind::after {
-  animation: flameFlickerAlt 4s infinite ease-in-out;
-}
-
-/* 🔥 Flame Animations */
-@keyframes flameFlicker {
-  0% {
-    transform: translateY(0) scale(1);
-    opacity: 0.6;
-  }
-  30% {
-    transform: translateY(-6px) scale(1.05);
-    opacity: 0.4;
-  }
-  60% {
-    transform: translateY(-3px) scale(1.2);
-    opacity: 0.7;
-  }
-  100% {
-    transform: translateY(0) scale(1);
-    opacity: 0.5;
-  }
-}
-
-@keyframes flameFlickerAlt {
-  0% {
-    transform: translateY(0) translateX(0) scale(1);
-    opacity: 0.3;
-  }
-  25% {
-    transform: translateY(-5px) translateX(3px) scale(1.1);
-    opacity: 0.6;
-  }
-  50% {
-    transform: translateY(-4px) translateX(-3px) scale(1.2);
-    opacity: 0.5;
-  }
-  75% {
-    transform: translateY(-2px) translateX(5px) scale(1.1);
-    opacity: 0.7;
-  }
-  100% {
-    transform: translateY(0) translateX(0) scale(1);
-    opacity: 0.4;
-  }
-}
-
-/* 🌟 Subtle Pulse to Simulate Heat Waves */
-@keyframes subtlePulse {
-  0% {
-    box-shadow: 0 0 40px rgba(255, 69, 0, 0.7);
-  }
-  50% {
-    box-shadow: 0 0 60px rgba(255, 165, 0, 0.5);
-  }
-  100% {
-    box-shadow: 0 0 40px rgba(255, 69, 0, 0.7);
-  }
-}
-
-/* Sport Item Styling */
-.sport-item {
-  background: linear-gradient(135deg, #a23c20, #842d14);
-  padding: 20px 30px;
-  border-radius: 15px;
-  color: #fff;
-  font-size: 1.2rem;
-  font-weight: bold;
-  text-transform: uppercase;
-  margin: 10px;
-  display: inline-block;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-}
-
-.sport-item::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: rgba(255, 255, 255, 0.1);
-  transform: skewX(-45deg);
-  transition: left 0.5s ease;
-}
-
-.sport-item:hover::before {
-  left: 200%;
-}
-
-.sport-item:hover {
-  transform: scale(1.1);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.7);
+.profile-no-sports,
+.profile-no-blogs-text,
+.profile-no-products-text {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 1rem;
+  color: #bbb;
 }
 
 .profile-cta-button {
@@ -265,54 +113,54 @@
   padding: 12px 20px;
   margin: 12px;
   font-size: 1rem;
-  background: #a23c20;
+  background: var(--ax-orange);
   border: none;
   border-radius: 8px;
-  color: white;
+  color: var(--ax-text);
   cursor: pointer;
-  transition: background 0.3s ease, transform 0.2s ease;
+  transition: background 0.3s, transform 0.2s;
 }
-
-.profile-signout-button:hover {
-  background: #842d14;
+.profile-cta-button:hover {
+  background: var(--ax-orange-dark);
   transform: scale(1.05);
 }
 
-/* Saved Blogs Grid */
-.profile-saved-blogs-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 20px;
-  padding: 20px;
+/* Sport Chips */
+.sport-item {
+  background: linear-gradient(135deg, var(--ax-orange), var(--ax-orange-dark));
+  padding: 20px 30px;
+  border-radius: var(--ax-card-radius);
+  color: var(--ax-text);
+  font-size: 1.2rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  margin: 10px;
+  display: inline-block;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+  transition: transform 0.3s, box-shadow 0.3s;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+.sport-item:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.7);
+}
+.sport-item::before {
+  content: "";
+  position: absolute;
+  top: 0; left: -100%;
+  width: 100%; height: 100%;
+  background: rgba(255,255,255,0.08);
+  transform: skewX(-45deg);
+  transition: left 0.5s;
+}
+.sport-item:hover::before {
+  left: 200%;
 }
 
-.profile-no-sports {
-  text-align: center;
-  margin-top: 20px;
-}
-
-.profile-no-sports-text {
-  margin-bottom: 10px;
-  font-size: 1rem;
-  color: #666;
-}
-
-/* No Blogs Text */
-.profile-no-blogs-text {
-  text-align: center;
-  font-size: 16px;
-  color: #ccc;
-  margin-top: 10px;
-}
-
-.profile-no-products-text {
-  text-align: center;
-  font-size: 16px;
-  color: #ccc;
-  margin-top: 10px;
-}
-
-/* Saved Products Section */
+/* Saved Blogs/Products Grids */
+.profile-saved-blogs-grid,
 .profile-saved-products {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -320,108 +168,106 @@
   padding: 20px;
 }
 
-/* Responsive Grid Layout */
-.saved-products-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 20px;
-  padding: 20px;
-}
-
-.buy-now-btn {
-  font-size: 1rem;
-  display: inline-block;
-  margin-top: auto;
-  padding: 0.75rem 1.5rem;
-  background: #ff9900;
-  color: #111;
-  text-decoration: none;
-  border-radius: 6px;
-  font-weight: bold;
-  transition: background 0.3s ease;
-  text-align: center;
-}
-
-.buy-now-btn:hover {
-  background: #e68a00;
-}
-
-/* Motivational Quote Section */
+/* Motivational Quote */
 .motivational-quote {
   background: transparent;
   padding: 2rem 1rem;
   margin: 3rem auto 1rem;
   text-align: center;
-  font-family: "Dancing Script", cursive; /* A less fancy, clean script */
+  font-family: "Dancing Script", cursive;
   font-size: 1.8rem;
-  color: #ff9900;
-  border-top: 2px solid #a23c20;
+  color: var(--ax-gold);
+  border-top: 2px solid var(--ax-divider);
 }
 
-.clickable-card {
-  position: relative;
-}
-
-@media (max-width: 768px) {
-  .profile-section {
-    margin: 0;
-  }
-
-  .profile-info {
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    align-content: center;
-    padding-left: 0;
-  }
-
-  .profile-container {
-    padding: 15px;
-    padding-top: 5.5rem;
-  }
-
-  .profile-banner {
-    flex-direction: column; /* ✅ Stack items vertically on small screens */
-    gap: 15px;
-    padding-left: 0;
-  }
-
+/* Responsive Styles */
+@media (max-width: 1024px) {
   .profile-name {
-    font-size: 1.6rem;
-    text-align: left;
-    
+    font-size: 2.2rem;
   }
-  .profile-bio {
-    max-width: 100%;
+  .profile-info {
+    padding-left: 1rem;
   }
+}
+@media (max-width: 768px) {
+  .profile-container { padding: 15px; padding-top: 5.5rem; }
+  .profile-banner { flex-direction: column; gap: 15px; padding-left: 0; }
+  .profile-info { text-align: center; align-items: center; padding-left: 0; }
+  .profile-name { font-size: 1.6rem; text-align: left; }
+  .profile-bio { max-width: 100%; }
+  .profile-saved-blogs-grid, .profile-saved-products { padding: 0; gap: 14px; }
+  .sport-item { padding: 15px 20px; font-size: 1rem; }
+  .profile-divider { margin: 16px 0; }
+  .motivational-quote { font-size: 1.2rem; }
+}
 
-  .badge-item,
-  .saved-item {
-    padding: 8px 12px;
-  }
+@media (max-width: 480px) {
+  .profile-name { font-size: 1.12rem; }
+  .profile-bio { font-size: 0.95rem; }
+  .profile-saved-blogs-grid, .profile-saved-products { grid-template-columns: 1fr; }
+  .sport-item { font-size: 0.85rem; }
+  .motivational-quote { font-size: 1rem; padding: 1rem 0.3rem; }
+}
 
-  .profile-signout-button {
-    padding: 10px 15px;
-    font-size: 0.9rem;
-  }
+/* --- Badge/Flame Animations (preserved from your file, see if you still use!) --- */
+.badge-item, .saved-item {
+  background: var(--ax-orange);
+  padding: 10px 15px;
+  border-radius: 12px;
+  color: white;
+  font-weight: bold;
+  display: inline-block;
+  margin: 5px;
+  transition: transform 0.3s;
+  cursor: pointer;
+}
+.badge-item:hover, .saved-item:hover {
+  transform: scale(1.1);
+  background: var(--ax-orange-dark);
+}
 
-  .sport-item {
-    padding: 15px 20px;
-    font-size: 1rem;
-  }
+/* If you use .badge-item-one-of-a-kind, keep the below! */
+.badge-item-one-of-a-kind {
+  position: relative;
+  width: 150px; height: 150px;
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow: 0 0 40px rgba(255, 69, 0, 0.7);
+  transition: transform 0.5s;
+  cursor: pointer;
+  animation: subtlePulse 6s infinite;
+}
+.badge-item-one-of-a-kind:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 80px rgba(255, 70, 0, 1);
+}
+.badge-item-one-of-a-kind .badge-image {
+  width: 100%; height: 100%; border-radius: 50%;
+}
+.badge-item-one-of-a-kind::before,
+.badge-item-one-of-a-kind::after {
+  content: "";
+  position: absolute; top: -40%; left: -40%;
+  width: 100%; height: 100%; border-radius: 50%; z-index: 1; pointer-events: none;
+}
+.badge-item-one-of-a-kind::before { animation: flameFlicker 3s infinite ease-in-out; }
+.badge-item-one-of-a-kind::after { animation: flameFlickerAlt 4s infinite ease-in-out; }
 
-  .profile-saved-products {
-    padding: 0px;
-  }
-
-  .profile-location {
-    color: #ff9900;
-    font-size: 1.1rem;
-    margin: 0.25rem 0;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-  }
+@keyframes flameFlicker {
+  0% { transform: translateY(0) scale(1); opacity: 0.6; }
+  30% { transform: translateY(-6px) scale(1.05); opacity: 0.4; }
+  60% { transform: translateY(-3px) scale(1.2); opacity: 0.7; }
+  100% { transform: translateY(0) scale(1); opacity: 0.5; }
+}
+@keyframes flameFlickerAlt {
+  0% { transform: translateY(0) translateX(0) scale(1); opacity: 0.3; }
+  25% { transform: translateY(-5px) translateX(3px) scale(1.1); opacity: 0.6; }
+  50% { transform: translateY(-4px) translateX(-3px) scale(1.2); opacity: 0.5; }
+  75% { transform: translateY(-2px) translateX(5px) scale(1.1); opacity: 0.7; }
+  100% { transform: translateY(0) translateX(0) scale(1); opacity: 0.4; }
+}
+@keyframes subtlePulse {
+  0% { box-shadow: 0 0 40px rgba(255, 69, 0, 0.7);}
+  50% { box-shadow: 0 0 60px rgba(255, 165, 0, 0.5);}
+  100% { box-shadow: 0 0 40px rgba(255, 69, 0, 0.7);}
 }

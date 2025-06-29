@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import axios from "axios";
@@ -6,6 +6,7 @@ import sportsData from "../../data/sports.json";
 import EsportExperience from "./EsportsExperience";
 import "../../styles/SportPage.css";
 import ProductCard from "../products/ProductCard";
+import BlogCard from "../blog/BlogCard";
 
 interface Sport {
   title: string;
@@ -34,7 +35,12 @@ interface BlogPost {
   summary: string;
   imageUrl: string;
   slug: string;
+  author?: string;
+  publishedDate?: string;
 }
+
+const slugify = (str: string) =>
+  str.toLowerCase().replace(/\s+/g, "-").replace(/[^\w\-]+/g, "");
 
 const SportPage: React.FC = () => {
   const { sport } = useParams<{ sport: string }>();
@@ -44,39 +50,31 @@ const SportPage: React.FC = () => {
   const [relatedBlogs, setRelatedBlogs] = useState<BlogPost[]>([]);
   const [loadingBlogs, setLoadingBlogs] = useState(true);
   const [recommendedProducts, setRecommendedProducts] = useState<Product[]>([]);
-  const isEsports = currentSport?.title.toLowerCase() === "e-sports";
 
-  useEffect(() => {
-    if (isEsports) {
-      navigate("/404", { replace: true });
-    }
-  }, [isEsports, navigate]);
+  // Find sport in local data (memoized for performance)
+  const foundSport = useMemo(() => {
+    if (!sport) return null;
+    return sportsData.find((s) => slugify(s.title) === sport.toLowerCase()) || null;
+  }, [sport]);
 
   useEffect(() => {
     if (!sport) {
       navigate("/404", { replace: true });
       return;
     }
-
-    const slugify = (str: string) =>
-      str
-        .toLowerCase()
-        .replace(/\s+/g, "-")
-        .replace(/[^\w\-]+/g, "");
-
-    const foundSport = sportsData.find(
-      (s) => slugify(s.title) === sport.toLowerCase()
-    );
-
-    if (!foundSport) {
-      console.warn(`Sport "${sport}" not found. Redirecting to 404.`);
+    if (foundSport?.title.toLowerCase() === "e-sports") {
       navigate("/404", { replace: true });
       return;
     }
-
+    if (!foundSport) {
+      navigate("/404", { replace: true });
+      return;
+    }
     setCurrentSport(foundSport);
 
+    // Fetch blogs
     const fetchRelatedBlogs = async () => {
+      setLoadingBlogs(true);
       try {
         const { data } = await axios.get(
           `${process.env.REACT_APP_API_URL}/blog/by-tag`,
@@ -84,12 +82,13 @@ const SportPage: React.FC = () => {
         );
         setRelatedBlogs(data);
       } catch (err) {
-        console.error("❌ Error fetching related blogs:", err);
+        setRelatedBlogs([]);
       } finally {
         setLoadingBlogs(false);
       }
     };
 
+    // Fetch products
     const fetchRecommendedProducts = async () => {
       try {
         const { data } = await axios.get(
@@ -97,14 +96,14 @@ const SportPage: React.FC = () => {
           { withCredentials: true }
         );
         setRecommendedProducts(data);
-      } catch (err) {
-        console.error("❌ Error fetching sport-specific products:", err);
+      } catch {
+        setRecommendedProducts([]);
       }
     };
 
     fetchRelatedBlogs();
     fetchRecommendedProducts();
-  }, [sport, navigate]);
+  }, [sport, foundSport, navigate]);
 
   if (!currentSport) {
     return (
@@ -114,15 +113,11 @@ const SportPage: React.FC = () => {
     );
   }
 
-  if (isEsports) {
-    return null;
-  }
-
   return (
     <div className="sport-page">
       <div className="sport-page-title">{currentSport.title}</div>
 
-      <section className="sport-page-section sport-page-funfact">
+      {/* <section className="sport-page-section sport-page-funfact">
         <h2 className="sport-page-section-title">Fun Fact</h2>
         <motion.div
           initial={{ scale: 0.9 }}
@@ -135,7 +130,7 @@ const SportPage: React.FC = () => {
               "This sport originally had wildly different rules that evolved over time!"}
           </p>
         </motion.div>
-      </section>
+      </section> */}
 
       <section className="sport-page-section">
         <h2 className="sport-page-section-title">Recommended Gear</h2>
@@ -166,18 +161,17 @@ const SportPage: React.FC = () => {
         ) : relatedBlogs.length > 0 ? (
           <div className="sport-related-blogs">
             {relatedBlogs.map((post) => (
-              <div key={post.id} className="related-blog-card">
-                <img
-                  src={post.imageUrl}
-                  alt={post.title}
-                  className="related-blog-image"
-                />
-                <div className="related-blog-info">
-                  <h3>{post.title}</h3>
-                  <p>{post.summary}</p>
-                  <Link to={`/blog/${post.slug}`}>Read More →</Link>
-                </div>
-              </div>
+              <BlogCard
+                key={post.id}
+                id={post.id}
+                title={post.title}
+                author={post.author || "Unknown"}
+                publishedDate={post.publishedDate}
+                slug={post.slug}
+                imageUrl={post.imageUrl}
+                summary={post.summary}
+                variant="list"
+              />
             ))}
           </div>
         ) : (

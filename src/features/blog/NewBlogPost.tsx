@@ -4,7 +4,7 @@ import { useUserContext } from "../../context/UserContext";
 import { useNavigate } from "react-router-dom";
 import { blogTemplates, BlogTemplate } from "../../data/blogTemplates";
 import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+// import "react-toastify/dist/ReactToastify.css";
 import "../../styles/NewBlogPost.css";
 
 interface BlogPost {

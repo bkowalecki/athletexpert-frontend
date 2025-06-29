@@ -7,7 +7,7 @@ import { Helmet } from "react-helmet";
 import { useUserContext } from "../../context/UserContext";
 import { toast } from "react-toastify";
 import BlogCard from "./BlogCard";
-import "react-toastify/dist/ReactToastify.css";
+// import "react-toastify/dist/ReactToastify.css";
 import "../../styles/BlogPage.css";
 
 interface BlogPost {
@@ -92,7 +92,7 @@ const BlogPage: React.FC = () => {
       setSavedBlogIds(prev => isSaved ? prev.filter(id => id !== blogId) : [...prev, blogId]);
       toast.success(isSaved ? "Removed!" : "Saved!");
     } catch {
-      toast.error("❌ Couldn't save blog.");
+      toast.error("Couldn't save blog :/ Please try again later.");
     }
   }, [savedBlogIds, user]);
 

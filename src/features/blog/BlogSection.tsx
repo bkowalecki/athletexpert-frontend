@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useCallback, useState } from "react";
 import { motion } from "framer-motion";
-import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 import BlogCard from "./BlogCard";
 import { useUserContext } from "../../context/UserContext";
@@ -17,9 +16,19 @@ interface BlogPost {
   slug: string;
 }
 
+// API fetch helpers
 const fetchLatestBlogs = async (): Promise<BlogPost[]> => {
-  const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/blog/latest?limit=3`);
+  const res = await fetch(`${process.env.REACT_APP_API_URL}/blog/latest?limit=3`);
+  if (!res.ok) throw new Error("Failed to fetch latest blogs");
+  const data = await res.json();
   return data.slice(0, 3);
+};
+
+const fetchSavedBlogIds = async (): Promise<number[]> => {
+  const res = await fetch(`${process.env.REACT_APP_API_URL}/users/profile`, { credentials: "include" });
+  if (!res.ok) throw new Error("Failed to fetch user profile");
+  const data = await res.json();
+  return data.savedBlogIds || [];
 };
 
 const LatestBlogsSection: React.FC = () => {
@@ -33,47 +42,43 @@ const LatestBlogsSection: React.FC = () => {
   const { user, isSessionChecked } = useUserContext();
   const [savedBlogIds, setSavedBlogIds] = useState<number[]>([]);
 
-  // Fetch saved blog IDs for the logged-in user
+  // Keep savedBlogIds in sync for logged-in user
   useEffect(() => {
-    const fetchSaved = async () => {
-      if (!user) return;
-      try {
-        const res = await fetch(`${process.env.REACT_APP_API_URL}/users/profile`, {
-          credentials: "include",
-        });
-        if (!res.ok) throw new Error();
-        const data = await res.json();
-        setSavedBlogIds(data.savedBlogIds || []);
-      } catch {
-        setSavedBlogIds([]);
-      }
-    };
-    fetchSaved();
+    if (!user) {
+      setSavedBlogIds([]);
+      return;
+    }
+    fetchSavedBlogIds()
+      .then(setSavedBlogIds)
+      .catch(() => setSavedBlogIds([]));
   }, [user]);
 
-  // Save/Unsave logic
-  const toggleSaveBlog = async (blogId: number) => {
-    if (!user) return toast.warn("Log in to save blogs!");
+  // Save/unsave logic (stable reference)
+  const toggleSaveBlog = useCallback(
+    async (blogId: number) => {
+      if (!user) return toast.warn("Log in to save blogs!");
 
-    const isSaved = savedBlogIds.includes(blogId);
-    try {
-      const res = await fetch(
-        `${process.env.REACT_APP_API_URL}/users/saved-blogs/${blogId}`,
-        {
-          method: isSaved ? "DELETE" : "POST",
-          credentials: "include",
-        }
-      );
-      if (res.ok) {
-        setSavedBlogIds((prev) =>
-          isSaved ? prev.filter((id) => id !== blogId) : [...prev, blogId]
+      const isSaved = savedBlogIds.includes(blogId);
+      try {
+        const res = await fetch(
+          `${process.env.REACT_APP_API_URL}/users/saved-blogs/${blogId}`,
+          {
+            method: isSaved ? "DELETE" : "POST",
+            credentials: "include",
+          }
         );
-        toast.success(isSaved ? "Blog removed!" : "Blog saved!");
+        if (res.ok) {
+          setSavedBlogIds((prev) =>
+            isSaved ? prev.filter((id) => id !== blogId) : [...prev, blogId]
+          );
+          toast.success(isSaved ? "Blog removed!" : "Blog saved!");
+        }
+      } catch {
+        toast.error("Error saving blog.");
       }
-    } catch {
-      toast.error("❌ Error saving blog.");
-    }
-  };
+    },
+    [user, savedBlogIds]
+  );
 
   if (!isSessionChecked) return null;
   if (isLoading) return <div className="loading">Loading latest blogs...</div>;
