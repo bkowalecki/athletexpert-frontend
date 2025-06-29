@@ -32,17 +32,31 @@ const TrendingProductList: React.FC = () => {
   } = useQuery<Product[], Error>({
     queryKey: ["trendingProducts"],
     queryFn: fetchTrendingProducts,
-    staleTime: 5000,
+    staleTime: 10_000, // More reasonable caching
+    retry: 1,
   });
-
-  if (isLoading) return <p className="loading">Loading trending products...</p>;
-  if (isError || products.length === 0)
-    return <p className="error">No trending products available.</p>;
 
   return (
     <section className="trending-products-section">
       <div className="trending-products-container">
         <h2 className="trending-products-heading">Trending</h2>
+
+        {isLoading && (
+          <p className="trending-products-message">Loading trending products...</p>
+        )}
+
+        {isError && (
+          <p className="trending-products-message error">
+            Unable to load trending products. Please try again later.
+          </p>
+        )}
+
+        {!isLoading && !isError && products.length === 0 && (
+          <p className="trending-products-message">
+            No trending products available right now.
+          </p>
+        )}
+
         <div className="trending-products-grid">
           {products.map((product) => (
             <ProductCard

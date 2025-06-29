@@ -32,42 +32,49 @@ const LatestBlogsSection: React.FC = () => {
   const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
+    if (!posts) return;
+
+    const container = document.querySelector(".latest-blog-scroll-row");
     const observer = new IntersectionObserver(
       (entries) => {
-        const visibleEntry = entries.find((entry) => entry.isIntersecting);
-        if (visibleEntry) {
-          const index = itemRefs.current.findIndex((el) => el === visibleEntry.target);
+        const visible = entries.find((entry) => entry.isIntersecting);
+        if (visible) {
+          const index = itemRefs.current.findIndex((el) => el === visible.target);
           if (index !== -1) setActiveIndex(index);
         }
       },
-      { root: document.querySelector(".latest-blog-scroll-row"), threshold: 0.5 }
+      { root: container, threshold: 0.5 }
     );
 
-    itemRefs.current.forEach((ref) => ref && observer.observe(ref));
-    return () => itemRefs.current.forEach((ref) => ref && observer.unobserve(ref));
+    itemRefs.current.forEach((el) => el && observer.observe(el));
+    return () => itemRefs.current.forEach((el) => el && observer.unobserve(el));
   }, [posts]);
 
   if (isLoading) return <div className="loading">Loading latest blogs...</div>;
   if (isError || !posts) return <div className="error">Error loading blogs. Try again later.</div>;
 
-  const renderBlogCard = (post: BlogPost) => (
-    <div className="latest-blog-card">
+  const BlogCard: React.FC<{ post: BlogPost }> = ({ post }) => (
+    <Link
+      to={`/blog/${post.slug}`}
+      className="latest-blog-card"
+      aria-label={`Read blog post: ${post.title}`}
+      tabIndex={0} // Not strictly necessary but explicit
+    >
       <div className="latest-blog-image-container">
         <img src={post.imageUrl} alt={post.title} className="latest-blog-image" />
       </div>
       <div className="latest-blog-info">
         <h3 className="latest-blog-title">{post.title}</h3>
         <p className="latest-blog-author">By {post.author}</p>
-        <p className="latest-blog-date">{new Date(post.publishedDate).toLocaleDateString()}</p>
+        <p className="latest-blog-date">
+          {new Date(post.publishedDate).toLocaleDateString()}
+        </p>
         <p className="latest-blog-summary">{post.summary}</p>
       </div>
-      <div className="latest-blog-cta-container">
-        <Link to={`/blog/${post.slug}`} className="latest-blog-cta-button">
-          Read More
-        </Link>
-      </div>
-    </div>
+      {/* No "Read More" button! */}
+    </Link>
   );
+  
 
   return (
     <section className="latest-blog-section-container">
@@ -80,27 +87,27 @@ const LatestBlogsSection: React.FC = () => {
       >
         <h2 className="latest-blog-heading">Latest</h2>
 
-        {/* Desktop View */}
-        <div className="latest-blog-grid">{posts.map((post) => renderBlogCard(post))}</div>
+        <div className="latest-blog-grid">
+          {posts.map((post) => <BlogCard key={post.id} post={post} />)}
+        </div>
 
-        {/* Mobile Scroll Row */}
         <div className="latest-blog-scroll-row">
-          {posts.map((post, index) => (
+          {posts.map((post, i) => (
             <div
               key={post.id}
               className="latest-blog-scroll-item"
-              ref={(el) => (itemRefs.current[index] = el)}
+              ref={(el) => (itemRefs.current[i] = el)}
             >
-              {renderBlogCard(post)}
+              <BlogCard post={post} />
             </div>
           ))}
         </div>
 
         <div className="latest-blog-indicators">
-          {posts.map((_, idx) => (
+          {posts.map((_, i) => (
             <span
-              key={idx}
-              className={`latest-blog-indicator-dot ${activeIndex === idx ? "active" : ""}`}
+              key={i}
+              className={`latest-blog-indicator-dot ${activeIndex === i ? "active" : ""}`}
             />
           ))}
         </div>

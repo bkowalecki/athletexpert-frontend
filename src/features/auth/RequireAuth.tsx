@@ -5,7 +5,7 @@ import { useUserContext } from "../../context/UserContext";
 const RequireAuth: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, isSessionChecked } = useUserContext();
 
-  if (!isSessionChecked) return <div></div>;
+  if (!isSessionChecked) return null;
   if (!user) return <Navigate to="/auth" replace />;
 
   return <>{children}</>;

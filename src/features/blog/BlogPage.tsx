@@ -21,21 +21,16 @@ interface BlogPost {
 
 const fetchPosts = async (searchQuery: string, page: number): Promise<BlogPost[]> => {
   if (searchQuery.trim().length > 50 || /[^\w\s-]/.test(searchQuery)) return [];
-  
   try {
     const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/blog`, {
       params: { searchQuery, page, size: 9 },
     });
-
-    if (!data?.content || !Array.isArray(data.content)) return [];
-
-    return data.content;
+    return Array.isArray(data?.content) ? data.content : [];
   } catch (err) {
     console.warn("⚠️ Failed to fetch posts", err);
-    return []; // gracefully handle failed page fetch (e.g. out of range)
+    return [];
   }
 };
-
 
 const BlogPostCard: React.FC<{
   post: BlogPost;
@@ -68,8 +63,8 @@ const BlogPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [hasMorePosts, setHasMorePosts] = useState(true);
-  const { user } = useUserContext();
   const [savedBlogIds, setSavedBlogIds] = useState<number[]>([]);
+  const { user } = useUserContext();
 
   const { data, isLoading, isFetching, error } = useQuery<BlogPost[], Error>({
     queryKey: ["posts", searchQuery, currentPage],
@@ -80,9 +75,7 @@ const BlogPage: React.FC = () => {
   });
 
   useEffect(() => {
-    if (error && currentPage === 0) {
-      toast.error("❌ Error fetching blog posts.");
-    }
+    if (error && currentPage === 0) toast.error("❌ Error fetching blog posts.");
   }, [error, currentPage]);
 
   useEffect(() => {
@@ -95,23 +88,17 @@ const BlogPage: React.FC = () => {
 
   useEffect(() => {
     if (!user) return;
-    axios
-      .get(`${process.env.REACT_APP_API_URL}/users/saved-blogs`, { withCredentials: true })
-      .then(res => setSavedBlogIds(res.data.map((blog: BlogPost) => blog.id)))
+    axios.get(`${process.env.REACT_APP_API_URL}/users/saved-blogs`, { withCredentials: true })
+      .then(res => setSavedBlogIds(res.data.map((b: BlogPost) => b.id)))
       .catch(err => console.error("❌ Error fetching saved blogs:", err));
   }, [user]);
 
   useEffect(() => {
     const handleScroll = () => {
-      if (
-        window.innerHeight + window.scrollY >= document.body.offsetHeight - 400 &&
-        !isFetching &&
-        hasMorePosts
-      ) {
-        setCurrentPage((prev) => prev + 1);
+      if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 400 && !isFetching && hasMorePosts) {
+        setCurrentPage(prev => prev + 1);
       }
     };
-  
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, [isFetching, hasMorePosts]);
@@ -161,11 +148,11 @@ const BlogPage: React.FC = () => {
 
       <div className="blog-post-list">
         {isLoading && posts.length === 0 ? (
-          Array.from({ length: 9 }).map((_, index) => (
-            <div key={index} className="blog-post-item skeleton-loader"></div>
+          Array.from({ length: 9 }).map((_, i) => (
+            <div key={i} className="blog-post-item skeleton-loader" />
           ))
         ) : posts.length ? (
-          posts.map((post) => (
+          posts.map(post => (
             <BlogPostCard
               key={post.id}
               post={post}

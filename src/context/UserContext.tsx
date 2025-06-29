@@ -21,8 +21,6 @@ export type User = {
   location?: string | null;
 };
 
-
-
 interface UserContextProps {
   user: User | null;
   setUser: React.Dispatch<React.SetStateAction<User | null>>;
@@ -32,15 +30,20 @@ interface UserContextProps {
 
 const UserContext = createContext<UserContextProps | undefined>(undefined);
 
-export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const UserProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
   const [user, setUser] = useState<User | null>(null);
   const [isSessionChecked, setIsSessionChecked] = useState(false);
 
   const checkSession = useCallback(async () => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/users/session`, {
-        credentials: "include",
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/users/session`,
+        {
+          credentials: "include",
+        }
+      );
       setUser(response.ok ? await response.json() : null);
     } catch {
       setUser(null);
@@ -54,7 +57,9 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }, [checkSession]);
 
   return (
-    <UserContext.Provider value={{ user, setUser, isSessionChecked, checkSession }}>
+    <UserContext.Provider
+      value={{ user, setUser, isSessionChecked, checkSession }}
+    >
       {children}
     </UserContext.Provider>
   );
@@ -62,6 +67,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
 export const useUserContext = (): UserContextProps => {
   const context = useContext(UserContext);
-  if (!context) throw new Error("useUserContext must be used within a UserProvider");
+  if (!context)
+    throw new Error("useUserContext must be used within a UserProvider");
   return context;
 };

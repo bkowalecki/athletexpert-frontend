@@ -43,7 +43,7 @@ const ProductsPage: React.FC = () => {
     sport: "",
     sortOption: "",
   });
-  const [visibleCount, setVisibleCount] = useState(12);
+  const [visibleCount, setVisibleCount] = useState(20);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
 
   const { savedProductIds, toggleSaveProduct } = useSavedProducts();
@@ -106,28 +106,44 @@ const ProductsPage: React.FC = () => {
     [filteredProducts, visibleCount]
   );
 
-  const handleFilterChange = (key: string, value: string) => {
+  const handleFilterChange = useCallback((key: string, value: string) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
-    setVisibleCount(12);
-  };
+    setVisibleCount(20);
+  }, []);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setSearchQuery(inputQuery);
-    setVisibleCount(12);
+    setVisibleCount(20);
   };
 
   const loadMore = useCallback(() => {
-    setVisibleCount((prev) => prev + 12);
+    setVisibleCount((prev) => prev + 20);
   }, []);
 
   useEffect(() => {
+    let debounceTimeout: NodeJS.Timeout | null = null;
+  
     const observer = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting) loadMore();
+      const [entry] = entries;
+      if (entry.isIntersecting && !debounceTimeout) {
+        debounceTimeout = setTimeout(() => {
+          loadMore();
+          debounceTimeout = null;
+        }, 300); // Delay of 300ms to prevent rapid triggering
+      }
     });
-    if (sentinelRef.current) observer.observe(sentinelRef.current);
-    return () => observer.disconnect();
+  
+    if (sentinelRef.current) {
+      observer.observe(sentinelRef.current);
+    }
+  
+    return () => {
+      if (debounceTimeout) clearTimeout(debounceTimeout);
+      observer.disconnect();
+    };
   }, [loadMore]);
+  
 
   return (
     <div className="products-page">

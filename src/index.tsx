@@ -4,6 +4,7 @@ import './styles/index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { register } from './serviceWorkerRegistration';
+import { toast } from "react-toastify";
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 
@@ -19,9 +20,16 @@ reportWebVitals();
 // Register service worker
 register({
   onUpdate: (registration) => {
-    if (registration?.waiting && window.confirm("🚀 A new version of AthleteXpert is available! Update now?")) {
-      registration.waiting.postMessage({ type: 'SKIP_WAITING' });
-      window.location.reload();
+    if (registration?.waiting) {
+      toast.info("A new version is available! Click here to update.", {
+        position: "bottom-center",
+        autoClose: false,
+        closeOnClick: true,
+        onClick: () => {
+          registration.waiting?.postMessage({ type: "SKIP_WAITING" });
+          window.location.reload();
+        },
+      });
     }
   },
 });

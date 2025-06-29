@@ -14,20 +14,21 @@ const AuthCallback: React.FC = () => {
       if (!isAuthenticated || !auth0User) return;
 
       try {
-        let idToken = sessionStorage.getItem("ax_id_token") || 
-          (await getAccessTokenSilently({
+        const cachedToken = sessionStorage.getItem("ax_id_token");
+        const idToken = cachedToken || (
+          await getAccessTokenSilently({
             authorizationParams: {
               audience: process.env.REACT_APP_AUTH0_AUDIENCE,
               scope: "openid profile email",
             },
             detailedResponse: true,
-          })).id_token;
+          })
+        ).id_token;
 
         sessionStorage.setItem("ax_id_token", idToken);
-
         await loginWithAuth0Token({ token: idToken, setUser, navigate });
-      } catch (error) {
-        console.error("Error during Auth0 callback:", error);
+      } catch (err) {
+        console.error("Error during Auth0 callback:", err);
         navigate("/auth", { replace: true });
       }
     };
@@ -36,7 +37,7 @@ const AuthCallback: React.FC = () => {
   }, [isAuthenticated, auth0User, getAccessTokenSilently, setUser, navigate]);
 
   return (
-    <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
+    <div className="auth-loading-screen">
       <h2>Authenticating...</h2>
     </div>
   );
