@@ -138,6 +138,7 @@ const SportPage: React.FC = () => {
           <div className="recommended-products-grid">
             {recommendedProducts.map((product) => (
               <ProductCard
+              id = {product.id}
                 key={product.id}
                 name={product.name}
                 brand={product.brand}

@@ -60,6 +60,7 @@ const TrendingProductList: React.FC = () => {
         <div className="trending-products-grid">
           {products.map((product) => (
             <ProductCard
+            id = {product.id}
               key={product.id}
               name={product.name}
               brand={product.brand}

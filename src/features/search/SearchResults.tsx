@@ -214,6 +214,7 @@ const SearchResults: React.FC = () => {
             <div className="search-results-page-list">
               {products.map((product) => (
                 <ProductCard
+                id = {product.id}
                   key={product.id}
                   name={product.name}
                   brand={product.brand || ""}

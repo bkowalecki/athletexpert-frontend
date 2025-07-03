@@ -1,8 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
+import { Link } from "react-router-dom";
+import type { MouseEvent, KeyboardEvent } from "react";
 import "../../styles/ProductCard.css";
 import { trackEvent } from "../../util/analytics";
 
-interface ProductCardProps {
+// (Optional) import Product type from types if you want full props reuse
+
+export interface ProductCardProps {
+  id: number | string; // Allow both number and string for flexibility
   name: string;
   brand: string;
   price: number | null;
@@ -11,9 +16,13 @@ interface ProductCardProps {
   isSaved?: boolean;
   onToggleSave?: () => void;
   isSaving?: boolean;
+  // New: Optional visual flags for trending, Amazon fallback, etc.
+  isAmazonFallback?: boolean;
+  isTrending?: boolean;
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({
+  id,
   name,
   brand,
   price,
@@ -22,14 +31,19 @@ const ProductCard: React.FC<ProductCardProps> = ({
   isSaved,
   onToggleSave,
   isSaving = false,
+  isAmazonFallback,
+  isTrending,
 }) => {
+  // Modal state & scroll management
   const [showModal, setShowModal] = useState(false);
   const [scrollPosition, setScrollPosition] = useState(0);
+  const modalImageRef = useRef<HTMLImageElement | null>(null);
 
+  // Open/close modal & manage scroll
   const toggleModal = (open: boolean) => {
     if (open) {
       setScrollPosition(window.scrollY);
-      document.body.style.cssText = `position: fixed; top: -${window.scrollY}px; overflow-y: scroll;`;
+      document.body.style.cssText = `position: fixed; top: -${window.scrollY}px; width: 100%;`;
     } else {
       document.body.style.cssText = "";
       window.scrollTo(0, scrollPosition);
@@ -37,26 +51,86 @@ const ProductCard: React.FC<ProductCardProps> = ({
     setShowModal(open);
   };
 
+  // Close modal on ESC
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => e.key === "Escape" && setShowModal(false);
-    if (showModal) document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
+    if (!showModal) return;
+  
+    const handleKeyDown = (e: Event) => {
+      if ("key" in e && (e as unknown as KeyboardEvent).key === "Escape") {
+        toggleModal(false);
+      }
+    };
+  
+    window.addEventListener("keydown", handleKeyDown);
+    modalImageRef.current?.focus?.();
+  
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, [showModal]);
+  
+  
+  
+  
+  
+
+  // Click card fires product view event
+  const handleCardClick = () => {
+    trackEvent("product_view", { product_name: name, brand, isAmazonFallback, isTrending });
+  };
 
   return (
     <>
-      <div className="ax-product-card" onClick={() => trackEvent("product_view", { product_name: name, brand, retailer: "Amazon" })}>
-        <div className="ax-product-card-image-wrapper" onClick={() => toggleModal(true)}>
-          <img src={imgUrl} alt={name} className="ax-product-card-image" loading="lazy" />
+      <div
+        className="ax-product-card"
+        tabIndex={0}
+        role="group"
+        aria-label={`Product card: ${name} by ${brand}`}
+        onClick={handleCardClick}
+        onKeyDown={(e: KeyboardEvent<HTMLDivElement>) => {
+          if (e.key === "Enter" || e.key === " ") {
+            handleCardClick();
+          }
+        }}
+      >
+        {/* Optional badge for Amazon Fallback, Trending, etc. */}
+        <div className="ax-product-card-badges">
+          {isTrending && <span className="ax-badge ax-badge-trending">Trending</span>}
+          {isAmazonFallback && <span className="ax-badge ax-badge-amazon">Amazon</span>}
         </div>
-
+        {/* Product image, opens modal on click */}
+        <div
+          className="ax-product-card-image-wrapper"
+          tabIndex={0}
+          onClick={(e: MouseEvent) => {
+            e.stopPropagation();
+            toggleModal(true);
+          }}
+          onKeyDown={(e: KeyboardEvent<HTMLDivElement>) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              e.stopPropagation();
+              toggleModal(true);
+            }
+          }}
+          aria-label={`Preview image of ${name}`}
+          role="button"
+        >
+          <img
+            src={imgUrl}
+            alt={name}
+            className="ax-product-card-image"
+            loading="lazy"
+            draggable={false}
+          />
+        </div>
+        {/* Product info */}
         <div className="ax-product-card-info">
           <div className="ax-product-card-info-top">
+          <Link to={`/products/${id}`}>
             <h3 className="ax-product-card-name">{name}</h3>
+            </Link>
             <p className="ax-product-card-brand">{brand}</p>
             <p className="ax-product-card-price">{price != null ? `$${price.toFixed(2)}` : "N/A"}</p>
           </div>
-
           <div className="ax-product-card-cta-row">
             {onToggleSave && (
               <button
@@ -78,6 +152,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
               className="ax-product-card-button"
               aria-label="View product on Amazon"
               onClick={(e) => e.stopPropagation()}
+              tabIndex={0}
             >
               View on Amazon
             </a>
@@ -85,6 +160,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
         </div>
       </div>
 
+      {/* Modal */}
       {showModal && (
         <div
           className="ax-modal-backdrop"
@@ -94,10 +170,20 @@ const ProductCard: React.FC<ProductCardProps> = ({
           aria-label={`Preview of ${name}`}
         >
           <div className="ax-modal-content" onClick={(e) => e.stopPropagation()}>
-            <button className="ax-modal-close" onClick={() => toggleModal(false)} aria-label="Close image preview">
+            <button
+              className="ax-modal-close"
+              onClick={() => toggleModal(false)}
+              aria-label="Close image preview"
+            >
               ×
             </button>
-            <img src={imgUrl} alt={`Preview of ${name}`} className="ax-modal-image" />
+            <img
+              src={imgUrl}
+              alt={`Preview of ${name}`}
+              className="ax-modal-image"
+              tabIndex={0}
+              ref={modalImageRef}
+            />
           </div>
         </div>
       )}
@@ -105,4 +191,6 @@ const ProductCard: React.FC<ProductCardProps> = ({
   );
 };
 
+// (Optional: React.memo(ProductCard) for long lists!)
+// export default React.memo(ProductCard);
 export default ProductCard;

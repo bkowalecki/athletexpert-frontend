@@ -11,30 +11,48 @@ import BlogSection from "./features/blog/BlogSection";
 
 // Lazy-load everything else
 const Quiz = React.lazy(() => import("./features/recommender/Quiz"));
-const ProductsPage = React.lazy(() => import("./features/products/ProductsPage"));
-const ProductDetail = React.lazy(() => import("./features/products/ProductDetail"));
-const AdminProductManager = React.lazy(() => import("./features/products/AdminProductManager"));
+const ProductsPage = React.lazy(
+  () => import("./features/products/ProductsPage")
+);
+const ProductDetail = React.lazy(
+  () => import("./features/products/ProductDetail")
+);
+const AdminProductManager = React.lazy(
+  () => import("./features/products/AdminProductManager")
+);
 
 const BlogPage = React.lazy(() => import("./features/blog/BlogPage"));
 const BlogPostPage = React.lazy(() => import("./features/blog/BlogPostPage"));
 const NewBlogPost = React.lazy(() => import("./features/blog/NewBlogPost"));
 
 const ProfilePage = React.lazy(() => import("./features/profile/ProfilePage"));
-const AccountSettings = React.lazy(() => import("./features/profile/AccountSettings"));
-const OnboardingPage = React.lazy(() => import("./features/profile/OnboardingPage"));
+const AccountSettings = React.lazy(
+  () => import("./features/profile/AccountSettings")
+);
+const OnboardingPage = React.lazy(
+  () => import("./features/profile/OnboardingPage")
+);
 
-const CommunityPage = React.lazy(() => import("./features/community/CommunityPage"));
+const CommunityPage = React.lazy(
+  () => import("./features/community/CommunityPage")
+);
 const SportPage = React.lazy(() => import("./features/community/SportPage"));
 
-const SearchResults = React.lazy(() => import("./features/search/SearchResults"));
+const SearchResults = React.lazy(
+  () => import("./features/search/SearchResults")
+);
 
 const AuthPage = React.lazy(() => import("./features/auth/AuthPage"));
 const AuthCallback = React.lazy(() => import("./features/auth/AuthCallback"));
 
 const AboutPage = React.lazy(() => import("./components/AboutPage"));
 const ContactPage = React.lazy(() => import("./features/legal/ContactPage"));
-const TermsAndConditionsPage = React.lazy(() => import("./features/legal/TermsAndConditions"));
-const PrivacyPolicy = React.lazy(() => import("./features/legal/PrivacyPolicy"));
+const TermsAndConditionsPage = React.lazy(
+  () => import("./features/legal/TermsAndConditions")
+);
+const PrivacyPolicy = React.lazy(
+  () => import("./features/legal/PrivacyPolicy")
+);
 
 const NotFoundPage = React.lazy(() => import("./components/four0fourPage"));
 
@@ -58,24 +76,26 @@ const AppRoutes: React.FC = () => {
                 <FeaturedProductList />
                 <TrendingProductList />
                 <BlogSection />
+                {/* Render Quiz as a true modal overlay */}
+                {isQuizModalOpen && (
+                  <Quiz
+                    isOpen={isQuizModalOpen}
+                    closeModal={() => setQuizModalOpen(false)}
+                  />
+                )}
               </>
             }
           />
-          {/* Quiz Modal route (optional, can use a modal system if desired) */}
-          {isQuizModalOpen && (
-            <Route
-              path="/quiz"
-              element={
-                <Quiz
-                  isOpen={isQuizModalOpen}
-                  closeModal={() => setQuizModalOpen(false)}
-                />
-              }
-            />
-          )}
 
           {/* Auth & Account */}
-          <Route path="/profile" element={<RequireAuth><ProfilePage /></RequireAuth>} />
+          <Route
+            path="/profile"
+            element={
+              <RequireAuth>
+                <ProfilePage />
+              </RequireAuth>
+            }
+          />
           <Route path="/settings" element={<AccountSettings />} />
           <Route path="/account-setup" element={<OnboardingPage />} />
           <Route path="/auth" element={<AuthPage />} />
@@ -84,7 +104,14 @@ const AppRoutes: React.FC = () => {
           {/* Products */}
           <Route path="/products" element={<ProductsPage />} />
           <Route path="/products/:id" element={<ProductDetail />} />
-          <Route path="/admin/products" element={<RequireAuth><AdminProductManager /></RequireAuth>} />
+          <Route
+            path="/admin/products"
+            element={
+              <RequireAuth>
+                <AdminProductManager />
+              </RequireAuth>
+            }
+          />
 
           {/* Blog */}
           <Route path="/blog" element={<BlogPage />} />
@@ -99,7 +126,10 @@ const AppRoutes: React.FC = () => {
           <Route path="/search" element={<SearchResults />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
-          <Route path="/terms-and-conditions" element={<TermsAndConditionsPage />} />
+          <Route
+            path="/terms-and-conditions"
+            element={<TermsAndConditionsPage />}
+          />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
 
           {/* 404 Fallback */}

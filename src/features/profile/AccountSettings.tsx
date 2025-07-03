@@ -19,28 +19,42 @@ interface UserProfile {
   favoriteColor?: string;
 }
 
+const defaultProfile: UserProfile = {
+  username: "",
+  firstName: "",
+  lastName: "",
+  bio: "",
+  profilePictureUrl: "",
+  sports: [],
+  city: "",
+  state: "",
+  country: "",
+  gender: "",
+  dob: "",
+  favoriteColor: "#ffffff",
+};
+
 const AccountSettings: React.FC = () => {
   const { user, setUser } = useUserContext();
-  const [formData, setFormData] = useState<UserProfile>({
-    username: "",
-    firstName: "",
-    lastName: "",
-    bio: "",
-    profilePictureUrl: "",
-    sports: [],
-  });
+  const [formData, setFormData] = useState<UserProfile>(defaultProfile);
   const [newSport, setNewSport] = useState("");
   const [message, setMessage] = useState<string | null>(null);
   const allowedSports = sportsList.map((s) => s.title);
   const [isDeleting, setIsDeleting] = useState(false);
 
+  // Make sure ALL user fields are populated into formData
   useEffect(() => {
     if (user) {
       setFormData({
-        username: user.username || "",
-        firstName: user.firstName || "",
-        lastName: user.lastName || "",
-        bio: user.bio || "",
+        ...defaultProfile,
+        ...user,
+        bio: user.bio ?? "", // convert null to empty string
+        city: user.city ?? "",
+        state: user.state ?? "",
+        country: user.country ?? "",
+        gender: user.gender ?? "",
+        dob: user.dob ?? "",
+        favoriteColor: user.favoriteColor ?? "#ffffff",
         profilePictureUrl: user.profilePictureUrl || "",
         sports: user.sports || [],
       });
@@ -183,6 +197,7 @@ const AccountSettings: React.FC = () => {
                 value={formData[field]}
                 onChange={handleChange}
                 required={field === "username"}
+                autoComplete={field === "username" ? "username" : undefined}
               />
             </div>
           )
@@ -198,6 +213,7 @@ const AccountSettings: React.FC = () => {
                 name={field}
                 value={formData[field] || ""}
                 onChange={handleChange}
+                autoComplete={field}
               />
             </div>
           )
@@ -225,11 +241,18 @@ const AccountSettings: React.FC = () => {
         <div className="account-settings-section">
           <label>{fieldLabels.dob}</label>
           <input
-            type="date"
-            name="dob"
-            value={formData.dob || ""}
-            onChange={handleChange}
-          />
+  type="date"
+  name="dob"
+  value={
+    formData.dob
+      ? formData.dob.length > 10
+        ? formData.dob.slice(0, 10)
+        : formData.dob
+      : ""
+  }
+  onChange={handleChange}
+  autoComplete="bday"
+/>
         </div>
 
         {/* Favorite Color */}
@@ -253,6 +276,7 @@ const AccountSettings: React.FC = () => {
           />
         </div>
 
+        {/* Sports Picker */}
         <div className="account-settings-section">
           <label>{fieldLabels.sports}</label>
           <div className="account-settings-sports">
@@ -262,6 +286,7 @@ const AccountSettings: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => handleSportChange("remove", sport)}
+                  aria-label={`Remove ${sport}`}
                 >
                   ✕
                 </button>

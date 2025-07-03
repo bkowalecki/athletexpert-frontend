@@ -263,6 +263,7 @@ const ProfilePage: React.FC = () => {
         {savedProducts.length > 0 ? (
           savedProducts.map((product) => (
             <ProductCard
+            id = {product.id}
               key={product.id}
               name={product.name}
               brand={product.brand}

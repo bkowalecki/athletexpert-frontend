@@ -75,6 +75,21 @@
   transform: translateY(-2px);
 }
 
+.blog-sport-filter {
+  font-size: 1.07rem;
+  padding: 7px 16px;
+  border-radius: 8px;
+  background: #232323;
+  color: #fff;
+  border: 2px solid #a23c20;
+  margin-left: 6px;
+  outline: none;
+  transition: border 0.19s;
+}
+.blog-sport-filter:focus {
+  border: 2px solid #FF6F00;
+}
+
 .skeleton-loader {
   background-color: #444;
   height: 300px;
@@ -116,7 +131,16 @@
     gap: 2rem;
     padding: 0 1rem;
   }
+
+  .blog-search-container {
+    /* flex-direction: column;
+    gap: 8px; */
+  }
+
+  /* .blog-sport-filter {
+    width: 100%;
+    margin-left: 0;
+  } */
+
 }
 
-@media (max-width: 480px) {
-}

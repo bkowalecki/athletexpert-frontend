@@ -10,6 +10,19 @@ import BlogCard from "./BlogCard";
 // import "react-toastify/dist/ReactToastify.css";
 import "../../styles/BlogPage.css";
 
+// ---- SPORTS ----
+const SPORTS = [
+  { value: "", label: "All Sports" },
+  { value: "Running", label: "Running" },
+  { value: "Pickleball", label: "Pickleball" },
+  { value: "Basketball", label: "Basketball" },
+  { value: "Soccer", label: "Soccer" },
+  { value: "Tennis", label: "Tennis" },
+  { value: "Swimming", label: "Swimming" },
+  { value: "Yoga", label: "Yoga" },
+  { value: "Weight Training", label: "Weight Training" },
+];
+
 interface BlogPost {
   id: number;
   title: string;
@@ -20,11 +33,15 @@ interface BlogPost {
   slug: string;
 }
 
-const fetchPosts = async (searchQuery: string, page: number): Promise<BlogPost[]> => {
+const fetchPosts = async (
+  searchQuery: string,
+  page: number,
+  sport: string
+): Promise<BlogPost[]> => {
   if (searchQuery.trim().length > 50 || /[^\w\s-]/.test(searchQuery)) return [];
   try {
     const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/blog`, {
-      params: { searchQuery, page, size: 9 },
+      params: { searchQuery, page, size: 9, sport },
     });
     return Array.isArray(data?.content) ? data.content : [];
   } catch (err) {
@@ -33,10 +50,10 @@ const fetchPosts = async (searchQuery: string, page: number): Promise<BlogPost[]
   }
 };
 
-
 const BlogPage: React.FC = () => {
   const [inputQuery, setInputQuery] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedSport, setSelectedSport] = useState("");
   const [currentPage, setCurrentPage] = useState(0);
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [hasMorePosts, setHasMorePosts] = useState(true);
@@ -44,8 +61,8 @@ const BlogPage: React.FC = () => {
   const { user } = useUserContext();
 
   const { data, isLoading, isFetching, error } = useQuery<BlogPost[], Error>({
-    queryKey: ["posts", searchQuery, currentPage],
-    queryFn: () => fetchPosts(searchQuery, currentPage),
+    queryKey: ["posts", searchQuery, currentPage, selectedSport],
+    queryFn: () => fetchPosts(searchQuery, currentPage, selectedSport),
     enabled: searchQuery.length < 100,
     staleTime: 5000,
     refetchOnWindowFocus: false,
@@ -61,18 +78,24 @@ const BlogPage: React.FC = () => {
       setPosts(currentPage === 0 ? data : [...posts, ...newPosts]);
       setHasMorePosts(data.length >= 9);
     }
+    // eslint-disable-next-line
   }, [data, currentPage]);
 
   useEffect(() => {
     if (!user) return;
-    axios.get(`${process.env.REACT_APP_API_URL}/users/saved-blogs`, { withCredentials: true })
+    axios
+      .get(`${process.env.REACT_APP_API_URL}/users/saved-blogs`, { withCredentials: true })
       .then(res => setSavedBlogIds(res.data.map((b: BlogPost) => b.id)))
       .catch(err => console.error("❌ Error fetching saved blogs:", err));
   }, [user]);
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 400 && !isFetching && hasMorePosts) {
+      if (
+        window.innerHeight + window.scrollY >= document.body.offsetHeight - 400 &&
+        !isFetching &&
+        hasMorePosts
+      ) {
         setCurrentPage(prev => prev + 1);
       }
     };
@@ -80,27 +103,42 @@ const BlogPage: React.FC = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [isFetching, hasMorePosts]);
 
-  const toggleSaveBlog = useCallback(async (blogId: number) => {
-    if (!user) return toast.warn("Log in to save blogs!");
-    const isSaved = savedBlogIds.includes(blogId);
-    try {
-      await axios({
-        method: isSaved ? "DELETE" : "POST",
-        url: `${process.env.REACT_APP_API_URL}/users/saved-blogs/${blogId}`,
-        withCredentials: true,
-      });
-      setSavedBlogIds(prev => isSaved ? prev.filter(id => id !== blogId) : [...prev, blogId]);
-      toast.success(isSaved ? "Removed!" : "Saved!");
-    } catch {
-      toast.error("Couldn't save blog :/ Please try again later.");
-    }
-  }, [savedBlogIds, user]);
+  const toggleSaveBlog = useCallback(
+    async (blogId: number) => {
+      if (!user) return toast.warn("Log in to save blogs!");
+      const isSaved = savedBlogIds.includes(blogId);
+      try {
+        await axios({
+          method: isSaved ? "DELETE" : "POST",
+          url: `${process.env.REACT_APP_API_URL}/users/saved-blogs/${blogId}`,
+          withCredentials: true,
+        });
+        setSavedBlogIds(prev => (isSaved ? prev.filter(id => id !== blogId) : [...prev, blogId]));
+        toast.success(isSaved ? "Removed!" : "Saved!");
+      } catch {
+        toast.error("Couldn't save blog :/ Please try again later.");
+      }
+    },
+    [savedBlogIds, user]
+  );
 
+  // When user types in search and hits enter
   const handleSearchSubmit = (e?: React.FormEvent) => {
     e?.preventDefault();
     setSearchQuery(inputQuery);
     setCurrentPage(0);
+    setPosts([]);
     setHasMorePosts(true);
+  };
+
+  // When sport is changed from dropdown
+  const handleSportChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedSport(e.target.value);
+    setCurrentPage(0);
+    setPosts([]);
+    setHasMorePosts(true);
+    // Search using whatever is typed in input
+    setSearchQuery(inputQuery);
   };
 
   return (
@@ -111,16 +149,34 @@ const BlogPage: React.FC = () => {
       </Helmet>
 
       <h1 className="blog-page-title">Blog</h1>
-      <form className="blog-search-container" onSubmit={handleSearchSubmit}>
+      <form
+        className="blog-search-container"
+        onSubmit={handleSearchSubmit}
+        style={{ display: "flex", gap: 12, flexWrap: "wrap" }}
+      >
         <input
           type="text"
           value={inputQuery}
-          onChange={(e) => setInputQuery(e.target.value)}
+          onChange={e => setInputQuery(e.target.value)}
           placeholder="Search blog posts"
           className="blog-search-input"
           aria-label="Search blog posts"
         />
-        <button type="submit" className="blog-search-button">Search</button>
+        <select
+          value={selectedSport}
+          onChange={handleSportChange}
+          className="blog-sport-filter"
+          aria-label="Filter by sport"
+        >
+          {SPORTS.map(sport => (
+            <option key={sport.value} value={sport.value}>
+              {sport.label}
+            </option>
+          ))}
+        </select>
+        <button type="submit" className="blog-search-button">
+          Search
+        </button>
       </form>
 
       <div className="blog-post-list">

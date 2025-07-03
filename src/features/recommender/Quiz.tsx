@@ -320,6 +320,7 @@ const Quiz: React.FC<QuizProps> = ({ isOpen, closeModal }) => {
                   <div className="quiz-product-grid">
                     {recommendedProducts.map((product) => (
                       <ProductCard
+                      id = {product.id}
                         key={product.id}
                         name={cleanProductTitle(product.name)}
 

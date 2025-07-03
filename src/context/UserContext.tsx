@@ -19,6 +19,12 @@ export type User = {
   role: string;
   isActive: boolean;
   location?: string | null;
+  city?: string | null;
+  state?: string | null;
+  country?: string | null;
+  gender?: string | null;
+  dob?: string | null;
+  favoriteColor?: string | null;
 };
 
 interface UserContextProps {
