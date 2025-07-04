@@ -81,10 +81,13 @@ const AdminProductManager: React.FC = () => {
 
     setLoading(true);
     try {
-      const res = await axios.get(`${process.env.REACT_APP_API_URL}/products/search`, {
-        params: { query: filter },
-        withCredentials: true,
-      });
+      const res = await axios.get(
+        `${process.env.REACT_APP_API_URL}/products/search`,
+        {
+          params: { query: filter },
+          withCredentials: true,
+        }
+      );
       setProducts(res.data);
     } catch {
       setError("Error searching products.");
@@ -108,7 +111,10 @@ const AdminProductManager: React.FC = () => {
       e.preventDefault();
       const newSport = sportInput.trim();
       if (!formData.sports.includes(newSport)) {
-        setFormData((prev) => ({ ...prev, sports: [...prev.sports, newSport] }));
+        setFormData((prev) => ({
+          ...prev,
+          sports: [...prev.sports, newSport],
+        }));
       }
       setSportInput("");
     } else if (e.key === "Backspace" && !sportInput && formData.sports.length) {
@@ -139,14 +145,22 @@ const AdminProductManager: React.FC = () => {
         return;
       }
       if (editingId) {
-        await axios.put(`${process.env.REACT_APP_API_URL}/products/admin/${editingId}`, formData, {
-          withCredentials: true,
-        });
+        await axios.put(
+          `${process.env.REACT_APP_API_URL}/products/admin/${editingId}`,
+          formData,
+          {
+            withCredentials: true,
+          }
+        );
         setSuccess("Product updated!");
       } else {
-        await axios.post(`${process.env.REACT_APP_API_URL}/products/admin`, formData, {
-          withCredentials: true,
-        });
+        await axios.post(
+          `${process.env.REACT_APP_API_URL}/products/admin`,
+          formData,
+          {
+            withCredentials: true,
+          }
+        );
         setSuccess("Product created!");
       }
       setFormData(emptyProduct);
@@ -169,9 +183,12 @@ const AdminProductManager: React.FC = () => {
   const handleDelete = async (id: number) => {
     if (!window.confirm("Delete this product?")) return;
     try {
-      await axios.delete(`${process.env.REACT_APP_API_URL}/products/admin/${id}`, {
-        withCredentials: true,
-      });
+      await axios.delete(
+        `${process.env.REACT_APP_API_URL}/products/admin/${id}`,
+        {
+          withCredentials: true,
+        }
+      );
       setSuccess("Product deleted.");
       fetchProducts();
     } catch {
@@ -196,27 +213,50 @@ const AdminProductManager: React.FC = () => {
     });
 
   return (
-    <div className="new-product-container" style={{ maxWidth: "100%", padding: "2rem" }}>
+    <div
+      className="new-product-container"
+      style={{ maxWidth: "100%", padding: "2rem" }}
+    >
       <h2>{editingId ? "Edit Product" : "Add New Product"}</h2>
-      {error && <p className="error-message" aria-live="assertive">{error}</p>}
-      {success && <p className="success-message" aria-live="polite">{success}</p>}
+      {error && (
+        <p className="error-message" aria-live="assertive">
+          {error}
+        </p>
+      )}
+      {success && (
+        <p className="success-message" aria-live="polite">
+          {success}
+        </p>
+      )}
 
-      <form onSubmit={handleSubmit} className="product-form" style={{ position: "sticky", top: 0, background: "#121212", zIndex: 10 }}>
-        {["name", "brand", "price", "imgUrl", "affiliateLink"].map((field, i) => (
-          <input
-            key={field}
-            ref={i === 0 ? inputRef : undefined}
-            name={field}
-            type={field === "price" ? "number" : "text"}
-            value={formData[field as keyof Product] as any}
-            onChange={handleChange}
-            placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
-            min={field === "price" ? 0 : undefined}
-            required={field !== "affiliateLink"}
-            autoComplete="off"
-            style={field === "price" ? { maxWidth: 100 } : {}}
-          />
-        ))}
+      <form
+        onSubmit={handleSubmit}
+        className="product-form"
+        style={{
+          position: "sticky",
+          top: 0,
+          background: "#121212",
+          zIndex: 10,
+        }}
+      >
+        {["name", "brand", "price", "imgUrl", "affiliateLink"].map(
+          (field, i) => (
+            <input
+              key={field}
+              ref={i === 0 ? inputRef : undefined}
+              name={field}
+              type={field === "price" ? "number" : "text"}
+              value={formData[field as keyof Product] as any}
+              onChange={handleChange}
+              placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
+              min={field === "price" ? 0 : undefined}
+              step={field === "price" ? "0.01" : undefined} // <-- ADD THIS!
+              required={field !== "affiliateLink"}
+              autoComplete="off"
+              style={field === "price" ? { maxWidth: 100 } : {}}
+            />
+          )
+        )}
 
         {formData.imgUrl && (
           <img
@@ -245,17 +285,34 @@ const AdminProductManager: React.FC = () => {
           {formData.sports.map((sport) => (
             <span key={sport} className="tag-chip">
               {sport}
-              <button type="button" onClick={() => removeSport(sport)} aria-label={`Remove ${sport}`}>✕</button>
+              <button
+                type="button"
+                onClick={() => removeSport(sport)}
+                aria-label={`Remove ${sport}`}
+              >
+                ✕
+              </button>
             </span>
           ))}
         </div>
 
-        <button type="submit" aria-label={editingId ? "Update Product" : "Create Product"}>
+        <button
+          type="submit"
+          aria-label={editingId ? "Update Product" : "Create Product"}
+        >
           {editingId ? "Update Product" : "Create Product"}
         </button>
       </form>
 
-      <form onSubmit={handleSearchSubmit} style={{ display: "flex", gap: "1rem", flexWrap: "wrap", margin: "1rem 0" }}>
+      <form
+        onSubmit={handleSearchSubmit}
+        style={{
+          display: "flex",
+          gap: "1rem",
+          flexWrap: "wrap",
+          margin: "1rem 0",
+        }}
+      >
         <input
           type="text"
           placeholder="Search by name, brand, or sport"
@@ -275,7 +332,11 @@ const AdminProductManager: React.FC = () => {
         >
           Search
         </button>
-        <select value={sortOption} onChange={(e) => setSortOption(e.target.value)} style={{ padding: "0.5rem" }}>
+        <select
+          value={sortOption}
+          onChange={(e) => setSortOption(e.target.value)}
+          style={{ padding: "0.5rem" }}
+        >
           <option value="recent">Sort: Recent</option>
           <option value="priceAsc">Price: Low → High</option>
           <option value="priceDesc">Price: High → Low</option>
@@ -289,7 +350,12 @@ const AdminProductManager: React.FC = () => {
           <p>No matching products.</p>
         ) : (
           sortedFilteredProducts.map((p) => (
-            <div key={p.id} className="product-item" tabIndex={0} aria-label={`${p.name} product`}>
+            <div
+              key={p.id}
+              className="product-item"
+              tabIndex={0}
+              aria-label={`${p.name} product`}
+            >
               <img src={p.imgUrl} alt={p.name} />
               <div>
                 <strong>{p.name}</strong> – ${p.price.toFixed(2)} <br />
@@ -312,8 +378,18 @@ const AdminProductManager: React.FC = () => {
                   ))}
                 </div>
               </div>
-              <button onClick={() => handleEdit(p)} aria-label={`Edit ${p.name}`}>✏️ Edit</button>
-              <button onClick={() => handleDelete(p.id!)} aria-label={`Delete ${p.name}`}>🗑 Delete</button>
+              <button
+                onClick={() => handleEdit(p)}
+                aria-label={`Edit ${p.name}`}
+              >
+                ✏️ Edit
+              </button>
+              <button
+                onClick={() => handleDelete(p.id!)}
+                aria-label={`Delete ${p.name}`}
+              >
+                🗑 Delete
+              </button>
             </div>
           ))
         )}
