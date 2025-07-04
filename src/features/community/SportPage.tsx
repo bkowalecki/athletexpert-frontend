@@ -1,13 +1,13 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import axios from "axios";
 import sportsData from "../../data/sports.json";
-import EsportExperience from "./EsportsExperience";
 import "../../styles/SportPage.css";
 import ProductCard from "../products/ProductCard";
 import BlogCard from "../blog/BlogCard";
 
+// Types
 interface Sport {
   title: string;
   backgroundImage: string;
@@ -39,71 +39,81 @@ interface BlogPost {
   publishedDate?: string;
 }
 
+// Slugify utility
 const slugify = (str: string) =>
   str.toLowerCase().replace(/\s+/g, "-").replace(/[^\w\-]+/g, "");
 
+// Memoize a lookup map for O(1) slug->sport
+const getSlugMap = (sportsArr: Sport[]) => {
+  const map: Record<string, Sport> = {};
+  sportsArr.forEach((s) => {
+    map[slugify(s.title)] = s;
+  });
+  return map;
+};
+
 const SportPage: React.FC = () => {
-  const { sport } = useParams<{ sport: string }>();
+  const { sport: slug } = useParams<{ sport: string }>();
   const navigate = useNavigate();
 
-  const [currentSport, setCurrentSport] = useState<Sport | null>(null);
+  const slugMap = useMemo(() => getSlugMap(sportsData), []);
+  const currentSport = slug ? slugMap[slug] : null;
+
+  // UI state
   const [relatedBlogs, setRelatedBlogs] = useState<BlogPost[]>([]);
   const [loadingBlogs, setLoadingBlogs] = useState(true);
   const [recommendedProducts, setRecommendedProducts] = useState<Product[]>([]);
+  const [loadingProducts, setLoadingProducts] = useState(true);
 
-  // Find sport in local data (memoized for performance)
-  const foundSport = useMemo(() => {
-    if (!sport) return null;
-    return sportsData.find((s) => slugify(s.title) === sport.toLowerCase()) || null;
-  }, [sport]);
-
+  // Redirect on 404 or Esports (coming soon)
   useEffect(() => {
-    if (!sport) {
+    if (!slug || !currentSport || currentSport.title.toLowerCase() === "e-sports") {
       navigate("/404", { replace: true });
-      return;
     }
-    if (foundSport?.title.toLowerCase() === "e-sports") {
-      navigate("/404", { replace: true });
-      return;
-    }
-    if (!foundSport) {
-      navigate("/404", { replace: true });
-      return;
-    }
-    setCurrentSport(foundSport);
+  }, [slug, currentSport, navigate]);
 
-    // Fetch blogs
+  // Fetch related data
+  useEffect(() => {
+    if (!currentSport) return;
+    let cancelled = false;
+
     const fetchRelatedBlogs = async () => {
       setLoadingBlogs(true);
       try {
         const { data } = await axios.get(
           `${process.env.REACT_APP_API_URL}/blog/by-tag`,
-          { params: { tag: foundSport.title }, withCredentials: true }
+          { params: { tag: currentSport.title }, withCredentials: true }
         );
-        setRelatedBlogs(data);
-      } catch (err) {
-        setRelatedBlogs([]);
+        if (!cancelled) setRelatedBlogs(data);
+      } catch {
+        if (!cancelled) setRelatedBlogs([]);
       } finally {
-        setLoadingBlogs(false);
+        if (!cancelled) setLoadingBlogs(false);
       }
     };
 
-    // Fetch products
     const fetchRecommendedProducts = async () => {
+      setLoadingProducts(true);
       try {
         const { data } = await axios.get(
-          `${process.env.REACT_APP_API_URL}/products/by-sport?sport=${foundSport.title}`,
-          { withCredentials: true }
+          `${process.env.REACT_APP_API_URL}/products/by-sport`,
+          { params: { sport: currentSport.title }, withCredentials: true }
         );
-        setRecommendedProducts(data);
+        if (!cancelled) setRecommendedProducts(data);
       } catch {
-        setRecommendedProducts([]);
+        if (!cancelled) setRecommendedProducts([]);
+      } finally {
+        if (!cancelled) setLoadingProducts(false);
       }
     };
 
     fetchRelatedBlogs();
     fetchRecommendedProducts();
-  }, [sport, foundSport, navigate]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [currentSport]);
 
   if (!currentSport) {
     return (
@@ -117,6 +127,7 @@ const SportPage: React.FC = () => {
     <div className="sport-page">
       <div className="sport-page-title">{currentSport.title}</div>
 
+      {/* Fun Fact (uncomment if you want!) */}
       {/* <section className="sport-page-section sport-page-funfact">
         <h2 className="sport-page-section-title">Fun Fact</h2>
         <motion.div
@@ -134,12 +145,14 @@ const SportPage: React.FC = () => {
 
       <section className="sport-page-section">
         <h2 className="sport-page-section-title">Recommended Gear</h2>
-        {recommendedProducts.length > 0 ? (
+        {loadingProducts ? (
+          <p className="sport-page-text">Loading products...</p>
+        ) : recommendedProducts.length > 0 ? (
           <div className="recommended-products-grid">
             {recommendedProducts.map((product) => (
               <ProductCard
-              id = {product.id}
                 key={product.id}
+                id={product.id}
                 name={product.name}
                 brand={product.brand}
                 price={product.price}

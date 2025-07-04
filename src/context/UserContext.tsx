@@ -4,7 +4,7 @@ import React, {
   useEffect,
   useContext,
   useCallback,
-  ReactNode,
+  PropsWithChildren,
 } from "react";
 
 export type User = {
@@ -36,9 +36,7 @@ interface UserContextProps {
 
 const UserContext = createContext<UserContextProps | undefined>(undefined);
 
-export const UserProvider: React.FC<{ children: ReactNode }> = ({
-  children,
-}) => {
+export const UserProvider: React.FC<PropsWithChildren> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isSessionChecked, setIsSessionChecked] = useState(false);
 
@@ -46,11 +44,15 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
     try {
       const response = await fetch(
         `${process.env.REACT_APP_API_URL}/users/session`,
-        {
-          credentials: "include",
-        }
+        { credentials: "include" }
       );
-      setUser(response.ok ? await response.json() : null);
+      // Support both `{ user: ... }` and raw user objects
+      if (response.ok) {
+        const data = await response.json();
+        setUser(data?.user ?? data ?? null);
+      } else {
+        setUser(null);
+      }
     } catch {
       setUser(null);
     } finally {
@@ -63,9 +65,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
   }, [checkSession]);
 
   return (
-    <UserContext.Provider
-      value={{ user, setUser, isSessionChecked, checkSession }}
-    >
+    <UserContext.Provider value={{ user, setUser, isSessionChecked, checkSession }}>
       {children}
     </UserContext.Provider>
   );

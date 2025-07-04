@@ -1,11 +1,20 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { useUserContext } from "../../context/UserContext";
 import { useNavigate } from "react-router-dom";
-import { blogTemplates, BlogTemplate } from "../../data/blogTemplates";
+import { blogTemplates } from "../../data/blogTemplates";
 import { toast } from "react-toastify";
-// import "react-toastify/dist/ReactToastify.css";
 import "../../styles/NewBlogPost.css";
+
+// Replace with your real product search type!
+interface Product {
+  id: number;
+  name: string;
+  brand: string;
+  price: number | string;
+  imgUrl: string;
+  affiliateLink: string;
+}
 
 interface BlogPost {
   id?: number;
@@ -39,11 +48,20 @@ const NewBlogPost: React.FC = () => {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [showBlogs, setShowBlogs] = useState(false);
 
+  // Product search
+  const [productSearch, setProductSearch] = useState("");
+  const [productResults, setProductResults] = useState<Product[]>([]);
+  const productTimeout = useRef<NodeJS.Timeout>();
+
+  // Focus on title at mount for speed
+  const titleRef = useRef<HTMLInputElement>(null);
+  useEffect(() => { titleRef.current?.focus(); }, []);
+
+  // Blog draft load/save
   useEffect(() => {
     const saved = localStorage.getItem("blog-draft");
     if (saved) setFormData(JSON.parse(saved));
   }, []);
-
   useEffect(() => {
     localStorage.setItem("blog-draft", JSON.stringify(formData));
   }, [formData]);
@@ -51,9 +69,27 @@ const NewBlogPost: React.FC = () => {
   useEffect(() => {
     axios.get(`${process.env.REACT_APP_API_URL}/blog/admin/all`, { withCredentials: true })
       .then(({ data }) => setBlogs(data || []))
-      .catch((err) => console.error("Error loading blogs", err));
+      .catch(() => {});
   }, []);
 
+  // ======== Product Search (auto debounce) ==========
+  useEffect(() => {
+    if (productSearch.length < 2) return setProductResults([]);
+    if (productTimeout.current) clearTimeout(productTimeout.current);
+    productTimeout.current = setTimeout(async () => {
+      try {
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/products/search`, {
+          params: { query: productSearch },
+        });
+        setProductResults(res.data);
+      } catch {
+        setProductResults([]);
+      }
+    }, 400);
+    // eslint-disable-next-line
+  }, [productSearch]);
+
+  // ======== Handlers =============
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -85,12 +121,47 @@ const NewBlogPost: React.FC = () => {
       await axios.delete(`${process.env.REACT_APP_API_URL}/blog/${id}`, { withCredentials: true });
       setBlogs((prev) => prev.filter((b) => b.id !== id));
       toast.success("Blog deleted!");
-    } catch (err) {
-      console.error("Delete failed", err);
+    } catch {
       toast.error("Error deleting blog.");
     }
   };
 
+  // ======== Insert product embed ==========
+  const insertProductEmbed = (product: Product) => {
+    // Customize this to your desired HTML format!
+    const embed = `
+<div class="ax-product-embed">
+  <a href="${product.affiliateLink}" target="_blank" rel="noopener noreferrer">
+    <img src="${product.imgUrl}" alt="${product.name}" />
+    <div><strong>${product.name}</strong> – ${product.brand}${product.price ? ` | $${product.price}` : ""}</div>
+  </a>
+</div>
+`;
+    setFormData((prev) => ({
+      ...prev,
+      content: prev.content + "\n" + embed,
+    }));
+    setProductResults([]);
+    setProductSearch("");
+  };
+
+  // ======== AI Draft Writer (Optional) ==========
+  const generateAIBlog = async () => {
+    // TODO: Swap for your API
+    toast.info("Drafting with AI...");
+    try {
+      const res = await axios.post("/api/ai/generate-blog", {
+        title: formData.title,
+        summary: formData.summary,
+        sport: formData.sport,
+      });
+      setFormData((prev) => ({ ...prev, content: res.data.content }));
+    } catch {
+      toast.error("AI drafting failed.");
+    }
+  };
+
+  // ======== Submit ==========
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const url = editingId
@@ -106,12 +177,12 @@ const NewBlogPost: React.FC = () => {
       window.scrollTo({ top: 0, behavior: "smooth" });
       const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/blog/admin/all`, { withCredentials: true });
       setBlogs(data || []);
-    } catch (err) {
-      console.error("Submit error:", err);
+    } catch {
       toast.error("Error submitting blog");
     }
   };
 
+  // ======== UI ==========
   if (user?.role !== "admin") {
     return (
       <div className="admin-lockout">
@@ -129,11 +200,13 @@ const NewBlogPost: React.FC = () => {
         {(["title", "author", "imageUrl", "sport"] as const).map((field) => (
           <input
             key={field}
+            ref={field === "title" ? titleRef : undefined}
             name={field}
             value={formData[field]}
             onChange={handleChange}
             placeholder={field === "imageUrl" ? "Header Image URL" : field.charAt(0).toUpperCase() + field.slice(1)}
             required={field === "title" || field === "author"}
+            autoComplete="off"
           />
         ))}
 
@@ -151,6 +224,7 @@ const NewBlogPost: React.FC = () => {
         />
         <p className="char-count">Characters: {formData.summary.length}/160</p>
 
+        {/* ===== TAGS ===== */}
         <div>
           <label className="bold-label">Tags</label>
           <input
@@ -159,6 +233,7 @@ const NewBlogPost: React.FC = () => {
             onChange={(e) => setTagInput(e.target.value)}
             onKeyDown={handleTagKeyDown}
             placeholder="Type a tag and press Enter"
+            autoComplete="off"
           />
           <div className="tag-preview">
             {formData.tags.map((tag) => (
@@ -178,6 +253,42 @@ const NewBlogPost: React.FC = () => {
           onChange={handleChange}
         />
 
+        {/* ===== FAST PRODUCT SEARCH & EMBED ===== */}
+        <div>
+          <label className="bold-label">Insert Product</label>
+          <input
+            type="text"
+            placeholder="Search for a product to embed"
+            value={productSearch}
+            onChange={e => setProductSearch(e.target.value)}
+          />
+          {productResults.length > 0 && (
+            <div className="product-search-results">
+              {productResults.map(p => (
+                <button
+                  key={p.id}
+                  type="button"
+                  className="product-search-result"
+                  onClick={() => insertProductEmbed(p)}
+                  title={`Insert "${p.name}"`}
+                >
+                  <img src={p.imgUrl} alt={p.name} width={36} height={36} style={{ objectFit: "cover", borderRadius: 4, marginRight: 8 }} />
+                  {p.name} – <span style={{ color: "#666" }}>{p.brand}</span>
+                  {p.price && <span style={{ marginLeft: 8, color: "#2a6045", fontWeight: 500 }}>${p.price}</span>}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* ===== AI WRITE BUTTON ===== */}
+        <div className="ai-write-bar">
+          <button type="button" onClick={generateAIBlog} style={{ marginBottom: 8 }}>
+            🪄 Draft Blog with AI (Experimental)
+          </button>
+        </div>
+
+        {/* ===== TEMPLATES & CONTENT ===== */}
         <div>
           <label className="bold-label">Blog HTML Content</label>
           <div className="template-buttons">
@@ -193,6 +304,7 @@ const NewBlogPost: React.FC = () => {
             onChange={handleChange}
             placeholder="Enter raw HTML content here..."
             className="blog-html-input"
+            rows={12}
           />
           <p className="word-count">Word Count: {formData.content.trim().split(/\s+/).length}</p>
         </div>

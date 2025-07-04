@@ -5,19 +5,23 @@ import "../../styles/ProductDetail.css";
 import { FaStar, FaChevronLeft, FaExternalLinkAlt } from "react-icons/fa";
 import type { Product } from "../../types/products";
 
-// Mock reviews if needed
+// Mock reviews (swap out for real data in prod)
 const mockReviews = [
   { reviewer: "Sam R.", rating: 5, comment: "Best gear I’ve ever used. Game changer!" },
   { reviewer: "Jordan P.", rating: 4, comment: "Comfortable, durable, and stylish. Worth the price." },
   { reviewer: "Drew F.", rating: 5, comment: "Love it! Delivery was quick and product was as described." },
 ];
-
-// Mock related products (swap with real query if needed)
 const mockRelated = [
   { id: 1, name: "HydroPro Bottle", imgUrl: "/images/categories/water-bottle.jpg" },
   { id: 2, name: "SpeedRunner Shoes", imgUrl: "/images/categories/running-shoes.jpg" },
   { id: 3, name: "Elite Recovery Roller", imgUrl: "/images/categories/recovery.jpg" },
 ];
+
+const renderStars = (rating: number) =>
+  <>
+    {"★".repeat(rating)}
+    {"☆".repeat(5 - rating)}
+  </>;
 
 const ProductDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -27,6 +31,7 @@ const ProductDetail: React.FC = () => {
 
   useEffect(() => {
     if (!id) return;
+    setLoading(true);
     const fetchProduct = async () => {
       try {
         const res = await fetch(`${process.env.REACT_APP_API_URL}/products/${id}`);
@@ -58,14 +63,15 @@ const ProductDetail: React.FC = () => {
     );
   }
 
-  const showAmazonBadge = product.retailer === "Amazon" || product.asin;
-  const showTrendingBadge = product.trending;
-  const features = product.sports?.length ? product.sports : ["All Sports"];
+  const showAmazonBadge = product.retailer === "Amazon" || !!product.asin;
+  const showTrendingBadge = !!product.trending;
+  const features = Array.isArray(product.sports) && product.sports.length > 0
+    ? product.sports
+    : ["All Sports"];
   const specs = [
     { label: "Brand", value: product.brand },
     { label: "Retailer", value: product.retailer },
     { label: "ASIN", value: product.asin ?? "N/A" },
-    // Add more fields as you wish!
   ];
 
   return (
@@ -74,6 +80,7 @@ const ProductDetail: React.FC = () => {
         <title>{product.name} | AthleteXpert</title>
         <meta name="description" content={product.description ?? product.name} />
       </Helmet>
+      {/* --- BACK BUTTON --- */}
       <div className="product-detail-back">
         <Link to="/products" className="product-detail-back-link">
           {FaChevronLeft && (FaChevronLeft as any)({ style: { marginRight: 8, fontSize: "1.1em" } })}
@@ -82,7 +89,7 @@ const ProductDetail: React.FC = () => {
       </div>
 
       <div className="product-detail-main">
-        {/* --- IMAGE --- */}
+        {/* --- IMAGE COLUMN --- */}
         <div className="product-detail-images">
           <div className="product-detail-image-wrapper highlight-border">
             {product.imgUrl ? (
@@ -105,15 +112,19 @@ const ProductDetail: React.FC = () => {
           </div>
         </div>
 
-        {/* --- INFO --- */}
+        {/* --- INFO COLUMN --- */}
         <div className="product-detail-info">
           <h1 className="product-detail-name">{product.name}</h1>
           <div className="product-detail-price-row">
             <span className="product-detail-price">
-              {product.price ? `$${product.price.toFixed(2)}` : "Price not available"}
+              {typeof product.price === "number"
+                ? `$${product.price.toFixed(2)}`
+                : "Price not available"}
             </span>
           </div>
-          <p className="product-detail-description">{product.description}</p>
+          {product.description && (
+            <p className="product-detail-description">{product.description}</p>
+          )}
           <div className="product-detail-specs-grid">
             {specs.map(
               ({ label, value }) =>
@@ -130,17 +141,21 @@ const ProductDetail: React.FC = () => {
             target="_blank"
             rel="noopener noreferrer"
             className="product-detail-affiliate-btn"
-            aria-label="View on Amazon"
+            aria-label={`View ${product.name} on Amazon`}
           >
-            View on Amazon&nbsp;{FaExternalLinkAlt && (FaExternalLinkAlt as any)({ style: { fontSize: "1.1em", verticalAlign: "-2px" } })}
+            View on Amazon&nbsp;
+            {FaExternalLinkAlt &&
+              (FaExternalLinkAlt as any)({
+                style: { fontSize: "1.1em", verticalAlign: "-2px" },
+              })}
           </a>
         </div>
       </div>
 
-      {/* Divider/gradient */}
+      {/* --- Divider --- */}
       <div className="product-detail-divider orange-gradient-divider" />
 
-      {/* --- Related Products Carousel (mock for now) --- */}
+      {/* --- Related Products --- */}
       <div className="product-detail-related">
         <h3>Related Products</h3>
         <div className="product-related-grid">
@@ -155,10 +170,12 @@ const ProductDetail: React.FC = () => {
         </div>
       </div>
 
-      {/* Reviews */}
+      {/* --- Reviews --- */}
       <div className="product-detail-reviews">
         <h2>
-          {FaStar && (FaStar as any)({ className: "star" })} Reviews
+          {FaStar &&
+            (FaStar as any)({ className: "star" })}{" "}
+          Reviews
         </h2>
         {mockReviews.length > 0 ? (
           mockReviews.map((review, idx) => (
@@ -166,8 +183,7 @@ const ProductDetail: React.FC = () => {
               <div className="product-detail-review-header">
                 <span className="product-detail-reviewer-name">{review.reviewer}</span>
                 <span className="product-detail-review-rating">
-                  {"★".repeat(review.rating)}
-                  {"☆".repeat(5 - review.rating)}
+                  {renderStars(review.rating)}
                 </span>
               </div>
               <p className="product-detail-review-comment">{review.comment}</p>

@@ -1,4 +1,9 @@
-import React, { createContext, useContext, useMemo, useState } from "react";
+import React, {
+  createContext,
+  useContext,
+  useMemo,
+  PropsWithChildren,
+} from "react";
 import sportsData from "../data/sports.json";
 
 interface Sport {
@@ -16,17 +21,20 @@ interface SportsContextType {
   sports: Sport[];
 }
 
-const SportsContext = createContext<SportsContextType>({ sports: [] });
+const SportsContext = createContext<SportsContextType | undefined>(undefined);
 
-export const useSports = () => useContext(SportsContext);
+// Robust custom hook
+export function useSports(): SportsContextType {
+  const context = useContext(SportsContext);
+  if (!context) throw new Error("useSports must be used within a SportsProvider");
+  return context;
+}
 
-export const SportsProvider: React.FC<{ children: React.ReactNode }> = React.memo(({ children }) => {
-  const [sports] = useState<Sport[]>(sportsData);
+export const SportsProvider: React.FC<PropsWithChildren> = ({ children }) => {
+  // No need for useState since sports never changes (immutable)
+  const sports = useMemo(() => sportsData as Sport[], []);
   const value = useMemo(() => ({ sports }), [sports]);
-
   return (
-    <SportsContext.Provider value={value}>
-      {children}
-    </SportsContext.Provider>
+    <SportsContext.Provider value={value}>{children}</SportsContext.Provider>
   );
-});
+};

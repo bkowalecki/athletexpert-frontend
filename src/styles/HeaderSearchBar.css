@@ -15,7 +15,6 @@
   width: 100%;
   background: #222;
   border-radius: 50px;
-  /* padding: 8px 12px; */
   backdrop-filter: blur(8px);
   border: 2px solid #a23c20;
   transition: all 0.3s ease-in-out;
@@ -43,7 +42,6 @@ input::placeholder {
   font-size: 18px;
 }
 
-/* 🔹 Input Focus */
 .search-input:focus {
   background: transparent !important;
   color: white;
@@ -62,29 +60,29 @@ input::placeholder {
   color: #ffffff;
   font-size: 14px;
   font-weight: bold;
-  border-radius: 50%; /* Make it a perfect circle */
+  border-radius: 50%;
   cursor: pointer;
   transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.5s ease;
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 55px; /* Equal width and height for a circle */
+  width: 55px;
   height: 50px;
-  padding: 0; /* Ensure no extra padding */
-  line-height: 1; /* Prevent line-height from affecting height */
-  box-sizing: border-box; /* Ensure consistent sizing */
+  padding: 0;
+  line-height: 1;
+  box-sizing: border-box;
 }
 
 .search-button:hover {
-  transform: scale(1.05); /* Slight zoom on hover */
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); /* Shadow increases on hover */
-  background-color: #a23c20; /* Darker burnt orange on hover */
+  transform: scale(1.05);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  background-color: #a23c20;
   transition: transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .search-button:active {
-  transform: scale(0.98); /* Slight compression on click */
+  transform: scale(0.98);
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
 }
 
@@ -98,7 +96,6 @@ input::placeholder {
   box-shadow: 0 0 12px rgba(162, 60, 32, 0.8);
   transform: scale(1.02);
 }
-
 
 /* 🔥 Live Search Suggestions */
 .search-suggestions {
@@ -135,6 +132,8 @@ input::placeholder {
   cursor: pointer;
   transition: background 0.2s ease-in-out, transform 0.1s ease-in-out;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+  /* No regression: keeps your old style but enables recent-label */
 }
 
 .search-suggestion-item:hover {
@@ -156,6 +155,24 @@ input::placeholder {
 .search-suggestion-item.highlighted {
   background-color: #a23c20;
   color: white;
+}
+
+/* 🔥 Recent label for suggestions */
+.recent-label {
+  display: inline-block;
+  margin-right: 10px;
+  font-size: 0.77em;
+  font-weight: 500;
+  color: #c3c3c3;
+  background: #383838;
+  border-radius: 6px;
+  padding: 2px 9px;
+  opacity: 0.85;
+  letter-spacing: 0.01em;
+  pointer-events: none;
+  user-select: none;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.11);
+  transition: background 0.22s;
 }
 
 /* Responsive adjustments */

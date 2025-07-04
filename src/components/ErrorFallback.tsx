@@ -1,18 +1,50 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 
 interface ErrorFallbackProps {
-  error: Error;
+  error: Error | { message: string } | string;
   resetErrorBoundary: () => void;
 }
 
-const ErrorFallback: React.FC<ErrorFallbackProps> = ({ error, resetErrorBoundary }) => (
-  <div role="alert" style={{ padding: "2rem", background: "#ffecec", borderRadius: 8 }}>
-    <h2 style={{ color: "#c00" }}>Something went wrong.</h2>
-    <p style={{ margin: "1rem 0" }}>{error.message}</p>
-    <button onClick={resetErrorBoundary} style={{ padding: "0.5rem 1.5rem", borderRadius: 4, background: "#c00", color: "#fff", border: "none" }}>
-      Try Again
-    </button>
-  </div>
-);
+const ErrorFallback: React.FC<ErrorFallbackProps> = ({ error, resetErrorBoundary }) => {
+  const buttonRef = useRef<HTMLButtonElement>(null);
+
+  // Accessibility: focus the button on mount
+  useEffect(() => {
+    buttonRef.current?.focus();
+  }, []);
+
+  // Defensive error handling
+  const errorMessage =
+    typeof error === "string"
+      ? error
+      : error && "message" in error
+      ? error.message
+      : "An unknown error occurred.";
+
+  return (
+    <div
+      className="error-fallback-container"
+      role="alertdialog"
+      aria-labelledby="error-fallback-title"
+      aria-describedby="error-fallback-desc"
+      tabIndex={-1}
+    >
+      <h2 id="error-fallback-title" className="error-fallback-title">
+        Something went wrong.
+      </h2>
+      <p id="error-fallback-desc" className="error-fallback-message">
+        {errorMessage}
+      </p>
+      <button
+        ref={buttonRef}
+        onClick={resetErrorBoundary}
+        className="error-fallback-button"
+        aria-label="Try to recover from error"
+      >
+        Try Again
+      </button>
+    </div>
+  );
+};
 
 export default ErrorFallback;

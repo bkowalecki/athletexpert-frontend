@@ -2,27 +2,43 @@ import React from "react";
 import { Link } from "react-router-dom";
 import "../../styles/Footer.css";
 
+// Centralize your links for easier edits/expansion
+const footerLinks = [
+  { path: "/privacy-policy", label: "Privacy Policy" },
+  { path: "/terms-and-conditions", label: "Terms & Conditions" },
+  { path: "/contact", label: "Contact" },
+  { path: "/about", label: "About" }
+];
+
+const socialLinks = [
+  {
+    href: "https://twitter.com",
+    label: "Twitter (X)",
+    icon: "fab fa-x-twitter"
+  },
+  {
+    href: "https://instagram.com",
+    label: "Instagram",
+    icon: "fab fa-instagram"
+  }
+];
+
 const Footer: React.FC = () => (
-  <footer className="app-footer">
+  <footer className="app-footer" role="contentinfo">
     <div className="footer-container">
       <div className="footer-content">
         <div className="footer-logo">
-          <Link to="/">
+          <Link to="/" aria-label="Home">
             <h2>AthleteXpert</h2>
           </Link>
         </div>
-        <div className="footer-links">
-          {["privacy-policy", "terms-and-conditions", "contact", "about"].map((path) => (
-            <Link key={path} to={`/${path}`}>
-              {path.replace("-", " ").replace(/\b\w/g, (char) => char.toUpperCase())}
-            </Link>
+        <nav className="footer-links" aria-label="Footer links">
+          {footerLinks.map(({ path, label }) => (
+            <Link key={path} to={path}>{label}</Link>
           ))}
-        </div>
+        </nav>
         <div className="social-media">
-          {[
-            { href: "https://twitter.com", label: "Twitter", icon: "fab fa-x-twitter" },
-            { href: "https://instagram.com", label: "Instagram", icon: "fab fa-instagram" },
-          ].map(({ href, label, icon }) => (
+          {socialLinks.map(({ href, label, icon }) => (
             <a
               key={label}
               href={href}
@@ -30,16 +46,18 @@ const Footer: React.FC = () => (
               rel="noopener noreferrer"
               aria-label={label}
             >
-              <i className={icon}></i>
+              <i className={icon} aria-hidden="true"></i>
             </a>
           ))}
         </div>
       </div>
       <div className="footer-bottom">
-        <p>&copy; {new Date().getFullYear()} AthleteXpert. All rights reserved.</p>
+        <p>
+          &copy; {new Date().getFullYear()} AthleteXpert. All rights reserved.
+        </p>
       </div>
     </div>
   </footer>
 );
 
-export default Footer;
+export default React.memo(Footer);

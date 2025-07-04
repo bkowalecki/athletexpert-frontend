@@ -14,34 +14,47 @@ const navLinks = [
   { path: "/blog", label: "Blog" },
 ];
 
+const MOBILE_BREAKPOINT = 875;
+
 const Header: React.FC = () => {
   const { user, isSessionChecked } = useUserContext();
   const { isAuthenticated } = useAuth0();
   const [menuState, setMenuState] = useState<MenuState>("closed");
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 875);
-  const navigate = useNavigate();
+  const [isMobile, setIsMobile] = useState(false);
+  const [isHydrated, setIsHydrated] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
 
-  const isMenuVisible = menuState === "open" || menuState === "closing";
-
-  const handleResize = useCallback(() => {
-    setIsMobile(window.innerWidth <= 875);
+  // --- Responsive check (safe for SSR)
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth <= MOBILE_BREAKPOINT);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    setIsHydrated(true); // Ensures client-side match
+    return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
+  // --- Lock body scroll on mobile menu open
   useEffect(() => {
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, [handleResize]);
+    if (isMobile && menuState === "open") {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => { document.body.style.overflow = ""; };
+  }, [isMobile, menuState]);
 
+  // --- Outside click closes menu
   useEffect(() => {
+    if (!isMobile || menuState !== "open") return;
     const handleOutsideClick = (e: MouseEvent) => {
-      if (isMenuVisible && menuRef.current && !menuRef.current.contains(e.target as Node)) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
         setMenuState("closing");
       }
     };
     document.addEventListener("mousedown", handleOutsideClick);
     return () => document.removeEventListener("mousedown", handleOutsideClick);
-  }, [isMenuVisible]);
+  }, [isMobile, menuState]);
 
   const toggleMobileMenu = () => {
     setMenuState(prev =>
@@ -49,15 +62,18 @@ const Header: React.FC = () => {
     );
   };
 
-  const closeMobileMenu = () => {
+  const closeMobileMenu = useCallback(() => {
     if (isMobile && menuState === "open") setMenuState("closing");
-  };
+  }, [isMobile, menuState]);
 
-  const handleProfileClick = () => {
+  const handleProfileClick = useCallback(() => {
     if (!isSessionChecked) return;
     navigate(user ? "/profile" : "/auth");
     closeMobileMenu();
-  };
+  }, [isSessionChecked, user, navigate, closeMobileMenu]);
+
+  // Don't render until hydration (avoid window mismatch on SSR)
+  if (!isHydrated) return null;
 
   return (
     <header className="app-header">
@@ -136,6 +152,10 @@ const Header: React.FC = () => {
         aria-label="Toggle navigation menu"
         aria-controls="main-navigation"
         aria-expanded={menuState === "open"}
+        tabIndex={0} // <-- make keyboard accessible
+        onKeyDown={e => {
+          if (e.key === "Enter" || e.key === " ") toggleMobileMenu();
+        }}
       >
         {[0, 1, 2].map(i => (
           <div key={i} className={`bar ${menuState === "open" ? "open" : ""}`} />
@@ -145,4 +165,4 @@ const Header: React.FC = () => {
   );
 };
 
-export default Header;
+export default React.memo(Header);

@@ -117,53 +117,126 @@
 }
 
 .preview-box {
+  background: none !important;      /* Remove preview-box background */
+  color: unset !important;
+  font-family: unset !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  max-height: unset;
+  overflow-y: unset;
+}
+
+/* Directly mimic published page! */
+.preview-box .blog-post-content {
   background: var(--content-background, #f9f9f9);
   color: var(--text-color, #111);
-  font-family: "Inter", "Georgia", serif;
-  padding: 2rem;
+  font-family: 'Georgia', serif;
+  font-size: 20px;
+  line-height: 1.85;
+  width: 100%;
+  max-width: 720px;
+  padding: 2.5rem 2rem;
   border-radius: 12px;
-  box-shadow: 0 0 14px rgba(0, 0, 0, 0.2);
-  line-height: 1.75;
-  max-height: 600px;
-  overflow-y: auto;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.18);
+  margin: 0 auto;
+  letter-spacing: 0.1px;
+  word-break: break-word;
+  transition: all 0.18s;
 }
 
-.image-preview {
+.preview-box .blog-post-content h2 {
+  font-size: 1.8rem;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  font-weight: 700;
+  color: var(--heading-color, #0B3D2E);
+  border-bottom: 2px solid var(--accent-green, #2A6045);
+  padding-bottom: 0.3rem;
+}
+
+.preview-box .blog-post-content h3 {
+  font-size: 1.4rem;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+  color: var(--link-hover-color, #a23c20);
+  font-weight: 600;
+}
+
+.preview-box .blog-post-content a {
+  color: var(--link-color, #a23c20);
+  text-decoration: underline;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+.preview-box .blog-post-content a:hover {
+  color: var(--link-hover-color, #8a2f17);
+}
+
+.preview-box .blog-post-content img {
+  display: block;
+  margin: 1.5rem auto;
+  width: 100%;
   max-width: 100%;
   height: auto;
+  max-height: 300px;
+  object-fit: contain;
   border-radius: 8px;
-  margin-top: 1rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
 }
 
-
-.preview-box h2 {
-  font-size: 1.5rem;
-  margin-top: 2rem;
-  margin-bottom: 0.5rem;
-  border-bottom: 2px solid #2A6045;
-  color: #0B3D2E;
+/* Preview p, ol, badge, etc (copy all from published page for perfect match) */
+.preview-box .blog-post-content p {
+  margin: 1.5rem 0;
+  line-height: 1.9;
+  font-weight: 400;
+  font-size: 1.17rem;
+  max-width: 65ch;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: left;
 }
 
-.preview-box h3 {
-  font-size: 1.25rem;
-  color: #a23c20;
-  margin-top: 1.5rem;
+.preview-box .blog-post-content ol.product-list {
+  list-style: none;
+  counter-reset: topItem;
+  padding-left: 0;
+  margin-bottom: 2rem;
 }
 
-.preview-box a {
-  color: #a23c20;
-  text-decoration: none;
-  font-weight: bold;
+.preview-box .blog-post-content ol.product-list li {
+  counter-increment: topItem;
+  position: relative;
+  background: #fff;
+  border-radius: 12px;
+  padding: 1rem 1.5rem 1rem 1.5rem;
+  padding-top: 3rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 
-.preview-box a:hover {
-  color: #8a2f17;
-  text-decoration: underline;
+.preview-box .blog-post-content ol.product-list li::before {
+  content: "#" counter(topItem);
+  position: absolute;
+  top: 0.5rem;
+  left: 1.5rem;
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: var(--accent-green, #2A6045);
+  font-family: 'Montserrat', sans-serif;
+  line-height: 1;
 }
 
-.preview-box p {
-  margin-bottom: 1.5rem;
-  text-align: justify;
+.preview-box .blog-post-content .product-badge {
+  background-color: var(--accent-green, #2A6045);
+  color: #fff;
+  font-size: 0.75rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-left: 0.5rem;
+  white-space: nowrap;
 }
 
 /* === Buttons === */

@@ -1,74 +1,117 @@
-/* ---- SportStatsModal: Clean, Sporty, Addictive ---- */
+/* ===============================
+   AthleteXpert: SportStatsModal.css
+   Color Theory: Future Athlete meets Warm Tech
+   =============================== */
 
-.sport-modal-overlay {
+/* --- Global Modal Overlay --- */
+.sport-modal-overlay,
+.sport-modal-overlay.enhanced {
   position: fixed;
   inset: 0;
-  background: rgba(22, 22, 22, 0.74);
+  z-index: 9999;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 9999;
-  animation: fadeIn 0.24s cubic-bezier(.4,1.4,.62,1.08) forwards;
-  backdrop-filter: blur(1.2px);
+  /* Background: Animated radial + soft vignette + glass */
+  background: radial-gradient(ellipse at 65% 38%, #2a604556 9%, #a23c2033 38%, #fff0 75%),
+              linear-gradient(110deg, #e2ead6 6%, #fff6 85%, #f6efe7 98%);
+  backdrop-filter: blur(2.7px) saturate(135%);
+  animation: fadeIn 0.28s cubic-bezier(.4,1.4,.62,1.08) forwards, gradientShift 14s linear infinite alternate;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes gradientShift {
+  0% { background-position: 60% 36%; }
+  100% { background-position: 44% 58%; }
 }
 
-.sport-modal {
-  background: linear-gradient(112deg, #fff 85%, #e2ead6 100%);
-  border-radius: 16px;
-  box-shadow: 0 8px 32px #2a60451b, 0 1.5px 12px #a23c2015;
-  padding: 2.3rem 1.4rem 1.6rem 1.4rem;
-  width: 92vw;
-  max-width: 430px;
-  animation: slideUp 0.38s cubic-bezier(.45,1.35,.5,1.15) forwards;
+/* --- Modal Card --- */
+.sport-modal,
+.sport-modal.enhanced {
+  background: linear-gradient(108deg, #fff 84%, #e2ead6 102%, #fcf6ea 124%);
+  border-radius: 22px;
+  box-shadow: 0 14px 44px #2a604539, 0 3.2px 14px #a23c2033, 0 2.2px 11px #1114;
+  border: 2.7px solid #2A6045;
+  padding: 2.5rem 1.65rem 1.6rem 1.65rem;
+  width: 94vw;
+  max-width: 435px;
+  animation: slideUp 0.33s cubic-bezier(.45,1.35,.5,1.15) forwards;
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  border: 2.5px solid #2A6045;
+  filter: drop-shadow(0 2px 18px #a23c2040);
+  transition: box-shadow 0.18s cubic-bezier(.38,1.25,.52,1.15);
 }
 
+@keyframes slideUp {
+  from { transform: translateY(64px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
+/* --- Close Button --- */
 .sport-modal-close {
   position: absolute;
-  top: 0.65rem;
-  right: 0.9rem;
+  top: 0.6rem;
+  right: 1.1rem;
   background: transparent;
   border: none;
-  font-size: 2.2rem;
+  font-size: 2.17rem;
   cursor: pointer;
   color: #2A6045;
-  transition: color 0.18s;
+  transition: color 0.18s, transform 0.12s cubic-bezier(.37,1.7,.38,1.08);
   z-index: 10;
   padding: 0;
   line-height: 1;
+  outline: none;
 }
-.sport-modal-close:hover { color: #a23c20; }
+.sport-modal-close:hover, .sport-modal-close:focus-visible {
+  color: #A23C20;
+  transform: scale(1.13);
+  outline: 2.5px solid #a23c20cc;
+  outline-offset: 2px;
+}
 
-/* ---- Header: Icon + Title ---- */
+/* --- Header: Icon + Title --- */
 .sport-modal-header {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 1rem;
-  margin-bottom: 0.5rem;
+  gap: 1.05rem;
+  margin-bottom: 0.45rem;
 }
 .sport-modal-sporticon {
-  font-size: 2.35rem;
-  filter: drop-shadow(0 3px 8px #0001);
+  font-size: 2.48rem;
+  filter: drop-shadow(0 3px 8px #2a604518);
   user-select: none;
   pointer-events: none;
+  transition: text-shadow 0.22s cubic-bezier(.38,1.3,.48,1.14);
 }
 .sport-modal-title {
-  font-size: 1.37rem;
-  font-weight: 700;
-  letter-spacing: 0.025em;
-  color: #a23c20;
-  text-shadow: 0 1px 6px #2a604516;
+  font-size: 1.41rem;
+  font-weight: 800;
+  letter-spacing: 0.037em;
+  color: #A23C20;
+  text-shadow: 0 1.5px 7px #2a604515;
   margin-bottom: 0.22rem;
 }
 
-/* ---- Stats List ---- */
+/* --- Fun Fact/Quote --- */
+.sport-modal-funfact {
+  font-size: 1.08rem;
+  color: #265F41;
+  background: linear-gradient(96deg, #e2ead6cc 70%, #fff 99%);
+  border-left: 4px solid #a23c20;
+  border-radius: 8px;
+  margin-bottom: 1.13rem;
+  padding: 0.67em 1.07em;
+  font-style: italic;
+  font-family: 'Georgia', serif;
+  box-shadow: 0 1.5px 6px #2a604511;
+}
+
+/* --- Stats List --- */
 .sport-stats-list {
-  margin-bottom: 1.1rem;
+  margin-bottom: 1.14rem;
   padding: 0;
   list-style: none;
 }
@@ -76,26 +119,28 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 1.04rem;
-  margin-bottom: 0.68rem;
-  color: #222;
+  font-size: 1.09rem;
+  margin-bottom: 0.71rem;
+  color: #232;
   background: linear-gradient(90deg, #e2ead6 55%, #fff 100%);
-  padding: 0.51em 0.74em;
-  border-radius: 8px;
+  padding: 0.52em 0.78em;
+  border-radius: 10px;
   font-weight: 500;
-  box-shadow: 0 2px 9px #2a604507;
+  box-shadow: 0 2.5px 9px #2a604506;
+  border: 1.1px solid #a23c201a;
+  transition: background 0.18s;
 }
 
 .sport-stat-row strong {
-  font-weight: 700;
+  font-weight: 800;
   color: #2A6045;
   display: flex;
   align-items: center;
-  gap: 0.28rem;
+  gap: 0.25rem;
 }
 
 .stat-progress-bar-wrap {
-  width: 78px;
+  width: 85px;
   height: 13px;
   margin-left: 10px;
   background: #e2ead6;
@@ -117,90 +162,132 @@
 .stat-progress-bar-fg {
   display: block;
   height: 100%;
-  background: linear-gradient(90deg, #a23c20 70%, #2A6045 100%);
+  background: linear-gradient(90deg, #a23c20 68%, #2A6045 100%);
   border-radius: 999px;
-  transition: width 0.44s cubic-bezier(0.24,0.9,0.5,1.2);
-  min-width: 4px;
+  min-width: 5px;
+  animation: statBarPulse 1.8s infinite cubic-bezier(.35,1.1,.6,1.02) alternate;
+  box-shadow: 0 0 8px #2a60451a;
+}
+@keyframes statBarPulse {
+  0% { filter: brightness(1.15); }
+  100% { filter: brightness(1.32); }
 }
 
-/* ---- Badge Row ---- */
+/* --- Tips Section --- */
+.sport-modal-tips {
+  margin: 0.7rem 0 1.05rem 0;
+  background: linear-gradient(99deg, #e2ead6 80%, #fff 100%);
+  padding: 0.89em 1em;
+  border-radius: 11px;
+  border-left: 5px solid #2A6045;
+  box-shadow: 0 1.2px 5px #2a604514;
+}
+.sport-modal-tips h3 {
+  font-size: 1.06rem;
+  font-weight: 700;
+  color: #A23C20;
+  margin-bottom: 0.4em;
+  letter-spacing: 0.03em;
+}
+.sport-modal-tips ul {
+  padding: 0 0 0 1em;
+  margin: 0;
+}
+.sport-modal-tips li {
+  font-size: 0.99rem;
+  color: #24402a;
+  margin-bottom: 0.33em;
+  font-style: italic;
+  line-height: 1.3;
+}
+
+/* --- Badge Row --- */
 .sport-badge-row {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.66rem;
-  margin: 1.07rem 0 0.89rem 0;
+  gap: 0.7rem;
+  margin: 1.12rem 0 0.9rem 0;
+  outline: none;
 }
 .sport-badge {
   display: inline-block;
-  padding: 0.54em 1.1em;
-  font-weight: 800;
+  padding: 0.54em 1.15em;
+  font-weight: 900;
   color: #fff;
-  background: linear-gradient(98deg, #a23c20 47%, #2A6045 100%);
-  border-radius: 2em;
-  font-size: 1.08rem;
-  box-shadow: 0 3px 18px #a23c2028, 0 2px 7px #2222;
-  letter-spacing: 0.09em;
-  text-shadow: 0 1.5px 6px #a23c2027;
+  background: linear-gradient(102deg, #a23c20 51%, #2A6045 100%);
+  border-radius: 2.4em;
+  font-size: 1.17rem;
+  box-shadow: 0 3.5px 18px #a23c2034, 0 2px 7px #2223;
+  letter-spacing: 0.11em;
+  text-shadow: 0 1.5px 6px #a23c2025;
   position: relative;
   user-select: none;
+  outline: none;
+  border: 1.1px solid #2A604599;
+  transition: background 0.17s, box-shadow 0.14s;
 }
-.badge-spark {
-  width: 17px;
-  height: 17px;
-  background: radial-gradient(circle, #ffcc80 53%, #fff0 77%);
-  border-radius: 50%;
+.sport-badge:active, .sport-badge:focus-visible {
+  background: linear-gradient(99deg, #2A6045 72%, #a23c20 100%);
+  box-shadow: 0 0 15px #ffd7009e;
+  outline: 2.5px solid #ffd700a0;
+}
+.badge-spark-svg {
   display: inline-block;
-  animation: badgeSparkPulse 1.24s infinite alternate;
-  margin-left: 2px;
-  box-shadow: 0 0 14px #ffdb99;
+  margin-left: 5px;
+  vertical-align: middle;
+  animation: badgeSparkPulse 1.14s infinite alternate;
+  filter: drop-shadow(0 1px 7px #ffd70080);
 }
 @keyframes badgeSparkPulse {
-  0% { transform: scale(1); opacity: 0.65;}
-  100% { transform: scale(1.45); opacity: 1;}
+  0% { opacity: 0.69; transform: scale(1); }
+  100% { opacity: 1; transform: scale(1.3);}
 }
 
-/* ---- Tip Box ---- */
+/* --- Tip Box --- */
 .sport-modal-tip {
-  font-size: 1.04rem;
+  font-size: 1.07rem;
   color: #265F41;
-  background: linear-gradient(100deg, #e2ead6 70%, #fff 100%);
-  border-left: 4.5px solid #a23c20;
-  padding: 0.62em 1.03em;
-  border-radius: 8px;
-  margin-bottom: 1.1rem;
+  background: linear-gradient(101deg, #e2ead6 77%, #fff 100%);
+  border-left: 4.2px solid #a23c20;
+  padding: 0.64em 1.05em;
+  border-radius: 9px;
+  margin-bottom: 1.13rem;
   font-style: italic;
   text-align: center;
-  box-shadow: 0 1.5px 7px #2a604511;
+  box-shadow: 0 1.8px 7px #2a604511;
   font-family: 'Georgia', serif;
 }
 
-/* ---- Footer ---- */
+/* --- Footer --- */
 .sport-modal-footer {
-  font-size: 0.93rem;
+  font-size: 0.97rem;
   text-align: center;
   color: #848484;
-  margin-top: 0.51rem;
+  margin-top: 0.54rem;
   font-weight: 500;
-  letter-spacing: 0.018em;
-  padding-bottom: 0.1em;
+  letter-spacing: 0.019em;
+  padding-bottom: 0.11em;
 }
 
-/* ---- Animations ---- */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-@keyframes slideUp {
-  from { transform: translateY(60px); opacity: 0;}
-  to   { transform: translateY(0); opacity: 1;}
+/* --- Focus States for a11y --- */
+.sport-modal-close:focus-visible,
+.sport-badge-row:focus-visible,
+.sport-badge:focus-visible {
+  outline: 2.5px solid #A23C20;
+  outline-offset: 2px;
 }
 
-/* ---- Responsive ---- */
+/* --- Responsive --- */
 @media (max-width: 540px) {
-  .sport-modal { padding: 1.2rem 0.6rem 1.09rem 0.6rem; }
-  .sport-modal-title { font-size: 1.08rem; }
-  .sport-modal-sporticon { font-size: 1.34rem; }
-  .sport-badge { font-size: 0.96rem; }
-  .stat-progress-bar-wrap { width: 55px; height: 10px; }
+  .sport-modal, .sport-modal.enhanced { padding: 1.2rem 0.6rem 1.07rem 0.6rem; }
+  .sport-modal-title { font-size: 1.10rem; }
+  .sport-modal-sporticon { font-size: 1.31rem; }
+  .sport-badge { font-size: 0.98rem; }
+  .stat-progress-bar-wrap { width: 54px; height: 10px; }
 }
+
+@media (max-width: 400px) {
+  .sport-modal, .sport-modal.enhanced { padding: 0.7rem 0.1rem 0.67rem 0.1rem; }
+}
+

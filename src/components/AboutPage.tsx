@@ -1,6 +1,38 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet"; // For SEO
 import "../styles/AboutPage.css";
+
+const coreValues = [
+  {
+    title: "Excellence",
+    description:
+      "We aim for the highest standards in everything we do, from product curation to community engagement.",
+  },
+  {
+    title: "Innovation",
+    description:
+      "We embrace new technologies and strategies to enhance athletic performance and gear selection.",
+  },
+  {
+    title: "Community",
+    description:
+      "AthleteXpert is built on a strong foundation of athletes supporting athletes.",
+  },
+];
+
+const testimonials = [
+  {
+    text:
+      "AthleteXpert gave me the tools and knowledge to upgrade my training like never before.",
+    author: "Alex Johnson, Pro Basketball Player",
+  },
+  {
+    text:
+      "The expert recommendations and smart gear insights have helped me improve my endurance and performance.",
+    author: "Sarah Lee, Triathlete",
+  },
+];
 
 const AboutPage: React.FC = () => {
   const navigate = useNavigate();
@@ -10,8 +42,16 @@ const AboutPage: React.FC = () => {
   };
 
   return (
-    <div className="about-page-container">
-      <div className="about-page-hero-section">
+    <main className="about-page-container" role="main">
+      <Helmet>
+        <title>About AthleteXpert | The Future of Sports Innovation</title>
+        <meta
+          name="description"
+          content="Discover AthleteXpert—your go-to community for athletes, with expert gear recommendations, training insights, and an empowering athlete network."
+        />
+      </Helmet>
+
+      <section className="about-page-hero-section">
         <div className="about-page-hero-content">
           <h1 className="about-page-hero-title">
             The Future of Sports Innovation
@@ -24,13 +64,14 @@ const AboutPage: React.FC = () => {
           <button
             className="about-page-hero-button"
             onClick={handleAuthPageNavigation}
+            aria-label="Join AthleteXpert Community"
           >
             Join the Community
           </button>
         </div>
-      </div>
+      </section>
 
-      <div className="about-page-sections">
+      <section className="about-page-sections">
         <div className="about-page-card">
           <h2 className="about-page-card-title">Our Purpose</h2>
           <p className="about-page-card-description">
@@ -59,59 +100,36 @@ const AboutPage: React.FC = () => {
             gear, and take your performance to new heights.
           </p>
         </div>
-      </div>
+      </section>
 
-      <div className="about-page-values-section">
-        <h2 className="about-page-section-title">Our Core Values</h2>
+      <section className="about-page-values-section" aria-labelledby="core-values-title">
+        <h2 id="core-values-title" className="about-page-section-title">
+          Our Core Values
+        </h2>
         <div className="about-page-values-list">
-          <div className="about-page-value-item">
-            <h3>Excellence</h3>
-            <p>
-              We aim for the highest standards in everything we do, from product
-              curation to community engagement.
-            </p>
-          </div>
-          <div className="about-page-value-item">
-            <h3>Innovation</h3>
-            <p>
-              We embrace new technologies and strategies to enhance athletic
-              performance and gear selection.
-            </p>
-          </div>
-          <div className="about-page-value-item">
-            <h3>Community</h3>
-            <p>
-              AthleteXpert is built on a strong foundation of athletes
-              supporting athletes.
-            </p>
-          </div>
+          {coreValues.map((val) => (
+            <div className="about-page-value-item" key={val.title}>
+              <h3>{val.title}</h3>
+              <p>{val.description}</p>
+            </div>
+          ))}
         </div>
-      </div>
+      </section>
 
-      <div className="about-page-testimonial-section">
-        <h2 className="about-page-section-title">What Athletes Say</h2>
+      <section className="about-page-testimonial-section" aria-labelledby="testimonials-title">
+        <h2 id="testimonials-title" className="about-page-section-title">
+          What Athletes Say
+        </h2>
         <div className="about-page-testimonials">
-          <div className="about-page-testimonial-card">
-            <p className="about-page-testimonial-text">
-              "AthleteXpert gave me the tools and knowledge to upgrade my
-              training like never before."
-            </p>
-            <p className="about-page-testimonial-author">
-              — Alex Johnson, Pro Basketball Player
-            </p>
-          </div>
-          <div className="about-page-testimonial-card">
-            <p className="about-page-testimonial-text">
-              "The expert recommendations and smart gear insights have helped me
-              improve my endurance and performance."
-            </p>
-            <p className="about-page-testimonial-author">
-              — Sarah Lee, Triathlete
-            </p>
-          </div>
+          {testimonials.map((t, i) => (
+            <div className="about-page-testimonial-card" key={i}>
+              <p className="about-page-testimonial-text">{`"${t.text}"`}</p>
+              <p className="about-page-testimonial-author">— {t.author}</p>
+            </div>
+          ))}
         </div>
-      </div>
-    </div>
+      </section>
+    </main>
   );
 };
 

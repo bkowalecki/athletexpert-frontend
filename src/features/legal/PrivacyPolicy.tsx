@@ -8,8 +8,8 @@ interface SectionProps {
 }
 
 const Section: React.FC<SectionProps> = ({ title, children }) => (
-  <section className="policy-section">
-    <h2>{title}</h2>
+  <section className="policy-section" aria-labelledby={title.replace(/\s+/g, "-").toLowerCase()}>
+    <h2 id={title.replace(/\s+/g, "-").toLowerCase()}>{title}</h2>
     {children}
   </section>
 );
@@ -30,13 +30,13 @@ const PrivacyPolicy: React.FC = () => {
           content="Learn how AthleteXpert collects, uses, and protects your personal data."
         />
       </Helmet>
-
-      <div className="terms-container">
+      <div className="terms-container" role="document" aria-label="Privacy Policy">
         <header className="policy-header" role="banner">
-          <h1>Privacy Policy</h1>
-          <p>Last updated: {lastUpdated}</p>
+          <h1 tabIndex={0}>Privacy Policy</h1>
+          <p className="policy-last-updated">
+            <strong>Last updated:</strong> {lastUpdated}
+          </p>
         </header>
-
         <main className="policy-main" role="main">
           <Section title="1. Introduction">
             <p>
@@ -51,118 +51,86 @@ const PrivacyPolicy: React.FC = () => {
             <p>We collect the following types of information:</p>
             <ul>
               <li>
-                <strong>Personal Information:</strong> Includes your name,
-                email, profile information, sports interests, and any data
-                provided through forms or user interactions.
+                <strong>Personal Information:</strong> Your name,
+                email, profile info, sports interests, and any data you submit.
               </li>
               <li>
-                <strong>Usage Data:</strong> Automatically collected data like
-                IP address, browser type, pages visited, referral URLs, and
-                timestamps.
+                <strong>Usage Data:</strong> Like IP, browser, pages visited, referral, and timestamps.
               </li>
               <li>
-                <strong>Cookies & Tracking Technologies:</strong> Used for
-                analytics, session management, and personalized
-                recommendations. See our Cookie Policy for more details.
+                <strong>Cookies & Tracking:</strong> For analytics, session management, and personalized recs.
               </li>
             </ul>
           </Section>
 
           <Section title="3. How We Use Your Information">
             <ul>
-              <li>To provide personalized product recommendations and content.</li>
-              <li>To improve website functionality and user experience.</li>
-              <li>
-                To send newsletters, updates, or promotional offers (with
-                consent).
-              </li>
-              <li>To monitor platform usage, detect fraud, and enhance security.</li>
+              <li>Personalized recommendations and content.</li>
+              <li>Improve website and user experience.</li>
+              <li>Send newsletters or offers (with consent).</li>
+              <li>Detect fraud and enhance security.</li>
             </ul>
           </Section>
 
           <Section title="4. Sharing Your Information">
             <p>We may share your data with:</p>
             <ul>
-              <li>
-                <strong>Service Providers:</strong> For hosting, analytics, and
-                operational support.
-              </li>
-              <li>
-                <strong>Legal Authorities:</strong> When required by law or to
-                protect our legal rights.
-              </li>
-              <li>
-                <strong>Affiliate Partners:</strong> Limited data may be shared
-                when you interact with affiliate links, governed by the
-                partner’s privacy policy.
-              </li>
+              <li><strong>Service Providers:</strong> For hosting, analytics, or operational support.</li>
+              <li><strong>Legal Authorities:</strong> When required by law or to protect rights.</li>
+              <li><strong>Affiliate Partners:</strong> Limited data when you interact with affiliate links.</li>
             </ul>
           </Section>
 
           <Section title="5. Cookies and Tracking Technologies">
             <p>
-              We use cookies to enhance your browsing experience, analyze site
-              traffic, and deliver personalized content. You can manage cookie
-              preferences in your browser settings. Depending on your location,
-              we may also present you with a cookie consent banner upon your
-              first visit.
+              We use cookies to enhance your experience, analyze traffic, and deliver personalized content. 
+              You can manage preferences in your browser settings. Depending on location, you may see a cookie consent banner on first visit.
             </p>
           </Section>
 
           <Section title="6. Your Data Rights">
             <ul>
-              <li>Access, update, or delete your personal information.</li>
-              <li>Withdraw consent for data processing at any time.</li>
-              <li>Opt-out of marketing communications.</li>
+              <li>Access, update, or delete your data.</li>
+              <li>Withdraw consent anytime.</li>
+              <li>Opt-out of marketing emails.</li>
             </ul>
           </Section>
 
           <Section title="7. Data Security and Retention">
             <p>
-              We implement strict security measures to protect your data, but no
-              system is completely secure. We encourage users to maintain strong
-              passwords and protect their login credentials.
+              We use strict security measures, but no system is 100% secure. Use strong passwords and protect your login.
             </p>
             <p>
-              We retain your personal information only as long as necessary to
-              provide our services, comply with legal obligations, resolve
-              disputes, and enforce our agreements. When no longer needed, we
-              securely delete or anonymize your data.
+              We retain personal info as long as necessary. Once not needed, we delete or anonymize it securely.
             </p>
           </Section>
 
           <Section title="8. Third-Party Links">
             <p>
-              Our platform contains links to third-party websites. We are not
-              responsible for their privacy practices. Please review their
-              policies before providing any personal information.
+              Our platform contains third-party links. We are not responsible for their privacy practices—review their policies before sharing info.
             </p>
           </Section>
 
           <Section title="9. Children's Privacy">
             <p>
-              We do not knowingly collect personal data from individuals under
-              the age of 13. If we become aware of such data, we will delete it
-              promptly.
+              We do not knowingly collect data from children under 13. If we become aware of such data, we will delete it promptly.
             </p>
           </Section>
 
           <Section title="10. International Users (GDPR Notice)">
             <p>
-              If you are accessing our platform from the European Union (EU) or
-              European Economic Area (EEA), you have the following additional
-              rights:
+              If you access from the EU or EEA, you have these additional rights:
             </p>
             <ul>
-              <li>The right to access, update, or delete your personal information.</li>
-              <li>The right to object to processing of your data.</li>
-              <li>The right to data portability.</li>
-              <li>The right to lodge a complaint with a supervisory authority.</li>
+              <li>Access, update, or delete your data.</li>
+              <li>Object to data processing.</li>
+              <li>Data portability.</li>
+              <li>File a complaint with your authority.</li>
             </ul>
             <p>
-              If you wish to exercise any of these rights, please contact us at{" "}
-              <a href="mailto:support@athletexpert.com">
-                support@athletexpert.com
+              To exercise these rights, email:{" "}
+              <a href="mailto:contact@athletexpert.com">
+                contact@athletexpert.com
               </a>
               .
             </p>
@@ -170,17 +138,15 @@ const PrivacyPolicy: React.FC = () => {
 
           <Section title="11. Changes to This Policy">
             <p>
-              We may update this policy from time to time. Changes will be
-              posted on this page with an updated date. Continued use of the
-              platform signifies your acceptance of the revised policy.
+              We may update this policy. Changes will be posted here with the new date. Continued use means you accept the update.
             </p>
           </Section>
 
           <Section title="12. Contact Us">
             <p>
-              For questions about this Privacy Policy, please contact us at{" "}
-              <a href="mailto:support@athletexpert.com">
-                support@athletexpert.com
+              For questions about this policy, email:{" "}
+              <a href="mailto:contact@athletexpert.com">
+                contact@athletexpert.com
               </a>
               .
             </p>

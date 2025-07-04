@@ -3,71 +3,47 @@ import { Routes, Route } from "react-router-dom";
 import { useUserContext } from "./context/UserContext";
 import RequireAuth from "./features/auth/RequireAuth";
 
-// Critical (non-lazy) imports for instant home rendering
+// Instant-load components for homepage
 import HeroSection from "./features/layout/HeroSection";
 import FeaturedProductList from "./features/products/FeaturedProductList";
 import TrendingProductList from "./features/products/TrendingProductList";
 import BlogSection from "./features/blog/BlogSection";
+import LoadingScreen from "./components/LoadingScreen";
 
-// Lazy-load everything else
+// Lazy-loaded routes
 const Quiz = React.lazy(() => import("./features/recommender/Quiz"));
-const ProductsPage = React.lazy(
-  () => import("./features/products/ProductsPage")
-);
-const ProductDetail = React.lazy(
-  () => import("./features/products/ProductDetail")
-);
-const AdminProductManager = React.lazy(
-  () => import("./features/products/AdminProductManager")
-);
-
+const ProductsPage = React.lazy(() => import("./features/products/ProductsPage"));
+const ProductDetail = React.lazy(() => import("./features/products/ProductDetail"));
+const AdminProductManager = React.lazy(() => import("./features/products/AdminProductManager"));
 const BlogPage = React.lazy(() => import("./features/blog/BlogPage"));
 const BlogPostPage = React.lazy(() => import("./features/blog/BlogPostPage"));
 const NewBlogPost = React.lazy(() => import("./features/blog/NewBlogPost"));
-
 const ProfilePage = React.lazy(() => import("./features/profile/ProfilePage"));
-const AccountSettings = React.lazy(
-  () => import("./features/profile/AccountSettings")
-);
-const OnboardingPage = React.lazy(
-  () => import("./features/profile/OnboardingPage")
-);
-
-const CommunityPage = React.lazy(
-  () => import("./features/community/CommunityPage")
-);
+const AccountSettings = React.lazy(() => import("./features/profile/AccountSettings"));
+const OnboardingPage = React.lazy(() => import("./features/profile/OnboardingPage"));
+const CommunityPage = React.lazy(() => import("./features/community/CommunityPage"));
 const SportPage = React.lazy(() => import("./features/community/SportPage"));
-
-const SearchResults = React.lazy(
-  () => import("./features/search/SearchResults")
-);
-
+const SearchResults = React.lazy(() => import("./features/search/SearchResults"));
 const AuthPage = React.lazy(() => import("./features/auth/AuthPage"));
 const AuthCallback = React.lazy(() => import("./features/auth/AuthCallback"));
-
 const AboutPage = React.lazy(() => import("./components/AboutPage"));
 const ContactPage = React.lazy(() => import("./features/legal/ContactPage"));
-const TermsAndConditionsPage = React.lazy(
-  () => import("./features/legal/TermsAndConditions")
-);
-const PrivacyPolicy = React.lazy(
-  () => import("./features/legal/PrivacyPolicy")
-);
-
+const TermsAndConditionsPage = React.lazy(() => import("./features/legal/TermsAndConditions"));
+const PrivacyPolicy = React.lazy(() => import("./features/legal/PrivacyPolicy"));
 const NotFoundPage = React.lazy(() => import("./components/four0fourPage"));
 
 const AppRoutes: React.FC = () => {
   const { isSessionChecked } = useUserContext();
   const [isQuizModalOpen, setQuizModalOpen] = useState(false);
 
-  // Wait for session to hydrate to avoid auth flash
-  if (!isSessionChecked) return <div className="loading-screen full-height" />;
+  // Avoid auth flash: only show content after session check
+  if (!isSessionChecked) return <LoadingScreen />;
 
   return (
     <main className="page-content">
-      <Suspense fallback={<div className="loading-screen full-height" />}>
+      <Suspense fallback={<LoadingScreen />}>
         <Routes>
-          {/* Home - "critical path" UI */}
+          {/* Home: All above-the-fold content is critical path */}
           <Route
             path="/"
             element={
@@ -76,7 +52,7 @@ const AppRoutes: React.FC = () => {
                 <FeaturedProductList />
                 <TrendingProductList />
                 <BlogSection />
-                {/* Render Quiz as a true modal overlay */}
+                {/* Modal Quiz, only mounted when open */}
                 {isQuizModalOpen && (
                   <Quiz
                     isOpen={isQuizModalOpen}
@@ -86,8 +62,7 @@ const AppRoutes: React.FC = () => {
               </>
             }
           />
-
-          {/* Auth & Account */}
+          {/* Auth / Account */}
           <Route
             path="/profile"
             element={
@@ -126,10 +101,7 @@ const AppRoutes: React.FC = () => {
           <Route path="/search" element={<SearchResults />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
-          <Route
-            path="/terms-and-conditions"
-            element={<TermsAndConditionsPage />}
-          />
+          <Route path="/terms-and-conditions" element={<TermsAndConditionsPage />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
 
           {/* 404 Fallback */}

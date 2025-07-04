@@ -7,12 +7,16 @@ interface SectionProps {
   children: React.ReactNode;
 }
 
-const Section: React.FC<SectionProps> = ({ title, children }) => (
-  <section className="terms-section">
-    <h2>{title}</h2>
-    {children}
-  </section>
-);
+const Section: React.FC<SectionProps> = ({ title, children }) => {
+  // Generate ID for in-page links if desired
+  const id = title.replace(/\s+/g, "-").toLowerCase();
+  return (
+    <section className="terms-section" aria-labelledby={id} id={id}>
+      <h2 id={id} tabIndex={-1}>{title}</h2>
+      {children}
+    </section>
+  );
+};
 
 const TermsAndConditionsPage: React.FC = () => {
   const lastUpdated = new Date("2025-04-27").toLocaleDateString(undefined, {
@@ -29,117 +33,96 @@ const TermsAndConditionsPage: React.FC = () => {
           name="description"
           content="Review the Terms and Conditions for using AthleteXpert, including legal disclaimers, age restrictions, and user responsibilities."
         />
+        <meta name="robots" content="noindex,follow" />
       </Helmet>
 
-      <div className="terms-container">
+      <div className="terms-container" role="document" aria-label="Terms and Conditions">
         <header className="terms-header" role="banner">
-          <h1>Terms and Conditions</h1>
-          <p>Last updated: {lastUpdated}</p>
+          <h1 tabIndex={0}>Terms and Conditions</h1>
+          <p className="terms-last-updated">
+            <strong>Last updated:</strong> {lastUpdated}
+          </p>
         </header>
 
         <main className="terms-main" role="main">
           <Section title="1. Introduction">
             <p>
               Welcome to AthleteXpert ("we", "our", "us"). By accessing our
-              website, you agree to comply with and be bound by the following
-              terms and conditions. Please review these terms carefully. If you
-              do not agree to these terms, you must not use this site.
+              website, you agree to comply with and be bound by these terms and conditions.
+              If you do not agree, you must not use this site.
             </p>
           </Section>
 
           <Section title="2. Affiliate Links and External Sites">
             <p>
-              AthleteXpert provides product recommendations and showcases sports
-              gear and equipment via affiliate links. We do not sell any
-              products directly on this platform. By clicking on these links,
-              you will be redirected to third-party websites. AthleteXpert is
-              not responsible for the content, pricing, policies, or
-              availability of products on external sites. Any purchases made
-              through these links are subject to the terms and policies of the
-              external websites.
+              AthleteXpert provides product recommendations via affiliate links. We do not sell
+              products directly. By clicking these links, you’re redirected to third-party sites.
+              We are not responsible for content, pricing, or availability on external sites.
+              Purchases are governed by those sites’ policies.
             </p>
           </Section>
 
           <Section title="3. User Data Collection">
             <p>
-              AthleteXpert may collect personal information such as your name,
-              email address, and other relevant data when you interact with our
-              platform, including when you sign up for newsletters or
-              participate in promotional events. By providing this information,
-              you agree to allow us to store and process your data in accordance
-              with our <a href="/privacy-policy">Privacy Policy</a>.
+              AthleteXpert may collect your name, email, and other info when you interact
+              with our platform (including newsletter sign-ups or promos). By providing this,
+              you agree to allow us to process your data as outlined in our{" "}
+              <a href="/privacy-policy">Privacy Policy</a>.
             </p>
             <p>
-              AthleteXpert may also use analytics to understand how users
-              interact with our platform to improve the user experience. This
-              information may include, but is not limited to, usage patterns,
-              referral sources, and interaction data.
+              We may also use analytics to improve the user experience. This includes
+              usage patterns, referral sources, and interaction data.
             </p>
           </Section>
 
           <Section title="4. Age Restrictions">
             <p>
-              AthleteXpert is not directed to children under the age of 13. If
-              you are under 18, you must use the platform under the supervision
-              of a parent or guardian. By using this site, you affirm that you
-              are either 18 years or older or are using this site with the
-              consent of a legal guardian.
+              AthleteXpert is not directed at children under 13. If you’re under 18, you must
+              use the platform under a parent or guardian’s supervision. By using this site, you
+              affirm that you’re 18 or older or using it with guardian consent.
             </p>
             <p>
-              Certain promotions, advertising, or features of the site may
-              require parental consent for users under the age of 18. Please
-              review our <a href="/privacy-policy">Privacy Policy</a> for
-              details on how we handle data from minors.
+              Some features may require parental consent for users under 18. See our{" "}
+              <a href="/privacy-policy">Privacy Policy</a> for more on minors’ data.
             </p>
           </Section>
 
           <Section title="5. Intellectual Property">
             <p>
-              All content and materials on this platform, including but not
-              limited to text, graphics, logos, videos, and software, are the
-              intellectual property of AthleteXpert or our content suppliers and
-              are protected by applicable intellectual property laws. You agree
-              not to reproduce, distribute, modify, or create derivative works
-              from any of the content on the platform without prior written
-              permission.
+              All content on AthleteXpert—text, graphics, logos, video, and code—is owned by us
+              or our content suppliers. You may not reproduce, distribute, or create derivative
+              works without written permission.
             </p>
           </Section>
 
           <Section title="6. Limitation of Liability">
             <p>
-              To the maximum extent permitted by law, AthleteXpert shall not be
-              liable for any direct, indirect, incidental, special, or
-              consequential damages arising from the use of, or inability to
-              use, our platform or affiliate links. This includes, but is not
-              limited to, damages resulting from errors, omissions,
-              interruptions, defects, delays, or actions of third-party websites
-              linked from our platform.
+              To the maximum extent permitted by law, AthleteXpert is not liable for any
+              direct, indirect, incidental, or consequential damages arising from use of,
+              or inability to use, our platform or affiliate links. This includes errors,
+              interruptions, or third-party actions.
             </p>
           </Section>
 
           <Section title="7. Changes to the Terms">
             <p>
-              We reserve the right to modify these Terms at any time. Changes
-              will be posted on this page with an updated revision date.
-              Continued use of the platform after such changes constitutes your
-              acceptance of the new Terms.
+              We may modify these Terms at any time. Updates will be posted on this page
+              with a new revision date. Continued use of the platform means you accept the new Terms.
             </p>
           </Section>
 
           <Section title="8. Governing Law">
             <p>
-              These Terms and Conditions are governed by and construed in
-              accordance with the laws of the Commonwealth of Pennsylvania,
-              United States, and you agree to submit to the exclusive
-              jurisdiction of its courts.
+              These Terms and Conditions are governed by Pennsylvania law, United States,
+              and you agree to submit to the exclusive jurisdiction of its courts.
             </p>
           </Section>
 
           <Section title="9. Contact Us">
             <p>
-              If you have any questions about these Terms, please contact us at{" "}
-              <a href="mailto:support@athletexpert.com">
-                support@athletexpert.com
+              If you have any questions, please email:{" "}
+              <a href="mailto:contact@athletexpert.com">
+                contact@athletexpert.com
               </a>
               .
             </p>
