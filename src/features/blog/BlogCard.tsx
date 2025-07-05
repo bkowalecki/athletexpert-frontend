@@ -1,24 +1,7 @@
 import React, { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import { BlogCardProps} from "@/types/blogs";
 import "../../styles/BlogCard.css";
-
-export type BlogCardVariant = "latest" | "list" | "profile" | "related" | "horizontal";
-
-interface BlogCardProps {
-  id: number;
-  title: string;
-  author: string;
-  slug: string;
-  imageUrl: string;
-  publishedDate?: string;
-  summary?: string;
-  variant?: BlogCardVariant;
-  isSaved?: boolean;
-  isPinned?: boolean;
-  onSave?: () => void;
-  onUnsave?: () => void;
-  onPin?: () => void;
-}
 
 const BookmarkIcon: React.FC<{ filled?: boolean }> = ({ filled }) => (
   <svg viewBox="0 0 24 24" width={26} height={26} aria-hidden="true">

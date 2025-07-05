@@ -5,6 +5,7 @@ import axios from "axios";
 import sportsData from "../../data/sports.json";
 import "../../styles/SportPage.css";
 import ProductCard from "../products/ProductCard";
+import { BlogPost } from "../../types/blogs";
 import BlogCard from "../blog/BlogCard";
 
 // Types
@@ -27,16 +28,6 @@ interface Product {
   price: number;
   imgUrl: string;
   affiliateLink: string;
-}
-
-interface BlogPost {
-  id: number;
-  title: string;
-  summary: string;
-  imageUrl: string;
-  slug: string;
-  author?: string;
-  publishedDate?: string;
 }
 
 // Slugify utility
@@ -126,22 +117,6 @@ const SportPage: React.FC = () => {
   return (
     <div className="sport-page">
       <div className="sport-page-title">{currentSport.title}</div>
-
-      {/* Fun Fact (uncomment if you want!) */}
-      {/* <section className="sport-page-section sport-page-funfact">
-        <h2 className="sport-page-section-title">Fun Fact</h2>
-        <motion.div
-          initial={{ scale: 0.9 }}
-          animate={{ scale: 1 }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
-          className="sport-page-funfact-box"
-        >
-          <p className="sport-page-funfact-text">
-            {currentSport.extra_data.fun_fact ||
-              "This sport originally had wildly different rules that evolved over time!"}
-          </p>
-        </motion.div>
-      </section> */}
 
       <section className="sport-page-section">
         <h2 className="sport-page-section-title">Recommended Gear</h2>

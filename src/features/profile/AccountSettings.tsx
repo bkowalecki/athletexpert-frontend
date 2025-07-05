@@ -3,23 +3,11 @@ import { Helmet } from "react-helmet";
 import { useUserContext } from "../../context/UserContext";
 import sportsList from "../../data/sports.json";
 import "../../styles/AccountSettings.css";
+import type { UserProfile } from "../../types/users";
 
-const allowedSports = Array.isArray(sportsList) ? sportsList.map((s: any) => s.title) : [];
-
-type UserProfile = {
-  username: string;
-  firstName: string;
-  lastName: string;
-  bio: string;
-  profilePictureUrl: string;
-  sports: string[];
-  city?: string;
-  state?: string;
-  country?: string;
-  gender?: string;
-  dob?: string;
-  favoriteColor?: string;
-};
+const allowedSports = Array.isArray(sportsList)
+  ? sportsList.map((s: any) => s.title)
+  : [];
 
 const defaultProfile: UserProfile = {
   username: "",
@@ -71,7 +59,6 @@ const AccountSettings: React.FC = () => {
       setFormData({
         ...defaultProfile,
         ...user,
-        // Null-safety: force string or ""
         bio: user.bio ?? "",
         city: user.city ?? "",
         state: user.state ?? "",
@@ -85,7 +72,11 @@ const AccountSettings: React.FC = () => {
     }
   }, [user]);
 
-  const updateField = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const updateField = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
     const { name, value } = e.target;
     setFormData((f) => ({ ...f, [name]: value }));
   };
@@ -94,7 +85,11 @@ const AccountSettings: React.FC = () => {
     const file = e.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onloadend = () => setFormData((f) => ({ ...f, profilePictureUrl: reader.result as string }));
+    reader.onloadend = () =>
+      setFormData((f) => ({
+        ...f,
+        profilePictureUrl: reader.result as string,
+      }));
     reader.readAsDataURL(file);
   };
 
@@ -113,12 +108,15 @@ const AccountSettings: React.FC = () => {
     e.preventDefault();
     setMsg(null);
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_URL}/users/profile`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(formData),
-      });
+      const res = await fetch(
+        `${process.env.REACT_APP_API_URL}/users/profile`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify(formData),
+        }
+      );
       if (res.ok) {
         setUser(await res.json());
         setMsg("Profile updated!");
@@ -129,22 +127,33 @@ const AccountSettings: React.FC = () => {
   };
 
   const handleDeleteAccount = async () => {
-    if (!window.confirm("⚠️ Deleting your account is permanent. All your data will be removed. Continue?")) return;
-    setIsDeleting(true); setMsg(null);
+    if (
+      !window.confirm(
+        "⚠️ Deleting your account is permanent. All your data will be removed. Continue?"
+      )
+    )
+      return;
+    setIsDeleting(true);
+    setMsg(null);
     try {
       const res = await fetch(`${process.env.REACT_APP_API_URL}/users/delete`, {
-        method: "DELETE", credentials: "include"
+        method: "DELETE",
+        credentials: "include",
       });
       if (res.ok) {
-        setUser(null); setMsg("Account deleted. Redirecting...");
-        setTimeout(() => { window.location.href = "/auth"; }, 1800);
+        setUser(null);
+        setMsg("Account deleted. Redirecting...");
+        setTimeout(() => {
+          window.location.href = "/auth";
+        }, 1800);
       } else setMsg("❌ Failed to delete account.");
     } catch {
       setMsg("An unexpected error occurred.");
-    } finally { setIsDeleting(false); }
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
-  // ---------- RENDER ----------
   return (
     <div className="account-settings-container">
       <Helmet>
@@ -152,52 +161,90 @@ const AccountSettings: React.FC = () => {
       </Helmet>
       <h2>Account Settings</h2>
       {msg && <div className="account-settings-message">{msg}</div>}
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} autoComplete="off">
         {/* Profile Picture */}
         <div className="account-settings-section">
           <label>{fieldLabels.profilePictureUrl}</label>
           <input type="file" accept="image/*" onChange={handleImageChange} />
           {formData.profilePictureUrl && (
-            <img src={formData.profilePictureUrl} alt="Profile" className="account-settings-avatar" />
+            <img
+              src={formData.profilePictureUrl}
+              alt="Profile"
+              className="account-settings-avatar"
+            />
           )}
         </div>
         {/* Basic Info */}
         {(["username", "firstName", "lastName"] as const).map((f) => (
           <div key={f} className="account-settings-section">
             <label>{fieldLabels[f]}</label>
-            <input type="text" name={f} value={formData[f]} onChange={updateField} required={f === "username"} autoComplete={f === "username" ? "username" : undefined} />
+            <input
+              type="text"
+              name={f}
+              value={formData[f]}
+              onChange={updateField}
+              required={f === "username"}
+              autoComplete={f === "username" ? "username" : undefined}
+            />
           </div>
         ))}
         {/* Location */}
         {(["city", "state", "country"] as const).map((f) => (
           <div key={f} className="account-settings-section">
             <label>{fieldLabels[f]}</label>
-            <input type="text" name={f} value={formData[f] || ""} onChange={updateField} />
+            <input
+              type="text"
+              name={f}
+              value={formData[f] || ""}
+              onChange={updateField}
+            />
           </div>
         ))}
         {/* Gender */}
         <div className="account-settings-section">
           <label>{fieldLabels.gender}</label>
-          <select name="gender" value={formData.gender || ""} onChange={updateField}>
+          <select
+            name="gender"
+            value={formData.gender || ""}
+            onChange={updateField}
+          >
             {genderOptions.map(({ value, label }) => (
-              <option value={value} key={value}>{label}</option>
+              <option value={value} key={value}>
+                {label}
+              </option>
             ))}
           </select>
         </div>
         {/* DOB */}
         <div className="account-settings-section">
           <label>{fieldLabels.dob}</label>
-          <input type="date" name="dob" value={formData.dob ? formData.dob.slice(0, 10) : ""} onChange={updateField} autoComplete="bday" />
+          <input
+            type="date"
+            name="dob"
+            value={formData.dob ? formData.dob.slice(0, 10) : ""}
+            onChange={updateField}
+            autoComplete="bday"
+          />
         </div>
         {/* Favorite Color */}
         <div className="account-settings-section">
           <label>{fieldLabels.favoriteColor}</label>
-          <input type="color" name="favoriteColor" value={formData.favoriteColor || "#ffffff"} onChange={updateField} />
+          <input
+            type="color"
+            name="favoriteColor"
+            value={formData.favoriteColor || "#ffffff"}
+            onChange={updateField}
+          />
         </div>
         {/* Bio */}
         <div className="account-settings-section">
           <label>{fieldLabels.bio}</label>
-          <textarea name="bio" value={formData.bio} onChange={updateField} maxLength={200} />
+          <textarea
+            name="bio"
+            value={formData.bio}
+            onChange={updateField}
+            maxLength={200}
+          />
         </div>
         {/* Sports Picker */}
         <div className="account-settings-section">
@@ -206,25 +253,56 @@ const AccountSettings: React.FC = () => {
             {formData.sports.map((sport) => (
               <span key={sport} className="account-settings-sport-tag">
                 {sport}
-                <button type="button" onClick={() => handleSportChange("remove", sport)} aria-label={`Remove ${sport}`}>✕</button>
+                <button
+                  type="button"
+                  onClick={() => handleSportChange("remove", sport)}
+                  aria-label={`Remove ${sport}`}
+                >
+                  ✕
+                </button>
               </span>
             ))}
           </div>
           <div className="account-settings-sport-picker">
-            <select value={newSport} onChange={e => setNewSport(e.target.value)}>
+            <select
+              value={newSport}
+              onChange={(e) => setNewSport(e.target.value)}
+            >
               <option value="">-- Select a sport --</option>
-              {allowedSports.filter((sport) => !formData.sports.includes(sport))
+              {allowedSports
+                .filter((sport) => !formData.sports.includes(sport))
                 .map((sport) => (
-                  <option key={sport} value={sport}>{sport}</option>
+                  <option key={sport} value={sport}>
+                    {sport}
+                  </option>
                 ))}
             </select>
-            <button type="button" onClick={() => handleSportChange("add", newSport)} disabled={!newSport}>Add Sport</button>
+            <button
+              type="button"
+              onClick={() => handleSportChange("add", newSport)}
+              disabled={!newSport}
+            >
+              Add Sport
+            </button>
           </div>
         </div>
-        <button type="submit" className="account-settings-save-button">Save Changes</button>
-        <hr style={{ margin: "2rem 0", border: "none", borderTop: "1px solid #333" }} />
+        <button type="submit" className="account-settings-save-button">
+          Save Changes
+        </button>
+        <hr
+          style={{
+            margin: "2rem 0",
+            border: "none",
+            borderTop: "1px solid #333",
+          }}
+        />
         <div className="account-settings-section">
-          <button type="button" className="account-settings-delete-button" onClick={handleDeleteAccount} disabled={isDeleting}>
+          <button
+            type="button"
+            className="account-settings-delete-button"
+            onClick={handleDeleteAccount}
+            disabled={isDeleting}
+          >
             {isDeleting ? "Deleting..." : "Delete Account"}
           </button>
         </div>

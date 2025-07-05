@@ -6,8 +6,9 @@ import DOMPurify from "dompurify";
 import { Helmet } from "react-helmet";
 import { useUserContext } from "../../context/UserContext";
 import { toast } from "react-toastify";
+import { BlogPost } from "../../types/blogs"; 
 import BlogCard from "./BlogCard";
-// import "react-toastify/dist/ReactToastify.css";
+
 import "../../styles/BlogPage.css";
 
 // ---- SPORTS ----
@@ -22,16 +23,6 @@ const SPORTS = [
   { value: "Yoga", label: "Yoga" },
   { value: "Weight Training", label: "Weight Training" },
 ];
-
-interface BlogPost {
-  id: number;
-  title: string;
-  author: string;
-  publishedDate: string;
-  summary: string;
-  imageUrl: string;
-  slug: string;
-}
 
 const fetchPosts = async (
   searchQuery: string,

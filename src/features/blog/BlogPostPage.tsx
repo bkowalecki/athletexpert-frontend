@@ -6,19 +6,8 @@ import DOMPurify from "dompurify";
 import { Helmet } from "react-helmet";
 import ShareButtons from "../../components/ShareButtons";
 import BlogCard from "./BlogCard";
+import { BlogPost } from "../../types/blogs";
 import "../../styles/BlogPostPage.css";
-
-interface BlogPost {
-  id: number;
-  title: string;
-  author: string;
-  publishedDate: string;
-  sport: string;
-  imageUrl: string;
-  content: string;
-  summary: string;
-  slug: string;
-}
 
 const fetchBlogPost = async (slug: string): Promise<BlogPost> => {
   const { data } = await axios.get(

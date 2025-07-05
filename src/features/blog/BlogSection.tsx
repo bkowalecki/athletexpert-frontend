@@ -4,17 +4,8 @@ import { useQuery } from "@tanstack/react-query";
 import BlogCard from "./BlogCard";
 import { useUserContext } from "../../context/UserContext";
 import { toast } from "react-toastify";
+import { BlogPost } from "../../types/blogs";
 import "../../styles/BlogSection.css";
-
-interface BlogPost {
-  id: number;
-  title: string;
-  author: string;
-  publishedDate: string;
-  summary: string;
-  imageUrl: string;
-  slug: string;
-}
 
 // API fetch helpers
 const fetchLatestBlogs = async (): Promise<BlogPost[]> => {

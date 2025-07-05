@@ -15,6 +15,20 @@ export interface Product {
     asin?: string;
     isAmazonFallback?: boolean;
   }
+
+  export interface ProductCardProps {
+    id: number | string;
+    name: string;
+    brand: string;
+    price: number | null;
+    imgUrl: string;
+    affiliateLink: string;
+    isSaved?: boolean;
+    onToggleSave?: () => void;
+    isSaving?: boolean;
+    isAmazonFallback?: boolean;
+    isTrending?: boolean;
+  }
   
   export type SortOption = "" | "priceLow" | "priceHigh";
   

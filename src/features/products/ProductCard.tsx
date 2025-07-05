@@ -1,24 +1,10 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, KeyboardEvent as ReactKeyboardEvent, MouseEvent } from "react";
 import { Link } from "react-router-dom";
-import type { MouseEvent, KeyboardEvent as ReactKeyboardEvent } from "react";
+import type { ProductCardProps } from "../../types/products";
 import "../../styles/ProductCard.css";
 import { trackEvent } from "../../util/analytics";
 
-export interface ProductCardProps {
-  id: number | string;
-  name: string;
-  brand: string;
-  price: number | null;
-  imgUrl: string;
-  affiliateLink: string;
-  isSaved?: boolean;
-  onToggleSave?: () => void;
-  isSaving?: boolean;
-  isAmazonFallback?: boolean;
-  isTrending?: boolean;
-}
-
-const FALLBACK_IMAGE = "/images/product-fallback.png"; // Or your preferred PNG
+const FALLBACK_IMAGE = "/images/product-fallback.png";
 
 const ProductCard: React.FC<ProductCardProps> = ({
   id,
@@ -33,49 +19,42 @@ const ProductCard: React.FC<ProductCardProps> = ({
   isAmazonFallback,
   isTrending,
 }) => {
-  // Modal state & scroll management
+  // Modal state & scroll mgmt
   const [showModal, setShowModal] = useState(false);
   const [scrollPosition, setScrollPosition] = useState(0);
   const modalImageRef = useRef<HTMLImageElement | null>(null);
 
-  // For image fallback
+  // Fallback image logic
   const [imgSrc, setImgSrc] = useState(imgUrl || FALLBACK_IMAGE);
-
-  // Keep imgSrc updated if imgUrl prop changes
   useEffect(() => {
     setImgSrc(imgUrl || FALLBACK_IMAGE);
   }, [imgUrl]);
 
-  // Modal open/close + body scroll freeze
+  // Modal scroll/focus logic
   const toggleModal = (open: boolean) => {
     if (open) {
       setScrollPosition(window.scrollY);
       document.body.style.cssText = `position: fixed; top: -${window.scrollY}px; width: 100%;`;
+      setShowModal(true);
+      setTimeout(() => modalImageRef.current?.focus?.(), 50); // focus modal img for a11y
     } else {
       document.body.style.cssText = "";
       window.scrollTo(0, scrollPosition);
+      setShowModal(false);
     }
-    setShowModal(open);
   };
 
-  // Close modal on ESC
+  // ESC closes modal
   useEffect(() => {
     if (!showModal) return;
-  
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        toggleModal(false);
-      }
+      if (e.key === "Escape") toggleModal(false);
     };
-  
     window.addEventListener("keydown", handleKeyDown);
-    modalImageRef.current?.focus?.();
-  
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [showModal]);
-  
 
-  // Click card fires product view event
+  // Product view analytics
   const handleCardClick = () => {
     trackEvent("product_view", {
       product_name: name,
@@ -84,6 +63,12 @@ const ProductCard: React.FC<ProductCardProps> = ({
       isTrending,
     });
   };
+
+  // Badges array DRY'd
+  const badges = [
+    isTrending && { text: "Trending", className: "ax-badge-trending" },
+    isAmazonFallback && { text: "Amazon", className: "ax-badge-amazon" },
+  ].filter(Boolean) as { text: string; className: string }[];
 
   return (
     <>
@@ -94,18 +79,21 @@ const ProductCard: React.FC<ProductCardProps> = ({
         aria-label={`Product card: ${name} by ${brand}`}
         onClick={handleCardClick}
         onKeyDown={(e: ReactKeyboardEvent<HTMLDivElement>) => {
-          if (e.key === "Enter" || e.key === " ") {
-            handleCardClick();
-          }
+          if (e.key === "Enter" || e.key === " ") handleCardClick();
         }}
       >
         {/* Badges */}
-        <div className="ax-product-card-badges">
-          {isTrending && <span className="ax-badge ax-badge-trending">Trending</span>}
-          {isAmazonFallback && <span className="ax-badge ax-badge-amazon">Amazon</span>}
-        </div>
+        {badges.length > 0 && (
+          <div className="ax-product-card-badges">
+            {badges.map(badge => (
+              <span key={badge.text} className={`ax-badge ${badge.className}`}>
+                {badge.text}
+              </span>
+            ))}
+          </div>
+        )}
 
-        {/* Image with fallback */}
+        {/* Image with modal/fallback */}
         <div
           className="ax-product-card-image-wrapper"
           tabIndex={0}
@@ -146,7 +134,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
           <div className="ax-product-card-cta-row">
             {onToggleSave && (
               <button
-                className={`ax-product-card-save-button ${isSaved ? "unsave" : ""}`}
+                className={`ax-product-card-save-button${isSaved ? " unsave" : ""}`}
                 onClick={e => {
                   e.stopPropagation();
                   onToggleSave();
