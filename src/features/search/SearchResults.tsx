@@ -8,6 +8,7 @@ import ProductCard from "../products/ProductCard";
 import sportsDataRaw from "../../data/sports.json";
 import { useSavedProducts } from "../../hooks/useSavedProducts";
 import { fetchSearchIntent } from "../../util/aiSearchIntent";
+import { trackEvent } from "../../util/analytics";
 
 interface Sport {
   title: string;
@@ -294,6 +295,7 @@ const SearchResults: React.FC = () => {
             tabIndex={0}
             role="button"
             onClick={() => {
+              trackEvent("search_suggestion_click", { suggestion: fixedQuery });
               navigate(`/search?query=${encodeURIComponent(fixedQuery)}`);
             }}
             onKeyDown={(e) => {

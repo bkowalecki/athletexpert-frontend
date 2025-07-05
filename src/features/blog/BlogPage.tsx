@@ -7,6 +7,7 @@ import { Helmet } from "react-helmet";
 import { useUserContext } from "../../context/UserContext";
 import { toast } from "react-toastify";
 import { BlogPost } from "../../types/blogs"; 
+import { trackEvent } from "../../util/analytics";
 import BlogCard from "./BlogCard";
 
 import "../../styles/BlogPage.css";
@@ -120,6 +121,7 @@ const BlogPage: React.FC = () => {
     setCurrentPage(0);
     setPosts([]);
     setHasMorePosts(true);
+    trackEvent("blog_search", { query: inputQuery, sport: selectedSport });
   };
 
   // When sport is changed from dropdown

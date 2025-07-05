@@ -1,6 +1,7 @@
 import React, { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { BlogCardProps} from "@/types/blogs";
+import { trackEvent } from "../../util/analytics";
 import "../../styles/BlogCard.css";
 
 const BookmarkIcon: React.FC<{ filled?: boolean }> = ({ filled }) => (
@@ -42,7 +43,16 @@ const BlogCard: React.FC<BlogCardProps> = ({
   onPin,
 }) => {
   const navigate = useNavigate();
-  const handleClick = () => navigate(`/blog/${slug}`);
+  const handleClick = () => {
+    trackEvent("blog_view", {
+      blog_id: id,
+      blog_title: title,
+      author, 
+      slug,
+    });
+    navigate(`/blog/${slug}`);
+  };
+
 
   // Format date once, only if present
   const formattedDate = useMemo(() => (

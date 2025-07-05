@@ -15,6 +15,7 @@ export interface BlogPost {
   tags?: string[];   // Only on admin or full detail
 }
 
+
 export interface BlogCardProps {
   id: number;
   title: string;

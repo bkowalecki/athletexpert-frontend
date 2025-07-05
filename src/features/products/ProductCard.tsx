@@ -1,4 +1,10 @@
-import React, { useEffect, useState, useRef, KeyboardEvent as ReactKeyboardEvent, MouseEvent } from "react";
+import React, {
+  useEffect,
+  useState,
+  useRef,
+  KeyboardEvent as ReactKeyboardEvent,
+  MouseEvent,
+} from "react";
 import { Link } from "react-router-dom";
 import type { ProductCardProps } from "../../types/products";
 import "../../styles/ProductCard.css";
@@ -85,7 +91,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
         {/* Badges */}
         {badges.length > 0 && (
           <div className="ax-product-card-badges">
-            {badges.map(badge => (
+            {badges.map((badge) => (
               <span key={badge.text} className={`ax-badge ${badge.className}`}>
                 {badge.text}
               </span>
@@ -113,7 +119,9 @@ const ProductCard: React.FC<ProductCardProps> = ({
         >
           <img
             src={imgSrc}
-            alt={imgSrc === FALLBACK_IMAGE ? "No product image available" : name}
+            alt={
+              imgSrc === FALLBACK_IMAGE ? "No product image available" : name
+            }
             className="ax-product-card-image"
             loading="lazy"
             draggable={false}
@@ -134,8 +142,10 @@ const ProductCard: React.FC<ProductCardProps> = ({
           <div className="ax-product-card-cta-row">
             {onToggleSave && (
               <button
-                className={`ax-product-card-save-button${isSaved ? " unsave" : ""}`}
-                onClick={e => {
+                className={`ax-product-card-save-button${
+                  isSaved ? " unsave" : ""
+                }`}
+                onClick={(e) => {
                   e.stopPropagation();
                   onToggleSave();
                 }}
@@ -151,7 +161,18 @@ const ProductCard: React.FC<ProductCardProps> = ({
               rel="noopener noreferrer"
               className="ax-product-card-button"
               aria-label="View product on Amazon"
-              onClick={e => e.stopPropagation()}
+              onClick={(e) => {
+                e.stopPropagation?.();
+                trackEvent("affiliate_click", {
+                  product_id: id,
+                  product_name: name,
+                  brand,
+                  affiliateLink,
+                  isAmazonFallback,
+                  isTrending,
+                });
+
+              }}
               tabIndex={0}
             >
               View on Amazon
@@ -171,7 +192,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
         >
           <div
             className="ax-modal-content"
-            onClick={e => e.stopPropagation()}
+            onClick={(e) => e.stopPropagation()}
           >
             <button
               className="ax-modal-close"

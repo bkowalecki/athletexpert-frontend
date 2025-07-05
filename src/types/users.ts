@@ -12,3 +12,17 @@ export type UserProfile = {
     dob?: string;
     favoriteColor?: string;
   };
+
+//   interface Profile {
+//     firstName: string;
+//     lastName: string;
+//     bio: string | null;
+//     profilePictureUrl: string | null;
+//     sports: string[] | null;
+//     badges?: string[];
+//     savedBlogIds?: number[];
+//     savedProductIds?: number[];
+//     location?: string | null;
+//     publishedDate?: string | null;
+//     summary?: string | null;
+//   }

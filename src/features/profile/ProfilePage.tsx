@@ -7,33 +7,12 @@ import { Helmet } from "react-helmet";
 import SportStatsModal from "./SportStatsModal";
 import ProductCard from "../products/ProductCard";
 import BlogCard from "../blog/BlogCard";
+import { Product } from "../../types/products";
+import { BlogPost } from "../../types/blogs";
 import { useSavedProducts } from "../../hooks/useSavedProducts";
 import "../../styles/Globals.css";
 import "../../styles/ProfilePage.css";
 
-// --- Types ---
-interface Product {
-  id: number;
-  name: string;
-  description: string;
-  price: number;
-  affiliateLink: string;
-  imgUrl: string;
-  brand: string;
-  category: string;
-  retailer: string;
-  featured?: boolean;
-  trending?: boolean;
-}
-interface BlogPost {
-  id: number;
-  title: string;
-  author: string;
-  imageUrl: string;
-  slug: string;
-  publishedDate: string;
-  summary: string;
-}
 interface Profile {
   firstName: string;
   lastName: string;

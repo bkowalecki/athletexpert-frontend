@@ -1,7 +1,7 @@
 // src/types/products.ts
 
 export interface Product {
-    id?: number;
+    id: number; // Optional for new products
     name: string;
     description?: string;
     price: number;

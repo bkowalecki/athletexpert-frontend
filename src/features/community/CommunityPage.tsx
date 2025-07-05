@@ -4,8 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { useSports } from "../../context/SportsContext";
 import "../../styles/Community.css";
 import { Helmet } from "react-helmet";
+import { trackEvent } from "../../util/analytics";
 
-// ===================== Types & Data =====================
 interface Sport {
   title: string;
   backgroundImage: string;
@@ -45,7 +45,17 @@ const SportCard: React.FC<SportCardProps> = React.memo(
     return (
       <div
         className={className}
-        onClick={!isDisabled ? () => onNavigate(slugify(sport.title)) : undefined}
+        onClick={
+          !isDisabled
+            ? () => {
+                trackEvent("community_page_click", {
+                  sport: sport.title,
+                  slug: slugify(sport.title),
+                });
+                onNavigate(slugify(sport.title));
+              }
+            : undefined
+        }
         tabIndex={isDisabled ? -1 : 0}
         aria-disabled={isDisabled}
         onKeyDown={handleKeyDown}

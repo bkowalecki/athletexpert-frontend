@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useUserContext } from "../../context/UserContext";
 import { loginWithAuth0Token } from "../../util/authUtils";
+import { trackEvent } from "../../util/analytics";
 import "../../styles/AuthPage.css";
 
 const AuthPage: React.FC = () => {
@@ -94,6 +95,8 @@ const AuthPage: React.FC = () => {
 
       const userData = await res.json();
       setUser(userData);
+      trackEvent("login_success", { method: isLogin ? "email" : "register" });
+
       if (isLogin) {
         navigate("/profile", { replace: true });
       } else {
@@ -122,6 +125,8 @@ const AuthPage: React.FC = () => {
       const idToken = (await getIdTokenClaims())?.__raw;
       if (!idToken) throw new Error("No ID Token claims received.");
 
+      trackEvent("login_success", { method: "google" });
+      trackEvent("user_signup", { method: "google", email: auth0User?.email });
       await loginWithAuth0Token({ token: idToken, setUser, navigate });
     } catch (err) {
       console.error("Google SSO Error:", err);
