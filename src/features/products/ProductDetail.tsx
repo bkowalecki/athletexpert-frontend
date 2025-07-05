@@ -7,21 +7,46 @@ import type { Product } from "../../types/products";
 
 // Mock reviews (swap out for real data in prod)
 const mockReviews = [
-  { reviewer: "Sam R.", rating: 5, comment: "Best gear I’ve ever used. Game changer!" },
-  { reviewer: "Jordan P.", rating: 4, comment: "Comfortable, durable, and stylish. Worth the price." },
-  { reviewer: "Drew F.", rating: 5, comment: "Love it! Delivery was quick and product was as described." },
+  {
+    reviewer: "Sam R.",
+    rating: 5,
+    comment: "Best gear I’ve ever used. Game changer!",
+  },
+  {
+    reviewer: "Jordan P.",
+    rating: 4,
+    comment: "Comfortable, durable, and stylish. Worth the price.",
+  },
+  {
+    reviewer: "Drew F.",
+    rating: 5,
+    comment: "Love it! Delivery was quick and product was as described.",
+  },
 ];
 const mockRelated = [
-  { id: 1, name: "HydroPro Bottle", imgUrl: "/images/categories/water-bottle.jpg" },
-  { id: 2, name: "SpeedRunner Shoes", imgUrl: "/images/categories/running-shoes.jpg" },
-  { id: 3, name: "Elite Recovery Roller", imgUrl: "/images/categories/recovery.jpg" },
+  {
+    id: 1,
+    name: "HydroPro Bottle",
+    imgUrl: "/images/categories/water-bottle.jpg",
+  },
+  {
+    id: 2,
+    name: "SpeedRunner Shoes",
+    imgUrl: "/images/categories/running-shoes.jpg",
+  },
+  {
+    id: 3,
+    name: "Elite Recovery Roller",
+    imgUrl: "/images/categories/recovery.jpg",
+  },
 ];
 
-const renderStars = (rating: number) =>
+const renderStars = (rating: number) => (
   <>
     {"★".repeat(rating)}
     {"☆".repeat(5 - rating)}
-  </>;
+  </>
+);
 
 const ProductDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -34,10 +59,13 @@ const ProductDetail: React.FC = () => {
     setLoading(true);
     const fetchProduct = async () => {
       try {
-        const res = await fetch(`${process.env.REACT_APP_API_URL}/products/${id}`);
+        const res = await fetch(
+          `${process.env.REACT_APP_API_URL}/products/${id}`
+        );
         if (!res.ok) throw new Error("Product not found");
         const data = await res.json();
-        if (!data || Object.keys(data).length === 0) throw new Error("No product data");
+        if (!data || Object.keys(data).length === 0)
+          throw new Error("No product data");
         setProduct(data);
       } catch (error) {
         navigate("/404", { replace: true });
@@ -57,17 +85,48 @@ const ProductDetail: React.FC = () => {
   }
   if (!product) {
     return (
-      <div className="product-detail-container dark-bg">
-        <div className="product-detail-error">Product not found.</div>
+      <div className="product-detail-container dark-bg" style={{ textAlign: "center", padding: "4rem 1rem" }}>
+        <img
+          src="/images/product-fallback.png"
+          alt="Product not found"
+          style={{
+            width: 120,
+            marginBottom: 24,
+            opacity: 0.75,
+            filter: "grayscale(0.8)"
+          }}
+        />
+        <h2 style={{ margin: "0 0 0.5em 0" }}>Uh oh! Product not found.</h2>
+        <p style={{ color: "#bbb", marginBottom: 20 }}>
+          We couldn’t find this product. It might have been removed or never existed.<br />
+          Try searching for another or explore all products below.
+        </p>
+        <Link
+          to="/products"
+          className="product-detail-back-link"
+          style={{
+            color: "#fff",
+            background: "#A23C20",
+            padding: "0.7em 1.4em",
+            borderRadius: 9,
+            textDecoration: "none",
+            fontWeight: 600,
+            fontSize: 17,
+            boxShadow: "0 3px 14px 0 rgba(0,0,0,0.09)",
+          }}
+        >
+          ← Back to Products
+        </Link>
       </div>
     );
   }
 
   const showAmazonBadge = product.retailer === "Amazon" || !!product.asin;
   const showTrendingBadge = !!product.trending;
-  const features = Array.isArray(product.sports) && product.sports.length > 0
-    ? product.sports
-    : ["All Sports"];
+  const features =
+    Array.isArray(product.sports) && product.sports.length > 0
+      ? product.sports
+      : ["All Sports"];
   const specs = [
     { label: "Brand", value: product.brand },
     { label: "Retailer", value: product.retailer },
@@ -78,12 +137,18 @@ const ProductDetail: React.FC = () => {
     <div className="product-detail-container dark-bg">
       <Helmet>
         <title>{product.name} | AthleteXpert</title>
-        <meta name="description" content={product.description ?? product.name} />
+        <meta
+          name="description"
+          content={product.description ?? product.name}
+        />
       </Helmet>
       {/* --- BACK BUTTON --- */}
       <div className="product-detail-back">
         <Link to="/products" className="product-detail-back-link">
-          {FaChevronLeft && (FaChevronLeft as any)({ style: { marginRight: 8, fontSize: "1.1em" } })}
+          {FaChevronLeft &&
+            (FaChevronLeft as any)({
+              style: { marginRight: 8, fontSize: "1.1em" },
+            })}
           Back to Products
         </Link>
       </div>
@@ -93,13 +158,23 @@ const ProductDetail: React.FC = () => {
         <div className="product-detail-images">
           <div className="product-detail-image-wrapper highlight-border">
             {product.imgUrl ? (
-              <img src={product.imgUrl} alt={product.name} />
+              <img
+                src={product.imgUrl || "/images/product-fallback.png"}
+                alt={product.name}
+                onError={(e) =>
+                  (e.currentTarget.src = "/images/product-fallback.png")
+                }
+              />
             ) : (
               <div className="product-detail-image-placeholder">No image</div>
             )}
             <div className="product-detail-badges">
-              {showTrendingBadge && <span className="badge badge-trending">Trending</span>}
-              {showAmazonBadge && <span className="badge badge-amazon">Amazon</span>}
+              {showTrendingBadge && (
+                <span className="badge badge-trending">Trending</span>
+              )}
+              {showAmazonBadge && (
+                <span className="badge badge-amazon">Amazon</span>
+              )}
             </div>
           </div>
           {/* Feature tags */}
@@ -160,7 +235,11 @@ const ProductDetail: React.FC = () => {
         <h3>Related Products</h3>
         <div className="product-related-grid">
           {mockRelated.map((prod) => (
-            <Link to={`/products/${prod.id}`} key={prod.id} className="related-card-link">
+            <Link
+              to={`/products/${prod.id}`}
+              key={prod.id}
+              className="related-card-link"
+            >
               <div className="related-card">
                 <img src={prod.imgUrl} alt={prod.name} />
                 <span>{prod.name}</span>
@@ -172,16 +251,14 @@ const ProductDetail: React.FC = () => {
 
       {/* --- Reviews --- */}
       <div className="product-detail-reviews">
-        <h2>
-          {FaStar &&
-            (FaStar as any)({ className: "star" })}{" "}
-          Reviews
-        </h2>
+        <h2>{FaStar && (FaStar as any)({ className: "star" })} Reviews</h2>
         {mockReviews.length > 0 ? (
           mockReviews.map((review, idx) => (
             <div className="product-detail-review-item" key={idx}>
               <div className="product-detail-review-header">
-                <span className="product-detail-reviewer-name">{review.reviewer}</span>
+                <span className="product-detail-reviewer-name">
+                  {review.reviewer}
+                </span>
                 <span className="product-detail-review-rating">
                   {renderStars(review.rating)}
                 </span>
@@ -190,7 +267,9 @@ const ProductDetail: React.FC = () => {
             </div>
           ))
         ) : (
-          <p className="product-detail-no-reviews">No reviews yet. Be the first!</p>
+          <p className="product-detail-no-reviews">
+            No reviews yet. Be the first!
+          </p>
         )}
       </div>
     </div>

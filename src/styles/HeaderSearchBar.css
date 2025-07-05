@@ -7,7 +7,8 @@
   max-width: 600px;
 }
 
-/* 🔹 Main Search Bar */
+/* 🔹 Main Search Bar (updated class name for new component) */
+.header-search-bar-form,
 .header-search-bar {
   display: flex;
   align-items: center;
@@ -19,13 +20,16 @@
   border: 2px solid #a23c20;
   transition: all 0.3s ease-in-out;
   box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+  padding: 0;
 }
 
+.header-search-bar-form:hover,
 .header-search-bar:hover {
   box-shadow: 0 0 15px rgba(255, 140, 0, 0.6);
 }
 
-/* 🔹 Input Field */
+/* 🔹 Input Field (updated for both class names) */
+.header-search-bar-input,
 .search-input {
   flex-grow: 1;
   padding: 12px 18px;
@@ -35,34 +39,40 @@
   border: none;
   outline: none;
   width: 100%;
+  font-family: inherit;
 }
 
 input,
-input::placeholder {
+input::placeholder,
+.header-search-bar-input::placeholder,
+.search-input::placeholder {
   font-size: 18px;
 }
 
+.header-search-bar-input:focus,
 .search-input:focus {
   background: transparent !important;
   color: white;
 }
 
 /* 🔹 Placeholder Styling */
+.header-search-bar-input::placeholder,
 .search-input::placeholder {
   color: rgba(255, 255, 255, 0.7);
   font-size: 15px;
 }
 
 /* 🔥 Modern Submit Button */
+.header-search-bar-button,
 .search-button {
   background: linear-gradient(135deg, #a23c20, #842d14);
   border: none;
   color: #ffffff;
-  font-size: 14px;
+  font-size: 18px;
   font-weight: bold;
   border-radius: 50%;
   cursor: pointer;
-  transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.5s ease;
+  transition: background 0.3s, transform 0.2s, box-shadow 0.5s;
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
   display: flex;
   align-items: center;
@@ -74,24 +84,28 @@ input::placeholder {
   box-sizing: border-box;
 }
 
+.header-search-bar-button:hover,
 .search-button:hover {
   transform: scale(1.05);
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
   background-color: #a23c20;
-  transition: transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+  transition: transform 0.3s, background-color 0.3s, box-shadow 0.3s;
 }
 
+.header-search-bar-button:active,
 .search-button:active {
   transform: scale(0.98);
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
 }
 
+.header-search-bar-button:focus,
 .search-button:focus {
   outline: none;
-  box-shadow: 0 0 10px rgba(255, 120, 80, 0.5);
+  /* box-shadow: 0 0 10px rgba(255, 120, 80, 0.5); */
 }
 
 /* 🔹 Focus & Hover Effects on search bar */
+.header-search-bar-form:focus-within,
 .header-search-bar:focus-within {
   box-shadow: 0 0 12px rgba(162, 60, 32, 0.8);
   transform: scale(1.02);
@@ -101,6 +115,7 @@ input::placeholder {
 .search-suggestions {
   position: absolute;
   top: 48px;
+  left: 0;
   width: 100%;
   background: #222;
   border-radius: 8px;
@@ -112,7 +127,7 @@ input::placeholder {
   padding: 5px 0;
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+  transition: opacity 0.2s, transform 0.2s;
   border: #a23c20 5px solid;
 }
 
@@ -130,14 +145,15 @@ input::placeholder {
   color: white;
   font-size: 18px;
   cursor: pointer;
-  transition: background 0.2s ease-in-out, transform 0.1s ease-in-out;
+  transition: background 0.2s, transform 0.1s;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   position: relative;
-  /* No regression: keeps your old style but enables recent-label */
 }
 
-.search-suggestion-item:hover {
+.search-suggestion-item:hover,
+.search-suggestion-item.highlighted {
   background: #a23c20;
+  color: white;
   transform: scale(1.02);
 }
 
@@ -150,11 +166,6 @@ input::placeholder {
   border-bottom-left-radius: 8px;
   border-bottom-right-radius: 8px;
   border-bottom: none;
-}
-
-.search-suggestion-item.highlighted {
-  background-color: #a23c20;
-  color: white;
 }
 
 /* 🔥 Recent label for suggestions */
@@ -175,30 +186,38 @@ input::placeholder {
   transition: background 0.22s;
 }
 
+/* Accessibility: Add strong visible focus for all clickable items */
+.header-search-bar-input:focus,
+.search-suggestion-item:focus {
+  outline: none;
+  outline-offset: 2px;
+  background: #33221b;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .search-bar-container {
     max-width: 100%;
   }
-
-  .header-search-bar {
+  .header-search-bar,
+  .header-search-bar-form {
     padding: 6px 10px;
   }
-
+  .header-search-bar-input,
   .search-input {
     font-size: 14px;
     padding: 10px;
   }
-
+  .header-search-bar-button,
   .search-button {
-    padding: 8px 12px;
+    width: 44px;
+    height: 40px;
     font-size: 14px;
+    padding: 0;
   }
-
   .search-suggestions {
     max-height: 200px;
   }
-
   .search-suggestion-item {
     font-size: 14px;
     padding: 10px;
@@ -206,24 +225,25 @@ input::placeholder {
 }
 
 @media (max-width: 480px) {
-  .header-search-bar {
+  .header-search-bar,
+  .header-search-bar-form {
     padding: 5px 8px;
   }
-
+  .header-search-bar-input,
   .search-input {
     font-size: 13px;
     padding: 8px;
   }
-
+  .header-search-bar-button,
   .search-button {
-    padding: 6px 10px;
+    width: 38px;
+    height: 36px;
     font-size: 12px;
+    padding: 0;
   }
-
   .search-suggestions {
     max-height: 180px;
   }
-
   .search-suggestion-item {
     font-size: 13px;
     padding: 8px;

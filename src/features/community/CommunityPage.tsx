@@ -51,6 +51,7 @@ const SportCard: React.FC<SportCardProps> = React.memo(
         onKeyDown={handleKeyDown}
         role="button"
         aria-label={`Go to ${sport.title} community page`}
+        title={isDisabled ? "Coming soon!" : `Go to ${sport.title} community`}
       >
         <div className="sport-card-bg">
           <img
@@ -60,7 +61,7 @@ const SportCard: React.FC<SportCardProps> = React.memo(
             loading="lazy"
           />
           {isDisabled && (
-            <div className="esport-coming-soon-overlay">
+            <div className="esport-coming-soon-overlay" title="Coming soon!">
               <span>Coming soon</span>
             </div>
           )}
@@ -122,7 +123,7 @@ const Community: React.FC = () => {
 
       <h1 className="community-page-title">Community</h1>
 
-      {/* Search Bar (if you want it) */}
+      {/* Uncomment if/when you want a search bar for sports */}
       {/* <div className="community-search-wrapper">
         <form
           className="community-search-bar-form"

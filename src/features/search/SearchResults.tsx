@@ -316,14 +316,16 @@ const SearchResults: React.FC = () => {
         <h1 className="search-results-page-title">
           Results for: "{searchQuery}"
         </h1>
-        <div className="search-results-page-no-results">
-          <p className="search-results-page-no-results-text">
-            No results found.
+        <div className="search-results-page-no-results" style={{ textAlign: "center" }}>
+          <div style={{ fontSize: 64, marginBottom: 16, opacity: 0.85 }}>🧐</div>
+          <h2 style={{ fontWeight: 800, color: "#fff", marginBottom: 8 }}>
+            No results found
+          </h2>
+          <p className="search-results-page-no-results-text" style={{ marginBottom: 22 }}>
+            We couldn't find anything for <b>{searchQuery}</b>.<br />
+            Try a different search or explore trending topics:
           </p>
           <div className="search-results-page-suggestions-block">
-            <p className="search-results-page-suggestions-title">
-              Try one of these popular searches:
-            </p>
             <ul className="search-results-page-trending-list">
               {trendingSearches.map((term) => (
                 <li
@@ -339,26 +341,53 @@ const SearchResults: React.FC = () => {
                       navigate(`/search?query=${encodeURIComponent(term)}`);
                     }
                   }}
+                  style={{
+                    display: "inline-block",
+                    margin: "0 0.4em 0.8em 0",
+                    padding: "0.35em 0.8em",
+                    background: "#181818",
+                    borderRadius: 14,
+                    color: "#fff",
+                    fontWeight: 500,
+                    border: "1.5px solid #A23C20",
+                    cursor: "pointer",
+                    transition: "background 0.18s, color 0.18s, border 0.15s"
+                  }}
                 >
                   {term}
                 </li>
               ))}
             </ul>
           </div>
-          <p
-            className="search-results-page-no-results-suggestion"
-            style={{ marginTop: "1.2em" }}
+          <div style={{ margin: "1.5em 0 1em" }}>
+            <span style={{ color: "#bbb" }}>
+              Still stuck?{" "}
+              <a href="/contact" style={{ color: "#A23C20" }}>
+                Let us know what you’re looking for
+              </a>
+            </span>
+          </div>
+          <a
+            href="/"
+            className="search-results-page-back-home"
+            style={{
+              display: "inline-block",
+              marginTop: 8,
+              padding: "0.55em 1.3em",
+              background: "#A23C20",
+              color: "#fff",
+              borderRadius: 12,
+              textDecoration: "none",
+              fontWeight: 600
+            }}
           >
-            Still stuck?{" "}
-            <a href="/contact">Let us know what you’re looking for</a>
-          </p>
-          <a href="/" className="search-results-page-back-home">
             Return to Homepage
           </a>
         </div>
       </div>
     );
   }
+  
 
   // Main results
   return (

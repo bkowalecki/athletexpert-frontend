@@ -4,7 +4,9 @@ import { useUserContext } from "../../context/UserContext";
 import sportsList from "../../data/sports.json";
 import "../../styles/AccountSettings.css";
 
-interface UserProfile {
+const allowedSports = Array.isArray(sportsList) ? sportsList.map((s: any) => s.title) : [];
+
+type UserProfile = {
   username: string;
   firstName: string;
   lastName: string;
@@ -17,7 +19,7 @@ interface UserProfile {
   gender?: string;
   dob?: string;
   favoriteColor?: string;
-}
+};
 
 const defaultProfile: UserProfile = {
   username: "",
@@ -34,248 +36,169 @@ const defaultProfile: UserProfile = {
   favoriteColor: "#ffffff",
 };
 
+const fieldLabels: Record<keyof UserProfile, string> = {
+  username: "Username",
+  firstName: "First Name",
+  lastName: "Last Name",
+  bio: "Bio",
+  profilePictureUrl: "Profile Picture",
+  sports: "Sports",
+  city: "City",
+  state: "State",
+  country: "Country",
+  gender: "Gender",
+  dob: "Date of Birth",
+  favoriteColor: "Favorite Color",
+};
+
+const genderOptions = [
+  { value: "", label: "-- Select Gender --" },
+  { value: "Male", label: "Male" },
+  { value: "Female", label: "Female" },
+  { value: "Non-binary", label: "Non-binary" },
+  { value: "Prefer not to say", label: "Prefer not to say" },
+];
+
 const AccountSettings: React.FC = () => {
   const { user, setUser } = useUserContext();
-  const [formData, setFormData] = useState<UserProfile>(defaultProfile);
+  const [formData, setFormData] = useState<UserProfile>({ ...defaultProfile });
   const [newSport, setNewSport] = useState("");
-  const [message, setMessage] = useState<string | null>(null);
-  const allowedSports = sportsList.map((s) => s.title);
+  const [msg, setMsg] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // Make sure ALL user fields are populated into formData
   useEffect(() => {
     if (user) {
       setFormData({
         ...defaultProfile,
         ...user,
-        bio: user.bio ?? "", // convert null to empty string
+        // Null-safety: force string or ""
+        bio: user.bio ?? "",
         city: user.city ?? "",
         state: user.state ?? "",
         country: user.country ?? "",
         gender: user.gender ?? "",
         dob: user.dob ?? "",
         favoriteColor: user.favoriteColor ?? "#ffffff",
+        sports: Array.isArray(user.sports) ? user.sports : [],
         profilePictureUrl: user.profilePictureUrl || "",
-        sports: user.sports || [],
       });
     }
   }, [user]);
 
-  const fieldLabels: Record<keyof UserProfile, string> = {
-    username: "Username",
-    firstName: "First Name",
-    lastName: "Last Name",
-    bio: "Bio",
-    profilePictureUrl: "Profile Picture",
-    sports: "Sports",
-    city: "City",
-    state: "State",
-    country: "Country",
-    gender: "Gender",
-    dob: "Date of Birth",
-    favoriteColor: "Favorite Color",
-  };
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  const updateField = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData((f) => ({ ...f, [name]: value }));
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files?.[0]) {
-      const reader = new FileReader();
-      reader.onloadend = () =>
-        setFormData((prev) => ({
-          ...prev,
-          profilePictureUrl: reader.result as string,
-        }));
-      reader.readAsDataURL(e.target.files[0]);
-    }
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onloadend = () => setFormData((f) => ({ ...f, profilePictureUrl: reader.result as string }));
+    reader.readAsDataURL(file);
   };
 
   const handleSportChange = (action: "add" | "remove", sport: string) => {
-    setFormData((prev) => ({
-      ...prev,
+    setFormData((f) => ({
+      ...f,
       sports:
         action === "add"
-          ? [...prev.sports, sport]
-          : prev.sports.filter((s) => s !== sport),
+          ? [...f.sports, sport]
+          : f.sports.filter((s) => s !== sport),
     }));
     if (action === "add") setNewSport("");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setMsg(null);
     try {
-      const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/users/profile`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify(formData),
-        }
-      );
-
-      if (response.ok) {
-        const updatedUser = await response.json();
-        setUser(updatedUser);
-        setMessage("Profile updated successfully!");
-      } else {
-        setMessage("Failed to update profile. Please try again.");
-      }
-    } catch (error) {
-      console.error("Error updating profile:", error);
-      setMessage("An error occurred. Please try again later.");
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/users/profile`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(formData),
+      });
+      if (res.ok) {
+        setUser(await res.json());
+        setMsg("Profile updated!");
+      } else setMsg("Failed to update profile. Please try again.");
+    } catch {
+      setMsg("An error occurred. Please try again later.");
     }
   };
 
   const handleDeleteAccount = async () => {
-    const confirmed = window.confirm(
-      "⚠️ Deleting your account is permanent.\nAll your saved products, blogs, and data will be removed.\n\nAre you sure?"
-    );
-    if (!confirmed) return;
-
-    setIsDeleting(true);
-    setMessage(null);
-
+    if (!window.confirm("⚠️ Deleting your account is permanent. All your data will be removed. Continue?")) return;
+    setIsDeleting(true); setMsg(null);
     try {
-      const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/users/delete`,
-        {
-          method: "DELETE",
-          credentials: "include",
-        }
-      );
-
-      if (response.ok) {
-        setUser(null);
-        setMessage("Your account has been deleted. Redirecting...");
-        setTimeout(() => {
-          window.location.href = "/auth";
-        }, 2000);
-      } else {
-        setMessage("❌ Failed to delete account. Please try again.");
-      }
-    } catch (error) {
-      console.error("Delete error:", error);
-      setMessage("An unexpected error occurred. Please try again.");
-    } finally {
-      setIsDeleting(false);
-    }
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/users/delete`, {
+        method: "DELETE", credentials: "include"
+      });
+      if (res.ok) {
+        setUser(null); setMsg("Account deleted. Redirecting...");
+        setTimeout(() => { window.location.href = "/auth"; }, 1800);
+      } else setMsg("❌ Failed to delete account.");
+    } catch {
+      setMsg("An unexpected error occurred.");
+    } finally { setIsDeleting(false); }
   };
 
+  // ---------- RENDER ----------
   return (
     <div className="account-settings-container">
       <Helmet>
         <title>Account Settings | AthleteXpert</title>
       </Helmet>
       <h2>Account Settings</h2>
-      {message && <div className="account-settings-message">{message}</div>}
+      {msg && <div className="account-settings-message">{msg}</div>}
       <form onSubmit={handleSubmit}>
+        {/* Profile Picture */}
         <div className="account-settings-section">
           <label>{fieldLabels.profilePictureUrl}</label>
           <input type="file" accept="image/*" onChange={handleImageChange} />
           {formData.profilePictureUrl && (
-            <img
-              src={formData.profilePictureUrl}
-              alt="Profile"
-              className="account-settings-avatar"
-            />
+            <img src={formData.profilePictureUrl} alt="Profile" className="account-settings-avatar" />
           )}
         </div>
-
-        {(["username", "firstName", "lastName"] as (keyof UserProfile)[]).map(
-          (field) => (
-            <div key={field} className="account-settings-section">
-              <label>{fieldLabels[field]}</label>
-              <input
-                type="text"
-                name={field}
-                value={formData[field]}
-                onChange={handleChange}
-                required={field === "username"}
-                autoComplete={field === "username" ? "username" : undefined}
-              />
-            </div>
-          )
-        )}
-
-        {/* Location Fields */}
-        {(["city", "state", "country"] as (keyof UserProfile)[]).map(
-          (field) => (
-            <div key={field} className="account-settings-section">
-              <label>{fieldLabels[field]}</label>
-              <input
-                type="text"
-                name={field}
-                value={formData[field] || ""}
-                onChange={handleChange}
-                autoComplete={field}
-              />
-            </div>
-          )
-        )}
-
-        {/* Gender Select */}
+        {/* Basic Info */}
+        {(["username", "firstName", "lastName"] as const).map((f) => (
+          <div key={f} className="account-settings-section">
+            <label>{fieldLabels[f]}</label>
+            <input type="text" name={f} value={formData[f]} onChange={updateField} required={f === "username"} autoComplete={f === "username" ? "username" : undefined} />
+          </div>
+        ))}
+        {/* Location */}
+        {(["city", "state", "country"] as const).map((f) => (
+          <div key={f} className="account-settings-section">
+            <label>{fieldLabels[f]}</label>
+            <input type="text" name={f} value={formData[f] || ""} onChange={updateField} />
+          </div>
+        ))}
+        {/* Gender */}
         <div className="account-settings-section">
           <label>{fieldLabels.gender}</label>
-          <select
-            name="gender"
-            value={formData.gender || ""}
-            onChange={(e) =>
-              setFormData((prev) => ({ ...prev, gender: e.target.value }))
-            }
-          >
-            <option value="">-- Select Gender --</option>
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
-            <option value="Non-binary">Non-binary</option>
-            <option value="Prefer not to say">Prefer not to say</option>
+          <select name="gender" value={formData.gender || ""} onChange={updateField}>
+            {genderOptions.map(({ value, label }) => (
+              <option value={value} key={value}>{label}</option>
+            ))}
           </select>
         </div>
-
-        {/* Date of Birth */}
+        {/* DOB */}
         <div className="account-settings-section">
           <label>{fieldLabels.dob}</label>
-          <input
-  type="date"
-  name="dob"
-  value={
-    formData.dob
-      ? formData.dob.length > 10
-        ? formData.dob.slice(0, 10)
-        : formData.dob
-      : ""
-  }
-  onChange={handleChange}
-  autoComplete="bday"
-/>
+          <input type="date" name="dob" value={formData.dob ? formData.dob.slice(0, 10) : ""} onChange={updateField} autoComplete="bday" />
         </div>
-
         {/* Favorite Color */}
         <div className="account-settings-section">
           <label>{fieldLabels.favoriteColor}</label>
-          <input
-            type="color"
-            name="favoriteColor"
-            value={formData.favoriteColor || "#ffffff"}
-            onChange={handleChange}
-          />
+          <input type="color" name="favoriteColor" value={formData.favoriteColor || "#ffffff"} onChange={updateField} />
         </div>
-
+        {/* Bio */}
         <div className="account-settings-section">
           <label>{fieldLabels.bio}</label>
-          <textarea
-            name="bio"
-            value={formData.bio}
-            onChange={handleChange}
-            maxLength={200}
-          />
+          <textarea name="bio" value={formData.bio} onChange={updateField} maxLength={200} />
         </div>
-
         {/* Sports Picker */}
         <div className="account-settings-section">
           <label>{fieldLabels.sports}</label>
@@ -283,58 +206,25 @@ const AccountSettings: React.FC = () => {
             {formData.sports.map((sport) => (
               <span key={sport} className="account-settings-sport-tag">
                 {sport}
-                <button
-                  type="button"
-                  onClick={() => handleSportChange("remove", sport)}
-                  aria-label={`Remove ${sport}`}
-                >
-                  ✕
-                </button>
+                <button type="button" onClick={() => handleSportChange("remove", sport)} aria-label={`Remove ${sport}`}>✕</button>
               </span>
             ))}
           </div>
           <div className="account-settings-sport-picker">
-            <select
-              value={newSport}
-              onChange={(e) => setNewSport(e.target.value)}
-            >
+            <select value={newSport} onChange={e => setNewSport(e.target.value)}>
               <option value="">-- Select a sport --</option>
-              {allowedSports
-                .filter((sport) => !formData.sports.includes(sport))
+              {allowedSports.filter((sport) => !formData.sports.includes(sport))
                 .map((sport) => (
-                  <option key={sport} value={sport}>
-                    {sport}
-                  </option>
+                  <option key={sport} value={sport}>{sport}</option>
                 ))}
             </select>
-            <button
-              type="button"
-              onClick={() => handleSportChange("add", newSport)}
-              disabled={!newSport}
-            >
-              Add Sport
-            </button>
+            <button type="button" onClick={() => handleSportChange("add", newSport)} disabled={!newSport}>Add Sport</button>
           </div>
         </div>
-
-        <button type="submit" className="account-settings-save-button">
-          Save Changes
-        </button>
-        <hr
-          style={{
-            margin: "2rem 0",
-            border: "none",
-            borderTop: "1px solid #333",
-          }}
-        />
-
+        <button type="submit" className="account-settings-save-button">Save Changes</button>
+        <hr style={{ margin: "2rem 0", border: "none", borderTop: "1px solid #333" }} />
         <div className="account-settings-section">
-          <button
-            type="button"
-            className="account-settings-delete-button"
-            onClick={handleDeleteAccount}
-            disabled={isDeleting}
-          >
+          <button type="button" className="account-settings-delete-button" onClick={handleDeleteAccount} disabled={isDeleting}>
             {isDeleting ? "Deleting..." : "Delete Account"}
           </button>
         </div>

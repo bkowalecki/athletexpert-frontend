@@ -3,8 +3,8 @@
   position: relative;
   overflow: hidden;
   width: 100%;
-  color: black;
-  background: #fff;
+  color: #ccc;
+  background: #A23C20;
 }
 
 .featured-products-section::before,
@@ -20,7 +20,7 @@
   right: -150px;
   height: 400px;
   width: 400px;
-  background-color: #A23C20;
+  background-color: #fff;
 }
 
 .featured-products-section::after {
@@ -28,7 +28,7 @@
   left: -150px;
   height: 400px;
   width: 400px;
-  background-color: #A23C20;
+  background-color: #fff;
 }
 
 .featured-products-container {
@@ -43,7 +43,7 @@
 .featured-products-heading {
   font-size: clamp(2.4rem, 4vw, 3.5rem);
   text-align: center;
-  color: black;
+  color: #fff;
   text-transform: uppercase;
   font-weight: 900;
   font-family: 'Oswald', sans-serif;
@@ -79,8 +79,8 @@
   }
 
   .featured-products-section::before {
-    top: -80px;
-    right: -80px;
+    top: -100px;
+    right: -125px;
     height: 200px;
     width: 200px;
   }

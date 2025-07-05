@@ -8,8 +8,6 @@ import SportStatsModal from "./SportStatsModal";
 import ProductCard from "../products/ProductCard";
 import BlogCard from "../blog/BlogCard";
 import { useSavedProducts } from "../../hooks/useSavedProducts";
-
-// Styles
 import "../../styles/Globals.css";
 import "../../styles/ProfilePage.css";
 
@@ -51,6 +49,11 @@ interface Profile {
 }
 
 const ProfilePage: React.FC = () => {
+  // --- State & hooks ---
+  const [isLoading, setIsLoading] = useState(true);
+  // const [loggingOut, setLoggingOut] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
   const [profile, setProfile] = useState<Profile | null>(null);
   const [savedBlogs, setSavedBlogs] = useState<BlogPost[]>([]);
   const [activeSport, setActiveSport] = useState<string | null>(null);
@@ -61,48 +64,7 @@ const ProfilePage: React.FC = () => {
   const { user, setUser, isSessionChecked, checkSession } = useUserContext();
   const { logout: auth0Logout } = useAuth0();
 
-  // --- Fetch Profile & Blogs ---
-  useEffect(() => {
-    if (!isSessionChecked) return;
-    if (!user) {
-      navigate("/auth", { replace: true });
-      return;
-    }
-    const fetchProfile = async () => {
-      try {
-        const res = await fetch(`${process.env.REACT_APP_API_URL}/users/profile`, { credentials: "include" });
-        if (!res.ok) throw new Error("❌ Failed to fetch profile");
-        const data: Profile = await res.json();
-        setProfile(data);
-        if (data.savedBlogIds?.length) fetchSavedBlogs(data.savedBlogIds);
-      } catch (err) {
-        console.error("❌ Error fetching profile:", err);
-        navigate("/auth", { replace: true });
-      }
-    };
-    fetchProfile();
-    // eslint-disable-next-line
-  }, [user, isSessionChecked]);
-
-  // --- Fetch Saved Products Details ---
-  useEffect(() => {
-    if (!savedProductIds.length) return;
-    const fetchSavedProductDetails = async () => {
-      try {
-        const res = await fetch(`${process.env.REACT_APP_API_URL}/products/bulk-fetch`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ids: savedProductIds }),
-        });
-        setSavedProducts(await res.json());
-      } catch (err) {
-        console.error("Error loading saved product details", err);
-      }
-    };
-    fetchSavedProductDetails();
-  }, [savedProductIds]);
-
-  // --- Fetch Saved Blogs ---
+  // --- Fetch Saved Blogs (must be defined before useEffect/conditionally!) ---
   const fetchSavedBlogs = useCallback(async (ids: number[]) => {
     try {
       const res = await fetch(`${process.env.REACT_APP_API_URL}/blog/bulk-fetch`, {
@@ -112,10 +74,58 @@ const ProfilePage: React.FC = () => {
       });
       if (!res.ok) throw new Error("❌ Failed to fetch blogs");
       setSavedBlogs(await res.json());
-    } catch (err) {
-      console.error("❌ Error fetching blogs:", err);
+    } catch {
+      // You can add a toast or setError if needed
     }
   }, []);
+
+  // --- Fetch Profile & Blogs ---
+  useEffect(() => {
+    if (!isSessionChecked) return;
+    if (!user) {
+      navigate("/auth", { replace: true });
+      return;
+    }
+    const fetchProfile = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const res = await fetch(`${process.env.REACT_APP_API_URL}/users/profile`, { credentials: "include" });
+        if (!res.ok) throw new Error("❌ Failed to fetch profile");
+        const data: Profile = await res.json();
+        setProfile(data);
+        if (data.savedBlogIds?.length) fetchSavedBlogs(data.savedBlogIds);
+      } catch (err) {
+        setError("Failed to load profile. Please try refreshing or check your connection.");
+        navigate("/auth", { replace: true });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchProfile();
+    // eslint-disable-next-line
+  }, [user, isSessionChecked, fetchSavedBlogs, navigate]);
+
+  // --- Fetch Saved Products Details ---
+  useEffect(() => {
+    if (!savedProductIds.length) {
+      setSavedProducts([]);
+      return;
+    }
+    const fetchSavedProductDetails = async () => {
+      try {
+        const res = await fetch(`${process.env.REACT_APP_API_URL}/products/bulk-fetch`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ids: savedProductIds }),
+        });
+        setSavedProducts(await res.json());
+      } catch {
+        // Optionally handle error
+      }
+    };
+    fetchSavedProductDetails();
+  }, [savedProductIds]);
 
   // --- Save/Unsave Blog ---
   const toggleSaveBlog = async (blogId: number) => {
@@ -137,7 +147,7 @@ const ProfilePage: React.FC = () => {
         );
         toast.success(isSaved ? "Blog removed!" : "Blog saved!");
       }
-    } catch (err) {
+    } catch {
       toast.error("❌ Error saving blog.");
     }
   };
@@ -154,17 +164,19 @@ const ProfilePage: React.FC = () => {
       setUser(null);
       await checkSession();
       if (user?.authProvider === "auth0") {
+        // This does a full page redirect away from your SPA
         auth0Logout({ logoutParams: { returnTo: window.location.origin + "/auth" } });
       } else {
+        // This does a full page reload so no spinner is needed
         window.location.href = "/auth";
       }
     } catch (err) {
-      console.error("❌ Logout error:", err);
       toast.error("Error signing out.");
+      // optionally: setLoggingOut(false); if you do want to retry
     }
   };
+  
 
-  // --- Helper for Location Formatting ---
   const formatLocation = (raw: string): string => {
     const parts = raw.split(",").map((p) => p.trim());
     if (parts.length === 3) {
@@ -174,11 +186,33 @@ const ProfilePage: React.FC = () => {
     return raw;
   };
 
-  // --- Early returns for loading/redirect ---
-  if (!isSessionChecked || !profile) return <div className="profile-loading"></div>;
-  if (!user) return null;
+  // --- Loading and Error States ---
 
-  // --- Render ---
+
+  if (isLoading) {
+    return (
+      <div className="profile-loading" aria-busy="true" aria-live="polite" style={{ minHeight: 320, display: "flex", justifyContent: "center", alignItems: "center" }}>
+        <div className="ax-spinner" style={{
+          width: 36, height: 36, border: "4px solid #f0a500", borderTop: "4px solid #1a1a1a", borderRadius: "50%", animation: "spin 0.8s linear infinite"
+        }} />
+        <span style={{ marginLeft: 16, fontWeight: 600, color: "#888" }}>Loading your profile...</span>
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="profile-error" role="alert" style={{ textAlign: "center", color: "#b00", marginTop: 80 }}>
+        <p><strong>Uh oh! {error}</strong></p>
+        <button onClick={() => window.location.reload()} className="profile-cta-button">Retry</button>
+      </div>
+    );
+  }
+
+  if (!user || !profile) return null;
+
+  // --- Main Render ---
   return (
     <div className="profile-container">
       <Helmet>
@@ -234,7 +268,9 @@ const ProfilePage: React.FC = () => {
       {/* --- Blogs --- */}
       <h2 className="profile-subsection-header-text">My Blogs</h2>
       <div className="profile-saved-blogs-grid">
-        {savedBlogs.length > 0 ? (
+        {!savedBlogs ? (
+          <p>Loading saved blogs…</p>
+        ) : savedBlogs.length > 0 ? (
           savedBlogs.map((blog) => (
             <BlogCard
               key={blog.id}
@@ -260,10 +296,12 @@ const ProfilePage: React.FC = () => {
       {/* --- Products --- */}
       <h2 className="profile-subsection-header-text">Maybe Later...</h2>
       <div className="profile-saved-products">
-        {savedProducts.length > 0 ? (
+        {!savedProducts ? (
+          <p>Loading saved products…</p>
+        ) : savedProducts.length > 0 ? (
           savedProducts.map((product) => (
             <ProductCard
-            id = {product.id}
+              id={product.id}
               key={product.id}
               name={product.name}
               brand={product.brand}

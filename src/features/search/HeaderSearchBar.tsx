@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import debounce from "lodash.debounce";
 import "../../styles/HeaderSearchBar.css";
@@ -6,7 +6,6 @@ import { trackEvent } from "../../util/analytics";
 import sportsTerms from "../../data/sportsTerms.json";
 import sportsDataRaw from "../../data/sports.json";
 import { fetchSearchIntent } from "../../util/aiSearchIntent";
-
 
 interface HeaderSearchBarProps {
   showSubmitButton?: boolean;
@@ -18,12 +17,25 @@ interface Sport {
   backgroundImage: string;
 }
 
-// Helper to check for valid community/sport page
 const sportsData: Sport[] = Array.isArray(sportsDataRaw) ? sportsDataRaw : [];
 function isCommunityValid(query: string) {
   return sportsData.some(
     (s) => s.title.toLowerCase() === query.trim().toLowerCase()
   );
+}
+
+const RECENT_SEARCHES_KEY = "ax_recent_searches";
+function getRecentSearches(): string[] {
+  try {
+    return JSON.parse(localStorage.getItem(RECENT_SEARCHES_KEY) || "[]");
+  } catch {
+    return [];
+  }
+}
+function addRecentSearch(query: string) {
+  let searches = getRecentSearches();
+  searches = [query, ...searches.filter((q) => q !== query)].slice(0, 8);
+  localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(searches));
 }
 
 const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
@@ -35,25 +47,29 @@ const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
   const [showDropdown, setShowDropdown] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState<number>(-1);
   const [loadingIntent, setLoadingIntent] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const navigate = useNavigate();
   const location = useLocation();
 
-  const RECENT_SEARCHES_KEY = "ax_recent_searches";
-function getRecentSearches(): string[] {
-  try {
-    return JSON.parse(localStorage.getItem(RECENT_SEARCHES_KEY) || "[]");
-  } catch {
-    return [];
-  }
-}
-function addRecentSearch(query: string) {
-  let searches = getRecentSearches();
-  searches = [query, ...searches.filter((q) => q !== query)].slice(0, 8); // 8 max
-  localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(searches));
-}
+  // --- Keyboard "/" shortcut for focus ---
+  useEffect(() => {
+    const handleSlash = (e: KeyboardEvent) => {
+      if (
+        e.key === "/" &&
+        document.activeElement?.tagName !== "INPUT" &&
+        !e.ctrlKey &&
+        !e.metaKey
+      ) {
+        e.preventDefault();
+        inputRef.current?.focus();
+      }
+    };
+    window.addEventListener("keydown", handleSlash);
+    return () => window.removeEventListener("keydown", handleSlash);
+  }, []);
 
-  // Reset search state when navigating away from the search page
+  // Reset search state on nav away from search page
   useEffect(() => {
     if (!location.pathname.startsWith("/search")) {
       setSearchQuery("");
@@ -62,7 +78,7 @@ function addRecentSearch(query: string) {
     }
   }, [location.pathname]);
 
-  // Close dropdown on Escape key press
+  // Close dropdown on Escape key press (global)
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) =>
       e.key === "Escape" && setShowDropdown(false);
@@ -79,15 +95,12 @@ function addRecentSearch(query: string) {
           setShowDropdown(false);
           return;
         }
-        // Static sports terms
         const staticFiltered = sportsTerms.sportsTerms.filter((term) =>
           term.toLowerCase().startsWith(query.toLowerCase())
         );
-        // Recent searches
         const recent = getRecentSearches().filter((term) =>
           term.toLowerCase().includes(query.toLowerCase())
         );
-        // No duplicates, show recents first
         const combined = [
           ...recent,
           ...staticFiltered.filter((t) => !recent.includes(t)),
@@ -97,8 +110,8 @@ function addRecentSearch(query: string) {
       }, 300),
     []
   );
-  
 
+  // Update suggestions on input change
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
     setSearchQuery(query);
@@ -106,22 +119,19 @@ function addRecentSearch(query: string) {
     updateSuggestions(query); // Debounced
   };
 
-  // New: Smart AI intent routing on submit/navigate
+  // --- Smart AI intent routing ---
   const handleNavigateAI = async (query: string) => {
     const trimmedQuery = query.trim();
     if (!trimmedQuery) return;
-  
+
     setLoadingIntent(true);
-  
+
     try {
       const ai = await fetchSearchIntent(trimmedQuery);
-  
-      // Static page intent? Route directly to the page
+
       if (ai.intent && ai.intent.includes("staticPage") && ai.suggestedPages?.length > 0) {
         navigate(`/${ai.suggestedPages[0].toLowerCase()}`);
-      }
-      // Community or Sport intent? Only navigate if it actually exists
-      else if (
+      } else if (
         (ai.intent && (ai.intent.includes("community") || ai.intent.includes("sport"))) &&
         ai.fixedQuery
       ) {
@@ -130,27 +140,21 @@ function addRecentSearch(query: string) {
         } else {
           navigate(`/search?query=${encodeURIComponent(trimmedQuery)}`);
         }
-      }
-      // Brand? Route to a filtered product page
-      else if (ai.intent && ai.intent.includes("brand") && ai.fixedQuery) {
+      } else if (ai.intent && ai.intent.includes("brand") && ai.fixedQuery) {
         navigate(`/products?brand=${encodeURIComponent(ai.fixedQuery)}`);
-      }
-      // Gibberish? Take them to trending or just search as fallback
-      else if (ai.isGibberish) {
+      } else if (ai.isGibberish) {
         navigate(`/search?query=`);
-      }
-      // Product/blog/other? Always navigate to the user's original query!
-      else {
+      } else {
         navigate(`/search?query=${encodeURIComponent(trimmedQuery)}`);
       }
-  
+
       trackEvent("search_submit", {
         query: trimmedQuery || "(empty)",
         fixedQuery: ai.fixedQuery,
         intent: ai.intent,
         source: "header",
       });
-  
+
       onSearchComplete?.();
     } catch (err) {
       navigate(`/search?query=${encodeURIComponent(query.trim())}`);
@@ -166,81 +170,103 @@ function addRecentSearch(query: string) {
     setLoadingIntent(false);
   };
 
+  // Handle keyboard navigation in dropdown
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (!showDropdown) return;
-
-    switch (e.key) {
-      case "ArrowDown":
-        e.preventDefault();
-        setHighlightedIndex((prev) => (prev + 1) % suggestions.length);
-        break;
-      case "ArrowUp":
-        e.preventDefault();
-        setHighlightedIndex((prev) =>
-          prev === 0 ? suggestions.length - 1 : prev - 1
-        );
-        break;
-      case "Enter":
-        e.preventDefault();
-        if (highlightedIndex >= 0 && highlightedIndex < suggestions.length) {
-          handleNavigateAI(suggestions[highlightedIndex]);
-        } else {
-          handleNavigateAI(searchQuery);
-        }
-        break;
-      default:
-        break;
+    if (showDropdown) {
+      switch (e.key) {
+        case "ArrowDown":
+          e.preventDefault();
+          setHighlightedIndex((prev) => (prev + 1) % suggestions.length);
+          break;
+        case "ArrowUp":
+          e.preventDefault();
+          setHighlightedIndex((prev) =>
+            prev === 0 ? suggestions.length - 1 : prev - 1
+          );
+          break;
+        case "Enter":
+          e.preventDefault();
+          if (highlightedIndex >= 0 && highlightedIndex < suggestions.length) {
+            handleNavigateAI(suggestions[highlightedIndex]);
+          } else {
+            handleNavigateAI(searchQuery);
+          }
+          break;
+        case "Tab":
+          setShowDropdown(false);
+          break;
+        default:
+          break;
+      }
     }
   };
 
+  // Handle form submit
   const handleSearchSubmit = (e: React.FormEvent | React.MouseEvent) => {
     e.preventDefault();
     handleNavigateAI(searchQuery);
   };
 
   return (
-    <div className="search-bar-container">
-      <form className="header-search-bar" onSubmit={handleSearchSubmit}>
+    <div className="search-bar-container" role="search" aria-label="Sitewide search">
+      <form
+        className="header-search-bar-form"
+        onSubmit={handleSearchSubmit}
+        autoComplete="off"
+        tabIndex={0}
+        aria-label="Search products, blogs, and more"
+      >
         <input
+          ref={inputRef}
           type="text"
-          className="search-input"
-          placeholder={loadingIntent ? "Finding best results..." : "Search"}
+          className="header-search-bar-input"
+          placeholder={loadingIntent ? "Finding best results..." : "Search products, blogs, or sports..."}
           value={searchQuery}
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
           onBlur={() => setTimeout(() => setShowDropdown(false), 150)}
-          aria-label="Search"
+          aria-label="Sitewide search"
           disabled={loadingIntent}
+          autoComplete="off"
+          autoFocus={false}
         />
         {showSubmitButton && (
           <button
             type="submit"
-            className="search-button"
+            className="header-search-bar-button"
             aria-label="Submit search"
             disabled={loadingIntent}
           >
-            {loadingIntent ? "..." : ""}
+            <i className="fas fa-search" aria-hidden="true"></i>
+            <span className="sr-only">Search</span>
           </button>
         )}
       </form>
 
       {showDropdown && suggestions.length > 0 && (
-  <ul className="search-suggestions show">
-    {suggestions.map((suggestion, index) => (
-      <li
-        key={suggestion}
-        className={`search-suggestion-item ${highlightedIndex === index ? "highlighted" : ""}`}
-        onMouseEnter={() => setHighlightedIndex(index)}
-        onClick={() => handleNavigateAI(suggestion)}
-      >
-        {getRecentSearches().includes(suggestion) ? (
-          <span className="recent-label">Recent</span>
-        ) : null}
-        {suggestion}
-      </li>
-    ))}
-  </ul>
-)}
+        <ul
+          className="search-suggestions show"
+          role="listbox"
+          aria-label="Search suggestions"
+        >
+          {suggestions.map((suggestion, index) => (
+            <li
+              key={suggestion}
+              className={`search-suggestion-item${highlightedIndex === index ? " highlighted" : ""}`}
+              role="option"
+              aria-selected={highlightedIndex === index}
+              tabIndex={-1}
+              onMouseEnter={() => setHighlightedIndex(index)}
+              onMouseDown={() => handleNavigateAI(suggestion)}
+            >
+              {getRecentSearches().includes(suggestion) && (
+                <span className="recent-label">Recent</span>
+              )}
+              {suggestion}
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 };
