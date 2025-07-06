@@ -20,13 +20,14 @@
   }
 }
 
+/* --------- Desktop Modal --------- */
 .quiz-modal {
   position: fixed;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
   width: 90vw;
   max-width: 1200px;
+  max-height: 90vh;
   background-color: #a23c20;
   border-radius: 20px;
   z-index: 50000;
@@ -35,7 +36,10 @@
   overflow: hidden;
   box-sizing: border-box;
   opacity: 0;
+  transform: translate(-50%, -50%);
   animation: fadeInScale 0.4s ease-out forwards;
+  display: flex;
+  flex-direction: column;
 }
 
 .quiz-modal.closing {
@@ -43,6 +47,7 @@
 }
 
 .quiz-modal-content {
+  flex: 1 1 auto;
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
@@ -69,6 +74,7 @@
   align-items: center;
   border-radius: 50%;
   transition: transform 0.3s ease, background-color 0.3s ease;
+  z-index: 2;
 }
 
 .close-button svg {
@@ -87,6 +93,7 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
+  flex: 1 1 auto;
 }
 
 .quiz-container h2 {
@@ -109,7 +116,6 @@
   border-radius: 5px;
 }
 
-/* Carousel for sport selection */
 .carousel-container {
   display: flex;
   align-items: center;
@@ -269,10 +275,9 @@
 }
 
 .quiz-summary{
-  color:black;
+  color:white;
 }
 
-/* Ensure product cards behave like normal cards in grid */
 .quiz-product-grid {
   display: flex;
   flex-wrap: wrap;
@@ -281,42 +286,28 @@
   padding: 1rem;
 }
 
-/* Override modal text alignment for embedded product cards */
 .quiz-product-grid .product-card {
   text-align: left;
   max-width: 300px;
   background-color: #1c1c1c; /* match main site background */
 }
 
-.quiz-product-grid .product-name,
-.quiz-product-grid .product-brand,
-.quiz-product-grid .product-price {
-  color: #fff !important;
-}
-
-.quiz-product-grid .product-button {
-  color: #111;
-  background: #ff9900;
-  border: none;
-}
-
 .quiz-loading-overlay {
   position: absolute;
   top: 0; left: 0;
   width: 100%; height: 100%;
-  background: rgba(255,255,255,0.7); /* or tweak for your theme */
+  background: rgba(255,255,255,0.7);
   z-index: 100;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-/* Fix mobile product card scaling inside modal */
+/* --------- MOBILE OVERRIDES --------- */
 @media (max-width: 768px) {
-
   .quiz-modal {
     position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
+    top: 0; left: 0;
     width: 100vw;
     height: 100vh;
     max-width: 100vw;
@@ -326,31 +317,35 @@
     transform: none !important;
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
-    align-items: stretch;
+    justify-content: center;
+    align-items: center;
     box-shadow: 0 4px 24px rgba(0,0,0,0.22);
     z-index: 50000;
     background: #a23c20;
-    /* Remove overflow: hidden so child can scroll */
-    overflow: visible;
+    overflow: hidden;
   }
 
   .quiz-modal-content {
     flex: 1 1 auto;
     min-height: 0;
-    padding: 0 0 18vw 0;
+    padding: 4vw 0 5vw 0;
     overflow-y: auto;
-    max-height: 90vh;
+    width: 100vw;
+    max-height: 100vh;
     display: flex;
     flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
   }
 
   .quiz-container {
     padding-top: 2vw;
-    padding-bottom: 5vw;
+    padding-bottom: 8vw;
     width: 100vw;
     min-height: 0;
     box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
   }
 
   .close-button {
@@ -361,15 +356,27 @@
     z-index: 10;
   }
 
+  .quiz-container h2 {
+    font-size: 2rem;
+  }
+
+  .quiz-options {
+    gap: 14px;
+  }
+
+  .quiz-option {
+    flex: 1 1 80vw;
+    max-width: 80vw;
+    font-size: 1.1rem;
+    padding: 14px 10px;
+    margin: 0 auto;
+  }
 
   .quiz-product-grid .product-card {
     flex-direction: row-reverse;
     padding: 0.75rem;
     align-items: center;
-  }
-
-  .quiz-container h2 {
-    font-size: 2rem;
+    max-width: 90vw;
   }
 
   .quiz-product-grid .product-image-wrapper {
