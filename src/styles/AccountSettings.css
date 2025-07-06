@@ -1,6 +1,4 @@
-/* ⚡️ AthleteXpert Account Settings — Premium UX CSS */
-
-/* Root for dark mode palette & sizing */
+/* ===================== Root Variables ===================== */
 :root {
   --ax-dark-bg: #181818;
   --ax-panel: #212121;
@@ -11,7 +9,7 @@
   --ax-gold: #ffcc70;
   --ax-card-radius: 17px;
   --ax-font: 'Poppins', 'Montserrat', Arial, sans-serif;
-  --ax-shadow: 0 8px 32px rgba(0,0,0,0.45);
+  --ax-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
   --ax-label: #ffcc70;
   --ax-light: #f5f5f5;
   --ax-border: #333;
@@ -19,10 +17,10 @@
   --ax-tag-hover: #842d14;
 }
 
-/* Main container */
+/* ===================== General Styles ===================== */
 .account-settings-container {
   max-width: 700px;
-  margin: 4rem auto;
+  margin: 4.5rem auto;
   padding: 2.3rem 2.2rem;
   background: var(--ax-panel);
   border-radius: var(--ax-card-radius);
@@ -36,7 +34,7 @@
 .account-settings-container h2 {
   font-size: 2.3rem;
   text-align: center;
-  color: var(--ax-contrast);
+  color: var(--ax-light);
   margin-bottom: 2.1rem;
   font-weight: 800;
   letter-spacing: 0.04em;
@@ -54,6 +52,7 @@
   font-weight: 600;
 }
 
+/* ===================== Form Fields ===================== */
 .account-settings-section {
   margin-bottom: 2.15rem;
 }
@@ -79,10 +78,21 @@
   border: 1.5px solid var(--ax-border);
   border-radius: 9px;
   font-size: 1.04rem;
-  margin-right: 0;
-  margin-bottom: 0;
   box-sizing: border-box;
   transition: border-color 0.23s, box-shadow 0.16s;
+}
+
+.account-settings-section input:focus,
+.account-settings-section textarea:focus,
+.account-settings-section select:focus {
+  outline: none;
+  border-color: var(--ax-contrast);
+  box-shadow: 0 0 0 1.5px var(--ax-contrast);
+}
+
+.account-settings-section textarea {
+  resize: vertical;
+  min-height: 108px;
 }
 
 .account-settings-section input[type="color"] {
@@ -105,26 +115,7 @@
   outline: none;
 }
 
-/* -- To align color picker next to label or field, tweak as needed -- */
-.account-settings-section label[for="favoriteColor"],
-.account-settings-section input[type="color"] {
-  display: inline-block;
-  vertical-align: middle;
-}
-
-.account-settings-section input:focus,
-.account-settings-section textarea:focus,
-.account-settings-section select:focus {
-  outline: none;
-  border-color: var(--ax-contrast);
-  box-shadow: 0 0 0 1.5px var(--ax-contrast);
-}
-
-.account-settings-section textarea {
-  resize: vertical;
-  min-height: 108px;
-}
-
+/* ===================== Avatar ===================== */
 .account-settings-avatar {
   width: 110px;
   height: 110px;
@@ -136,7 +127,7 @@
   border: 2.5px solid var(--ax-contrast);
 }
 
-/* Sports tags */
+/* ===================== Sports Tags ===================== */
 .account-settings-sports {
   display: flex;
   flex-wrap: wrap;
@@ -156,7 +147,7 @@
   font-weight: 500;
   letter-spacing: 0.01em;
   transition: background 0.17s, box-shadow 0.17s;
-  box-shadow: 0 2px 7px rgba(0,0,0,0.15);
+  box-shadow: 0 2px 7px rgba(0, 0, 0, 0.15);
   user-select: none;
 }
 
@@ -176,61 +167,25 @@
   background: var(--ax-tag-hover);
 }
 
-/* Sports picker */
-.account-settings-sport-picker {
-  display: flex;
-  align-items: center;
-  gap: 1.1rem;
-  margin-top: 0.5rem;
-}
-
-.account-settings-sport-picker select {
-  /* flex: 1 1 160px; */
-  min-width: 100px;
-  background: #1d1d1d;
-  border: 1.5px solid var(--ax-border);
-  padding: 0.74rem 0.7rem;
-  color: #fff;
-  border-radius: 10px;
-}
-
-.account-settings-sport-picker button {
-  padding: 0.7rem 1.3rem;
-  background: var(--ax-contrast);
-  border: none;
-  border-radius: 9px;
-  color: #111;
-  font-weight: 600;
-  cursor: pointer;
-  font-size: 1rem;
-  letter-spacing: 0.01em;
-  transition: background 0.18s;
-  margin-left: 0;
-}
-
-.account-settings-sport-picker button:hover:not(:disabled) {
-  background: var(--ax-contrast-hover);
-}
-
-.account-settings-sport-picker button:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
-}
-
-.account-settings-save-button {
+/* ===================== Buttons ===================== */
+.account-settings-save-button,
+.account-settings-delete-button {
   width: 100%;
   padding: 1rem 0;
-  background: linear-gradient(135deg, #a23c20, #ff9900 75%);
   border: none;
-  color: #fff;
   border-radius: 10px;
   font-size: 1.17rem;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 2px 8px #0004;
   letter-spacing: 0.01em;
   margin-top: 1.1rem;
   transition: background 0.25s, box-shadow 0.22s;
+}
+
+.account-settings-save-button {
+  background: linear-gradient(135deg, #a23c20, #ff9900 75%);
+  color: #fff;
+  box-shadow: 0 2px 8px #0004;
 }
 
 .account-settings-save-button:hover {
@@ -238,50 +193,27 @@
   box-shadow: 0 3px 16px #0006;
 }
 
-/* Delete button */
 .account-settings-delete-button {
-  width: 100%;
-  padding: 1rem 0;
   background: var(--ax-red);
   color: #fff;
-  border: none;
-  border-radius: 10px;
   font-size: 1.09rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background 0.2s;
-  margin-top: 0.7rem;
 }
 
 .account-settings-delete-button:hover {
   background: var(--ax-red-dark);
 }
 
-/* File input styling (keeps it pretty) */
-.account-settings-section input[type="file"] {
-  background: none;
-  border: none;
-  color: #fff;
-  padding-left: 0;
-  font-size: 1rem;
-  margin-bottom: 0.8rem;
-}
-
-/* Divider line */
-hr {
-  border: none;
-  border-top: 1.5px solid #353535;
-  margin: 2.2rem 0 1.1rem 0;
-}
-
-/* Responsive */
+/* ===================== Responsive Styles ===================== */
 @media (max-width: 700px) {
   .account-settings-container {
     padding: 1.4rem 0.7rem;
-    margin: 1.3rem 0.6rem;
+    margin: 4.5rem 0.6rem;
     border-radius: 13px;
   }
-  .account-settings-container h2 { font-size: 1.4rem; }
+
+  .account-settings-container h2 {
+    font-size: 1.4rem;
+  }
 
   .account-settings-sport-picker {
     flex-direction: column;
@@ -289,15 +221,16 @@ hr {
     gap: 0.55rem;
     margin-top: 0.45rem;
   }
+
   .account-settings-sport-picker select {
     min-height: 38px;
     padding: 10px 9px;
     font-size: 1rem;
-    /* Prevent it from ballooning in height */
     box-sizing: border-box;
     width: 100%;
     max-width: 100%;
   }
+
   .account-settings-sport-picker button {
     padding: 12px 0;
     width: 100%;
@@ -310,39 +243,21 @@ hr {
   .account-settings-container {
     padding: 1.15rem 0.35rem;
   }
-  .account-settings-section label { font-size: 0.95rem; }
+
+  .account-settings-section label {
+    font-size: 0.95rem;
+  }
+
   .account-settings-section input,
   .account-settings-section textarea,
   .account-settings-section select {
     font-size: 0.97rem;
     padding: 12px 9px;
   }
-  .account-settings-sport-picker button { width: 100%; }
+
   .account-settings-save-button,
   .account-settings-delete-button {
     font-size: 1rem;
     padding: 13px 0;
-  }
-
-  .account-settings-sport-picker {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.55rem;
-    margin-top: 0.45rem;
-  }
-  .account-settings-sport-picker select {
-    min-height: 38px;
-    padding: 10px 9px;
-    font-size: 1rem;
-    /* Prevent it from ballooning in height */
-    box-sizing: border-box;
-    width: 100%;
-    max-width: 100%;
-  }
-  .account-settings-sport-picker button {
-    padding: 12px 0;
-    width: 100%;
-    font-size: 1rem;
-    margin-top: 2px;
   }
 }

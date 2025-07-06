@@ -240,12 +240,15 @@
   color: #e2e2e2;
   line-height: 1.95;
   margin: 0;
-  flex-grow: 1;
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
+  max-height: calc(1.95em * 3);
+  word-break: break-word;
+  min-width: 0;
+  width: 100%;
 }
 
 /* Profile Variant */

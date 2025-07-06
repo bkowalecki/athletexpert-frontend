@@ -1,4 +1,4 @@
-/* General About Page Container */
+/* ===================== General Styles ===================== */
 .about-page-container {
   display: flex;
   flex-direction: column;
@@ -10,7 +10,7 @@
   color: #333;
 }
 
-/* Hero Section */
+/* ===================== Hero Section ===================== */
 .about-page-hero-section {
   width: 100%;
   background: linear-gradient(135deg, #A23C20, #d45330);
@@ -81,7 +81,7 @@
   background-color: #ffdab9;
 }
 
-/* Section Layout */
+/* ===================== Section Layout ===================== */
 .about-page-sections {
   display: flex;
   justify-content: space-between;
@@ -97,13 +97,13 @@
   border-radius: 20px;
   flex: 1;
   min-width: 250px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: var(--box-shadow-light);
+  transition: var(--transition-hover);
 }
 
 .about-page-card:hover {
   transform: translateY(-10px);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--box-shadow-hover);
 }
 
 .about-page-highlight-card {
@@ -111,7 +111,7 @@
   color: white;
 }
 
-/* Values Section */
+/* ===================== Values Section ===================== */
 .about-page-values-section {
   max-width: 1200px;
   margin: 80px auto;
@@ -130,8 +130,8 @@
   background-color: #fff;
   padding: 30px;
   border-radius: 15px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease;
+  box-shadow: var(--box-shadow-light);
+  transition: var(--transition-hover);
   min-width: 250px;
 }
 
@@ -145,7 +145,7 @@
   margin-bottom: 10px;
 }
 
-/* Testimonial Section */
+/* ===================== Testimonial Section ===================== */
 .about-page-testimonial-section {
   max-width: 1200px;
   margin: 80px auto;
@@ -163,7 +163,7 @@
   background-color: white;
   padding: 30px;
   border-radius: 15px;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--box-shadow-light);
   flex: 1;
   min-width: 250px;
 }
@@ -180,7 +180,28 @@
   color: #A23C20;
 }
 
-/* Media Queries for Mobile Responsiveness */
+/* ===================== Utility Classes ===================== */
+:root {
+  --box-shadow-light: 0 5px 15px rgba(0, 0, 0, 0.1);
+  --box-shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.15);
+  --transition-hover: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.hover-transform {
+  transition: var(--transition-hover);
+}
+
+.box-shadow {
+  box-shadow: var(--box-shadow-light);
+}
+
+/* ===================== Media Queries ===================== */
 @media (max-width: 768px) {
   .about-page-hero-title {
     font-size: 2.5rem;
