@@ -4,6 +4,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { useUserContext } from "../../context/UserContext";
 import { loginWithAuth0Token } from "../../util/authUtils";
 import { trackEvent } from "../../util/analytics";
+import { loginUser, registerUser } from "../../api/user"; // <-- add this
 import "../../styles/AuthPage.css";
 
 const AuthPage: React.FC = () => {
@@ -63,40 +64,30 @@ const AuthPage: React.FC = () => {
     e.preventDefault();
     setIsSubmitting(true);
     setError(null);
-
+  
     if (!isLogin && formData.password !== formData.confirmPassword) {
       setError("Passwords do not match.");
       setIsSubmitting(false);
       return;
     }
-
-    const endpoint = isLogin ? "login" : "register";
-    const payload = isLogin
-      ? { email: formData.email, password: formData.password }
-      : {
+  
+    try {
+      let userData;
+      if (isLogin) {
+        userData = await loginUser({
+          email: formData.email,
+          password: formData.password,
+        });
+      } else {
+        userData = await registerUser({
           username: formData.username,
           email: formData.email,
           password: formData.password,
-        };
-
-    try {
-      const res = await fetch(
-        `${process.env.REACT_APP_API_URL}/users/${endpoint}`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-          credentials: "include",
-        }
-      );
-
-      if (!res.ok)
-        throw new Error((await res.text()) || "Authentication failed");
-
-      const userData = await res.json();
+        });
+      }
       setUser(userData);
       trackEvent("login_success", { method: isLogin ? "email" : "register" });
-
+  
       if (isLogin) {
         navigate("/profile", { replace: true });
       } else {
@@ -105,8 +96,7 @@ const AuthPage: React.FC = () => {
         });
       }
     } catch (err: any) {
-      console.error("❌ Auth error:", err);
-      setError(err.message || "Something went wrong. Try again.");
+      setError(err?.response?.data?.message || err.message || "Something went wrong. Try again.");
     } finally {
       setIsSubmitting(false);
     }

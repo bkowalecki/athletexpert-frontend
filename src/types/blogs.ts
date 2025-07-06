@@ -4,16 +4,29 @@ export type BlogCardVariant = "latest" | "list" | "profile" | "related" | "horiz
 
 export interface BlogPost {
   id: number;
+  slug: string;
   title: string;
   author: string;
-  publishedDate: string;
-  summary: string;
   imageUrl: string;
-  slug: string;
-  sport?: string;    // Some places use this, so it's optional
-  content?: string;  // Only present on BlogPostPage or admin
-  tags?: string[];   // Only on admin or full detail
+  summary: string;
+  content: string;
+  sport: string;
+  tags: string[];
+  publishedDate: string;
 }
+
+// For form/draft (no id, no slug required)
+export type BlogPostForm = {
+  title: string;
+  author: string;
+  imageUrl: string;
+  summary: string;
+  content: string;
+  sport: string;
+  tags: string[];
+  publishedDate: string;
+};
+
 
 
 export interface BlogCardProps {

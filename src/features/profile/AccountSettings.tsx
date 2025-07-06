@@ -4,6 +4,7 @@ import { useUserContext } from "../../context/UserContext";
 import sportsList from "../../data/sports.json";
 import "../../styles/AccountSettings.css";
 import type { UserProfile } from "../../types/users";
+import { updateUserProfile, deleteUserAccount } from "../../api/user";
 
 const allowedSports = Array.isArray(sportsList)
   ? sportsList.map((s: any) => s.title)
@@ -104,28 +105,20 @@ const AccountSettings: React.FC = () => {
     if (action === "add") setNewSport("");
   };
 
+  // ✅ Now using API function
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setMsg(null);
     try {
-      const res = await fetch(
-        `${process.env.REACT_APP_API_URL}/users/profile`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify(formData),
-        }
-      );
-      if (res.ok) {
-        setUser(await res.json());
-        setMsg("Profile updated!");
-      } else setMsg("Failed to update profile. Please try again.");
+      const updated = await updateUserProfile(formData);
+      setUser(prev => prev ? { ...prev, ...updated } : { ...defaultProfile, ...updated } as any);
+      setMsg("Profile updated!");
     } catch {
-      setMsg("An error occurred. Please try again later.");
+      setMsg("Failed to update profile. Please try again.");
     }
   };
 
+  // ✅ Now using API function
   const handleDeleteAccount = async () => {
     if (
       !window.confirm(
@@ -136,23 +129,20 @@ const AccountSettings: React.FC = () => {
     setIsDeleting(true);
     setMsg(null);
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_URL}/users/delete`, {
-        method: "DELETE",
-        credentials: "include",
-      });
-      if (res.ok) {
-        setUser(null);
-        setMsg("Account deleted. Redirecting...");
-        setTimeout(() => {
-          window.location.href = "/auth";
-        }, 1800);
-      } else setMsg("❌ Failed to delete account.");
+      await deleteUserAccount();
+      setUser(null);
+      setMsg("Account deleted. Redirecting...");
+      setTimeout(() => {
+        window.location.href = "/auth";
+      }, 1800);
     } catch {
       setMsg("An unexpected error occurred.");
     } finally {
       setIsDeleting(false);
     }
   };
+
+  // --- UI stays the same below ---
 
   return (
     <div className="account-settings-container">

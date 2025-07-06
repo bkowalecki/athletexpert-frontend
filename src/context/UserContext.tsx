@@ -6,6 +6,7 @@ import React, {
   useCallback,
   PropsWithChildren,
 } from "react";
+import { fetchUserSession } from "../api/user"; // <--- Use this!
 
 export type User = {
   username: string;
@@ -42,17 +43,8 @@ export const UserProvider: React.FC<PropsWithChildren> = ({ children }) => {
 
   const checkSession = useCallback(async () => {
     try {
-      const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/users/session`,
-        { credentials: "include" }
-      );
-      // Support both `{ user: ... }` and raw user objects
-      if (response.ok) {
-        const data = await response.json();
-        setUser(data?.user ?? data ?? null);
-      } else {
-        setUser(null);
-      }
+      const data = await fetchUserSession();
+      setUser(data?.user ?? data ?? null);
     } catch {
       setUser(null);
     } finally {

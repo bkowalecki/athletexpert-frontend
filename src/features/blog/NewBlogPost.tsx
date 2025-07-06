@@ -1,10 +1,17 @@
 import React, { useState, useEffect, useRef } from "react";
-import axios from "axios";
 import { useUserContext } from "../../context/UserContext";
 import { useNavigate } from "react-router-dom";
 import { blogTemplates } from "../../data/blogTemplates";
 import { toast } from "react-toastify";
 import "../../styles/NewBlogPost.css";
+import {
+  fetchAllBlogs,
+  createBlog,
+  updateBlog,
+  deleteBlog as deleteBlogApi,
+} from "../../api/blog";
+import { searchProducts } from "../../api/product";
+import { BlogPost, BlogPostForm } from "../../types/blogs";
 
 // Replace with your real product search type!
 interface Product {
@@ -16,19 +23,7 @@ interface Product {
   affiliateLink: string;
 }
 
-interface BlogPost {
-  id?: number;
-  title: string;
-  author: string;
-  imageUrl: string;
-  summary: string;
-  content: string;
-  sport: string;
-  tags: string[];
-  publishedDate: string;
-}
-
-const emptyFormData: BlogPost = {
+const emptyFormData: BlogPostForm = {
   title: "",
   author: "",
   imageUrl: "",
@@ -42,20 +37,22 @@ const emptyFormData: BlogPost = {
 const NewBlogPost: React.FC = () => {
   const { user } = useUserContext();
   const navigate = useNavigate();
-  const [formData, setFormData] = useState<BlogPost>(emptyFormData);
+  const [formData, setFormData] = useState<BlogPostForm>(emptyFormData);
   const [tagInput, setTagInput] = useState("");
   const [blogs, setBlogs] = useState<BlogPost[]>([]);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [showBlogs, setShowBlogs] = useState(false);
 
-  // Product search
+  // Product search for embed
   const [productSearch, setProductSearch] = useState("");
   const [productResults, setProductResults] = useState<Product[]>([]);
   const productTimeout = useRef<NodeJS.Timeout>();
 
   // Focus on title at mount for speed
   const titleRef = useRef<HTMLInputElement>(null);
-  useEffect(() => { titleRef.current?.focus(); }, []);
+  useEffect(() => {
+    titleRef.current?.focus();
+  }, []);
 
   // Blog draft load/save
   useEffect(() => {
@@ -66,22 +63,21 @@ const NewBlogPost: React.FC = () => {
     localStorage.setItem("blog-draft", JSON.stringify(formData));
   }, [formData]);
 
+  // Fetch blogs on mount
   useEffect(() => {
-    axios.get(`${process.env.REACT_APP_API_URL}/blog/admin/all`, { withCredentials: true })
-      .then(({ data }) => setBlogs(data || []))
+    fetchAllBlogs()
+      .then((data) => setBlogs(data || []))
       .catch(() => {});
   }, []);
 
-  // ======== Product Search (auto debounce) ==========
+  // ======== Product Search (auto debounce, uses your /api/product) ==========
   useEffect(() => {
     if (productSearch.length < 2) return setProductResults([]);
     if (productTimeout.current) clearTimeout(productTimeout.current);
     productTimeout.current = setTimeout(async () => {
       try {
-        const res = await axios.get(`${process.env.REACT_APP_API_URL}/products/search`, {
-          params: { query: productSearch },
-        });
-        setProductResults(res.data);
+        const results = await searchProducts(productSearch);
+        setProductResults(results);
       } catch {
         setProductResults([]);
       }
@@ -90,7 +86,9 @@ const NewBlogPost: React.FC = () => {
   }, [productSearch]);
 
   // ======== Handlers =============
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
@@ -106,19 +104,31 @@ const NewBlogPost: React.FC = () => {
   };
 
   const removeTag = (tag: string) => {
-    setFormData((prev) => ({ ...prev, tags: prev.tags.filter((t) => t !== tag) }));
+    setFormData((prev) => ({
+      ...prev,
+      tags: prev.tags.filter((t) => t !== tag),
+    }));
   };
 
   const handleEdit = (blog: BlogPost) => {
     setEditingId(blog.id ?? null);
-    setFormData({ ...blog, tags: Array.isArray(blog.tags) ? blog.tags : [] });
+    setFormData({
+      title: blog.title,
+      author: blog.author,
+      imageUrl: blog.imageUrl,
+      summary: blog.summary,
+      content: blog.content || "",
+      sport: blog.sport,
+      tags: Array.isArray(blog.tags) ? blog.tags : [],
+      publishedDate: blog.publishedDate,
+    });
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleDelete = async (id: number) => {
     if (!window.confirm("Delete this post?")) return;
     try {
-      await axios.delete(`${process.env.REACT_APP_API_URL}/blog/${id}`, { withCredentials: true });
+      await deleteBlogApi(id);
       setBlogs((prev) => prev.filter((b) => b.id !== id));
       toast.success("Blog deleted!");
     } catch {
@@ -128,12 +138,13 @@ const NewBlogPost: React.FC = () => {
 
   // ======== Insert product embed ==========
   const insertProductEmbed = (product: Product) => {
-    // Customize this to your desired HTML format!
     const embed = `
 <div class="ax-product-embed">
   <a href="${product.affiliateLink}" target="_blank" rel="noopener noreferrer">
     <img src="${product.imgUrl}" alt="${product.name}" />
-    <div><strong>${product.name}</strong> – ${product.brand}${product.price ? ` | $${product.price}` : ""}</div>
+    <div><strong>${product.name}</strong> – ${product.brand}${
+      product.price ? ` | $${product.price}` : ""
+    }</div>
   </a>
 </div>
 `;
@@ -146,36 +157,41 @@ const NewBlogPost: React.FC = () => {
   };
 
   // ======== AI Draft Writer (Optional) ==========
-  const generateAIBlog = async () => {
-    // TODO: Swap for your API
-    toast.info("Drafting with AI...");
-    try {
-      const res = await axios.post("/api/ai/generate-blog", {
-        title: formData.title,
-        summary: formData.summary,
-        sport: formData.sport,
-      });
-      setFormData((prev) => ({ ...prev, content: res.data.content }));
-    } catch {
-      toast.error("AI drafting failed.");
-    }
-  };
+  // const generateAIBlog = async () => {
+  //   toast.info("Drafting with AI...");
+  //   try {
+      
+  //     const res = await fetch("/api/ai/generate-blog", {
+  //       method: "POST",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify({
+  //         title: formData.title,
+  //         summary: formData.summary,
+  //         sport: formData.sport,
+  //       }),
+  //     });
+  //     const data = await res.json();
+  //     setFormData((prev) => ({ ...prev, content: data.content }));
+  //   } catch {
+  //     toast.error("AI drafting failed.");
+  //   }
+  // };
 
   // ======== Submit ==========
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const url = editingId
-      ? `${process.env.REACT_APP_API_URL}/blog/admin/blog/${editingId}`
-      : `${process.env.REACT_APP_API_URL}/blog/admin/blog`;
-    const method = editingId ? "put" : "post";
-
     try {
-      await axios({ url, method, data: formData, withCredentials: true });
-      toast.success(editingId ? "Blog updated!" : "Blog created!");
+      if (editingId) {
+        await updateBlog(editingId, formData);
+        toast.success("Blog updated!");
+      } else {
+        await createBlog(formData);
+        toast.success("Blog created!");
+      }
       setEditingId(null);
       setFormData(emptyFormData);
       window.scrollTo({ top: 0, behavior: "smooth" });
-      const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/blog/admin/all`, { withCredentials: true });
+      const data = await fetchAllBlogs();
       setBlogs(data || []);
     } catch {
       toast.error("Error submitting blog");
@@ -204,7 +220,11 @@ const NewBlogPost: React.FC = () => {
             name={field}
             value={formData[field]}
             onChange={handleChange}
-            placeholder={field === "imageUrl" ? "Header Image URL" : field.charAt(0).toUpperCase() + field.slice(1)}
+            placeholder={
+              field === "imageUrl"
+                ? "Header Image URL"
+                : field.charAt(0).toUpperCase() + field.slice(1)
+            }
             required={field === "title" || field === "author"}
             autoComplete="off"
           />
@@ -212,7 +232,11 @@ const NewBlogPost: React.FC = () => {
 
         {formData.imageUrl && (
           <div className="image-preview-wrapper">
-            <img src={formData.imageUrl} alt="Header Preview" className="image-preview" />
+            <img
+              src={formData.imageUrl}
+              alt="Header Preview"
+              className="image-preview"
+            />
           </div>
         )}
 
@@ -239,7 +263,13 @@ const NewBlogPost: React.FC = () => {
             {formData.tags.map((tag) => (
               <span key={tag} className="tag-chip">
                 {tag}
-                <button type="button" onClick={() => removeTag(tag)} aria-label={`Remove ${tag}`}>×</button>
+                <button
+                  type="button"
+                  onClick={() => removeTag(tag)}
+                  aria-label={`Remove ${tag}`}
+                >
+                  ×
+                </button>
               </span>
             ))}
           </div>
@@ -260,11 +290,11 @@ const NewBlogPost: React.FC = () => {
             type="text"
             placeholder="Search for a product to embed"
             value={productSearch}
-            onChange={e => setProductSearch(e.target.value)}
+            onChange={(e) => setProductSearch(e.target.value)}
           />
           {productResults.length > 0 && (
             <div className="product-search-results">
-              {productResults.map(p => (
+              {productResults.map((p) => (
                 <button
                   key={p.id}
                   type="button"
@@ -272,9 +302,29 @@ const NewBlogPost: React.FC = () => {
                   onClick={() => insertProductEmbed(p)}
                   title={`Insert "${p.name}"`}
                 >
-                  <img src={p.imgUrl} alt={p.name} width={36} height={36} style={{ objectFit: "cover", borderRadius: 4, marginRight: 8 }} />
+                  <img
+                    src={p.imgUrl}
+                    alt={p.name}
+                    width={36}
+                    height={36}
+                    style={{
+                      objectFit: "cover",
+                      borderRadius: 4,
+                      marginRight: 8,
+                    }}
+                  />
                   {p.name} – <span style={{ color: "#666" }}>{p.brand}</span>
-                  {p.price && <span style={{ marginLeft: 8, color: "#2a6045", fontWeight: 500 }}>${p.price}</span>}
+                  {p.price && (
+                    <span
+                      style={{
+                        marginLeft: 8,
+                        color: "#2a6045",
+                        fontWeight: 500,
+                      }}
+                    >
+                      ${p.price}
+                    </span>
+                  )}
                 </button>
               ))}
             </div>
@@ -282,18 +332,31 @@ const NewBlogPost: React.FC = () => {
         </div>
 
         {/* ===== AI WRITE BUTTON ===== */}
-        <div className="ai-write-bar">
-          <button type="button" onClick={generateAIBlog} style={{ marginBottom: 8 }}>
+        {/* <div className="ai-write-bar">
+          <button
+            type="button"
+            onClick={generateAIBlog}
+            style={{ marginBottom: 8 }}
+          >
             🪄 Draft Blog with AI (Experimental)
           </button>
-        </div>
+        </div> */}
 
         {/* ===== TEMPLATES & CONTENT ===== */}
         <div>
           <label className="bold-label">Blog HTML Content</label>
           <div className="template-buttons">
             {blogTemplates.map(({ name, html }) => (
-              <button key={name} type="button" onClick={() => setFormData((prev) => ({ ...prev, content: prev.content + "\n" + html }))}>
+              <button
+                key={name}
+                type="button"
+                onClick={() =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    content: prev.content + "\n" + html,
+                  }))
+                }
+              >
                 Add {name}
               </button>
             ))}
@@ -306,20 +369,34 @@ const NewBlogPost: React.FC = () => {
             className="blog-html-input"
             rows={12}
           />
-          <p className="word-count">Word Count: {formData.content.trim().split(/\s+/).length}</p>
+          <p className="word-count">
+            Word Count: {formData.content.trim().split(/\s+/).length}
+          </p>
         </div>
 
         <div className="live-preview">
           <h3 className="preview-heading">Live Preview</h3>
           <div className="preview-box">
-            <div className="blog-post-content" dangerouslySetInnerHTML={{ __html: formData.content }} />
+            <div
+              className="blog-post-content"
+              dangerouslySetInnerHTML={{ __html: formData.content }}
+            />
           </div>
         </div>
 
         <div className="button-group">
-          <button type="submit">{editingId ? "Update Blog" : "Publish Blog"}</button>
+          <button type="submit">
+            {editingId ? "Update Blog" : "Publish Blog"}
+          </button>
           {editingId && (
-            <button type="button" onClick={() => { setEditingId(null); setFormData(emptyFormData); }} className="cancel-btn">
+            <button
+              type="button"
+              onClick={() => {
+                setEditingId(null);
+                setFormData(emptyFormData);
+              }}
+              className="cancel-btn"
+            >
               Cancel Edit
             </button>
           )}
@@ -332,15 +409,23 @@ const NewBlogPost: React.FC = () => {
             {showBlogs ? "Hide" : "Show"} Existing Blog Posts
           </button>
         </h3>
-        {showBlogs && blogs.map((b) => (
-          <div key={b.id} className="blog-admin-row">
-            <span><strong>{b.title}</strong> – {b.author}</span>
-            <div>
-              <button onClick={() => handleEdit(b)}>Edit</button>
-              <button onClick={() => handleDelete(b.id!)} className="delete-btn">Delete</button>
+        {showBlogs &&
+          blogs.map((b) => (
+            <div key={b.id} className="blog-admin-row">
+              <span>
+                <strong>{b.title}</strong> – {b.author}
+              </span>
+              <div>
+                <button onClick={() => handleEdit(b)}>Edit</button>
+                <button
+                  onClick={() => handleDelete(b.id!)}
+                  className="delete-btn"
+                >
+                  Delete
+                </button>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
       </div>
     </div>
   );

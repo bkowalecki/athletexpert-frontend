@@ -1,27 +1,13 @@
 import React, { useEffect, useMemo } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
 import DOMPurify from "dompurify";
 import { Helmet } from "react-helmet";
 import ShareButtons from "../../components/ShareButtons";
 import BlogCard from "./BlogCard";
 import { BlogPost } from "../../types/blogs";
+import { fetchBlogPost, fetchRelatedBlogs } from "../../api/blog";
 import "../../styles/BlogPostPage.css";
-
-const fetchBlogPost = async (slug: string): Promise<BlogPost> => {
-  const { data } = await axios.get(
-    `${process.env.REACT_APP_API_URL}/blog/slug/${slug}`
-  );
-  return data;
-};
-
-const fetchRelatedBlogs = async (slug: string): Promise<BlogPost[]> => {
-  const { data } = await axios.get(
-    `${process.env.REACT_APP_API_URL}/blog/related/${slug}`
-  );
-  return data;
-};
 
 const BlogPostPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();

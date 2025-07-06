@@ -1,10 +1,8 @@
 import ReactCanvasConfetti from "react-canvas-confetti";
 import { useRef } from "react";
 import React, { useState, ChangeEvent, useEffect } from "react";
-import axios from "axios";
 import { Helmet } from "react-helmet";
-
-import { toast } from "react-toastify"; // 👈 Add this at top if you want a nice popup
+import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import "../../styles/OnboardingPage.css";
 import { useUserContext } from "../../context/UserContext";

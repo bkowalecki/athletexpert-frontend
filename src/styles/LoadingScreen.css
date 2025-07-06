@@ -1,22 +1,62 @@
+/* ===================== Loading Screen ===================== */
 .ax-loading-screen {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background: none;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #181818, #212121); /* Dark background */
+  color: #fff; /* White text */
+  font-family: 'Poppins', Arial, sans-serif;
+}
+
+.ax-spinner {
+  border: 4px solid rgba(255, 255, 255, 0.2); /* Transparent border */
+  border-top: 4px solid #A23C20; /* Brand orange for the spinning part */
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: ax-spin 0.8s linear infinite;
+  margin-bottom: 1rem;
+}
+
+.ax-loading-text {
+  font-size: 1.2rem;
+  color: #A23C20; /* Brand orange text */
+  font-weight: 500;
+  margin-top: 0.5rem;
+  text-align: center;
+  animation: fade-in 1.5s ease-in-out infinite alternate;
+}
+
+/* ===================== Animations ===================== */
+@keyframes ax-spin {
+  0% {
+    transform: rotate(0deg);
   }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes fade-in {
+  0% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* ===================== Responsive Design ===================== */
+@media (max-width: 768px) {
   .ax-spinner {
-    border: 4px solid #2A6045;
-    border-top: 4px solid #A23C20;
-    border-radius: 50%;
     width: 40px;
     height: 40px;
-    animation: ax-spin 1s linear infinite;
-    margin-bottom: 1rem;
+    border-width: 3px;
   }
-  @keyframes ax-spin {
-    0% { transform: rotate(0deg);}
-    100% { transform: rotate(360deg);}
+
+  .ax-loading-text {
+    font-size: 1rem;
   }
-  
+}

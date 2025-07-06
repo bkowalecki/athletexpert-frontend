@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 import DOMPurify from "dompurify";
 import { Helmet } from "react-helmet";
@@ -8,8 +7,8 @@ import { useUserContext } from "../../context/UserContext";
 import { toast } from "react-toastify";
 import { BlogPost } from "../../types/blogs"; 
 import { trackEvent } from "../../util/analytics";
+import { fetchBlogs, fetchSavedBlogIds, toggleSaveBlogApi } from "../../api/blog";
 import BlogCard from "./BlogCard";
-
 import "../../styles/BlogPage.css";
 
 // ---- SPORTS ----
@@ -25,23 +24,6 @@ const SPORTS = [
   { value: "Weight Training", label: "Weight Training" },
 ];
 
-const fetchPosts = async (
-  searchQuery: string,
-  page: number,
-  sport: string
-): Promise<BlogPost[]> => {
-  if (searchQuery.trim().length > 50 || /[^\w\s-]/.test(searchQuery)) return [];
-  try {
-    const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/blog`, {
-      params: { searchQuery, page, size: 9, sport },
-    });
-    return Array.isArray(data?.content) ? data.content : [];
-  } catch (err) {
-    console.warn("⚠️ Failed to fetch posts", err);
-    return [];
-  }
-};
-
 const BlogPage: React.FC = () => {
   const [inputQuery, setInputQuery] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
@@ -52,18 +34,35 @@ const BlogPage: React.FC = () => {
   const [savedBlogIds, setSavedBlogIds] = useState<number[]>([]);
   const { user } = useUserContext();
 
+  // Fetch blog posts
   const { data, isLoading, isFetching, error } = useQuery<BlogPost[], Error>({
     queryKey: ["posts", searchQuery, currentPage, selectedSport],
-    queryFn: () => fetchPosts(searchQuery, currentPage, selectedSport),
+    queryFn: () => fetchBlogs(searchQuery, currentPage, selectedSport),
     enabled: searchQuery.length < 100,
     staleTime: 5000,
     refetchOnWindowFocus: false,
   });
 
+  // Fetch saved blogs when user changes
+  useEffect(() => {
+    if (!user) {
+      setSavedBlogIds([]);
+      return;
+    }
+    fetchSavedBlogIds()
+      .then(setSavedBlogIds)
+      .catch(err => {
+        setSavedBlogIds([]);
+        console.error("❌ Error fetching saved blogs:", err);
+      });
+  }, [user]);
+
+  // Error toast for blogs
   useEffect(() => {
     if (error && currentPage === 0) toast.error("❌ Error fetching blog posts.");
   }, [error, currentPage]);
 
+  // Add new posts as you paginate
   useEffect(() => {
     if (data) {
       const newPosts = data.filter(post => !posts.some(p => p.id === post.id));
@@ -73,14 +72,7 @@ const BlogPage: React.FC = () => {
     // eslint-disable-next-line
   }, [data, currentPage]);
 
-  useEffect(() => {
-    if (!user) return;
-    axios
-      .get(`${process.env.REACT_APP_API_URL}/users/saved-blogs`, { withCredentials: true })
-      .then(res => setSavedBlogIds(res.data.map((b: BlogPost) => b.id)))
-      .catch(err => console.error("❌ Error fetching saved blogs:", err));
-  }, [user]);
-
+  // Infinite scroll for more blogs
   useEffect(() => {
     const handleScroll = () => {
       if (
@@ -95,16 +87,13 @@ const BlogPage: React.FC = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [isFetching, hasMorePosts]);
 
+  // Save/Unsave blog
   const toggleSaveBlog = useCallback(
     async (blogId: number) => {
       if (!user) return toast.warn("Log in to save blogs!");
       const isSaved = savedBlogIds.includes(blogId);
       try {
-        await axios({
-          method: isSaved ? "DELETE" : "POST",
-          url: `${process.env.REACT_APP_API_URL}/users/saved-blogs/${blogId}`,
-          withCredentials: true,
-        });
+        await toggleSaveBlogApi(blogId, isSaved);
         setSavedBlogIds(prev => (isSaved ? prev.filter(id => id !== blogId) : [...prev, blogId]));
         toast.success(isSaved ? "Removed!" : "Saved!");
       } catch {
@@ -114,7 +103,7 @@ const BlogPage: React.FC = () => {
     [savedBlogIds, user]
   );
 
-  // When user types in search and hits enter
+  // Search handler
   const handleSearchSubmit = (e?: React.FormEvent) => {
     e?.preventDefault();
     setSearchQuery(inputQuery);
@@ -124,13 +113,12 @@ const BlogPage: React.FC = () => {
     trackEvent("blog_search", { query: inputQuery, sport: selectedSport });
   };
 
-  // When sport is changed from dropdown
+  // Sport filter
   const handleSportChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedSport(e.target.value);
     setCurrentPage(0);
     setPosts([]);
     setHasMorePosts(true);
-    // Search using whatever is typed in input
     setSearchQuery(inputQuery);
   };
 

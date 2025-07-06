@@ -5,35 +5,23 @@ import BlogCard from "./BlogCard";
 import { useUserContext } from "../../context/UserContext";
 import { toast } from "react-toastify";
 import { BlogPost } from "../../types/blogs";
+import { fetchLatestBlogs } from "../../api/blog";
+import { fetchSavedBlogIds, toggleSaveBlog as toggleSaveBlogApi } from "../../api/user";
 import "../../styles/BlogSection.css";
 
-// API fetch helpers
-const fetchLatestBlogs = async (): Promise<BlogPost[]> => {
-  const res = await fetch(`${process.env.REACT_APP_API_URL}/blog/latest?limit=3`);
-  if (!res.ok) throw new Error("Failed to fetch latest blogs");
-  const data = await res.json();
-  return data.slice(0, 3);
-};
-
-const fetchSavedBlogIds = async (): Promise<number[]> => {
-  const res = await fetch(`${process.env.REACT_APP_API_URL}/users/profile`, { credentials: "include" });
-  if (!res.ok) throw new Error("Failed to fetch user profile");
-  const data = await res.json();
-  return data.savedBlogIds || [];
-};
-
 const LatestBlogsSection: React.FC = () => {
+  // 1. Blogs
   const { data: posts, isLoading, isError } = useQuery<BlogPost[], Error>({
     queryKey: ["latestBlogs"],
-    queryFn: fetchLatestBlogs,
+    queryFn: () => fetchLatestBlogs(3),
     staleTime: 5000,
     retry: 1,
   });
 
+  // 2. Saved blog IDs (for user save/unsave)
   const { user, isSessionChecked } = useUserContext();
   const [savedBlogIds, setSavedBlogIds] = useState<number[]>([]);
 
-  // Keep savedBlogIds in sync for logged-in user
   useEffect(() => {
     if (!user) {
       setSavedBlogIds([]);
@@ -44,26 +32,17 @@ const LatestBlogsSection: React.FC = () => {
       .catch(() => setSavedBlogIds([]));
   }, [user]);
 
-  // Save/unsave logic (stable reference)
+  // 3. Save/unsave blog logic
   const toggleSaveBlog = useCallback(
     async (blogId: number) => {
       if (!user) return toast.warn("Log in to save blogs!");
-
       const isSaved = savedBlogIds.includes(blogId);
       try {
-        const res = await fetch(
-          `${process.env.REACT_APP_API_URL}/users/saved-blogs/${blogId}`,
-          {
-            method: isSaved ? "DELETE" : "POST",
-            credentials: "include",
-          }
+        await toggleSaveBlogApi(blogId, isSaved);
+        setSavedBlogIds((prev) =>
+          isSaved ? prev.filter((id) => id !== blogId) : [...prev, blogId]
         );
-        if (res.ok) {
-          setSavedBlogIds((prev) =>
-            isSaved ? prev.filter((id) => id !== blogId) : [...prev, blogId]
-          );
-          toast.success(isSaved ? "Blog removed!" : "Blog saved!");
-        }
+        toast.success(isSaved ? "Blog removed!" : "Blog saved!");
       } catch {
         toast.error("Error saving blog.");
       }
@@ -71,10 +50,12 @@ const LatestBlogsSection: React.FC = () => {
     [user, savedBlogIds]
   );
 
+  // 4. Session check (if you want to HIDE this section until session/user is loaded)
   if (!isSessionChecked) return null;
   if (isLoading) return <div className="loading">Loading latest blogs...</div>;
   if (isError || !posts) return <div className="error">Error loading blogs. Try again later.</div>;
 
+  // 5. Render
   return (
     <section className="latest-blog-section-container">
       <motion.div
@@ -86,7 +67,7 @@ const LatestBlogsSection: React.FC = () => {
       >
         <h2 className="latest-blog-heading">Latest</h2>
         <div className="latest-blog-grid">
-          {posts.map((post) => (
+          {posts.slice(0, 3).map((post) => (
             <BlogCard
               key={post.id}
               id={post.id}

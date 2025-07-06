@@ -1,3 +1,5 @@
+// src/features/products/ProductsPage.tsx
+
 import React, {
   useState,
   useEffect,
@@ -5,64 +7,34 @@ import React, {
   useRef,
   useCallback,
 } from "react";
-
-// -------------- Third-Party Libs --------------
-import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { ErrorBoundary } from "react-error-boundary";
 
-// -------------- Types --------------
+// --- Types & API ---
 import type { Product, SortOption, Filters } from "../../types/products";
+import { fetchProducts, searchProducts } from "../../api/product";
 
-// -------------- UI Components --------------
+// --- Components ---
 import ProductCard from "../products/ProductCard";
-// import CategoryCard from "./CategoryCard";
 import ProductGridSkeleton from "./ProductGridSkeleton";
 import ErrorFallback from "../../components/ErrorFallback";
-
-// -------------- Hooks --------------
 import { useSavedProducts } from "../../hooks/useSavedProducts";
 import { useFilteredProducts } from "../../hooks/useFilteredProducts";
 import { useRateLimiter } from "../../util/useRateLimiter";
 
-// -------------- Data --------------
-// import productCategories from "../../data/productCategories";
-
-// -------------- Styles --------------
 import "../../styles/ProductsPage.css";
 
-// ---------------------------------------------------------------------------
-// API Calls & Utility Functions
-// ---------------------------------------------------------------------------
-
-const fetchProducts = async (): Promise<Product[]> =>
-  (await axios.get(`${process.env.REACT_APP_API_URL}/products`)).data;
-
-const searchProducts = async (query: string): Promise<Product[]> => {
-  if (!query.trim()) return [];
-  const res = await axios.get(
-    `${process.env.REACT_APP_API_URL}/products/search`,
-    { params: { query } }
-  );
-  return res.data;
-};
-
+// --- Helper ---
 const sanitizeQuery = (q: string) =>
   q.replace(/[^a-zA-Z0-9\s-]/g, "").trim().slice(0, 40);
 
-// ---------------------------------------------------------------------------
-// Main Component
-// ---------------------------------------------------------------------------
-
 const ProductsPage: React.FC = () => {
-  // ------------ Navigation & Refs ------------
   const navigate = useNavigate();
   const sentinelRef = useRef<HTMLDivElement | null>(null);
 
-  // ------------ State ------------
   const [inputQuery, setInputQuery] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<Product[] | null>(null);
@@ -74,11 +46,9 @@ const ProductsPage: React.FC = () => {
     sortOption: "",
   });
 
-  // ------------ Hooks ------------
   const { canProceed, record } = useRateLimiter(10, 60_000);
   const { savedProductIds, toggleSaveProduct } = useSavedProducts();
 
-  // ------------ Data Fetching ------------
   const {
     data: products = [],
     isLoading,
@@ -90,7 +60,7 @@ const ProductsPage: React.FC = () => {
     staleTime: 5000,
   });
 
-  // ------------ Filtering & Visible Products ------------
+  // --- Filtering ---
   const productsToShow = searchResults !== null ? searchResults : products;
   const filteredProducts = useFilteredProducts(productsToShow, filters);
   const visibleProducts = useMemo(
@@ -98,20 +68,16 @@ const ProductsPage: React.FC = () => {
     [filteredProducts, visibleCount]
   );
 
-  // ------------ Brands & Sports for Filters ------------
   const allBrands = useMemo(
     () => [...new Set(productsToShow.map((p) => p.brand).filter(Boolean))],
     [productsToShow]
   );
   const allSports = useMemo(
-    () => [...new Set(productsToShow.flatMap((p) => p.sports || []))],
+    () => [...new Set(productsToShow.flatMap((p) => p.sports ?? []))],
     [productsToShow]
   );
 
-  // -------------------------------------------------------------------------
-  // Handlers
-  // -------------------------------------------------------------------------
-
+  // --- Handlers ---
   const handleFilterChange = useCallback(
     (key: keyof Filters, value: string) => {
       setFilters((prev) => ({
@@ -125,7 +91,6 @@ const ProductsPage: React.FC = () => {
 
   const handleSearchSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!canProceed()) {
       toast.error("You're searching too fast! Please wait a minute.");
       return;
@@ -149,11 +114,7 @@ const ProductsPage: React.FC = () => {
       const results = await searchProducts(cleanedInput);
       setSearchResults(results);
     } catch (err: any) {
-      if (err.response && err.response.status === 429) {
-        toast.error("You're searching too fast! Please wait a minute.");
-      } else {
-        toast.error("Failed to fetch products. Please try again.");
-      }
+      toast.error("Failed to fetch products. Please try again.");
       setSearchResults([]);
     }
     setIsSearching(false);
@@ -171,12 +132,9 @@ const ProductsPage: React.FC = () => {
     setVisibleCount((prev) => prev + 20);
   }, []);
 
-  // -------------------------------------------------------------------------
-  // Infinite Scroll Effect
-  // -------------------------------------------------------------------------
+  // --- Infinite Scroll ---
   useEffect(() => {
     let debounceTimeout: NodeJS.Timeout | null = null;
-
     const observer = new IntersectionObserver((entries) => {
       const [entry] = entries;
       if (entry.isIntersecting && !debounceTimeout) {
@@ -190,17 +148,13 @@ const ProductsPage: React.FC = () => {
     if (sentinelRef.current) {
       observer.observe(sentinelRef.current);
     }
-
     return () => {
       if (debounceTimeout) clearTimeout(debounceTimeout);
       observer.disconnect();
     };
   }, [loadMore]);
 
-  // -------------------------------------------------------------------------
-  // Render
-  // -------------------------------------------------------------------------
-
+  // --- Render ---
   return (
     <div className="products-page">
       <Helmet>
@@ -211,12 +165,6 @@ const ProductsPage: React.FC = () => {
         />
       </Helmet>
       <h1 className="products-page-title">Explore</h1>
-
-      {/* <div className="category-grid" aria-label="Product Categories">
-        {productCategories.map((cat) => (
-          <CategoryCard key={cat.title} {...cat} />
-        ))}
-      </div> */}
 
       <form
         className="filters-container"
@@ -310,8 +258,8 @@ const ProductsPage: React.FC = () => {
           {visibleProducts.length > 0
             ? visibleProducts.map((product, idx) => (
                 <ProductCard
-                id={product.id ?? `amazon-${idx}-${product.name}`} 
-                key={product.id ?? `amazon-${idx}-${product.name}`}
+                  id={product.id ?? `amazon-${idx}-${product.name}`}
+                  key={product.id ?? `amazon-${idx}-${product.name}`}
                   name={product.name}
                   brand={product.brand}
                   price={product.price}

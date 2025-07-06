@@ -1,21 +1,17 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
-import axios from "axios";
 import { useUserContext } from "../../context/UserContext";
 import { useNavigate } from "react-router-dom";
+import {
+  fetchProducts,
+  searchProducts,
+  createProduct,
+  updateProduct,
+  deleteProduct,
+} from "../../api/product";
 import "../../styles/NewProduct.css";
+import type { Product } from "../../types/products";
 
-interface Product {
-  id?: number;
-  name: string;
-  brand: string;
-  price: number;
-  imgUrl: string;
-  affiliateLink: string;
-  sports: string[];
-  asin?: string; // Added ASIN field
-}
-
-const emptyProduct: Product = {
+const emptyProduct: Omit<Product, "id"> = {
   name: "",
   brand: "",
   price: 0,
@@ -23,6 +19,7 @@ const emptyProduct: Product = {
   affiliateLink: "",
   sports: [],
   asin: "",
+  retailer: "",
 };
 
 const AdminProductManager: React.FC = () => {
@@ -31,7 +28,7 @@ const AdminProductManager: React.FC = () => {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const [products, setProducts] = useState<Product[]>([]);
-  const [formData, setFormData] = useState<Product>(emptyProduct);
+  const [formData, setFormData] = useState<Omit<Product, "id">>(emptyProduct);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [sportInput, setSportInput] = useState("");
@@ -44,13 +41,12 @@ const AdminProductManager: React.FC = () => {
     if (user?.role !== "admin") navigate("/");
   }, [user, navigate]);
 
-  const fetchProducts = useCallback(async () => {
+  // Fetch all products
+  const loadProducts = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`${process.env.REACT_APP_API_URL}/products`, {
-        withCredentials: true,
-      });
-      setProducts(res.data);
+      const data = await fetchProducts();
+      setProducts(data);
     } catch {
       setError("Error loading products.");
     } finally {
@@ -59,8 +55,8 @@ const AdminProductManager: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    fetchProducts();
-  }, [fetchProducts]);
+    loadProducts();
+  }, [loadProducts]);
 
   useEffect(() => {
     if (error || success) {
@@ -72,20 +68,15 @@ const AdminProductManager: React.FC = () => {
     }
   }, [error, success]);
 
+  // Search products
   const handleSearchSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!filter.trim()) return fetchProducts();
+    if (!filter.trim()) return loadProducts();
 
     setLoading(true);
     try {
-      const res = await axios.get(
-        `${process.env.REACT_APP_API_URL}/products/search`,
-        {
-          params: { query: filter },
-          withCredentials: true,
-        }
-      );
-      setProducts(res.data);
+      const data = await searchProducts(filter.trim());
+      setProducts(data);
     } catch {
       setError("Error searching products.");
     } finally {
@@ -93,6 +84,7 @@ const AdminProductManager: React.FC = () => {
     }
   };
 
+  // Handle form field changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -101,21 +93,26 @@ const AdminProductManager: React.FC = () => {
     }));
   };
 
+  // Handle sports input
   const handleSportKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && sportInput.trim()) {
       e.preventDefault();
       const newSport = sportInput.trim();
-      if (!formData.sports.includes(newSport)) {
+      if (!(formData.sports ?? []).includes(newSport)) {
         setFormData((prev) => ({
           ...prev,
-          sports: [...prev.sports, newSport],
+          sports: [...(prev.sports ?? []), newSport],
         }));
       }
       setSportInput("");
-    } else if (e.key === "Backspace" && !sportInput && formData.sports.length) {
+    } else if (
+      e.key === "Backspace" &&
+      !sportInput &&
+      (formData.sports ?? []).length
+    ) {
       setFormData((prev) => ({
         ...prev,
-        sports: prev.sports.slice(0, -1),
+        sports: (prev.sports ?? []).slice(0, -1),
       }));
     }
   };
@@ -123,10 +120,11 @@ const AdminProductManager: React.FC = () => {
   const removeSport = (sportToRemove: string) => {
     setFormData((prev) => ({
       ...prev,
-      sports: prev.sports.filter((s) => s !== sportToRemove),
+      sports: (prev.sports ?? []).filter((s) => s !== sportToRemove),
     }));
   };
 
+  // Submit form for create/update
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -139,52 +137,43 @@ const AdminProductManager: React.FC = () => {
         return;
       }
       if (editingId) {
-        await axios.put(
-          `${process.env.REACT_APP_API_URL}/products/admin/${editingId}`,
-          formData,
-          {
-            withCredentials: true,
-          }
-        );
+        await updateProduct(editingId, formData);
         setSuccess("Product updated!");
       } else {
-        await axios.post(
-          `${process.env.REACT_APP_API_URL}/products/admin`,
-          formData,
-          {
-            withCredentials: true,
-          }
-        );
+        await createProduct(formData);
         setSuccess("Product created!");
       }
       setFormData(emptyProduct);
       setEditingId(null);
-      fetchProducts();
+      loadProducts();
       inputRef.current?.focus();
     } catch {
       setError("Error saving product.");
     }
   };
 
+  // Edit mode
   const handleEdit = (product: Product) => {
     if (!window.confirm(`Edit "${product.name}"?`)) return;
-    setFormData({ ...product, price: Number(product.price) });
-    setEditingId(product.id || null);
+    // Strip id for form, just in case
+    const { id, ...rest } = product;
+    setFormData({
+      ...rest,
+      price: Number(product.price),
+      sports: rest.sports ?? [],
+    });
+    setEditingId(product.id ?? null);
     window.scrollTo({ top: 0, behavior: "smooth" });
     setTimeout(() => inputRef.current?.focus(), 100);
   };
 
+  // Delete
   const handleDelete = async (id: number) => {
     if (!window.confirm("Delete this product?")) return;
     try {
-      await axios.delete(
-        `${process.env.REACT_APP_API_URL}/products/admin/${id}`,
-        {
-          withCredentials: true,
-        }
-      );
+      await deleteProduct(id);
       setSuccess("Product deleted.");
-      fetchProducts();
+      loadProducts();
     } catch {
       setError("Error deleting product.");
     }
@@ -196,7 +185,7 @@ const AdminProductManager: React.FC = () => {
       return (
         p.name.toLowerCase().includes(term) ||
         p.brand.toLowerCase().includes(term) ||
-        p.sports.join(",").toLowerCase().includes(term) ||
+        (p.sports ?? []).join(",").toLowerCase().includes(term) ||
         (p.asin && p.asin.toLowerCase().includes(term))
       );
     })
@@ -213,14 +202,14 @@ const AdminProductManager: React.FC = () => {
       {success && <p className="success-message">{success}</p>}
 
       <form onSubmit={handleSubmit} className="product-form">
-        {["name", "brand", "price", "imgUrl", "affiliateLink", "asin"].map(
+        {["name", "brand", "price", "imgUrl", "affiliateLink", "asin", "retailer"].map(
           (field, i) => (
             <input
               key={field}
               ref={i === 0 ? inputRef : undefined}
               name={field}
               type={field === "price" ? "number" : "text"}
-              value={formData[field as keyof Product] as any}
+              value={formData[field as keyof typeof formData] as any}
               onChange={handleChange}
               placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
               min={field === "price" ? 0 : undefined}
@@ -255,7 +244,7 @@ const AdminProductManager: React.FC = () => {
           placeholder="Add sports (Enter to confirm, Backspace to remove last)"
         />
         <div className="tag-preview">
-          {formData.sports.map((sport) => (
+          {(formData.sports ?? []).map((sport) => (
             <span key={sport} className="tag-chip">
               {sport}
               <button type="button" onClick={() => removeSport(sport)}>
@@ -297,7 +286,7 @@ const AdminProductManager: React.FC = () => {
                 <small>{p.brand}</small>
                 {p.asin && <p>ASIN: {p.asin}</p>}
                 <div>
-                  {p.sports.map((sport) => (
+                  {(p.sports ?? []).map((sport) => (
                     <span key={sport} className="tag-chip">
                       {sport}
                     </span>

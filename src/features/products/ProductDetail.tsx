@@ -5,7 +5,8 @@ import { FaStar, FaChevronLeft, FaExternalLinkAlt } from "react-icons/fa";
 import "../../styles/ProductDetail.css";
 import { trackEvent } from "../../util/analytics";
 import type { Product } from "../../types/products";
-import ProductCard from "../products/ProductCard"; // <-- Use this!
+import ProductCard from "../products/ProductCard";
+import { fetchProductById, fetchRelatedProducts } from "../../api/product";
 
 const mockReviews = [
   { reviewer: "Sam R.", rating: 5, comment: "Best gear I’ve ever used. Game changer!" },
@@ -31,13 +32,10 @@ const ProductDetail: React.FC = () => {
   useEffect(() => {
     if (!id) return;
     setLoading(true);
-    const fetchProduct = async () => {
+    (async () => {
       try {
-        const res = await fetch(`${process.env.REACT_APP_API_URL}/products/${id}`);
-        if (!res.ok) throw new Error("Product not found");
-        const data = await res.json();
-        if (!data || Object.keys(data).length === 0)
-          throw new Error("No product data");
+        const data = await fetchProductById(id!);
+        if (!data || Object.keys(data).length === 0) throw new Error("No product data");
         setProduct(data);
 
         // Analytics
@@ -52,24 +50,21 @@ const ProductDetail: React.FC = () => {
           trending: !!data.trending,
         });
 
-        fetchRelatedProducts(data.id);
+        loadRelatedProducts(data.id);
       } catch (error) {
         navigate("/404", { replace: true });
       } finally {
         setLoading(false);
       }
-    };
-    fetchProduct();
+    })();
     // eslint-disable-next-line
   }, [id, navigate]);
 
-  const fetchRelatedProducts = async (productId: number | string) => {
+  const loadRelatedProducts = async (productId: number | string) => {
     try {
       setRelatedLoading(true);
-      const res = await fetch(`${process.env.REACT_APP_API_URL}/products/${productId}/related`);
-      if (!res.ok) throw new Error("Related products not found");
-      const data = await res.json();
-      setRelatedProducts(Array.isArray(data) ? data : []);
+      const related = await fetchRelatedProducts(productId);
+      setRelatedProducts(Array.isArray(related) ? related : []);
     } catch {
       setRelatedProducts([]);
     } finally {
@@ -130,7 +125,6 @@ const ProductDetail: React.FC = () => {
     { label: "ASIN", value: product.asin ?? "N/A" },
   ];
 
-  // Make View on Amazon super visible + analytics
   const handleAffiliateClick = () => {
     trackEvent("affiliate_click", {
       product_id: product.id,
@@ -138,7 +132,7 @@ const ProductDetail: React.FC = () => {
       brand: product.brand,
       retailer: product.retailer,
       asin: product.asin,
-      from: "product_detail"
+      from: "product_detail",
     });
   };
 
@@ -238,7 +232,7 @@ const ProductDetail: React.FC = () => {
               boxShadow: "0 2px 10px 0 rgba(162,60,32,0.15)",
               border: "none",
               cursor: "pointer",
-              textDecoration: "none"
+              textDecoration: "none",
             }}
           >
             View on Amazon&nbsp;
@@ -254,24 +248,23 @@ const ProductDetail: React.FC = () => {
       <div className="product-detail-related">
         <h3>Related Products</h3>
         <div className="product-related-grid">
-        {relatedProducts.slice(0, 4).map(prod => (
-  <div
-    key={prod.id}
-    className="related-card-link"
-    onClick={() =>
-      trackEvent("related_product_click", {
-        from_product_id: product.id,
-        from_product_name: product.name,
-        to_product_id: prod.id,
-        to_product_name: prod.name,
-      })
-    }
-    style={{ marginBottom: 18 }}
-  >
-    <ProductCard {...prod} />
-  </div>
-))}
-
+          {relatedProducts.slice(0, 4).map((prod) => (
+            <div
+              key={prod.id}
+              className="related-card-link"
+              onClick={() =>
+                trackEvent("related_product_click", {
+                  from_product_id: product.id,
+                  from_product_name: product.name,
+                  to_product_id: prod.id,
+                  to_product_name: prod.name,
+                })
+              }
+              style={{ marginBottom: 18 }}
+            >
+              <ProductCard {...prod} />
+            </div>
+          ))}
         </div>
       </div>
 

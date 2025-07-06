@@ -12,6 +12,7 @@ import { BlogPost } from "../../types/blogs";
 import { useSavedProducts } from "../../hooks/useSavedProducts";
 import "../../styles/Globals.css";
 import "../../styles/ProfilePage.css";
+import api from "../../api/axios"; 
 
 interface Profile {
   firstName: string;
@@ -30,7 +31,6 @@ interface Profile {
 const ProfilePage: React.FC = () => {
   // --- State & hooks ---
   const [isLoading, setIsLoading] = useState(true);
-  // const [loggingOut, setLoggingOut] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -46,15 +46,10 @@ const ProfilePage: React.FC = () => {
   // --- Fetch Saved Blogs (must be defined before useEffect/conditionally!) ---
   const fetchSavedBlogs = useCallback(async (ids: number[]) => {
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_URL}/blog/bulk-fetch`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ids }),
-      });
-      if (!res.ok) throw new Error("❌ Failed to fetch blogs");
-      setSavedBlogs(await res.json());
+      const res = await api.post("/blog/bulk-fetch", { ids });
+      setSavedBlogs(res.data);
     } catch {
-      // You can add a toast or setError if needed
+      setSavedBlogs([]);
     }
   }, []);
 
@@ -69,9 +64,8 @@ const ProfilePage: React.FC = () => {
       setIsLoading(true);
       setError(null);
       try {
-        const res = await fetch(`${process.env.REACT_APP_API_URL}/users/profile`, { credentials: "include" });
-        if (!res.ok) throw new Error("❌ Failed to fetch profile");
-        const data: Profile = await res.json();
+        const res = await api.get("/users/profile");
+        const data: Profile = res.data;
         setProfile(data);
         if (data.savedBlogIds?.length) fetchSavedBlogs(data.savedBlogIds);
       } catch (err) {
@@ -82,7 +76,6 @@ const ProfilePage: React.FC = () => {
       }
     };
     fetchProfile();
-    // eslint-disable-next-line
   }, [user, isSessionChecked, fetchSavedBlogs, navigate]);
 
   // --- Fetch Saved Products Details ---
@@ -93,14 +86,10 @@ const ProfilePage: React.FC = () => {
     }
     const fetchSavedProductDetails = async () => {
       try {
-        const res = await fetch(`${process.env.REACT_APP_API_URL}/products/bulk-fetch`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ids: savedProductIds }),
-        });
-        setSavedProducts(await res.json());
+        const res = await api.post("/products/bulk-fetch", { ids: savedProductIds });
+        setSavedProducts(res.data);
       } catch {
-        // Optionally handle error
+        setSavedProducts([]);
       }
     };
     fetchSavedProductDetails();
@@ -111,21 +100,17 @@ const ProfilePage: React.FC = () => {
     if (!user) return toast.warn("Log in to save blogs!");
     const isSaved = savedBlogs.some((b) => b.id === blogId);
     try {
-      const res = await fetch(
-        `${process.env.REACT_APP_API_URL}/users/saved-blogs/${blogId}`,
-        {
-          method: isSaved ? "DELETE" : "POST",
-          credentials: "include",
-        }
+      await api({
+        method: isSaved ? "DELETE" : "POST",
+        url: `/users/saved-blogs/${blogId}`,
+        withCredentials: true,
+      });
+      setSavedBlogs((prev) =>
+        isSaved
+          ? prev.filter((b) => b.id !== blogId)
+          : [...prev, { id: blogId } as BlogPost]
       );
-      if (res.ok) {
-        setSavedBlogs((prev) =>
-          isSaved
-            ? prev.filter((b) => b.id !== blogId)
-            : [...prev, { id: blogId } as BlogPost]
-        );
-        toast.success(isSaved ? "Blog removed!" : "Blog saved!");
-      }
+      toast.success(isSaved ? "Blog removed!" : "Blog saved!");
     } catch {
       toast.error("❌ Error saving blog.");
     }
@@ -136,25 +121,18 @@ const ProfilePage: React.FC = () => {
     try {
       sessionStorage.removeItem("ax_id_token");
       sessionStorage.removeItem("ax_token_time");
-      await fetch(`${process.env.REACT_APP_API_URL}/users/logout`, {
-        method: "POST",
-        credentials: "include",
-      });
+      await api.post("/users/logout");
       setUser(null);
       await checkSession();
       if (user?.authProvider === "auth0") {
-        // This does a full page redirect away from your SPA
         auth0Logout({ logoutParams: { returnTo: window.location.origin + "/auth" } });
       } else {
-        // This does a full page reload so no spinner is needed
         window.location.href = "/auth";
       }
     } catch (err) {
       toast.error("Error signing out.");
-      // optionally: setLoggingOut(false); if you do want to retry
     }
   };
-  
 
   const formatLocation = (raw: string): string => {
     const parts = raw.split(",").map((p) => p.trim());
@@ -166,8 +144,6 @@ const ProfilePage: React.FC = () => {
   };
 
   // --- Loading and Error States ---
-
-
   if (isLoading) {
     return (
       <div className="profile-loading" aria-busy="true" aria-live="polite" style={{ minHeight: 320, display: "flex", justifyContent: "center", alignItems: "center" }}>

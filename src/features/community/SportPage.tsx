@@ -1,11 +1,12 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
 import sportsData from "../../data/sports.json";
 import "../../styles/SportPage.css";
 import ProductCard from "../products/ProductCard";
 import BlogCard from "../blog/BlogCard";
 import { BlogPost } from "../../types/blogs";
+import { fetchBlogsByTag } from "../../api/blog";
+import { fetchProductsBySport } from "../../api/product";
 
 // Types
 interface Sport {
@@ -73,32 +74,25 @@ const SportPage: React.FC = () => {
   // Fetch related blogs and products
   useEffect(() => {
     if (!currentSport) return;
-
+  
     const fetchData = async () => {
       setLoading(true);
       setError(null);
-
+  
       try {
-        const [blogsRes, productsRes] = await Promise.all([
-          axios.get(`${process.env.REACT_APP_API_URL}/blog/by-tag`, {
-            params: { tag: currentSport.title },
-            withCredentials: true,
-          }),
-          axios.get(`${process.env.REACT_APP_API_URL}/products/by-sport`, {
-            params: { sport: currentSport.title },
-            withCredentials: true,
-          }),
+        const [blogs, products] = await Promise.all([
+          fetchBlogsByTag(currentSport.title),
+          fetchProductsBySport(currentSport.title),
         ]);
-
-        setRelatedBlogs(blogsRes.data);
-        setRecommendedProducts(productsRes.data);
+        setRelatedBlogs(blogs);
+        setRecommendedProducts(products);
       } catch (err) {
         setError("Failed to load data. Please try again later.");
       } finally {
         setLoading(false);
       }
     };
-
+  
     fetchData();
   }, [currentSport]);
 

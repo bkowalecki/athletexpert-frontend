@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useRef, useMemo } from "react";
-import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
 import LoadingScreen from "../../components/LoadingScreen";
 import ErrorScreen from "../../components/ErrorScreen";
@@ -10,28 +9,17 @@ import { useSavedProducts } from "../../hooks/useSavedProducts";
 import { fetchSearchIntent } from "../../util/aiSearchIntent";
 import { trackEvent } from "../../util/analytics";
 
+// Use your API helpers!
+import { searchProducts } from "../../api/product";
+import { searchBlogs } from "../../api/blog";
+import type { Product } from "../../types/products";
+import type { BlogPost } from "../../types/blogs";
+
+// --- Types ---
 interface Sport {
   title: string;
   backgroundImage: string;
 }
-interface Product {
-  id: number;
-  name: string;
-  brand: string;
-  price: number;
-  imgUrl: string;
-  affiliateLink: string;
-}
-interface BlogPost {
-  id: number;
-  title: string;
-  author: string;
-  publishedDate: string;
-  summary: string;
-  imageUrl: string;
-  slug: string;
-}
-
 const staticPages: { name: string; path: string }[] = [
   { name: "About", path: "/about" },
   { name: "Terms of Service", path: "/terms" },
@@ -69,9 +57,7 @@ const SearchResults: React.FC = () => {
 
   // In-memory cache for session
   const intentCacheRef = useRef<Record<string, any>>({});
-  const resultsCacheRef = useRef<
-    Record<string, { products: Product[]; blogs: BlogPost[] }>
-  >({});
+  const resultsCacheRef = useRef<Record<string, { products: Product[]; blogs: BlogPost[] }>>({});
 
   // Parse query from URL (?query=...)
   const searchQuery: string =
@@ -133,18 +119,10 @@ const SearchResults: React.FC = () => {
           blogData = resultsCacheRef.current[cacheKey].blogs;
         } else {
           if (ai.intent?.includes("product")) {
-            const prodRes = await axios.get(
-              `${process.env.REACT_APP_API_URL}/products/search`,
-              { params: { query: searchQuery }, withCredentials: true }
-            );
-            prodData = prodRes.data;
+            prodData = await searchProducts(searchQuery);
           }
           if (ai.intent?.includes("blog")) {
-            const blogRes = await axios.get(
-              `${process.env.REACT_APP_API_URL}/blog/search`,
-              { params: { query: searchQuery }, withCredentials: true }
-            );
-            blogData = blogRes.data;
+            blogData = await searchBlogs(searchQuery);
           }
           resultsCacheRef.current[cacheKey] = {
             products: prodData,
@@ -171,30 +149,20 @@ const SearchResults: React.FC = () => {
     };
   }, [searchQuery, navigate]);
 
+  // ----------- SPORT & STATIC PAGE SEARCH LOGIC -----------
+
   function getRelevantSports(query: string): Sport[] {
     if (!query) return [];
     const words = query.toLowerCase().split(/\s+/);
-    // prioritize exact title, but include partials
     return sportsData.filter(sport =>
       words.some(word => sport.title.toLowerCase().includes(word))
     );
   }
-  
   const matchingSports: Sport[] = useMemo(
     () => getRelevantSports(fixedQuery || searchQuery),
     [fixedQuery, searchQuery]
   );
 
-  // Memoized filtered matches for community/sport/static page results
-  // const matchingSports: Sport[] = useMemo(
-  //   () =>
-  //     fixedQuery
-  //       ? sportsData.filter((sport: Sport) =>
-  //           sport.title.toLowerCase().includes(fixedQuery.toLowerCase())
-  //         )
-  //       : [],
-  //   [fixedQuery]
-  // );
   const matchingStaticPages: { name: string; path: string }[] = useMemo(
     () =>
       fixedQuery
@@ -272,7 +240,6 @@ const SearchResults: React.FC = () => {
     );
   }
 
-  // "Did you mean..." UX
   if (shouldShowDidYouMean) {
     return (
       <div className="search-results-page-container">
@@ -389,7 +356,6 @@ const SearchResults: React.FC = () => {
       </div>
     );
   }
-  
 
   // Main results
   return (

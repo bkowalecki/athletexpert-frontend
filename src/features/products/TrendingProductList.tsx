@@ -1,26 +1,10 @@
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
 import ProductCard from "../products/ProductCard";
 import { useSavedProducts } from "../../hooks/useSavedProducts";
+import { fetchTrendingProducts } from "../../api/product";
+import type { Product } from "../../types/products";
 import "../../styles/TrendingProductList.css";
-
-interface Product {
-  id: number;
-  name: string;
-  brand: string;
-  category: string;
-  price: number | null;
-  imgUrl: string;
-  affiliateLink: string;
-}
-
-const fetchTrendingProducts = async (): Promise<Product[]> => {
-  const response = await axios.get(
-    `${process.env.REACT_APP_API_URL}/products/trending`
-  );
-  return response.data;
-};
 
 const TrendingProductList: React.FC = () => {
   const { savedProductIds, toggleSaveProduct } = useSavedProducts();
@@ -32,7 +16,7 @@ const TrendingProductList: React.FC = () => {
   } = useQuery<Product[], Error>({
     queryKey: ["trendingProducts"],
     queryFn: fetchTrendingProducts,
-    staleTime: 10_000, // More reasonable caching
+    staleTime: 10_000, // Cache for 10 seconds
     retry: 1,
   });
 
@@ -60,8 +44,8 @@ const TrendingProductList: React.FC = () => {
         <div className="trending-products-grid">
           {products.map((product) => (
             <ProductCard
-            id = {product.id}
               key={product.id}
+              id={product.id}
               name={product.name}
               brand={product.brand}
               price={product.price}
@@ -69,6 +53,8 @@ const TrendingProductList: React.FC = () => {
               affiliateLink={product.affiliateLink}
               isSaved={savedProductIds.includes(product.id)}
               onToggleSave={() => toggleSaveProduct(product.id)}
+              // Optionally: pass isTrending={true} for styling
+              isTrending={!!product.trending}
             />
           ))}
         </div>
