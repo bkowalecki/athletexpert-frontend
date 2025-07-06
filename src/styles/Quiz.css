@@ -20,7 +20,7 @@
   }
 }
 
-/* --------- Desktop Modal --------- */
+/* --------- Desktop Modal (centered, animated) --------- */
 .quiz-modal {
   position: fixed;
   top: 50%;
@@ -56,7 +56,7 @@
   overflow-y: auto;
 }
 
-.recommended-products-title{
+.recommended-products-title {
   color: white;
 }
 
@@ -274,8 +274,8 @@
   text-align: center;
 }
 
-.quiz-summary{
-  color:white;
+.quiz-summary {
+  color: white;
 }
 
 .quiz-product-grid {
@@ -289,7 +289,7 @@
 .quiz-product-grid .product-card {
   text-align: left;
   max-width: 300px;
-  background-color: #1c1c1c; /* match main site background */
+  background-color: #1c1c1c;
 }
 
 .quiz-loading-overlay {
@@ -303,39 +303,42 @@
   justify-content: center;
 }
 
-/* --------- MOBILE OVERRIDES --------- */
+/* --------- Mobile: FULLSCREEN, NO CROPPING, NO TRANSFORM --------- */
 @media (max-width: 768px) {
   .quiz-modal {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100vw;
-    height: 100vh;
-    max-width: 100vw;
-    max-height: 100vh;
-    border-radius: 0;
-    margin: 0;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    max-width: 100vw !important;
+    max-height: 100vh !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
     transform: none !important;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    align-items: center !important;
     box-shadow: 0 4px 24px rgba(0,0,0,0.22);
     z-index: 50000;
     background: #a23c20;
-    overflow: hidden;
+    overflow: hidden !important;
+    opacity: 1 !important; /* override fadeInScale to show immediately on mobile if needed */
+    animation: none !important;
   }
 
   .quiz-modal-content {
-    flex: 1 1 auto;
-    min-height: 0;
-    padding: 4vw 0 5vw 0;
-    overflow-y: auto;
-    width: 100vw;
-    max-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    padding: 4vw 0 5vw 0 !important;
+    overflow-y: auto !important;
+    width: 100vw !important;
+    max-height: 100vh !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
   }
 
   .quiz-container {
