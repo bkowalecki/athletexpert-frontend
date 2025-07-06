@@ -27,7 +27,7 @@
   transform: translate(-50%, -50%);
   width: 90vw;
   max-width: 1200px;
-  background-color: #fff;
+  background-color: #a23c20;
   border-radius: 20px;
   z-index: 50000;
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
@@ -51,6 +51,10 @@
   overflow-y: auto;
 }
 
+.recommended-products-title{
+  color: white;
+}
+
 .close-button {
   position: absolute;
   top: 10px;
@@ -70,7 +74,7 @@
 .close-button svg {
   width: 50px;
   height: 50px;
-  fill: #ff4b4b;
+  fill: #FFF;
 }
 
 .close-button:hover {
@@ -88,7 +92,7 @@
 .quiz-container h2 {
   font-size: 2.4rem;
   padding-top: 10px;
-  color: black;
+  color: #fff;
 }
 
 .progress-bar {
@@ -137,7 +141,7 @@
 
 .carousel-text {
   font-size: 1.2rem;
-  color: #555;
+  color: #fff;
   font-weight: 600;
   margin: 5px auto;
 }
@@ -238,7 +242,7 @@
   font-size: 1rem;
   color: #ffffff;
   background-color: #a23c20;
-  border: none;
+  border: 2px solid #fff;
   border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.3s, transform 0.2s;
@@ -263,12 +267,10 @@
 .recommended-products {
   text-align: center;
 }
-.recommended-products-title {
-  font-size: 1.8rem;
-  text-align: center;
-  color: #111;
-}
 
+.quiz-summary{
+  color:black;
+}
 
 /* Ensure product cards behave like normal cards in grid */
 .quiz-product-grid {
@@ -298,12 +300,64 @@
   border: none;
 }
 
+.quiz-loading-overlay {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(255,255,255,0.7); /* or tweak for your theme */
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 /* Fix mobile product card scaling inside modal */
 @media (max-width: 768px) {
+
+  .quiz-modal {
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 95vw;
+    height: 60vh;
+    max-width: none;
+    max-height: none;
+    border-radius: 12px;
+    margin: auto;
+    transform: none !important;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    /* Add a subtle shadow for pop */
+    box-shadow: 0 4px 24px rgba(0,0,0,0.28);
+  }
+
+  .quiz-modal-content {
+    flex: 1 1 auto;
+    min-height: 0;
+    padding: 5vw 0 10vw 0;
+    overflow-y: auto;
+    /* Prevent scrollbars from hiding content */
+    max-height: 95vh;
+  }
+
+  .close-button {
+    top: 8px;
+    right: 8px;
+    width: 40px;
+    height: 40px;
+  }
+
+
   .quiz-product-grid .product-card {
     flex-direction: row-reverse;
     padding: 0.75rem;
     align-items: center;
+  }
+
+  .quiz-container h2 {
+    font-size: 2rem;
   }
 
   .quiz-product-grid .product-image-wrapper {

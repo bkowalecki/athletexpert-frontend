@@ -1,117 +1,81 @@
 import React, { useState, useContext, useEffect } from "react";
 import "../../styles/Quiz.css";
 import sportsData from "../../data/sports.json";
-import ProductCard from "../products/ProductCard"; // Adjust path if needed]
+import quizData from "../../data/quizData.json";
+import ProductCard from "../products/ProductCard";
 import cleanProductTitle from "../../util/CleanProductTitle";
 import { trackEvent } from "../../util/analytics";
 import { QuizContext } from "../../context/QuizContext";
 import LoadingSpinner from "../../components/LoadingSpinner";
 
-// Types
-interface Product {
-  id: number;
-  name: string;
-  brand: string;
-  price: number;
-  imgUrl: string;
-  affiliateLink: string;
-}
-
-interface QuizQuestion {
-  question: string;
-  field: keyof typeof initialAnswers;
-  options: string[];
-}
-
-interface QuizProps {
-  isOpen: boolean;
-  closeModal: () => void;
-}
-
-type AnswerKey = keyof typeof initialAnswers;
-
-const initialAnswers = {
-  sport: "",
-  skillLevel: "",
-  trainingFrequency: "",
-  budget: "",
-  favoriteColor: "",
-};
-
 const AMAZON_ASSOCIATE_TAG = "athletexper0b-20";
 
 const appendAffiliateTag = (url: string, tag: string) => {
   const urlObj = new URL(url);
-  urlObj.searchParams.set("tag", tag); // Add or replace the 'tag' query param
-  return urlObj.toString(); // Return the updated URL as a string
+  urlObj.searchParams.set("tag", tag);
+  return urlObj.toString();
 };
 
-// Component for a quiz step with multiple options
+// Quiz Step Component
 const QuizStep: React.FC<{
   question: string;
   options: string[];
   selectedOption: string;
   onNext: (option: string) => void;
-}> = ({ question, options, selectedOption, onNext }) => (
+  onBack?: () => void;
+  showBack?: boolean;
+}> = ({ question, options, selectedOption, onNext, onBack, showBack }) => (
   <>
     <h2>{question}</h2>
     <div className="quiz-options">
       {options.map((option) => (
         <button
           key={option}
-          className={`quiz-option ${
-            selectedOption === option ? "selected" : ""
-          }`}
+          className={`quiz-option ${selectedOption === option ? "selected" : ""}`}
           onClick={() => onNext(option)}
         >
           {option}
         </button>
       ))}
     </div>
+    {showBack && (
+      <div className="quiz-navigation">
+        <button className="quiz-nav-button back" onClick={onBack}>
+          &#8592; Back
+        </button>
+      </div>
+    )}
   </>
 );
 
-const Quiz: React.FC<QuizProps> = ({ isOpen, closeModal }) => {
+const Quiz: React.FC<{ isOpen: boolean; closeModal: () => void }> = ({
+  isOpen,
+  closeModal,
+}) => {
   const { dispatch } = useContext(QuizContext);
-  const [step, setStep] = useState(0);
+  const [step, setStep] = useState(0); // 0 = sport selector
   const [carouselIndex, setCarouselIndex] = useState(0);
-  const [recommendedProducts, setRecommendedProducts] = useState<Product[]>([]);
+  const [recommendedProducts, setRecommendedProducts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const totalSteps = 5;
+  const [answers, setAnswers] = useState<any>({ sport: "" });
 
-  const [answers, setAnswers] = useState(initialAnswers);
+  // Sport-specific then global
+  type SportSpecificKey = keyof typeof quizData.sportSpecific;
+  const selectedSport = answers.sport?.toLowerCase() as SportSpecificKey;
+  const sportSpecificQuestions =
+    quizData.sportSpecific &&
+    selectedSport &&
+    selectedSport in quizData.sportSpecific
+      ? quizData.sportSpecific[selectedSport]
+      : [];
+  const mainQuestions = quizData.questions;
+  const allQuestions = [...sportSpecificQuestions, ...mainQuestions];
+  const totalSteps = 1 + allQuestions.length;
 
-  // Define quizQuestions with proper typing
-  const quizQuestions: QuizQuestion[] = [
-    {
-      question: `What's your skill level in ${
-        initialAnswers.sport ? initialAnswers.sport : "your sport"
-      } ?`,
-      field: "skillLevel",
-      options: ["Beginner", "Intermediate", "Advanced", "Professional"],
-    },
-    {
-      question: "How often do you play/train?",
-      field: "trainingFrequency",
-      options: [
-        "1-2 times per week",
-        "3-4 times per week",
-        "5-6 times per week",
-        "Daily",
-      ],
-    },
-    {
-      question: "What's your budget?",
-      field: "budget",
-      options: ["Under $50", "$50-$100", "$100-$200", "Over $200"],
-    },
-    {
-      question: "What's your favorite color?",
-      field: "favoriteColor",
-      options: ["Red", "Blue", "Green", "Yellow", "Purple", "Black", "White"],
-    },
-  ];
+  // For back button logic, store the field name of each step
+  const questionFields = allQuestions.map(q => q.field);
 
+  // Recommendations
   useEffect(() => {
     if (step === totalSteps) {
       setIsLoading(true);
@@ -128,19 +92,35 @@ const Quiz: React.FC<QuizProps> = ({ isOpen, closeModal }) => {
         })
         .catch(() => setIsLoading(false));
 
-        trackEvent("quiz_complete", {
-  sport: answers.sport,
-  skillLevel: answers.skillLevel,
-  budget: answers.budget,
-});
+      trackEvent("quiz_complete", answers);
     }
-  }, [step, answers]);
+  }, [step, answers, totalSteps]);
 
-  const handleNext = (field: AnswerKey, value: string) => {
-    setAnswers((prev) => ({ ...prev, [field]: value }));
-    setStep(step + 1);
+  // Next and Back
+  const handleNext = (field: string, value: string) => {
+    setAnswers((prev: any) => ({ ...prev, [field]: value }));
+    setStep((prevStep) => prevStep + 1);
   };
 
+  const handleBack = () => {
+    // If on the results screen, go back to the last question
+    if (step === totalSteps) {
+      setStep(step - 1);
+      return;
+    }
+    if (step > 0) {
+      // Clear answer for this step's field (optional, keeps data clean)
+      const fieldToClear = allQuestions[step - 1]?.field;
+      setAnswers((prev: any) => {
+        const updated = { ...prev };
+        if (fieldToClear) updated[fieldToClear] = "";
+        return updated;
+      });
+      setStep((prev) => prev - 1);
+    }
+  };
+
+  // Carousel
   const handleCarousel = (direction: "left" | "right") => {
     if (direction === "left") {
       setCarouselIndex((prevIndex) =>
@@ -153,23 +133,15 @@ const Quiz: React.FC<QuizProps> = ({ isOpen, closeModal }) => {
     }
   };
 
-  const handleClose = () => {
-    closeModal(); // Closes the modal
-  };
-
-  // Use useEffect to control overflow based on modal visibility
+  // Modal/overflow logic
   useEffect(() => {
     const body = document.body;
-    if (isOpen) {
-      body.classList.add("scroll-lock");
-    } else {
-      body.classList.remove("scroll-lock");
-    }
-  
+    if (isOpen) body.classList.add("scroll-lock");
+    else body.classList.remove("scroll-lock");
     return () => body.classList.remove("scroll-lock");
   }, [isOpen]);
-  
 
+  // Carousel keyboard navigation on step 0
   useEffect(() => {
     if (step === 0) {
       const handleKeyDown = (e: KeyboardEvent) => {
@@ -181,25 +153,40 @@ const Quiz: React.FC<QuizProps> = ({ isOpen, closeModal }) => {
     }
   }, [step]);
 
-  if (!isOpen) {
-    return null;
-  }
+  if (!isOpen) return null;
+
+  // Progress bar logic (excludes sport selection step)
+  const progress =
+    step === 0
+      ? 0
+      : Math.min(100, Math.round((step / allQuestions.length) * 100));
 
   return (
-    <div className="quiz-modal" onClick={handleClose}>
-      <button className="close-button" onClick={handleClose}>
+    <div className="quiz-modal" onClick={closeModal}>
+      <button className="close-button" onClick={closeModal}>
         <svg viewBox="0 0 24 24">
           <path d="M18.3 5.71a1 1 0 0 0-1.42-1.42L12 9.17 7.11 4.29A1 1 0 0 0 5.7 5.71L10.58 10.6 5.7 15.48a1 1 0 0 0 1.41 1.41L12 11.99l4.89 4.89a1 1 0 0 0 1.42-1.41l-4.88-4.89 4.88-4.89Z" />
         </svg>
       </button>
-
       <div className="quiz-modal-content" onClick={(e) => e.stopPropagation()}>
-  
         <div className="quiz-container">
+          {/* Progress bar */}
+          <div className="quiz-progress-bar">
+            <div
+              className="quiz-progress"
+              style={{ width: `${progress}%` }}
+              aria-valuenow={progress}
+              aria-valuemax={100}
+              aria-valuemin={0}
+            />
+          </div>
           {isLoading ? (
-            <LoadingSpinner />
+            <div className="quiz-loading-overlay">
+              <LoadingSpinner />
+            </div>
           ) : (
             <>
+              {/* Sport selection carousel */}
               {step === 0 && (
                 <>
                   <h2>What sport are you shopping for?</h2>
@@ -208,22 +195,8 @@ const Quiz: React.FC<QuizProps> = ({ isOpen, closeModal }) => {
                       className="carousel-button left"
                       onClick={() => handleCarousel("left")}
                     >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 50 100"
-                        fill="currentColor"
-                        width="24px"
-                        height="80px"
-                      >
-                        <path
-                          d="M40 5 L10 50 L40 95"
-                          stroke="currentColor"
-                          strokeWidth="5"
-                          fill="none"
-                        />
-                      </svg>
+                      &lt;
                     </button>
-
                     <div
                       className="carousel-item-container"
                       style={{
@@ -241,28 +214,15 @@ const Quiz: React.FC<QuizProps> = ({ isOpen, closeModal }) => {
                         </div>
                       ))}
                     </div>
-
                     <button
                       className="carousel-button right"
                       onClick={() => handleCarousel("right")}
                     >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 50 100"
-                        fill="currentColor"
-                        width="24px"
-                        height="80px"
-                      >
-                        <path
-                          d="M10 5 L40 50 L10 95"
-                          stroke="currentColor"
-                          strokeWidth="5"
-                          fill="none"
-                        />
-                      </svg>
+                      &gt;
                     </button>
                   </div>
                   <div className="quiz-navigation">
+                    {/* No back button on sport select step */}
                     <button
                       className="quiz-nav-button"
                       onClick={() =>
@@ -277,53 +237,36 @@ const Quiz: React.FC<QuizProps> = ({ isOpen, closeModal }) => {
                   </div>
                 </>
               )}
-
-              {step > 0 && step <= 4 && (
+              {/* Sport-specific THEN global questions, with Back */}
+              {step > 0 && step < totalSteps && (
                 <QuizStep
                   question={
-                    step === 1
+                    // Custom label for skill level
+                    allQuestions[step - 1].field === "skillLevel" && answers.sport
                       ? `What's your skill level in ${answers.sport}?`
-                      : quizQuestions[step - 1].question
+                      : allQuestions[step - 1].question
                   }
-                  options={quizQuestions[step - 1].options}
-                  selectedOption={answers[quizQuestions[step - 1].field]}
+                  options={allQuestions[step - 1].options}
+                  selectedOption={answers[allQuestions[step - 1].field]}
                   onNext={(option) =>
-                    handleNext(quizQuestions[step - 1].field, option)
+                    handleNext(allQuestions[step - 1].field, option)
                   }
+                  onBack={handleBack}
+                  showBack={step > 0}
                 />
               )}
-
-              {/* {step === 5 && (
-                <QuizStep
-                  question="What's your favorite color?"
-                  options={[
-                    "Red",
-                    "Blue",
-                    "Green",
-                    "Yellow",
-                    "Purple",
-                    "Black",
-                    "White",
-                  ]}
-                  selectedOption={answers.favoriteColor}
-                  onNext={(option) => {
-                    dispatch({ type: "SET_FAVORITE_COLOR", color: option });
-                    handleNext("favoriteColor", option);
-                  
-                  }}
-                />
-              )} */}
-
+              {/* Recommendations display, Back on summary */}
               {step === totalSteps && (
                 <div className="recommended-products">
-                  <h3 className="recommended-products-title">Recommended For You</h3>
+                  <h3 className="recommended-products-title">
+                    Recommended For You
+                  </h3>
                   <div className="quiz-product-grid">
                     {recommendedProducts.map((product) => (
                       <ProductCard
-                      id = {product.id}
+                        id={product.id}
                         key={product.id}
                         name={cleanProductTitle(product.name)}
-
                         brand={product.brand}
                         price={product.price}
                         imgUrl={product.imgUrl}
@@ -333,6 +276,11 @@ const Quiz: React.FC<QuizProps> = ({ isOpen, closeModal }) => {
                         )}
                       />
                     ))}
+                  </div>
+                  <div className="quiz-navigation">
+                    <button className="quiz-nav-button back" onClick={handleBack}>
+                      &#8592; Back
+                    </button>
                   </div>
                 </div>
               )}

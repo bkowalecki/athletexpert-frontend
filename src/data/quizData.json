@@ -8,27 +8,202 @@
     },
     {
       "id": 2,
-      "question": "What's your fitness goal?",
-      "field": "fitnessGoal",
-      "options": ["Build Strength", "Lose Weight", "Gain Weight", "Increase Stamina", "Improve Flexibility", "Boost Mobility"]
+      "question": "How often do you play or train?",
+      "field": "trainingFrequency",
+      "options": [
+        "Just occasionally",
+        "1-2 times per week",
+        "3-4 times per week",
+        "5+ times per week",
+        "Whenever I can"
+      ]
     },
     {
       "id": 3,
-      "question": "How often do you play/train?",
-      "field": "trainingFrequency",
-      "options": ["1-2 times per week", "3-4 times per week", "5-6 times per week", "Daily"]
+      "question": "What's your budget?",
+      "field": "budget",
+      "options": [
+        "Under $50",
+        "$50–$100",
+        "$100–$250",
+        "$250–$500",
+        "$500+"
+      ]
     },
     {
       "id": 4,
-      "question": "What's your budget?",
-      "field": "budget",
-      "options": ["Under $50", "$50-$100", "$100-$200", "Over $200"]
-    },
-    {
-      "id": 5,
       "question": "What's your favorite color?",
       "field": "favoriteColor",
-      "options": ["Red", "Blue", "Green", "Yellow", "Purple", "Black", "White"]
+      "options": [
+        "Red", "Blue", "Green", "Yellow", "Purple", "Black", "White", "No Preference"
+      ]
     }
-  ]
+  ],
+  "sportSpecific": {
+    "basketball": [
+      {
+        "id": "basketballCategory",
+        "question": "What basketball gear are you shopping for?",
+        "field": "productCategory",
+        "options": ["Shoes", "Basketballs", "Hoops", "Apparel", "Socks", "Bags", "Accessories", "Training Equipment", "Any"]
+      },
+      {
+        "id": "basketballEnv",
+        "question": "Do you mostly play basketball indoors or outdoors?",
+        "field": "trainingEnvironment",
+        "options": ["Indoors", "Outdoors", "Both"]
+      }
+    ],
+    "running": [
+      {
+        "id": "runningCategory",
+        "question": "What running gear are you shopping for?",
+        "field": "productCategory",
+        "options": ["Shoes", "Apparel", "Watches", "Socks", "Hydration", "Accessories", "Headphones", "Sunglasses", "Any"]
+      },
+      {
+        "id": "runningGoal",
+        "question": "Do you have a specific running goal right now?",
+        "field": "fitnessGoal",
+        "options": [
+          "Train for a race",
+          "Build endurance",
+          "Improve speed",
+          "Lose weight",
+          "Stay healthy",
+          "Just enjoy running"
+        ]
+      },
+      {
+        "id": "runningEnv",
+        "question": "Do you mostly run indoors or outdoors?",
+        "field": "trainingEnvironment",
+        "options": ["Indoors", "Outdoors", "Both"]
+      }
+    ],
+    "golf": [
+      {
+        "id": "golfCategory",
+        "question": "What golf gear are you shopping for?",
+        "field": "productCategory",
+        "options": ["Clubs", "Balls", "Shoes", "Gloves", "Apparel", "Bags", "Accessories", "Training Aids", "Any"]
+      }
+    ],
+    "swimming": [
+      {
+        "id": "swimmingCategory",
+        "question": "What swimming gear are you shopping for?",
+        "field": "productCategory",
+        "options": ["Swimsuit", "Goggles", "Cap", "Towel", "Training Aids", "Bag", "Earplugs", "Accessories", "Any"]
+      }
+    ],
+    "football": [
+      {
+        "id": "footballCategory",
+        "question": "What football gear are you shopping for?",
+        "field": "productCategory",
+        "options": ["Cleats", "Football", "Gloves", "Apparel", "Helmets", "Pads", "Accessories", "Training Equipment", "Any"]
+      }
+    ],
+    "soccer": [
+      {
+        "id": "soccerCategory",
+        "question": "What soccer gear are you shopping for?",
+        "field": "productCategory",
+        "options": ["Cleats", "Soccer Ball", "Shin Guards", "Apparel", "Socks", "Bags", "Goalkeeper Gloves", "Training Equipment", "Any"]
+      }
+    ],
+    "tennis": [
+      {
+        "id": "tennisCategory",
+        "question": "What tennis gear are you shopping for?",
+        "field": "productCategory",
+        "options": ["Racquets", "Balls", "Shoes", "Apparel", "Bags", "Grips", "Strings", "Accessories", "Any"]
+      }
+    ],
+    "cycling": [
+      {
+        "id": "cyclingCategory",
+        "question": "What cycling gear are you shopping for?",
+        "field": "productCategory",
+        "options": ["Bike", "Helmet", "Apparel", "Shoes", "Gloves", "Lights", "Locks", "Accessories", "Bags", "Any"]
+      }
+    ],
+    "baseball": [
+      {
+        "id": "baseballCategory",
+        "question": "What baseball gear are you shopping for?",
+        "field": "productCategory",
+        "options": ["Bat", "Glove", "Ball", "Helmet", "Apparel", "Cleats", "Catcher's Gear", "Training Equipment", "Any"]
+      }
+    ],
+    "pickleball": [
+      {
+        "id": "pickleballCategory",
+        "question": "What pickleball gear are you shopping for?",
+        "field": "productCategory",
+        "options": ["Paddle", "Balls", "Shoes", "Bag", "Apparel", "Accessories", "Nets", "Any"]
+      }
+    ],
+    "hiking": [
+      {
+        "id": "hikingCategory",
+        "question": "What hiking gear are you shopping for?",
+        "field": "productCategory",
+        "options": ["Boots", "Backpack", "Clothing", "Socks", "Poles", "Hydration", "Navigation", "Accessories", "Any"]
+      }
+    ],
+    "yoga": [
+      {
+        "id": "yogaCategory",
+        "question": "What yoga gear are you shopping for?",
+        "field": "productCategory",
+        "options": ["Mat", "Blocks", "Strap", "Apparel", "Bag", "Accessories", "Bolster", "Blanket", "Any"]
+      }
+    ],
+    "weightlifting": [
+      {
+        "id": "weightliftingCategory",
+        "question": "What weightlifting gear are you shopping for?",
+        "field": "productCategory",
+        "options": ["Shoes", "Apparel", "Belts", "Gloves", "Wrist Wraps", "Straps", "Knee Sleeves", "Accessories", "Any"]
+      },
+      {
+        "id": "weightliftingGoal",
+        "question": "Do you have a strength goal right now?",
+        "field": "fitnessGoal",
+        "options": [
+          "Build muscle",
+          "Get stronger",
+          "Lose weight",
+          "Increase endurance",
+          "Just stay fit"
+        ]
+      }
+    ],
+    "volleyball": [
+      {
+        "id": "volleyballCategory",
+        "question": "What volleyball gear are you shopping for?",
+        "field": "productCategory",
+        "options": ["Ball", "Shoes", "Apparel", "Knee Pads", "Bag", "Socks", "Accessories", "Net", "Any"]
+      }
+    ],
+    "lacrosse": [
+      {
+        "id": "lacrosseCategory",
+        "question": "What lacrosse gear are you shopping for?",
+        "field": "productCategory",
+        "options": ["Stick", "Head", "Gloves", "Apparel", "Pads", "Helmet", "Bag", "Ball", "Accessories", "Any"]
+      }
+    ],
+    "esports": [
+      {
+        "id": "esportsCategory",
+        "question": "What esports gear are you shopping for?",
+        "field": "productCategory",
+        "options": ["Controller", "Headset", "Monitor", "Keyboard", "Mouse", "Chair", "Desk", "Lighting", "Accessories", "Any"]
+      }
+    ]
+  }
 }
