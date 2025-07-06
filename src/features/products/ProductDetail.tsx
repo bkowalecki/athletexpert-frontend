@@ -1,44 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { Helmet } from "react-helmet";
-import "../../styles/ProductDetail.css";
 import { FaStar, FaChevronLeft, FaExternalLinkAlt } from "react-icons/fa";
+import "../../styles/ProductDetail.css";
+import { trackEvent } from "../../util/analytics";
 import type { Product } from "../../types/products";
+import ProductCard from "../products/ProductCard"; // <-- Use this!
 
-// Mock reviews (swap out for real data in prod)
 const mockReviews = [
-  {
-    reviewer: "Sam R.",
-    rating: 5,
-    comment: "Best gear I’ve ever used. Game changer!",
-  },
-  {
-    reviewer: "Jordan P.",
-    rating: 4,
-    comment: "Comfortable, durable, and stylish. Worth the price.",
-  },
-  {
-    reviewer: "Drew F.",
-    rating: 5,
-    comment: "Love it! Delivery was quick and product was as described.",
-  },
-];
-const mockRelated = [
-  {
-    id: 1,
-    name: "HydroPro Bottle",
-    imgUrl: "/images/categories/water-bottle.jpg",
-  },
-  {
-    id: 2,
-    name: "SpeedRunner Shoes",
-    imgUrl: "/images/categories/running-shoes.jpg",
-  },
-  {
-    id: 3,
-    name: "Elite Recovery Roller",
-    imgUrl: "/images/categories/recovery.jpg",
-  },
+  { reviewer: "Sam R.", rating: 5, comment: "Best gear I’ve ever used. Game changer!" },
+  { reviewer: "Jordan P.", rating: 4, comment: "Comfortable, durable, and stylish. Worth the price." },
+  { reviewer: "Drew F.", rating: 5, comment: "Love it! Delivery was quick and product was as described." },
 ];
 
 const renderStars = (rating: number) => (
@@ -52,6 +24,8 @@ const ProductDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
+  const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
+  const [relatedLoading, setRelatedLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -59,14 +33,26 @@ const ProductDetail: React.FC = () => {
     setLoading(true);
     const fetchProduct = async () => {
       try {
-        const res = await fetch(
-          `${process.env.REACT_APP_API_URL}/products/${id}`
-        );
+        const res = await fetch(`${process.env.REACT_APP_API_URL}/products/${id}`);
         if (!res.ok) throw new Error("Product not found");
         const data = await res.json();
         if (!data || Object.keys(data).length === 0)
           throw new Error("No product data");
         setProduct(data);
+
+        // Analytics
+        trackEvent("product_detail_view", {
+          product_id: data.id,
+          product_name: data.name,
+          brand: data.brand,
+          retailer: data.retailer,
+          price: data.price,
+          sports: data.sports,
+          asin: data.asin,
+          trending: !!data.trending,
+        });
+
+        fetchRelatedProducts(data.id);
       } catch (error) {
         navigate("/404", { replace: true });
       } finally {
@@ -74,7 +60,22 @@ const ProductDetail: React.FC = () => {
       }
     };
     fetchProduct();
+    // eslint-disable-next-line
   }, [id, navigate]);
+
+  const fetchRelatedProducts = async (productId: number | string) => {
+    try {
+      setRelatedLoading(true);
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/products/${productId}/related`);
+      if (!res.ok) throw new Error("Related products not found");
+      const data = await res.json();
+      setRelatedProducts(Array.isArray(data) ? data : []);
+    } catch {
+      setRelatedProducts([]);
+    } finally {
+      setRelatedLoading(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -89,12 +90,8 @@ const ProductDetail: React.FC = () => {
         <img
           src="/images/product-fallback.png"
           alt="Product not found"
-          style={{
-            width: 120,
-            marginBottom: 24,
-            opacity: 0.75,
-            filter: "grayscale(0.8)"
-          }}
+          width={120}
+          style={{ marginBottom: 24, opacity: 0.75, filter: "grayscale(0.8)" }}
         />
         <h2 style={{ margin: "0 0 0.5em 0" }}>Uh oh! Product not found.</h2>
         <p style={{ color: "#bbb", marginBottom: 20 }}>
@@ -133,22 +130,33 @@ const ProductDetail: React.FC = () => {
     { label: "ASIN", value: product.asin ?? "N/A" },
   ];
 
+  // Make View on Amazon super visible + analytics
+  const handleAffiliateClick = () => {
+    trackEvent("affiliate_click", {
+      product_id: product.id,
+      product_name: product.name,
+      brand: product.brand,
+      retailer: product.retailer,
+      asin: product.asin,
+      from: "product_detail"
+    });
+  };
+
   return (
     <div className="product-detail-container dark-bg">
       <Helmet>
         <title>{product.name} | AthleteXpert</title>
-        <meta
-          name="description"
-          content={product.description ?? product.name}
-        />
+        <meta name="description" content={product.description ?? product.name} />
+        <meta property="og:title" content={`${product.name} | AthleteXpert`} />
+        <meta property="og:description" content={product.description ?? product.name} />
+        <meta property="og:image" content={product.imgUrl || "/images/product-fallback.png"} />
+        <meta property="og:url" content={`https://www.athletexpert.org/products/${product.id}`} />
+        <meta name="twitter:card" content="summary_large_image" />
       </Helmet>
       {/* --- BACK BUTTON --- */}
       <div className="product-detail-back">
         <Link to="/products" className="product-detail-back-link">
-          {FaChevronLeft &&
-            (FaChevronLeft as any)({
-              style: { marginRight: 8, fontSize: "1.1em" },
-            })}
+          {FaChevronLeft({ style: { marginRight: 8, fontSize: "1.1em" } })}
           Back to Products
         </Link>
       </div>
@@ -161,7 +169,10 @@ const ProductDetail: React.FC = () => {
               <img
                 src={product.imgUrl || "/images/product-fallback.png"}
                 alt={product.name}
-                onError={(e) =>
+                loading="lazy"
+                width={350}
+                height={350}
+                onError={e =>
                   (e.currentTarget.src = "/images/product-fallback.png")
                 }
               />
@@ -179,16 +190,11 @@ const ProductDetail: React.FC = () => {
           </div>
           {/* Feature tags */}
           <div className="product-detail-features-row">
-            {features.map((sport, idx) => (
-              <span className="product-feature-tag" key={idx}>
-                {sport}
-              </span>
-            ))}
           </div>
         </div>
 
         {/* --- INFO COLUMN --- */}
-        <div className="product-detail-info">
+        <div className="product-detail-info" aria-live="polite">
           <h1 className="product-detail-name">{product.name}</h1>
           <div className="product-detail-price-row">
             <span className="product-detail-price">
@@ -217,12 +223,26 @@ const ProductDetail: React.FC = () => {
             rel="noopener noreferrer"
             className="product-detail-affiliate-btn"
             aria-label={`View ${product.name} on Amazon`}
+            onClick={handleAffiliateClick}
+            style={{
+              marginTop: 18,
+              fontWeight: 700,
+              background: "#A23C20",
+              color: "#fff",
+              fontSize: "1.13rem",
+              padding: "0.9em 1.45em",
+              borderRadius: 13,
+              letterSpacing: "0.02em",
+              display: "inline-flex",
+              alignItems: "center",
+              boxShadow: "0 2px 10px 0 rgba(162,60,32,0.15)",
+              border: "none",
+              cursor: "pointer",
+              textDecoration: "none"
+            }}
           >
             View on Amazon&nbsp;
-            {FaExternalLinkAlt &&
-              (FaExternalLinkAlt as any)({
-                style: { fontSize: "1.1em", verticalAlign: "-2px" },
-              })}
+            {FaExternalLinkAlt({ style: { fontSize: "1.1em", verticalAlign: "-2px" } })}
           </a>
         </div>
       </div>
@@ -234,38 +254,48 @@ const ProductDetail: React.FC = () => {
       <div className="product-detail-related">
         <h3>Related Products</h3>
         <div className="product-related-grid">
-          {mockRelated.map((prod) => (
-            <Link
-              to={`/products/${prod.id}`}
-              key={prod.id}
-              className="related-card-link"
-            >
-              <div className="related-card">
-                <img src={prod.imgUrl} alt={prod.name} />
-                <span>{prod.name}</span>
-              </div>
-            </Link>
-          ))}
+        {relatedProducts.slice(0, 4).map(prod => (
+  <div
+    key={prod.id}
+    className="related-card-link"
+    onClick={() =>
+      trackEvent("related_product_click", {
+        from_product_id: product.id,
+        from_product_name: product.name,
+        to_product_id: prod.id,
+        to_product_name: prod.name,
+      })
+    }
+    style={{ marginBottom: 18 }}
+  >
+    <ProductCard {...prod} />
+  </div>
+))}
+
         </div>
       </div>
 
       {/* --- Reviews --- */}
       <div className="product-detail-reviews">
-        <h2>{FaStar && (FaStar as any)({ className: "star" })} Reviews</h2>
+        <h2>
+          {FaStar({ className: "star" })} Reviews
+        </h2>
         {mockReviews.length > 0 ? (
-          mockReviews.map((review, idx) => (
-            <div className="product-detail-review-item" key={idx}>
-              <div className="product-detail-review-header">
-                <span className="product-detail-reviewer-name">
-                  {review.reviewer}
-                </span>
-                <span className="product-detail-review-rating">
-                  {renderStars(review.rating)}
-                </span>
-              </div>
-              <p className="product-detail-review-comment">{review.comment}</p>
-            </div>
-          ))
+          <ul className="product-detail-reviews-list">
+            {mockReviews.map((review, idx) => (
+              <li className="product-detail-review-item" key={idx}>
+                <div className="product-detail-review-header">
+                  <span className="product-detail-reviewer-name">
+                    {review.reviewer}
+                  </span>
+                  <span className="product-detail-review-rating">
+                    {renderStars(review.rating)}
+                  </span>
+                </div>
+                <p className="product-detail-review-comment">{review.comment}</p>
+              </li>
+            ))}
+          </ul>
         ) : (
           <p className="product-detail-no-reviews">
             No reviews yet. Be the first!

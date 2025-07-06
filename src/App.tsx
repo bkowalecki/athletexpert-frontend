@@ -19,6 +19,28 @@ const PwaNav = React.lazy(() => import("./features/layout/PwaNav"));
 
 const queryClient = new QueryClient();
 
+// ===================== AppProviders Component =====================
+const AppProviders: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <Auth0Provider
+    domain={process.env.REACT_APP_AUTH0_DOMAIN ?? ""}
+    clientId={process.env.REACT_APP_AUTH0_CLIENT_ID ?? ""}
+    authorizationParams={{
+      redirect_uri: window.location.origin + "/auth/callback",
+      audience: process.env.REACT_APP_AUTH0_AUDIENCE,
+    }}
+  >
+    <QueryClientProvider client={queryClient}>
+      <UserProvider>
+        <Router>
+          <ScrollToTop />
+          {children}
+        </Router>
+      </UserProvider>
+    </QueryClientProvider>
+  </Auth0Provider>
+);
+
+// ===================== AppContent Component =====================
 const AppContent: React.FC = React.memo(() => {
   const isMobilePWA = useIsMobilePWA();
 
@@ -33,12 +55,8 @@ const AppContent: React.FC = React.memo(() => {
             </ErrorBoundary>
           </Suspense>
         </AnimatePresence>
-        {isMobilePWA && (
-          <Suspense fallback={null}>
-            <PwaNav />
-          </Suspense>
-        )}
         <Suspense fallback={null}>
+          {isMobilePWA && <PwaNav />}
           <Footer />
         </Suspense>
       </SportsProvider>
@@ -46,34 +64,21 @@ const AppContent: React.FC = React.memo(() => {
   );
 });
 
+// ===================== App Component =====================
 const App: React.FC = () => (
-  <Auth0Provider
-    domain={process.env.REACT_APP_AUTH0_DOMAIN ?? ""}
-    clientId={process.env.REACT_APP_AUTH0_CLIENT_ID ?? ""}
-    authorizationParams={{
-      redirect_uri: window.location.origin + "/auth/callback",
-      audience: process.env.REACT_APP_AUTH0_AUDIENCE,
-    }}
-  >
-    <QueryClientProvider client={queryClient}>
-      <UserProvider>
-        <Router>
-          <ScrollToTop />
-          <ToastContainer
-            position="top-center"
-            toastClassName="ax-toast"
-            autoClose={1800}
-            hideProgressBar
-            pauseOnHover
-            closeOnClick
-            newestOnTop
-            draggable={false}
-          />
-          <AppContent />
-        </Router>
-      </UserProvider>
-    </QueryClientProvider>
-  </Auth0Provider>
+  <AppProviders>
+    <ToastContainer
+      position="top-center"
+      toastClassName="ax-toast"
+      autoClose={1800}
+      hideProgressBar
+      pauseOnHover
+      closeOnClick
+      newestOnTop
+      draggable={false}
+    />
+    <AppContent />
+  </AppProviders>
 );
 
 export default App;

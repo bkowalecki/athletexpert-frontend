@@ -1,4 +1,3 @@
-// src/components/Footer.tsx
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import "../../styles/Footer.css";
@@ -21,17 +20,20 @@ const socialLinks = [
     label: "Instagram",
     icon: "fab fa-instagram",
   },
+  {
+    href: "https://pinterest.com/athletexpert", // Pinterest link
+    label: "Pinterest",
+    icon: "fab fa-pinterest", // Pinterest icon
+  },
 ];
 
 const Footer: React.FC = () => {
   const { pathname } = useLocation();
 
-  // Ensures scroll to top even if already on home
   const handleLogoClick = (e: React.MouseEvent) => {
     if (pathname === "/") {
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
-    // Otherwise, <Link> does the navigation and ScrollToTop handles it
   };
 
   return (
@@ -63,10 +65,7 @@ const Footer: React.FC = () => {
                 href={href}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label={`Follow AthleteXpert on ${label.replace(
-                  /\/.*$/,
-                  ""
-                )}`}
+                aria-label={`Follow AthleteXpert on ${label}`}
                 style={{
                   color: "#f7f7f7",
                   fontSize: 22,

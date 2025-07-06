@@ -1,12 +1,11 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
 import axios from "axios";
 import sportsData from "../../data/sports.json";
 import "../../styles/SportPage.css";
 import ProductCard from "../products/ProductCard";
-import { BlogPost } from "../../types/blogs";
 import BlogCard from "../blog/BlogCard";
+import { BlogPost } from "../../types/blogs";
 
 // Types
 interface Sport {
@@ -30,80 +29,77 @@ interface Product {
   affiliateLink: string;
 }
 
-// Slugify utility
+// Utility: Slugify
 const slugify = (str: string) =>
   str.toLowerCase().replace(/\s+/g, "-").replace(/[^\w\-]+/g, "");
 
-// Memoize a lookup map for O(1) slug->sport
-const getSlugMap = (sportsArr: Sport[]) => {
-  const map: Record<string, Sport> = {};
-  sportsArr.forEach((s) => {
-    map[slugify(s.title)] = s;
-  });
-  return map;
-};
+// Reusable Loading Component
+const LoadingState: React.FC<{ message: string }> = ({ message }) => (
+  <p className="sport-page-text">{message}</p>
+);
+
+// Reusable No Data Component
+const NoDataState: React.FC<{ message: string }> = ({ message }) => (
+  <p className="sport-page-text">{message}</p>
+);
 
 const SportPage: React.FC = () => {
   const { sport: slug } = useParams<{ sport: string }>();
   const navigate = useNavigate();
 
-  const slugMap = useMemo(() => getSlugMap(sportsData), []);
+  // Memoized Slug Map
+  const slugMap = useMemo(() => {
+    return sportsData.reduce((map, sport) => {
+      map[slugify(sport.title)] = sport;
+      return map;
+    }, {} as Record<string, Sport>);
+  }, []);
+
   const currentSport = slug ? slugMap[slug] : null;
 
-  // UI state
+  // State
   const [relatedBlogs, setRelatedBlogs] = useState<BlogPost[]>([]);
-  const [loadingBlogs, setLoadingBlogs] = useState(true);
   const [recommendedProducts, setRecommendedProducts] = useState<Product[]>([]);
-  const [loadingProducts, setLoadingProducts] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Redirect on 404 or Esports (coming soon)
+  // Redirect on invalid sport or "E-Sports"
   useEffect(() => {
     if (!slug || !currentSport || currentSport.title.toLowerCase() === "e-sports") {
       navigate("/404", { replace: true });
     }
   }, [slug, currentSport, navigate]);
 
-  // Fetch related data
+  // Fetch related blogs and products
   useEffect(() => {
     if (!currentSport) return;
-    let cancelled = false;
 
-    const fetchRelatedBlogs = async () => {
-      setLoadingBlogs(true);
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+
       try {
-        const { data } = await axios.get(
-          `${process.env.REACT_APP_API_URL}/blog/by-tag`,
-          { params: { tag: currentSport.title }, withCredentials: true }
-        );
-        if (!cancelled) setRelatedBlogs(data);
-      } catch {
-        if (!cancelled) setRelatedBlogs([]);
+        const [blogsRes, productsRes] = await Promise.all([
+          axios.get(`${process.env.REACT_APP_API_URL}/blog/by-tag`, {
+            params: { tag: currentSport.title },
+            withCredentials: true,
+          }),
+          axios.get(`${process.env.REACT_APP_API_URL}/products/by-sport`, {
+            params: { sport: currentSport.title },
+            withCredentials: true,
+          }),
+        ]);
+
+        setRelatedBlogs(blogsRes.data);
+        setRecommendedProducts(productsRes.data);
+      } catch (err) {
+        setError("Failed to load data. Please try again later.");
       } finally {
-        if (!cancelled) setLoadingBlogs(false);
+        setLoading(false);
       }
     };
 
-    const fetchRecommendedProducts = async () => {
-      setLoadingProducts(true);
-      try {
-        const { data } = await axios.get(
-          `${process.env.REACT_APP_API_URL}/products/by-sport`,
-          { params: { sport: currentSport.title }, withCredentials: true }
-        );
-        if (!cancelled) setRecommendedProducts(data);
-      } catch {
-        if (!cancelled) setRecommendedProducts([]);
-      } finally {
-        if (!cancelled) setLoadingProducts(false);
-      }
-    };
-
-    fetchRelatedBlogs();
-    fetchRecommendedProducts();
-
-    return () => {
-      cancelled = true;
-    };
+    fetchData();
   }, [currentSport]);
 
   if (!currentSport) {
@@ -118,10 +114,13 @@ const SportPage: React.FC = () => {
     <div className="sport-page">
       <div className="sport-page-title">{currentSport.title}</div>
 
+      {/* Recommended Gear Section */}
       <section className="sport-page-section">
         <h2 className="sport-page-section-title">Recommended Gear</h2>
-        {loadingProducts ? (
-          <p className="sport-page-text">Loading products...</p>
+        {loading ? (
+          <LoadingState message="Loading products..." />
+        ) : error ? (
+          <NoDataState message={error} />
         ) : recommendedProducts.length > 0 ? (
           <div className="recommended-products-grid">
             {recommendedProducts.map((product) => (
@@ -137,16 +136,17 @@ const SportPage: React.FC = () => {
             ))}
           </div>
         ) : (
-          <p className="sport-page-text">
-            We're still gathering the best gear for this sport.
-          </p>
+          <NoDataState message="We're still gathering the best gear for this sport." />
         )}
       </section>
 
+      {/* Related Blogs Section */}
       <section className="sport-page-section">
         <h2 className="sport-page-section-title">Explore More</h2>
-        {loadingBlogs ? (
-          <p className="sport-page-text">Loading related blogs...</p>
+        {loading ? (
+          <LoadingState message="Loading related blogs..." />
+        ) : error ? (
+          <NoDataState message={error} />
         ) : relatedBlogs.length > 0 ? (
           <div className="sport-related-blogs">
             {relatedBlogs.map((post) => (
@@ -164,9 +164,9 @@ const SportPage: React.FC = () => {
             ))}
           </div>
         ) : (
-          <p className="sport-page-text">
-            No blog posts found for {currentSport.title}. Want to write one?
-          </p>
+          <NoDataState
+            message={`No blog posts found for ${currentSport.title}. Want to write one?`}
+          />
         )}
       </section>
     </div>

@@ -8,10 +8,11 @@ interface Product {
   id?: number;
   name: string;
   brand: string;
-  price: number; // Store as number for easier math/sorting
+  price: number;
   imgUrl: string;
   affiliateLink: string;
   sports: string[];
+  asin?: string; // Added ASIN field
 }
 
 const emptyProduct: Product = {
@@ -21,6 +22,7 @@ const emptyProduct: Product = {
   imgUrl: "",
   affiliateLink: "",
   sports: [],
+  asin: "",
 };
 
 const AdminProductManager: React.FC = () => {
@@ -38,13 +40,10 @@ const AdminProductManager: React.FC = () => {
   const [filter, setFilter] = useState("");
   const [sortOption, setSortOption] = useState("recent");
 
-  // Protect route for admin only
   useEffect(() => {
     if (user?.role !== "admin") navigate("/");
-    // eslint-disable-next-line
   }, [user, navigate]);
 
-  // Load all products on mount
   const fetchProducts = useCallback(async () => {
     setLoading(true);
     try {
@@ -63,7 +62,6 @@ const AdminProductManager: React.FC = () => {
     fetchProducts();
   }, [fetchProducts]);
 
-  // Clear messages after 2s
   useEffect(() => {
     if (error || success) {
       const timeout = setTimeout(() => {
@@ -74,7 +72,6 @@ const AdminProductManager: React.FC = () => {
     }
   }, [error, success]);
 
-  // Handle filter/search
   const handleSearchSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!filter.trim()) return fetchProducts();
@@ -96,7 +93,6 @@ const AdminProductManager: React.FC = () => {
     }
   };
 
-  // Handle form changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -105,7 +101,6 @@ const AdminProductManager: React.FC = () => {
     }));
   };
 
-  // Handle sports tag entry
   const handleSportKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && sportInput.trim()) {
       e.preventDefault();
@@ -132,7 +127,6 @@ const AdminProductManager: React.FC = () => {
     }));
   };
 
-  // Save/Create product
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -196,50 +190,30 @@ const AdminProductManager: React.FC = () => {
     }
   };
 
-  // Sort and filter
   const sortedFilteredProducts = products
     .filter((p) => {
       const term = filter.toLowerCase();
       return (
         p.name.toLowerCase().includes(term) ||
         p.brand.toLowerCase().includes(term) ||
-        p.sports.join(",").toLowerCase().includes(term)
+        p.sports.join(",").toLowerCase().includes(term) ||
+        (p.asin && p.asin.toLowerCase().includes(term))
       );
     })
     .sort((a, b) => {
       if (sortOption === "priceAsc") return a.price - b.price;
       if (sortOption === "priceDesc") return b.price - a.price;
-      return (b.id || 0) - (a.id || 0); // recent
+      return (b.id || 0) - (a.id || 0);
     });
 
   return (
-    <div
-      className="new-product-container"
-      style={{ maxWidth: "100%", padding: "2rem" }}
-    >
+    <div className="new-product-container" style={{ maxWidth: "100%", padding: "2rem" }}>
       <h2>{editingId ? "Edit Product" : "Add New Product"}</h2>
-      {error && (
-        <p className="error-message" aria-live="assertive">
-          {error}
-        </p>
-      )}
-      {success && (
-        <p className="success-message" aria-live="polite">
-          {success}
-        </p>
-      )}
+      {error && <p className="error-message">{error}</p>}
+      {success && <p className="success-message">{success}</p>}
 
-      <form
-        onSubmit={handleSubmit}
-        className="product-form"
-        style={{
-          position: "sticky",
-          top: 0,
-          background: "#121212",
-          zIndex: 10,
-        }}
-      >
-        {["name", "brand", "price", "imgUrl", "affiliateLink"].map(
+      <form onSubmit={handleSubmit} className="product-form">
+        {["name", "brand", "price", "imgUrl", "affiliateLink", "asin"].map(
           (field, i) => (
             <input
               key={field}
@@ -250,8 +224,8 @@ const AdminProductManager: React.FC = () => {
               onChange={handleChange}
               placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
               min={field === "price" ? 0 : undefined}
-              step={field === "price" ? "0.01" : undefined} // <-- ADD THIS!
-              required={field !== "affiliateLink"}
+              step={field === "price" ? "0.01" : undefined}
+              required={field !== "affiliateLink" && field !== "asin"}
               autoComplete="off"
               style={field === "price" ? { maxWidth: 100 } : {}}
             />
@@ -279,64 +253,30 @@ const AdminProductManager: React.FC = () => {
           onChange={(e) => setSportInput(e.target.value)}
           onKeyDown={handleSportKeyDown}
           placeholder="Add sports (Enter to confirm, Backspace to remove last)"
-          aria-label="Add sport"
         />
         <div className="tag-preview">
           {formData.sports.map((sport) => (
             <span key={sport} className="tag-chip">
               {sport}
-              <button
-                type="button"
-                onClick={() => removeSport(sport)}
-                aria-label={`Remove ${sport}`}
-              >
+              <button type="button" onClick={() => removeSport(sport)}>
                 ✕
               </button>
             </span>
           ))}
         </div>
 
-        <button
-          type="submit"
-          aria-label={editingId ? "Update Product" : "Create Product"}
-        >
-          {editingId ? "Update Product" : "Create Product"}
-        </button>
+        <button type="submit">{editingId ? "Update Product" : "Create Product"}</button>
       </form>
 
-      <form
-        onSubmit={handleSearchSubmit}
-        style={{
-          display: "flex",
-          gap: "1rem",
-          flexWrap: "wrap",
-          margin: "1rem 0",
-        }}
-      >
+      <form onSubmit={handleSearchSubmit} style={{ display: "flex", gap: "1rem", margin: "1rem 0" }}>
         <input
           type="text"
-          placeholder="Search by name, brand, or sport"
+          placeholder="Search by name, brand, sport, or ASIN"
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
-          style={{ padding: "0.5rem", borderRadius: "6px", flex: 1 }}
         />
-        <button
-          type="submit"
-          style={{
-            padding: "0.5rem 1rem",
-            borderRadius: "6px",
-            fontWeight: "bold",
-            background: "#ff9900",
-            color: "#121212",
-          }}
-        >
-          Search
-        </button>
-        <select
-          value={sortOption}
-          onChange={(e) => setSortOption(e.target.value)}
-          style={{ padding: "0.5rem" }}
-        >
+        <button type="submit">Search</button>
+        <select value={sortOption} onChange={(e) => setSortOption(e.target.value)}>
           <option value="recent">Sort: Recent</option>
           <option value="priceAsc">Price: Low → High</option>
           <option value="priceDesc">Price: High → Low</option>
@@ -350,46 +290,22 @@ const AdminProductManager: React.FC = () => {
           <p>No matching products.</p>
         ) : (
           sortedFilteredProducts.map((p) => (
-            <div
-              key={p.id}
-              className="product-item"
-              tabIndex={0}
-              aria-label={`${p.name} product`}
-            >
+            <div key={p.id} className="product-item">
               <img src={p.imgUrl} alt={p.name} />
               <div>
                 <strong>{p.name}</strong> – ${p.price.toFixed(2)} <br />
                 <small>{p.brand}</small>
-                <div style={{ marginTop: "0.25rem" }}>
+                {p.asin && <p>ASIN: {p.asin}</p>}
+                <div>
                   {p.sports.map((sport) => (
-                    <span
-                      key={sport}
-                      style={{
-                        background: "#2a6045",
-                        color: "white",
-                        padding: "0.2rem 0.4rem",
-                        fontSize: "0.75rem",
-                        borderRadius: "6px",
-                        marginRight: "0.25rem",
-                      }}
-                    >
+                    <span key={sport} className="tag-chip">
                       {sport}
                     </span>
                   ))}
                 </div>
               </div>
-              <button
-                onClick={() => handleEdit(p)}
-                aria-label={`Edit ${p.name}`}
-              >
-                ✏️ Edit
-              </button>
-              <button
-                onClick={() => handleDelete(p.id!)}
-                aria-label={`Delete ${p.name}`}
-              >
-                🗑 Delete
-              </button>
+              <button onClick={() => handleEdit(p)}>✏️ Edit</button>
+              <button onClick={() => handleDelete(p.id!)}>🗑 Delete</button>
             </div>
           ))
         )}
