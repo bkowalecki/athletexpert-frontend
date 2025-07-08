@@ -263,11 +263,7 @@ const Quiz: React.FC<{ isOpen: boolean; closeModal: () => void }> = ({
     return () => clearInterval(interval);
   }, [isLoading]);
 
-  
-
   if (!isOpen) return null;
-
-
 
   return (
     <div
@@ -361,22 +357,32 @@ const Quiz: React.FC<{ isOpen: boolean; closeModal: () => void }> = ({
                   <h3 className="recommended-products-title">
                     Recommended For You
                   </h3>
-                  <div className="quiz-product-grid">
-                    {recommendedProducts.map((product) => (
-                      <ProductCard
-                        id={product.id}
-                        key={product.id}
-                        name={cleanProductTitle(product.name)}
-                        brand={product.brand}
-                        price={product.price}
-                        imgUrl={product.imgUrl}
-                        affiliateLink={appendAffiliateTag(
-                          product.affiliateLink,
-                          AMAZON_ASSOCIATE_TAG
-                        )}
-                      />
-                    ))}
-                  </div>
+                  {recommendedProducts.length === 0 ? (
+                    <div className="recommended-empty">
+                      <span>
+                        Sorry, we couldn't find any gear this time.
+                        <br />
+                        Try changing your answers or come back soon!
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="quiz-product-grid">
+                      {recommendedProducts.map((product) => (
+                        <ProductCard
+                          id={product.id}
+                          key={product.id}
+                          name={cleanProductTitle(product.name)}
+                          brand={product.brand}
+                          price={product.price}
+                          imgUrl={product.imgUrl}
+                          affiliateLink={appendAffiliateTag(
+                            product.affiliateLink,
+                            AMAZON_ASSOCIATE_TAG
+                          )}
+                        />
+                      ))}
+                    </div>
+                  )}
                   {/* <div className="quiz-navigation">
                     <button
                       className="quiz-nav-button back"
