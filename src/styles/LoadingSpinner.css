@@ -1,25 +1,29 @@
-.loading-spinner-overlay {
-  position: fixed;
+/* === Only covers modal area === */
+.ax-loading-overlay {
+  position: absolute; /* absolute: covers parent only */
   inset: 0;
-  background: rgba(10, 10, 10, 0.94);
+  background: rgba(15, 15, 15, 0.86);
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  z-index: 9999;
-  min-height: 100vh;
+  z-index: 99;
+  border-radius: 24px; /* matches modal */
+  pointer-events: none; /* allows spinner clicks to pass through if needed */
 }
 
+/* === Modern spinner (brand colors) === */
 .ax-spinner {
   width: 54px;
   height: 54px;
-  border: 6px solid #181818;
-  border-top: 6px solid #A23C20;
-  border-right: 6px solid #FF9900;
+  border: 5px solid #fff;
+  border-top: 5px solid #A23C20;   /* burnt orange */
+  border-right: 5px solid #FF9900; /* accent orange */
   border-radius: 50%;
-  animation: ax-spin 1.2s linear infinite;
-  margin-bottom: 1.6rem;
-  box-shadow: 0 4px 22px 0 #a23c2055;
+  animation: ax-spin 1s cubic-bezier(.45,.1,.62,1.6) infinite;
+  margin-bottom: 1.4rem;
+  box-shadow: 0 4px 16px 0 #a23c2044;
+  background: transparent;
 }
 
 @keyframes ax-spin {
@@ -31,20 +35,24 @@
   color: #fff;
   font-size: 1.12rem;
   font-family: "Montserrat", Arial, sans-serif;
-  margin: 0;
   text-align: center;
   letter-spacing: 0.04em;
-  opacity: 0.95;
+  opacity: 0.97;
+  font-weight: 600;
+  text-shadow: 0 1px 8px #2227;
+  margin: 0;
+  padding: 0 10px;
 }
 
-/* Mobile scaling */
 @media (max-width: 500px) {
   .ax-spinner {
     width: 38px;
     height: 38px;
-    border-width: 4px;
+    border-width: 3.5px;
+    margin-bottom: 1rem;
   }
   .ax-spinner-text {
-    font-size: 1em;
+    font-size: 0.98rem;
+    padding: 0 4px;
   }
 }

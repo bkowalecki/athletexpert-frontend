@@ -13,8 +13,8 @@ interface SportsCarouselProps {
   onSelect?: (sport: Sport) => void; // called on "choose" click
 }
 
-const ITEM_WIDTH = 150; // width in px (including margin/gap)
-const GAP = 20; // px
+const ITEM_WIDTH = 150;
+const GAP = 18; // Match your CSS
 
 const SportsCarousel: React.FC<SportsCarouselProps> = ({
   sports,

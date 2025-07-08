@@ -45,25 +45,25 @@
 .close-button {
   position: absolute;
   top: 10px; right: 0px;
-  background: rgba(36,36,36,0.18);
+  background: none;
   border: none;
   border-radius: 50%;
-  width: 48px; height: 48px;
+  width: 55px; height: 55px;
   display: flex; align-items: center; justify-content: center;
   cursor: pointer;
   z-index: 10;
-  transition: background 0.22s, box-shadow 0.16s;
-  box-shadow: 0 2px 8px #00000024;
+  /* transition: background 0.22s, box-shadow 0.16s; */
+  /* box-shadow: 0 2px 8px #00000024; */
 }
 .close-button:active,
 .close-button:focus,
 .close-button:hover { background: #e35022; }
-.close-button svg { width: 30px; height: 30px; fill: #fff; }
+.close-button svg { width: 55px; height: 55px; fill: #fff; }
 
 .quiz-scrollable-content {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: center;
   flex: 1 1 0;
   overflow-y: auto;
   max-height: calc(89vh - 125px);
@@ -76,15 +76,14 @@
 
 .quiz-progress-bar {
   width: 100%; height: 9px;
-  background: #661e0e;
+  background: black;
   border-radius: 8px;
   overflow: hidden;
-  margin-bottom: 30px;
   position: sticky; top: 0; left: 0; z-index: 3;
 }
 .quiz-progress {
   height: 100%;
-  background: #ffc785;
+  background: #a23c20;
   border-radius: 6px;
   transition: width 0.42s cubic-bezier(.22,.77,.6,1.01);
 }
@@ -123,7 +122,8 @@
 .quiz-option:hover,
 .quiz-option:active,
 .quiz-option.selected {
-  background: #2a6045;
+  background: #a23c20;
+  border: 3px solid #fff;
   color: #fff;
   box-shadow: 0 4px 16px #2a604550;
 }
@@ -140,8 +140,8 @@
   padding: 18px 34px;
   font-size: 1.13rem;
   color: #fff;
-  background: #2a6045;
-  border: none;
+  background: #a23c20;
+  border: 3px solid #fff;
   border-radius: 13px;
   margin: 0 8px;
   cursor: pointer;
@@ -159,6 +159,39 @@
 .quiz-nav-button:focus-visible {
   outline: 2.5px solid #ffe7bb;
 }
+
+.recommended-products {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* The key: set a height (or max-height) and allow scrolling! */
+  max-height: 62vh;  /* tweak as needed to fit modal design */
+  min-height: 220px;
+  overflow-y: auto;
+  width: 100%;
+  padding: 0 4px 10px 4px;
+  position: relative;
+}
+
+.quiz-product-grid {
+  /* Let cards be natural height, don't constrain */
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 22px;
+  /* No scrolling or height here! */
+}
+.quiz-product-grid::-webkit-scrollbar {
+  width: 7px;
+  background: #a23c2015;
+  border-radius: 5px;
+}
+.quiz-product-grid::-webkit-scrollbar-thumb {
+  background: #a23c2065;
+  border-radius: 5px;
+}
+
 
 .quiz-question,
 .recommended-products-title {

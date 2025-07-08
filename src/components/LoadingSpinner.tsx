@@ -1,4 +1,3 @@
-// LoadingSpinner.tsx
 import React from "react";
 import "../styles/LoadingSpinner.css";
 
@@ -6,10 +5,10 @@ interface LoadingSpinnerProps {
   text?: string;
 }
 
-const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({ text = "Loading..." }) => (
-  <div className="loading-spinner-overlay" role="status" aria-live="polite">
-    <div className="new-spinner" />
-    <p style={{ margin: 0 }}>{text}</p>
+const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({ text = "Finding the best gear for you…" }) => (
+  <div className="ax-loading-overlay" role="status" aria-live="polite">
+    <div className="ax-spinner" />
+    <div className="ax-spinner-text">{text}</div>
   </div>
 );
 

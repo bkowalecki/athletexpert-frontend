@@ -7,8 +7,21 @@ import cleanProductTitle from "../../util/CleanProductTitle";
 import { trackEvent } from "../../util/analytics";
 import { QuizContext } from "../../context/QuizContext";
 import LoadingSpinner from "../../components/LoadingSpinner";
-import SportsCarousel, { Sport } from "../../components/SportsCarousel"; // adjust path
+import SportsCarousel, { Sport } from "../../components/SportsCarousel";
 const AMAZON_ASSOCIATE_TAG = "athletexper0b-20";
+const FUNNY_LOADING_TEXTS = [
+  "Finding the best gear for you…",
+  "Sharpening your spikes…",
+  "Polishing your pickleballs…",
+  "Consulting LeBron’s cousin…",
+  "Summoning the equipment fairy…",
+  "Chasing down the UPS truck…",
+  "Clearing the sweatbands…",
+  "Checking the locker room…",
+  "Negotiating with Amazon bots…",
+  "Applying extra stickum…",
+  "Arguing with the referee…",
+];
 
 type SportKey = keyof typeof quizData.sportSpecific;
 
@@ -72,43 +85,64 @@ const Quiz: React.FC<{ isOpen: boolean; closeModal: () => void }> = ({
   const [recommendedProducts, setRecommendedProducts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [answers, setAnswers] = useState<any>(initialAnswers);
+  const [loadingText, setLoadingText] = useState(FUNNY_LOADING_TEXTS[0]);
+  const [loadingTextIndex, setLoadingTextIndex] = useState(0);
 
-  // --- SPORT-SPECIFIC AND MAIN QUESTION LOGIC ---
-  const selectedSport = answers.sport?.toLowerCase() as SportKey | undefined;
-  const sportSpecificQuestions = useMemo(() => {
-    if (
-      selectedSport &&
-      quizData.sportSpecific &&
-      selectedSport in quizData.sportSpecific
-    ) {
-      return (
-        (quizData.sportSpecific as Record<SportKey, any[]>)[selectedSport] || []
-      );
-    }
-    return [];
-  }, [selectedSport]);
+  // Memoize main/global questions (never includes "sport")
+  const mainQuestions = useMemo(() => {
+    return quizData.questions.filter((q: any) => q.field !== "sport");
+  }, []);
 
-  // Remove global questions whose 'field' matches any in sportSpecific for dedupe
-  const sportSpecificFields = new Set(
-    sportSpecificQuestions.map((q: any) => q.field)
-  );
-  const mainQuestions = quizData.questions.filter(
-    (q: any) => !sportSpecificFields.has(q.field) && q.field !== "sport"
-  );
+  // Memoize all questions to ask (after sport selection)
+  const quizQuestions = useMemo(() => {
+    if (!answers.sport) return [];
+    const sportKey = answers.sport?.toLowerCase() as SportKey | undefined;
+    const sportQs =
+      sportKey && quizData.sportSpecific && sportKey in quizData.sportSpecific
+        ? (quizData.sportSpecific as Record<SportKey, any[]>)[sportKey] || []
+        : [];
+    // Remove global questions whose 'field' matches any in sportQs
+    const sportFields = new Set(sportQs.map((q: any) => q.field));
+    const globalQs = mainQuestions.filter(
+      (q: any) => !sportFields.has(q.field)
+    );
+    return [...sportQs, ...globalQs];
+  }, [answers.sport, quizData, mainQuestions]);
 
-  // Build the full ordered list of questions (after sport is selected)
-  const allQuizQuestions = [...sportSpecificQuestions, ...mainQuestions];
-  const totalSteps = 1 + allQuizQuestions.length; // 1 for sport selection, rest for all questions
+  const totalSteps = 1 + quizQuestions.length; // 1 = sport, rest = quizQuestions
 
-  // Progress bar logic
+  // The "current" question (after sport selected)
+  const currentQuestion =
+    step > 0 && step <= quizQuestions.length ? quizQuestions[step - 1] : null;
+
+  // Progress bar logic (starts at 0 for sport, then increments per question)
   const progress =
     step === 0
       ? 0
-      : Math.min(100, Math.round((step / allQuizQuestions.length) * 100));
+      : Math.min(100, Math.round((step / quizQuestions.length) * 100));
 
+  useEffect(() => {
+    if (!isLoading) {
+      setLoadingTextIndex(0);
+      return;
+    }
+    // Start at random index
+    setLoadingTextIndex(Math.floor(Math.random() * FUNNY_LOADING_TEXTS.length));
+    // Change message every 2.2 seconds
+    const interval = setInterval(() => {
+      setLoadingTextIndex((prev) => (prev + 1) % FUNNY_LOADING_TEXTS.length);
+    }, 2200);
+
+    return () => clearInterval(interval);
+  }, [isLoading]);
   // Recommendation fetch
   useEffect(() => {
     if (step === totalSteps) {
+      setLoadingText(
+        FUNNY_LOADING_TEXTS[
+          Math.floor(Math.random() * FUNNY_LOADING_TEXTS.length)
+        ]
+      );
       setIsLoading(true);
       fetch(`${process.env.REACT_APP_API_URL}/recommendations`, {
         method: "POST",
@@ -141,7 +175,7 @@ const Quiz: React.FC<{ isOpen: boolean; closeModal: () => void }> = ({
     }
     if (step > 0) {
       // Find field for this step and clear answer (optional)
-      const fieldToClear = allQuizQuestions[step - 1]?.field;
+      const fieldToClear = quizQuestions[step - 1]?.field;
       setAnswers((prev: any) => {
         const updated = { ...prev };
         if (fieldToClear) updated[fieldToClear] = "";
@@ -214,6 +248,21 @@ const Quiz: React.FC<{ isOpen: boolean; closeModal: () => void }> = ({
     }
   }, [step]);
 
+  useEffect(() => {
+    if (!isLoading) {
+      setLoadingTextIndex(0);
+      return;
+    }
+    // Start at random index
+    setLoadingTextIndex(Math.floor(Math.random() * FUNNY_LOADING_TEXTS.length));
+    // Change message every 2.2 seconds
+    const interval = setInterval(() => {
+      setLoadingTextIndex((prev) => (prev + 1) % FUNNY_LOADING_TEXTS.length);
+    }, 2200);
+
+    return () => clearInterval(interval);
+  }, [isLoading]);
+
   if (!isOpen) return null;
 
   return (
@@ -251,17 +300,10 @@ const Quiz: React.FC<{ isOpen: boolean; closeModal: () => void }> = ({
         </div>
         <div className="quiz-scrollable-content">
           {isLoading ? (
-            <div className="quiz-loading-overlay">
-              <div className="quiz-spinner-container">
-                <LoadingSpinner />
-                <div className="quiz-loading-text">
-                  Finding the best gear for you…
-                </div>
-              </div>
-            </div>
+            <LoadingSpinner text={FUNNY_LOADING_TEXTS[loadingTextIndex]} />
           ) : (
             <>
-              {/* Step 0: Netflix-style Sport Selection Carousel */}
+              {/* Step 0: Sport Selection Carousel */}
               {step === 0 && (
                 <>
                   <h2 className="quiz-question">
@@ -272,7 +314,6 @@ const Quiz: React.FC<{ isOpen: boolean; closeModal: () => void }> = ({
                     currentIndex={carouselIndex}
                     setCurrentIndex={setCarouselIndex}
                     onSelect={(sport) => {
-                      // User clicks the middle icon or hits Enter
                       handleNext("sport", sport.title.toLowerCase());
                     }}
                   />
@@ -294,20 +335,17 @@ const Quiz: React.FC<{ isOpen: boolean; closeModal: () => void }> = ({
                 </>
               )}
 
-              {/* Sport-specific and global steps */}
-              {step > 0 && step < totalSteps && (
+              {/* All follow-up questions */}
+              {step > 0 && step < totalSteps && currentQuestion && (
                 <QuizStep
                   question={
-                    allQuizQuestions[step - 1]?.field === "skillLevel" &&
-                    answers.sport
+                    currentQuestion.field === "skillLevel" && answers.sport
                       ? `What's your skill level in ${answers.sport}?`
-                      : allQuizQuestions[step - 1].question
+                      : currentQuestion.question
                   }
-                  options={allQuizQuestions[step - 1].options}
-                  selectedOption={answers[allQuizQuestions[step - 1].field]}
-                  onNext={(option) =>
-                    handleNext(allQuizQuestions[step - 1].field, option)
-                  }
+                  options={currentQuestion.options}
+                  selectedOption={answers[currentQuestion.field]}
+                  onNext={(option) => handleNext(currentQuestion.field, option)}
                   onBack={handleBack}
                   showBack={step > 0}
                 />
@@ -335,14 +373,14 @@ const Quiz: React.FC<{ isOpen: boolean; closeModal: () => void }> = ({
                       />
                     ))}
                   </div>
-                  <div className="quiz-navigation">
+                  {/* <div className="quiz-navigation">
                     <button
                       className="quiz-nav-button back"
                       onClick={handleBack}
                     >
                       <span aria-hidden="true">&#8592;</span> Back
                     </button>
-                  </div>
+                  </div> */}
                 </div>
               )}
             </>
