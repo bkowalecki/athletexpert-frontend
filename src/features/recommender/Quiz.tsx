@@ -263,7 +263,11 @@ const Quiz: React.FC<{ isOpen: boolean; closeModal: () => void }> = ({
     return () => clearInterval(interval);
   }, [isLoading]);
 
+  
+
   if (!isOpen) return null;
+
+
 
   return (
     <div

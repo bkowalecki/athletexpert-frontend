@@ -49,7 +49,7 @@
       },
       {
         "id": "basketballEnv",
-        "question": "Do you mostly play basketball indoors or outdoors?",
+        "question": "Indoors or outdoors?",
         "field": "trainingEnvironment",
         "options": ["Indoors", "Outdoors", "Both"]
       }
