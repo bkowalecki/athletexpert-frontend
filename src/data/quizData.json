@@ -45,7 +45,7 @@
         "id": "basketballCategory",
         "question": "What basketball gear are you shopping for?",
         "field": "productCategory",
-        "options": ["Shoes", "Basketballs", "Hoops", "Apparel", "Socks", "Bags", "Accessories", "Training Equipment", "Any"]
+        "options": ["Any", "Shoes", "Basketballs", "Hoops", "Apparel", "Socks", "Bags", "Accessories", "Training Equipment"]
       },
       {
         "id": "basketballEnv",
@@ -59,7 +59,7 @@
         "id": "runningCategory",
         "question": "What running gear are you shopping for?",
         "field": "productCategory",
-        "options": ["Shoes", "Apparel", "Watches", "Socks", "Hydration", "Accessories", "Headphones", "Sunglasses", "Any"]
+        "options": ["Any", "Shoes", "Apparel", "Watches", "Socks", "Hydration", "Accessories", "Headphones", "Sunglasses"]
       },
       {
         "id": "runningGoal",
@@ -86,7 +86,7 @@
         "id": "golfCategory",
         "question": "What golf gear are you shopping for?",
         "field": "productCategory",
-        "options": ["Clubs", "Balls", "Shoes", "Gloves", "Apparel", "Bags", "Accessories", "Training Aids", "Any"]
+        "options": ["Any", "Clubs", "Balls", "Shoes", "Gloves", "Apparel", "Bags", "Accessories", "Training Aids"]
       }
     ],
     "swimming": [
@@ -94,7 +94,7 @@
         "id": "swimmingCategory",
         "question": "What swimming gear are you shopping for?",
         "field": "productCategory",
-        "options": ["Swimsuit", "Goggles", "Cap", "Towel", "Training Aids", "Bag", "Earplugs", "Accessories", "Any"]
+        "options": ["Any", "Swimsuit", "Goggles", "Cap", "Towel", "Training Aids", "Bag", "Earplugs", "Accessories"]
       }
     ],
     "football": [
@@ -102,7 +102,7 @@
         "id": "footballCategory",
         "question": "What football gear are you shopping for?",
         "field": "productCategory",
-        "options": ["Cleats", "Football", "Gloves", "Apparel", "Helmets", "Pads", "Accessories", "Training Equipment", "Any"]
+        "options": ["Any", "Cleats", "Football", "Gloves", "Apparel", "Helmets", "Pads", "Accessories", "Training Equipment"]
       }
     ],
     "soccer": [
@@ -110,7 +110,7 @@
         "id": "soccerCategory",
         "question": "What soccer gear are you shopping for?",
         "field": "productCategory",
-        "options": ["Cleats", "Soccer Ball", "Shin Guards", "Apparel", "Socks", "Bags", "Goalkeeper Gloves", "Training Equipment", "Any"]
+        "options": ["Any", "Cleats", "Soccer Ball", "Shin Guards", "Apparel", "Socks", "Bags", "Goalkeeper Gloves", "Training Equipment"]
       }
     ],
     "tennis": [
@@ -118,7 +118,7 @@
         "id": "tennisCategory",
         "question": "What tennis gear are you shopping for?",
         "field": "productCategory",
-        "options": ["Racquets", "Balls", "Shoes", "Apparel", "Bags", "Grips", "Strings", "Accessories", "Any"]
+        "options": ["Any", "Racquets", "Balls", "Shoes", "Apparel", "Bags", "Grips", "Strings", "Accessories"]
       }
     ],
     "cycling": [
@@ -126,7 +126,7 @@
         "id": "cyclingCategory",
         "question": "What cycling gear are you shopping for?",
         "field": "productCategory",
-        "options": ["Bike", "Helmet", "Apparel", "Shoes", "Gloves", "Lights", "Locks", "Accessories", "Bags", "Any"]
+        "options": ["Any","Bike", "Helmet", "Apparel", "Shoes", "Gloves", "Lights", "Locks", "Accessories", "Bags"]
       }
     ],
     "baseball": [

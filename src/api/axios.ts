@@ -1,43 +1,49 @@
 // src/api/axios.ts
 
-import axios from "axios";
+import axios, { InternalAxiosRequestConfig } from "axios";
 
-// Build the base API URL from env vars
-const baseURL = process.env.REACT_APP_API_URL;
+// Set your base URL
+const baseURL = process.env.REACT_APP_API_URL || "http://localhost:8080";
 
-// Create the axios instance with your base config
+// 🔒 Grab cookie value by name (for CSRF token)
+function getCookie(name: string): string | null {
+  const match = document.cookie.match(new RegExp(`(^| )${name}=([^;]+)`));
+  return match ? decodeURIComponent(match[2]) : null;
+}
+
+// ✅ Create Axios instance
 const api = axios.create({
   baseURL,
-  withCredentials: true, // Send cookies for auth/session by default
+  withCredentials: true,
   headers: {
     "Content-Type": "application/json",
   },
-  // You can add timeout, etc., if needed
-  // timeout: 15000,
 });
 
-// --- OPTIONAL: Add interceptors for auth, logging, or error handling ---
+// ✅ Interceptor to attach CSRF token on mutating requests
+api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
+  const csrfToken = getCookie("XSRF-TOKEN");
+  const method = config.method?.toLowerCase();
+  const needsCsrf = ["post", "put", "delete"].includes(method || "");
 
-// Add a response interceptor for global error handling/logging if needed
+  if (csrfToken && needsCsrf) {
+    config.headers["X-XSRF-TOKEN"] = csrfToken;
+  }
+
+  return config;
+});
+
+// ✅ Global response handler (optional)
 api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    // Example: Show a toast on error (if you want)
-    // import { toast } from "react-toastify";
-    // toast.error(error?.response?.data?.message || "API Error");
-    // Optionally log error to a monitoring service here
-
-    // Always reject so downstream code knows about the error
-    return Promise.reject(error);
+  (res) => res,
+  (err) => {
+    if (err?.response?.status === 401) {
+      // Optional: toast or redirect
+      sessionStorage.removeItem("ax_id_token");
+      window.location.href = "/auth"; // or use navigate if inside component
+    }
+    return Promise.reject(err);
   }
 );
-
-// --- OPTIONAL: Attach JWT token if you use Auth0 or other JWT-based auth ---
-
-// api.interceptors.request.use((config) => {
-//   const token = sessionStorage.getItem("ax_id_token");
-//   if (token) config.headers["Authorization"] = `Bearer ${token}`;
-//   return config;
-// });
 
 export default api;

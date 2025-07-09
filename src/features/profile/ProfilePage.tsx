@@ -12,7 +12,7 @@ import { BlogPost } from "../../types/blogs";
 import { useSavedProducts } from "../../hooks/useSavedProducts";
 import "../../styles/Globals.css";
 import "../../styles/ProfilePage.css";
-import api from "../../api/axios"; 
+import api from "../../api/axios";
 
 interface Profile {
   firstName: string;
@@ -20,84 +20,71 @@ interface Profile {
   bio: string | null;
   profilePictureUrl: string | null;
   sports: string[] | null;
-  badges?: string[];
   savedBlogIds?: number[];
   savedProductIds?: number[];
   location?: string | null;
-  publishedDate?: string | null;
-  summary?: string | null;
 }
 
 const ProfilePage: React.FC = () => {
-  // --- State & hooks ---
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
   const [profile, setProfile] = useState<Profile | null>(null);
   const [savedBlogs, setSavedBlogs] = useState<BlogPost[]>([]);
-  const [activeSport, setActiveSport] = useState<string | null>(null);
   const [savedProducts, setSavedProducts] = useState<Product[]>([]);
-  const { savedProductIds, toggleSaveProduct } = useSavedProducts();
+  const [activeSport, setActiveSport] = useState<string | null>(null);
 
   const navigate = useNavigate();
   const { user, setUser, isSessionChecked, checkSession } = useUserContext();
   const { logout: auth0Logout } = useAuth0();
+  const { savedProductIds, toggleSaveProduct } = useSavedProducts();
 
-  // --- Fetch Saved Blogs (must be defined before useEffect/conditionally!) ---
+  // Fetch full blog objects
   const fetchSavedBlogs = useCallback(async (ids: number[]) => {
     try {
-      const res = await api.post("/blog/bulk-fetch", { ids });
-      setSavedBlogs(res.data);
+      const { data } = await api.post("/blog/bulk-fetch", { ids });
+      setSavedBlogs(data);
     } catch {
       setSavedBlogs([]);
     }
   }, []);
 
-  // --- Fetch Profile & Blogs ---
+  // Fetch profile & blogs
   useEffect(() => {
-    if (!isSessionChecked) return;
-    if (!user) {
-      navigate("/auth", { replace: true });
-      return;
-    }
-    const fetchProfile = async () => {
+    if (!isSessionChecked || !user) return;
+
+    const load = async () => {
       setIsLoading(true);
-      setError(null);
       try {
-        const res = await api.get("/users/profile");
-        const data: Profile = res.data;
+        const { data } = await api.get("/users/profile");
         setProfile(data);
-        if (data.savedBlogIds?.length) fetchSavedBlogs(data.savedBlogIds);
-      } catch (err) {
-        setError("Failed to load profile. Please try refreshing or check your connection.");
+        if (data.savedBlogIds?.length) await fetchSavedBlogs(data.savedBlogIds);
+      } catch {
+        toast.error("Failed to load profile.");
         navigate("/auth", { replace: true });
       } finally {
         setIsLoading(false);
       }
     };
-    fetchProfile();
+
+    load();
   }, [user, isSessionChecked, fetchSavedBlogs, navigate]);
 
-  // --- Fetch Saved Products Details ---
+  // Fetch product details
   useEffect(() => {
-    if (!savedProductIds.length) {
-      setSavedProducts([]);
-      return;
-    }
-    const fetchSavedProductDetails = async () => {
+    if (!savedProductIds.length) return setSavedProducts([]);
+    const fetchProducts = async () => {
       try {
-        const res = await api.post("/products/bulk-fetch", { ids: savedProductIds });
-        setSavedProducts(res.data);
+        const { data } = await api.post("/products/bulk-fetch", { ids: savedProductIds });
+        setSavedProducts(data);
       } catch {
         setSavedProducts([]);
       }
     };
-    fetchSavedProductDetails();
+    fetchProducts();
   }, [savedProductIds]);
 
-  // --- Save/Unsave Blog ---
   const toggleSaveBlog = async (blogId: number) => {
-    if (!user) return toast.warn("Log in to save blogs!");
+    if (!user) return toast.warn("Please log in to manage blogs.");
     const isSaved = savedBlogs.some((b) => b.id === blogId);
     try {
       await api({
@@ -105,18 +92,16 @@ const ProfilePage: React.FC = () => {
         url: `/users/saved-blogs/${blogId}`,
         withCredentials: true,
       });
+
       setSavedBlogs((prev) =>
-        isSaved
-          ? prev.filter((b) => b.id !== blogId)
-          : [...prev, { id: blogId } as BlogPost]
+        isSaved ? prev.filter((b) => b.id !== blogId) : [...prev, { id: blogId } as BlogPost]
       );
-      toast.success(isSaved ? "Blog removed!" : "Blog saved!");
+      toast.success(isSaved ? "Blog removed." : "Blog saved!");
     } catch {
-      toast.error("❌ Error saving blog.");
+      toast.error("Error updating saved blogs.");
     }
   };
 
-  // --- Sign Out Logic ---
   const handleSignOut = async () => {
     try {
       sessionStorage.removeItem("ax_id_token");
@@ -124,29 +109,26 @@ const ProfilePage: React.FC = () => {
       await api.post("/users/logout");
       setUser(null);
       await checkSession();
-      if (user?.authProvider === "auth0") {
-        auth0Logout({ logoutParams: { returnTo: window.location.origin + "/auth" } });
-      } else {
-        window.location.href = "/auth";
-      }
-    } catch (err) {
-      toast.error("Error signing out.");
+      user?.authProvider === "auth0"
+        ? auth0Logout({ logoutParams: { returnTo: window.location.origin + "/auth" } })
+        : (window.location.href = "/auth");
+    } catch {
+      toast.error("Sign out failed.");
     }
   };
 
-  const formatLocation = (raw: string): string => {
-    const parts = raw.split(",").map((p) => p.trim());
+  const formatLocation = (loc: string): string => {
+    const parts = loc.split(",").map((p) => p.trim());
     if (parts.length === 3) {
       const [city, state, country] = parts;
       return country === "United States" ? `${city}, ${state}` : `${city}, ${country}`;
     }
-    return raw;
+    return loc;
   };
 
-  // --- Loading and Error States ---
   if (isLoading) {
     return (
-      <div className="profile-loading" aria-busy="true" aria-live="polite" style={{ minHeight: 320, display: "flex", justifyContent: "center", alignItems: "center" }}>
+      <div className="profile-loading" style={{ minHeight: 320, display: "flex", justifyContent: "center", alignItems: "center" }}>
         <div className="ax-spinner" style={{
           width: 36, height: 36, border: "4px solid #f0a500", borderTop: "4px solid #1a1a1a", borderRadius: "50%", animation: "spin 0.8s linear infinite"
         }} />
@@ -156,36 +138,27 @@ const ProfilePage: React.FC = () => {
     );
   }
 
-  if (error) {
+  if (error || !user || !profile) {
     return (
       <div className="profile-error" role="alert" style={{ textAlign: "center", color: "#b00", marginTop: 80 }}>
-        <p><strong>Uh oh! {error}</strong></p>
+        <p><strong>Uh oh! {error || "Unable to load profile."}</strong></p>
         <button onClick={() => window.location.reload()} className="profile-cta-button">Retry</button>
       </div>
     );
   }
 
-  if (!user || !profile) return null;
-
-  // --- Main Render ---
   return (
     <div className="profile-container">
       <Helmet>
         <title>AthleteXpert | My Profile</title>
-        <meta
-          name="description"
-          content="Manage your athlete profile, save blogs and products on AthleteXpert."
-        />
+        <meta name="description" content="Manage your athlete profile, save blogs and products on AthleteXpert." />
       </Helmet>
 
-      {/* --- Profile Banner --- */}
+      {/* Banner */}
       <div className="profile-banner">
         <div className="profile-image-wrapper">
           <img
-            src={
-              profile.profilePictureUrl ||
-              "https://athletexpertbucket.s3.us-east-1.amazonaws.com/avatars/default_avatar.png"
-            }
+            src={profile.profilePictureUrl || "https://athletexpertbucket.s3.us-east-1.amazonaws.com/avatars/default_avatar.png"}
             alt="Profile"
             className="profile-image"
           />
@@ -201,12 +174,12 @@ const ProfilePage: React.FC = () => {
 
       <hr className="profile-divider" />
 
-      {/* --- Sports --- */}
+      {/* Sports */}
       <h2 className="profile-subsection-header-text">Sports & Stats</h2>
       <div className="profile-sports">
         {profile.sports?.length ? (
-          profile.sports.map((sport, idx) => (
-            <div key={idx} className="sport-item" onClick={() => setActiveSport(sport)}>
+          profile.sports.map((sport, i) => (
+            <div key={i} className="sport-item" onClick={() => setActiveSport(sport)}>
               {sport}
             </div>
           ))
@@ -220,12 +193,10 @@ const ProfilePage: React.FC = () => {
         )}
       </div>
 
-      {/* --- Blogs --- */}
+      {/* Blogs */}
       <h2 className="profile-subsection-header-text">My Blogs</h2>
       <div className="profile-saved-blogs-grid">
-        {!savedBlogs ? (
-          <p>Loading saved blogs…</p>
-        ) : savedBlogs.length > 0 ? (
+        {savedBlogs.length > 0 ? (
           savedBlogs.map((blog) => (
             <BlogCard
               key={blog.id}
@@ -237,7 +208,7 @@ const ProfilePage: React.FC = () => {
               publishedDate={blog.publishedDate}
               summary={blog.summary}
               variant="profile"
-              isSaved={true}
+              isSaved
               isPinned={false}
               onUnsave={() => toggleSaveBlog(blog.id)}
               onPin={() => {}}
@@ -248,12 +219,10 @@ const ProfilePage: React.FC = () => {
         )}
       </div>
 
-      {/* --- Products --- */}
+      {/* Products */}
       <h2 className="profile-subsection-header-text">Maybe Later...</h2>
       <div className="profile-saved-products">
-        {!savedProducts ? (
-          <p>Loading saved products…</p>
-        ) : savedProducts.length > 0 ? (
+        {savedProducts.length > 0 ? (
           savedProducts.map((product) => (
             <ProductCard
               id={product.id}
@@ -263,7 +232,7 @@ const ProfilePage: React.FC = () => {
               price={product.price}
               imgUrl={product.imgUrl}
               affiliateLink={product.affiliateLink}
-              isSaved={true}
+              isSaved
               onToggleSave={() => toggleSaveProduct(product.id)}
             />
           ))
@@ -272,25 +241,18 @@ const ProfilePage: React.FC = () => {
         )}
       </div>
 
-      {/* --- Quote & Actions --- */}
+      {/* Footer Actions */}
       <div className="motivational-quote">
         "Every champion was once a contender who refused to give up." - Rocky Balboa
       </div>
       <div>
-        <button onClick={handleSignOut} className="profile-cta-button">
-          Sign Out
-        </button>
-        <button onClick={() => navigate("/settings")} className="profile-cta-button">
-          Settings
-        </button>
+        <button onClick={handleSignOut} className="profile-cta-button">Sign Out</button>
+        <button onClick={() => navigate("/settings")} className="profile-cta-button">Settings</button>
       </div>
 
-      {/* --- Modal for Sport Stats --- */}
+      {/* Modal */}
       {activeSport && (
-        <SportStatsModal
-          sport={activeSport}
-          onClose={() => setActiveSport(null)}
-        />
+        <SportStatsModal sport={activeSport} onClose={() => setActiveSport(null)} />
       )}
     </div>
   );
