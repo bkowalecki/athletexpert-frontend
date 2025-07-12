@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { BlogCardProps} from "@/types/blogs";
+import { BlogCardProps } from "@/types/blogs";
 import { trackEvent } from "../../util/analytics";
 import "../../styles/BlogCard.css";
 
@@ -47,23 +47,24 @@ const BlogCard: React.FC<BlogCardProps> = ({
     trackEvent("blog_view", {
       blog_id: id,
       blog_title: title,
-      author, 
+      author,
       slug,
     });
     navigate(`/blog/${slug}`);
   };
 
-
   // Format date once, only if present
-  const formattedDate = useMemo(() => (
-    publishedDate
-      ? new Date(publishedDate).toLocaleDateString(undefined, {
-          year: "numeric",
-          month: "short",
-          day: "numeric",
-        })
-      : ""
-  ), [publishedDate]);
+  const formattedDate = useMemo(
+    () =>
+      publishedDate
+        ? new Date(publishedDate).toLocaleDateString(undefined, {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+          })
+        : "",
+    [publishedDate]
+  );
 
   // Card variant class
   const cardClass = `blog-card blog-card-${variant}`;
@@ -82,7 +83,7 @@ const BlogCard: React.FC<BlogCardProps> = ({
           className={`blog-card-bookmark-btn${isSaved ? " saved" : ""}`}
           aria-label={isSaved ? "Unsave blog" : "Save blog"}
           tabIndex={0}
-          onClick={e => {
+          onClick={(e) => {
             e.stopPropagation();
             isSaved ? onUnsave?.() : onSave?.();
           }}
@@ -98,7 +99,7 @@ const BlogCard: React.FC<BlogCardProps> = ({
             className={`blog-card-pin-btn${isPinned ? " pinned" : ""}`}
             aria-label={isPinned ? "Unpin blog" : "Pin blog"}
             tabIndex={0}
-            onClick={e => {
+            onClick={(e) => {
               e.stopPropagation();
               onPin?.();
             }}
@@ -126,6 +127,9 @@ const BlogCard: React.FC<BlogCardProps> = ({
         )}
         {summary && <p className="blog-card-summary">{summary}</p>}
       </div>
+      <a href={`/blog/${slug}`} style={{ display: "none" }} aria-hidden="true">
+        SEO link
+      </a>
     </div>
   );
 };
