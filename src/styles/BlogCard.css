@@ -266,7 +266,7 @@
   gap: 0.51rem;
 }
 .blog-card-meta-row { font-size: 0.97rem !important; gap: 0.5rem; }
-.blog-card-author, .blog-card-date { font-size: 0.89rem !important; }
+/* .blog-card-author, .blog-card-date { font-size: 0.89rem !important; } */
 .blog-card-summary { font-size: 0.97rem !important; line-height: 1.5; }
 
 /* Related Variant */
@@ -379,7 +379,7 @@
   }
   .blog-card-author,
   .blog-card-date {
-    font-size: 0.93rem !important;
+    font-size: 1rem !important;
     color: #fff;
     font-style: italic;
     line-height: 1.1;

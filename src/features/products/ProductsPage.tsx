@@ -13,27 +13,45 @@ import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { ErrorBoundary } from "react-error-boundary";
 
-// --- Types & API ---
 import type { Product, SortOption, Filters } from "../../types/products";
 import { fetchProducts, searchProducts } from "../../api/product";
-
-// --- Components ---
 import ProductCard from "../products/ProductCard";
 import ProductGridSkeleton from "./ProductGridSkeleton";
 import ErrorFallback from "../../components/ErrorFallback";
 import { useSavedProducts } from "../../hooks/useSavedProducts";
 import { useFilteredProducts } from "../../hooks/useFilteredProducts";
 import { useRateLimiter } from "../../util/useRateLimiter";
+import { trackEvent } from "../../util/analytics";
 
 import "../../styles/ProductsPage.css";
 
-// --- Helper ---
 const sanitizeQuery = (q: string) =>
   q.replace(/[^a-zA-Z0-9\s-]/g, "").trim().slice(0, 40);
 
+const FilterSelect = ({
+  label,
+  value,
+  onChange,
+  options,
+}: {
+  label: string;
+  value: string;
+  onChange: (val: string) => void;
+  options: string[];
+}) => (
+  <select value={value} onChange={(e) => onChange(e.target.value)} aria-label={`Filter by ${label}`}>
+    <option value="">All {label}</option>
+    {options.map((opt) => (
+      <option key={opt} value={opt}>
+        {opt}
+      </option>
+    ))}
+  </select>
+);
+
 const ProductsPage: React.FC = () => {
   const navigate = useNavigate();
-  const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const sentinelRef = useRef<HTMLDivElement>(null);
 
   const [inputQuery, setInputQuery] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
@@ -44,6 +62,7 @@ const ProductsPage: React.FC = () => {
     brand: "",
     sport: "",
     sortOption: "",
+    // budget: "",
   });
 
   const { canProceed, record } = useRateLimiter(10, 60_000);
@@ -60,7 +79,6 @@ const ProductsPage: React.FC = () => {
     staleTime: 5000,
   });
 
-  // --- Filtering ---
   const productsToShow = searchResults !== null ? searchResults : products;
   const filteredProducts = useFilteredProducts(productsToShow, filters);
   const visibleProducts = useMemo(
@@ -77,7 +95,6 @@ const ProductsPage: React.FC = () => {
     [productsToShow]
   );
 
-  // --- Handlers ---
   const handleFilterChange = useCallback(
     (key: keyof Filters, value: string) => {
       setFilters((prev) => ({
@@ -85,6 +102,7 @@ const ProductsPage: React.FC = () => {
         [key]: key === "sortOption" ? (value as SortOption) : value,
       }));
       setVisibleCount(20);
+      trackEvent("product_filter_change", { [key]: value });
     },
     []
   );
@@ -109,6 +127,7 @@ const ProductsPage: React.FC = () => {
     setSearchQuery(cleanedInput);
     setVisibleCount(20);
     setIsSearching(true);
+    trackEvent("product_search", { query: cleanedInput });
 
     try {
       const results = await searchProducts(cleanedInput);
@@ -132,7 +151,6 @@ const ProductsPage: React.FC = () => {
     setVisibleCount((prev) => prev + 20);
   }, []);
 
-  // --- Infinite Scroll ---
   useEffect(() => {
     let debounceTimeout: NodeJS.Timeout | null = null;
     const observer = new IntersectionObserver((entries) => {
@@ -154,7 +172,6 @@ const ProductsPage: React.FC = () => {
     };
   }, [loadMore]);
 
-  // --- Render ---
   return (
     <div className="products-page">
       <Helmet>
@@ -164,7 +181,11 @@ const ProductsPage: React.FC = () => {
           content="Discover the best gear for your sport on AthleteXpert."
         />
       </Helmet>
+
       <h1 className="products-page-title">Explore</h1>
+      <p className="products-page-subtitle">
+        Find top-rated gear.
+      </p>
 
       <form
         className="filters-container"
@@ -190,39 +211,22 @@ const ProductsPage: React.FC = () => {
             onClick={handleClearSearch}
             style={{ marginLeft: 8 }}
           >
-            Clear Search
+            Clear
           </button>
         )}
 
-        <select
+        <FilterSelect
+          label="Brand"
           value={filters.brand}
-          onChange={(e) => handleFilterChange("brand", e.target.value)}
-          aria-label="Filter by brand"
-        >
-          <option value="">All Brands</option>
-          {allBrands.map(
-            (brand, index) =>
-              brand && (
-                <option key={`${brand}-${index}`} value={brand}>
-                  {brand}
-                </option>
-              )
-          )}
-        </select>
-
-        <select
+          onChange={(val) => handleFilterChange("brand", val)}
+          options={allBrands}
+        />
+        <FilterSelect
+          label="Sport"
           value={filters.sport}
-          onChange={(e) => handleFilterChange("sport", e.target.value)}
-          aria-label="Filter by sport"
-        >
-          <option value="">All Sports</option>
-          {allSports.map((sport, i) => (
-            <option key={i} value={sport}>
-              {sport}
-            </option>
-          ))}
-        </select>
-
+          onChange={(val) => handleFilterChange("sport", val)}
+          options={allSports}
+        />
         <select
           value={filters.sortOption}
           onChange={(e) => handleFilterChange("sortOption", e.target.value)}
@@ -237,13 +241,12 @@ const ProductsPage: React.FC = () => {
       </form>
 
       {(isLoading || isSearching) && <ProductGridSkeleton count={visibleCount} />}
+
       {error && (
         <div className="products-error-container">
           <h2>😵 Oops! Something went wrong.</h2>
           <p>We couldn't load the products right now. Please try again later.</p>
-          <button className="return-home-btn" onClick={() => navigate("/")}>
-            Return Home
-          </button>
+          <button className="return-home-btn" onClick={() => navigate("/")}>Return Home</button>
         </div>
       )}
 
@@ -254,31 +257,30 @@ const ProductsPage: React.FC = () => {
           refetch();
         }}
       >
+        <p className="results-count">
+          Showing {visibleProducts.length} of {filteredProducts.length} results
+        </p>
+
         <div className="product-grid" aria-live="polite">
-          {visibleProducts.length > 0
-            ? visibleProducts.map((product, idx) => (
-                <ProductCard
-                  id={product.id ?? `amazon-${idx}-${product.name}`}
-                  key={product.id ?? `amazon-${idx}-${product.name}`}
-                  name={product.name}
-                  brand={product.brand}
-                  price={product.price}
-                  imgUrl={product.imgUrl}
-                  affiliateLink={product.affiliateLink}
-                  isSaved={
-                    product.id ? savedProductIds.includes(product.id) : false
-                  }
-                  onToggleSave={() =>
-                    product.id && toggleSaveProduct(product.id)
-                  }
-                />
-              ))
-            : !isLoading &&
-              !isSearching && (
-                <p className="no-products-text">
-                  No products match your search.
-                </p>
-              )}
+          {visibleProducts.length > 0 ? (
+            visibleProducts.map((product, idx) => (
+              <ProductCard
+                id={product.id ?? `amazon-${idx}-${product.name}`}
+                key={product.id ?? `amazon-${idx}-${product.name}`}
+                name={product.name}
+                brand={product.brand}
+                price={product.price}
+                imgUrl={product.imgUrl}
+                affiliateLink={product.affiliateLink}
+                isSaved={product.id ? savedProductIds.includes(product.id) : false}
+                onToggleSave={() => product.id && toggleSaveProduct(product.id)}
+              />
+            ))
+          ) : (
+            <p className="no-products-text">
+              No gear found. Try a different keyword or clear filters.
+            </p>
+          )}
         </div>
       </ErrorBoundary>
 

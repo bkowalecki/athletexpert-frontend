@@ -1,11 +1,17 @@
 import React from "react";
-import "../styles/LoadingScreen.css"; // Adjust path if your styles folder is elsewhere
+import "../styles/LoadingScreen.css";
 
 const LoadingScreen: React.FC = () => (
-<div className="ax-loading-screen">
-  <div className="ax-spinner"></div>
-  <p className="ax-loading-text">Loading, please wait...</p>
-</div>
+  <div className="ax-loading-overlay">
+    <div className="ax-loading-content">
+      <div className="ax-spinner"></div>
+      {/* <img
+        src="/favicon.png"
+        alt="AthleteXpert logo"
+        className="ax-loading-logo"
+      /> */}
+    </div>
+  </div>
 );
 
 export default LoadingScreen;

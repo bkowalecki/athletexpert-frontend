@@ -24,6 +24,16 @@
   line-height: 1.2;
 }
 
+.products-page-subtitle {
+  font-size: 1.125rem; /* 18px */
+  color: #cccccc;
+  margin-top: -10px;
+  margin-bottom: 20px;
+  line-height: 1.5;
+  max-width: 680px;
+  text-align: left;
+}
+
 /* 🌟 Filters & Search */
 .filters-container {
   display: flex;
@@ -149,6 +159,14 @@
 @media (max-width: 768px) {
   .product-grid {
     grid-template-columns: repeat(1, 1fr);
+  }
+
+  .products-page-subtitle {
+    font-size: 1rem; /* 16px */
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 16px;
+    padding: 0 12px;
   }
 
 }
