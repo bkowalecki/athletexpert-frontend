@@ -403,6 +403,7 @@ const SearchResults: React.FC = () => {
                   brand={product.brand || ""}
                   price={product.price}
                   imgUrl={product.imgUrl}
+                  slug={product.slug}
                   affiliateLink={product.affiliateLink}
                   isSaved={savedProductIds.includes(product.id)}
                   onToggleSave={() => toggleSaveProduct(product.id)}

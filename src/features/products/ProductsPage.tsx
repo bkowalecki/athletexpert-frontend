@@ -271,6 +271,7 @@ const ProductsPage: React.FC = () => {
                 brand={product.brand}
                 price={product.price}
                 imgUrl={product.imgUrl}
+                slug={product.slug}
                 affiliateLink={product.affiliateLink}
                 isSaved={product.id ? savedProductIds.includes(product.id) : false}
                 onToggleSave={() => product.id && toggleSaveProduct(product.id)}

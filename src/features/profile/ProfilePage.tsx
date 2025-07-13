@@ -247,6 +247,7 @@ const ProfilePage: React.FC = () => {
               price={product.price}
               imgUrl={product.imgUrl}
               affiliateLink={product.affiliateLink}
+              slug={product.slug}
               isSaved
               onToggleSave={() => toggleSaveProduct(product.id)}
             />

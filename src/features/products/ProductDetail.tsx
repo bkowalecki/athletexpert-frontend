@@ -6,7 +6,7 @@ import "../../styles/ProductDetail.css";
 import { trackEvent } from "../../util/analytics";
 import type { Product } from "../../types/products";
 import ProductCard from "../products/ProductCard";
-import { fetchProductById, fetchRelatedProducts } from "../../api/product";
+import { fetchProductBySlug, fetchRelatedProducts } from "../../api/product";
 
 const mockReviews = [
   { reviewer: "Sam R.", rating: 5, comment: "Best gear I’ve ever used. Game changer!" },
@@ -22,6 +22,7 @@ const renderStars = (rating: number) => (
 
 const ProductDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const { slug } = useParams<{ slug: string }>();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
@@ -30,14 +31,17 @@ const ProductDetail: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!id) return;
+    if (!slug) return;
+  
     setLoading(true);
+  
     (async () => {
       try {
-        const data = await fetchProductById(id);
+        const data = await fetchProductBySlug(slug);
+  
         if (!data || Object.keys(data).length === 0) throw new Error("No product data");
         setProduct(data);
-
+  
         trackEvent("product_detail_view", {
           product_id: data.id,
           product_name: data.name,
@@ -48,7 +52,7 @@ const ProductDetail: React.FC = () => {
           asin: data.asin,
           trending: !!data.trending,
         });
-
+  
         loadRelatedProducts(data.id);
       } catch {
         navigate("/404", { replace: true });
@@ -56,7 +60,8 @@ const ProductDetail: React.FC = () => {
         setLoading(false);
       }
     })();
-  }, [id, navigate]);
+  }, [slug, navigate]);
+
 
   const loadRelatedProducts = async (productId: number | string) => {
     try {
@@ -137,7 +142,7 @@ const ProductDetail: React.FC = () => {
         <meta property="og:title" content={`${product.name} | AthleteXpert`} />
         <meta property="og:description" content={product.description ?? product.name} />
         <meta property="og:image" content={product.imgUrl || "/images/product-fallback.png"} />
-        <meta property="og:url" content={`https://www.athletexpert.org/products/${product.id}`} />
+        <meta property="og:url" content={`https://www.athletexpert.org/products/${product.slug}`} />
         <meta name="twitter:card" content="summary_large_image" />
         <script type="application/ld+json">{JSON.stringify(structuredData)}</script>
       </Helmet>

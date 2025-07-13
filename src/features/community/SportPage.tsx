@@ -28,6 +28,7 @@ interface Product {
   price: number;
   imgUrl: string;
   affiliateLink: string;
+  slug: string;
 }
 
 // Utility: Slugify
@@ -126,6 +127,7 @@ const SportPage: React.FC = () => {
                 price={product.price}
                 imgUrl={product.imgUrl}
                 affiliateLink={product.affiliateLink}
+                slug={product.slug}
               />
             ))}
           </div>

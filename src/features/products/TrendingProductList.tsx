@@ -51,6 +51,7 @@ const TrendingProductList: React.FC = () => {
               price={product.price}
               imgUrl={product.imgUrl}
               affiliateLink={product.affiliateLink}
+              slug={product.slug}
               isSaved={savedProductIds.includes(product.id)}
               onToggleSave={() => toggleSaveProduct(product.id)}
               // Optionally: pass isTrending={true} for styling

@@ -19,6 +19,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   price,
   imgUrl,
   affiliateLink,
+  slug,
   isSaved,
   onToggleSave,
   isSaving = false,
@@ -131,7 +132,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
         {/* Product info */}
         <div className="ax-product-card-info">
           <div className="ax-product-card-info-top">
-            <Link to={`/products/${id}`}>
+            <Link to={`/products/${slug}`}>
               <h3 className="ax-product-card-name">{name}</h3>
             </Link>
             <p className="ax-product-card-brand">{brand}</p>

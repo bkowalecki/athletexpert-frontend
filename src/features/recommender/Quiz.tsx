@@ -375,6 +375,7 @@ const Quiz: React.FC<{ isOpen: boolean; closeModal: () => void }> = ({
                           brand={product.brand}
                           price={product.price}
                           imgUrl={product.imgUrl}
+                          slug={product.slug}
                           affiliateLink={appendAffiliateTag(
                             product.affiliateLink,
                             AMAZON_ASSOCIATE_TAG

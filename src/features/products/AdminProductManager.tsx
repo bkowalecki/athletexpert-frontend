@@ -20,6 +20,7 @@ const emptyProduct: Omit<Product, "id"> = {
   sports: [],
   asin: "",
   retailer: "",
+  slug: "",
 };
 
 const AdminProductManager: React.FC = () => {

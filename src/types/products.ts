@@ -9,6 +9,7 @@ export interface Product {
   imgUrl: string;
   brand: string;
   retailer: string;
+  slug: string;
   trending?: boolean;
   featured?: boolean;
   sports: string[];          // <--- Not optional; always treat as array!
@@ -23,6 +24,7 @@ export interface ProductCardProps {
   price: number | null;
   imgUrl: string;
   affiliateLink: string;
+  slug: string;
   isSaved?: boolean;
   onToggleSave?: () => void;
   isSaving?: boolean;

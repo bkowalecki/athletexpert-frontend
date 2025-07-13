@@ -53,6 +53,7 @@ const FeaturedProductList: React.FC = () => {
               price={typeof product.price === "number" ? product.price : 0}
               imgUrl={product.imgUrl}
               affiliateLink={product.affiliateLink}
+              slug={product.slug}
               isSaved={!!product.id && savedProductIds.includes(product.id)}
               onToggleSave={() => toggleSaveProduct(product.id)}
               isAmazonFallback={product.isAmazonFallback}

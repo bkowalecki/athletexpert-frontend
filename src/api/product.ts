@@ -66,5 +66,10 @@ export const fetchProductsBySport = async (sport: string): Promise<Product[]> =>
   return data;
 };
 
+export async function fetchProductBySlug(slug: string): Promise<Product> {
+  const { data } = await api.get(`/products/${slug}`);
+  return data;
+}
+
 
 

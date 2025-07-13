@@ -43,7 +43,8 @@ const authRoutes = [
 
 const productRoutes = [
   { path: "/products", element: <ProductsPage /> },
-  { path: "/products/:id", element: <ProductDetail /> },
+  // { path: "/products/:id", element: <ProductDetail /> },
+  {path: "/products/:slug", element:<ProductDetail /> },
   { path: "/admin/products", element: <RequireAuth><AdminProductManager /></RequireAuth> },
 ];
 
