@@ -104,14 +104,22 @@ const ProfilePage: React.FC = () => {
 
   const handleSignOut = async () => {
     try {
+      // Clear local token stuff
       sessionStorage.removeItem("ax_id_token");
       sessionStorage.removeItem("ax_token_time");
+  
+      // Hit backend logout
       await api.post("/users/logout");
+  
+      // Clear frontend state WITHOUT checkSession (causes bug)
       setUser(null);
-      await checkSession();
-      user?.authProvider === "auth0"
-        ? auth0Logout({ logoutParams: { returnTo: window.location.origin + "/auth" } })
-        : (window.location.href = "/auth");
+  
+      // ✅ Redirect AFTER backend has time to clear cookie
+      if (user?.authProvider === "auth0") {
+        auth0Logout({ logoutParams: { returnTo: window.location.origin + "/auth" } });
+      } else {
+        window.location.href = "/auth";
+      }
     } catch {
       toast.error("Sign out failed.");
     }
