@@ -107,6 +107,7 @@ const ProfilePage: React.FC = () => {
       // Clear local storage/sessionStorage
       sessionStorage.removeItem("ax_id_token");
       sessionStorage.removeItem("ax_token_time");
+      sessionStorage.setItem("justLoggedOut", "true");
   
       // Backend logout (clears cookie)
       await api.post("/users/logout");
@@ -118,7 +119,7 @@ const ProfilePage: React.FC = () => {
   
       if (user?.authProvider === "auth0") {
         // Auth0 handles cookie cleanup + redirect
-        auth0Logout({ logoutParams: { returnTo: window.location.origin + "/auth" } });
+        auth0Logout({ logoutParams: {  returnTo: window.location.origin + "/" } });
       } else {
         // Delay slightly to give cookie time to clear
         setTimeout(() => {

@@ -53,6 +53,13 @@ export const UserProvider: React.FC<PropsWithChildren> = ({ children }) => {
   }, []);
 
   useEffect(() => {
+    const justLoggedOut = sessionStorage.getItem("justLoggedOut");
+    if (justLoggedOut) {
+      sessionStorage.removeItem("justLoggedOut");
+      setIsSessionChecked(true); // Skip fetch
+      return;
+    }
+  
     checkSession();
   }, [checkSession]);
 
