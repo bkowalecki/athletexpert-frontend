@@ -4,6 +4,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { useUserContext } from "../../context/UserContext";
 import { loginWithAuth0Token } from "../../util/authUtils";
 import { trackEvent } from "../../util/analytics";
+import { toast } from "react-toastify"; 
 import { loginUser, registerUser } from "../../api/user"; // <-- add this
 import "../../styles/AuthPage.css";
 
@@ -45,6 +46,14 @@ const AuthPage: React.FC = () => {
       handleSSO();
     }
   }, [isSessionChecked, isAuthenticated, auth0User, user]);
+
+  useEffect(() => {
+    const expired = sessionStorage.getItem("sessionExpired");
+    if (expired) {
+      toast.warning("Your session expired. Please log in again.");
+      sessionStorage.removeItem("sessionExpired");
+    }
+  }, []);
 
   const handleSSO = async () => {
     try {

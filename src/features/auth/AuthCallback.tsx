@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useNavigate } from "react-router-dom";
 import { useUserContext } from "../../context/UserContext";
@@ -6,6 +6,8 @@ import { loginWithAuth0Token } from "../../util/authUtils";
 
 const AuthCallback: React.FC = () => {
   const { isAuthenticated, user: auth0User, getAccessTokenSilently } = useAuth0();
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const { setUser } = useUserContext();
   const navigate = useNavigate();
 
@@ -24,23 +26,40 @@ const AuthCallback: React.FC = () => {
             detailedResponse: true,
           })
         ).id_token;
-
+      
         sessionStorage.setItem("ax_id_token", idToken);
         await loginWithAuth0Token({ token: idToken, setUser, navigate });
       } catch (err) {
         console.error("Error during Auth0 callback:", err);
-        navigate("/auth", { replace: true });
+        setError("Authentication failed. Please try logging in again.");
+      } finally {
+        setIsLoading(false);
       }
     };
 
     handleAuth();
   }, [isAuthenticated, auth0User, getAccessTokenSilently, setUser, navigate]);
 
-  return (
-    <div className="auth-loading-screen">
-      <h2>Authenticating...</h2>
-    </div>
-  );
+  if (isLoading) {
+    return (
+      <div className="auth-loading-screen">
+        <h2>Authenticating...</h2>
+      </div>
+    );
+  }
+  
+  if (error) {
+    return (
+      <div className="auth-error-screen">
+        <h2>{error}</h2>
+        <button onClick={() => navigate("/auth")} style={{ marginTop: 16 }}>
+          Back to Login
+        </button>
+      </div>
+    );
+  }
+  
+  return null;
 };
 
 export default AuthCallback;

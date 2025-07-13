@@ -4,10 +4,18 @@ import api from "./axios";
 import type { UserProfile } from "../types/users";
 
 // Fetch the current user session (for UserContext bootstrapping)
-export const fetchUserSession = async () => {
-  const { data } = await api.get(`/users/session`, { withCredentials: true });
-  return data;
-};
+export async function fetchUserSession() {
+  try {
+    const res = await api.get("/users/session", { withCredentials: true });
+    return res.data;
+  } catch (err: any) {
+    if (err.response?.status === 401) {
+      console.warn("🕒 Session expired or invalid.");
+      return null;
+    }
+    throw err;
+  }
+}
 
 // ---- GET USER PROFILE ----
 // Optionally type your profile if you have a type (example below).

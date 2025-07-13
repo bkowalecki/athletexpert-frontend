@@ -43,9 +43,17 @@ export const UserProvider: React.FC<PropsWithChildren> = ({ children }) => {
 
   const checkSession = useCallback(async () => {
     try {
-      const data = await fetchUserSession();
-      setUser(data?.user ?? data ?? null);
-    } catch {
+      const userData = await fetchUserSession();
+  
+      if (!userData) {
+        console.warn("🔒 No valid session. Logging out user.");
+        sessionStorage.setItem("sessionExpired", "1");
+        setUser(null);
+      } else {
+        setUser(userData?.user ?? userData);
+      }
+    } catch (err) {
+      console.error("❌ Session check error:", err);
       setUser(null);
     } finally {
       setIsSessionChecked(true);
