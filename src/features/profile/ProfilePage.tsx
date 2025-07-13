@@ -104,26 +104,32 @@ const ProfilePage: React.FC = () => {
 
   const handleSignOut = async () => {
     try {
-      // Clear local token stuff
+      // Clear local storage/sessionStorage
       sessionStorage.removeItem("ax_id_token");
       sessionStorage.removeItem("ax_token_time");
   
-      // Hit backend logout
+      // Backend logout (clears cookie)
       await api.post("/users/logout");
   
-      // Clear frontend state WITHOUT checkSession (causes bug)
+      // Hard clear any lingering context **before** redirect
       setUser(null);
   
-      // ✅ Redirect AFTER backend has time to clear cookie
+      // Skip checkSession() — it's often the root of the flash/loop bug
+  
       if (user?.authProvider === "auth0") {
+        // Auth0 handles cookie cleanup + redirect
         auth0Logout({ logoutParams: { returnTo: window.location.origin + "/auth" } });
       } else {
-        window.location.href = "/auth";
+        // Delay slightly to give cookie time to clear
+        setTimeout(() => {
+          window.location.href = "/auth"; // or "/" if you'd rather land them on home
+        }, 100); // You can tweak delay if needed
       }
     } catch {
-      toast.error("Sign out failed.");
+      toast.error("Log out failed.");
     }
   };
+  
 
   const formatLocation = (loc: string): string => {
     const parts = loc.split(",").map((p) => p.trim());
