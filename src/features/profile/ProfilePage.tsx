@@ -122,7 +122,7 @@ const ProfilePage: React.FC = () => {
       } else {
         // Delay slightly to give cookie time to clear
         setTimeout(() => {
-          window.location.href = "/auth"; // or "/" if you'd rather land them on home
+          window.location.href = "/"; // or "/" if you'd rather land them on home
         }, 100); // You can tweak delay if needed
       }
     } catch {
