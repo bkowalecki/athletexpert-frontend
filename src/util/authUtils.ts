@@ -1,7 +1,6 @@
-// src/util/authUtils.ts
-
 import api from "../api/axios";
-import { User } from "../context/UserContext";
+import { User } from "../types/users"; // Now using the centralized type
+import { normalizeUser } from "./userUtils";
 
 export async function loginWithAuth0Token({
   token,
@@ -21,11 +20,11 @@ export async function loginWithAuth0Token({
       { withCredentials: true }
     );
 
-    setUser({ ...userData, authProvider: "auth0" });
+    setUser(normalizeUser({ ...userData, authProvider: "auth0" }));
     navigate("/profile", { replace: true });
   } catch (error) {
     console.error("❌ Error in loginWithAuth0Token:", error);
-    setUser(null); // <- Clear user on error to avoid UI issues
+    setUser(null);
     navigate(fallbackRoute, { replace: true });
   }
 }

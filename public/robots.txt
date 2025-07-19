@@ -1,8 +1,10 @@
 # robots.txt for AthleteXpert
 
+# Sitemap location
 Sitemap: https://www.athletexpert.org/sitemap.xml
 
 User-agent: *
+# Block sensitive or private paths
 Disallow: /admin/
 Disallow: /auth/
 Disallow: /settings/
@@ -11,11 +13,17 @@ Disallow: /checkout/
 Disallow: /api/
 Disallow: /server/
 
-# Allow search engines to index the main pages
-Allow: /$
+# Block old product ID-based URLs (e.g., /products/123)
+Disallow: /products/[0-9]+$
+
+# Allow main public routes
+Allow: /
 Allow: /products/
+Allow: /products/
+Allow: /products/*
 Allow: /blog/
 Allow: /about/
 Allow: /contact/
 
-
+# Optional: Slow down aggressive bots (Google ignores this but some obey)
+Crawl-delay: 2

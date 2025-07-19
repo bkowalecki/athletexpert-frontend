@@ -6,27 +6,9 @@ import React, {
   useCallback,
   PropsWithChildren,
 } from "react";
-import { fetchUserSession } from "../api/user"; // <--- Use this!
-
-export type User = {
-  username: string;
-  email: string;
-  firstName?: string;
-  lastName?: string;
-  profilePictureUrl?: string;
-  bio?: string | null;
-  sports?: string[] | null;
-  authProvider?: "local" | "auth0";
-  role: string;
-  isActive: boolean;
-  location?: string | null;
-  city?: string | null;
-  state?: string | null;
-  country?: string | null;
-  gender?: string | null;
-  dob?: string | null;
-  favoriteColor?: string | null;
-};
+import { fetchUserSession } from "../api/user";
+import { checkJustLoggedOut } from "../util/sessionUtils";
+import type { User } from "../types/users"; // Make sure it's centralized now
 
 interface UserContextProps {
   user: User | null;
@@ -37,20 +19,33 @@ interface UserContextProps {
 
 const UserContext = createContext<UserContextProps | undefined>(undefined);
 
+// Optional default user object for fallback/guest mode
+// const defaultUser: User = { ... };
+
 export const UserProvider: React.FC<PropsWithChildren> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isSessionChecked, setIsSessionChecked] = useState(false);
 
+  const normalizeUser = (data: any): User => {
+    return {
+      sports: [],
+      savedBlogIds: [],
+      savedProductIds: [],
+      ...data,
+    };
+  };
+
   const checkSession = useCallback(async () => {
     try {
       const userData = await fetchUserSession();
-  
+
       if (!userData) {
         console.warn("🔒 No valid session. Logging out user.");
         sessionStorage.setItem("sessionExpired", "1");
         setUser(null);
       } else {
-        setUser(userData?.user ?? userData);
+        const rawUser = userData.user ?? userData;
+        setUser(normalizeUser(rawUser));
       }
     } catch (err) {
       console.error("❌ Session check error:", err);
@@ -61,13 +56,11 @@ export const UserProvider: React.FC<PropsWithChildren> = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    const justLoggedOut = sessionStorage.getItem("justLoggedOut");
-    if (justLoggedOut) {
-      sessionStorage.removeItem("justLoggedOut");
-      setIsSessionChecked(true); // Skip fetch
+    if (checkJustLoggedOut()) {
+      setIsSessionChecked(true);
       return;
     }
-  
+
     checkSession();
   }, [checkSession]);
 

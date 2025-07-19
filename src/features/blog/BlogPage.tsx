@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import DOMPurify from "dompurify";
 import { Helmet } from "react-helmet";
 import { useUserContext } from "../../context/UserContext";
 import { toast } from "react-toastify";

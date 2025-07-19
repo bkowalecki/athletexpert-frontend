@@ -9,12 +9,24 @@ export interface Product {
   imgUrl: string;
   brand: string;
   retailer: string;
-  slug: string;
-  trending?: boolean;
-  featured?: boolean;
-  sports: string[];          // <--- Not optional; always treat as array!
+  isFeatured?: boolean;
+  isTrending?: boolean;
   asin?: string;
-  isAmazonFallback?: boolean;
+  slug: string;
+  tags?: string[];
+  sports: string[];
+  rating?: number;
+  numReviews?: number;
+  category?: string;
+  features?: string[];
+  source?: string;
+  lastSyncedAt?: string;
+  isValid?: boolean;
+  upc?: string;
+  ean?: string;
+  gtin?: string;
+  isAmazonFallback?: boolean; // only used on frontend fallbacks
+  trending?: boolean; // in case backend sends it differently
 }
 
 export interface ProductCardProps {
@@ -30,6 +42,10 @@ export interface ProductCardProps {
   isSaving?: boolean;
   isAmazonFallback?: boolean;
   isTrending?: boolean;
+  rating?: number;
+  numReviews?: number;
+  source?: string;
+  lastSyncedAt?: string;
 }
 
 export type SortOption = "" | "priceLow" | "priceHigh";

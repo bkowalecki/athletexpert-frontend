@@ -85,6 +85,10 @@ const Footer: React.FC = () => {
           <p>
             &copy; {new Date().getFullYear()} AthleteXpert. All rights reserved.
           </p>
+          <p className="affiliate-disclaimer">
+            As an Amazon Associate, AthleteXpert earns from qualifying
+            purchases.
+          </p>
         </div>
       </div>
     </footer>

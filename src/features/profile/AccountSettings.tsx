@@ -49,34 +49,32 @@ const genderOptions = [
 ];
 
 const AccountSettings: React.FC = () => {
-  const { user, setUser } = useUserContext();
+  const { user, setUser, isSessionChecked } = useUserContext(); // ✅ include isSessionChecked
   const [formData, setFormData] = useState<UserProfile>({ ...defaultProfile });
   const [newSport, setNewSport] = useState("");
   const [msg, setMsg] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
-    if (user) {
-      setFormData({
-        ...defaultProfile,
-        ...user,
-        bio: user.bio ?? "",
-        city: user.city ?? "",
-        state: user.state ?? "",
-        country: user.country ?? "",
-        gender: user.gender ?? "",
-        dob: user.dob ?? "",
-        favoriteColor: user.favoriteColor ?? "#ffffff",
-        sports: Array.isArray(user.sports) ? user.sports : [],
-        profilePictureUrl: user.profilePictureUrl || "",
-      });
-    }
-  }, [user]);
+    if (!user || !isSessionChecked) return;
+
+    setFormData({
+      ...defaultProfile,
+      ...user,
+      bio: user.bio ?? "",
+      city: user.city ?? "",
+      state: user.state ?? "",
+      country: user.country ?? "",
+      gender: user.gender ?? "",
+      dob: user.dob ?? "",
+      favoriteColor: user.favoriteColor ?? "#ffffff",
+      sports: Array.isArray(user.sports) ? user.sports : [],
+      profilePictureUrl: user.profilePictureUrl || "",
+    });
+  }, [user, isSessionChecked]);
 
   const updateField = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
     setFormData((f) => ({ ...f, [name]: value }));
@@ -105,25 +103,21 @@ const AccountSettings: React.FC = () => {
     if (action === "add") setNewSport("");
   };
 
-  // ✅ Now using API function
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setMsg(null);
     try {
       const updated = await updateUserProfile(formData);
-      setUser(prev => prev ? { ...prev, ...updated } : { ...defaultProfile, ...updated } as any);
+      setUser(prev => prev ? { ...prev, ...updated } : prev);
       setMsg("Profile updated!");
     } catch {
       setMsg("Failed to update profile. Please try again.");
     }
   };
 
-  // ✅ Now using API function
   const handleDeleteAccount = async () => {
     if (
-      !window.confirm(
-        "⚠️ Deleting your account is permanent. All your data will be removed. Continue?"
-      )
+      !window.confirm("⚠️ Deleting your account is permanent. All your data will be removed. Continue?")
     )
       return;
     setIsDeleting(true);
@@ -142,7 +136,15 @@ const AccountSettings: React.FC = () => {
     }
   };
 
-  // --- UI stays the same below ---
+  if (!isSessionChecked) {
+    return (
+      <div className="account-settings-container">
+        <p style={{ textAlign: "center", paddingTop: 80, color: "#888" }}>
+          Loading your settings...
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="account-settings-container">
@@ -164,6 +166,7 @@ const AccountSettings: React.FC = () => {
             />
           )}
         </div>
+
         {/* Basic Info */}
         {(["username", "firstName", "lastName"] as const).map((f) => (
           <div key={f} className="account-settings-section">
@@ -178,6 +181,7 @@ const AccountSettings: React.FC = () => {
             />
           </div>
         ))}
+
         {/* Location */}
         {(["city", "state", "country"] as const).map((f) => (
           <div key={f} className="account-settings-section">
@@ -190,14 +194,11 @@ const AccountSettings: React.FC = () => {
             />
           </div>
         ))}
+
         {/* Gender */}
         <div className="account-settings-section">
           <label>{fieldLabels.gender}</label>
-          <select
-            name="gender"
-            value={formData.gender || ""}
-            onChange={updateField}
-          >
+          <select name="gender" value={formData.gender || ""} onChange={updateField}>
             {genderOptions.map(({ value, label }) => (
               <option value={value} key={value}>
                 {label}
@@ -205,6 +206,7 @@ const AccountSettings: React.FC = () => {
             ))}
           </select>
         </div>
+
         {/* DOB */}
         <div className="account-settings-section">
           <label>{fieldLabels.dob}</label>
@@ -216,6 +218,7 @@ const AccountSettings: React.FC = () => {
             autoComplete="bday"
           />
         </div>
+
         {/* Favorite Color */}
         <div className="account-settings-section">
           <label>{fieldLabels.favoriteColor}</label>
@@ -226,6 +229,7 @@ const AccountSettings: React.FC = () => {
             onChange={updateField}
           />
         </div>
+
         {/* Bio */}
         <div className="account-settings-section">
           <label>{fieldLabels.bio}</label>
@@ -236,6 +240,7 @@ const AccountSettings: React.FC = () => {
             maxLength={200}
           />
         </div>
+
         {/* Sports Picker */}
         <div className="account-settings-section">
           <label>{fieldLabels.sports}</label>
@@ -254,10 +259,7 @@ const AccountSettings: React.FC = () => {
             ))}
           </div>
           <div className="account-settings-sport-picker">
-            <select
-              value={newSport}
-              onChange={(e) => setNewSport(e.target.value)}
-            >
+            <select value={newSport} onChange={(e) => setNewSport(e.target.value)}>
               <option value="">-- Select a sport --</option>
               {allowedSports
                 .filter((sport) => !formData.sports.includes(sport))
@@ -276,16 +278,13 @@ const AccountSettings: React.FC = () => {
             </button>
           </div>
         </div>
+
         <button type="submit" className="account-settings-save-button">
           Save Changes
         </button>
-        <hr
-          style={{
-            margin: "2rem 0",
-            border: "none",
-            borderTop: "1px solid #333",
-          }}
-        />
+
+        <hr style={{ margin: "2rem 0", border: "none", borderTop: "1px solid #333" }} />
+
         <div className="account-settings-section">
           <button
             type="button"
