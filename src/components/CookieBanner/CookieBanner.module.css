@@ -1,8 +1,22 @@
 .cookieBanner {
-  /* existing styles */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background-color: #fff;
+  border-top: 1px solid #ccc;
 }
 
 .ctaButton {
   background-color: #a23c20;
-  /* other button styles */
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.ctaButton:hover {
+  background-color: #922f1a;
 }
