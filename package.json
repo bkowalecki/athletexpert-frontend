@@ -9,9 +9,6 @@
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
     "@fortawesome/react-fontawesome": "^0.2.2",
     "@tanstack/react-query": "^5.66.0",
-    "@testing-library/jest-dom": "^5.17.0",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^13.5.0",
     "@types/jest": "^27.5.2",
     "@types/node": "^16.18.108",
     "@types/react": "^18.3.5",
@@ -66,12 +63,18 @@
     ]
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
     "@types/lodash.debounce": "^4.0.9",
     "@types/react-helmet": "^6.1.11",
     "@types/react-modal": "^3.16.3",
     "@types/react-slick": "^0.23.13",
     "@typescript-eslint/parser": "^8.31.0",
     "babel-eslint": "^10.1.0",
+    "jest": "^30.0.4",
+    "jest-environment-jsdom": "^30.0.4",
+    "ts-jest": "^29.4.0",
     "vite-plugin-pwa": "^1.0.0",
     "workbox-cli": "^7.3.0",
     "workbox-webpack-plugin": "^7.3.0"

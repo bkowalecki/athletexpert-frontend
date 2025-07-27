@@ -13,6 +13,7 @@ import { UserProvider } from "./context/UserContext";
 import { SportsProvider } from "./context/SportsContext";
 import AppRoutes from "./AppRoutes";
 import useIsMobilePWA from "./hooks/useIsMobilePWA";
+import CookieConsentBanner from "./features/legal/CookieConsentBanner";
 
 const Footer = React.lazy(() => import("./features/layout/Footer"));
 const PwaNav = React.lazy(() => import("./features/layout/PwaNav"));
@@ -59,6 +60,7 @@ const AppContent: React.FC = React.memo(() => {
           {isMobilePWA && <PwaNav />}
           <Footer />
         </Suspense>
+        <CookieConsentBanner />
       </SportsProvider>
     </div>
   );
