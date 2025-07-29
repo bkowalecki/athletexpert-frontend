@@ -66,7 +66,7 @@ const LatestBlogsSection: React.FC = () => {
         className="latest-blog-section-content"
       >
         <h2 className="latest-blog-heading">
-          <a href="/blog" className="latest-blog-link">Latest</a>
+          <a href="/blog">Latest</a>
         </h2>
         <div className="latest-blog-grid">
           {posts.slice(0, 3).map((post) => (
