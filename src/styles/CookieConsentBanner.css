@@ -26,10 +26,10 @@
 }
 
 .cookie-actions button {
-  background: #a23c20;
+  background: #fff;
   border: none;
   padding: 0.5rem 1rem;
-  color: #fff;
+  color: #000;
   font-weight: 600;
   border-radius: 6px;
   cursor: pointer;
