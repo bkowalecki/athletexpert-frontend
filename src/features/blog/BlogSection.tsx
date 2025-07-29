@@ -65,7 +65,9 @@ const LatestBlogsSection: React.FC = () => {
         viewport={{ once: true }}
         className="latest-blog-section-content"
       >
-        <h2 className="latest-blog-heading">Latest</h2>
+        <h2 className="latest-blog-heading">
+          <a href="/blog" className="latest-blog-link">Latest</a>
+        </h2>
         <div className="latest-blog-grid">
           {posts.slice(0, 3).map((post) => (
             <BlogCard
