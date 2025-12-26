@@ -5,8 +5,10 @@ export interface Product {
   name: string;
   description?: string;
   price: number;
+  listPrice?: number;        // Amazon "ListPrice" (before discount)
   affiliateLink: string;
   imgUrl: string;
+  images?: string[];         // Amazon can return multiple image variants
   brand: string;
   retailer: string;
   isFeatured?: boolean;
@@ -15,18 +17,20 @@ export interface Product {
   slug: string;
   tags?: string[];
   sports: string[];
-  rating?: number;
-  numReviews?: number;
+  rating?: number;           // Amazon "AverageRating"
+  numReviews?: number;       // Amazon "TotalReviewCount"
   category?: string;
-  features?: string[];
+  features?: string[];       // Amazon "ItemInfo.Features"
   source?: string;
   lastSyncedAt?: string;
   isValid?: boolean;
   upc?: string;
   ean?: string;
   gtin?: string;
-  isAmazonFallback?: boolean; // only used on frontend fallbacks
-  trending?: boolean; // in case backend sends it differently
+  isAmazonFallback?: boolean;
+  trending?: boolean;
+  dimensions?: string;       // From Amazon "ItemInfo.ProductInfo" or "ItemDimensions"
+  isPrime?: boolean;         // Amazon Prime eligible
 }
 
 export interface ProductCardProps {

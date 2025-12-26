@@ -12,7 +12,11 @@ import { trackEvent } from "../../util/analytics";
 
 const FALLBACK_IMAGE = "/images/product-fallback.png";
 
-const ProductCard: React.FC<ProductCardProps> = ({
+const ProductCard: React.FC<ProductCardProps & {
+  asin?: string;
+  source?: string;
+  lastSyncedAt?: string;
+}> = ({
   id,
   name,
   brand,
@@ -25,6 +29,9 @@ const ProductCard: React.FC<ProductCardProps> = ({
   isSaving = false,
   isAmazonFallback,
   isTrending,
+  asin,
+  source,
+  lastSyncedAt,
 }) => {
   // Modal state & scroll mgmt
   const [showModal, setShowModal] = useState(false);
@@ -37,13 +44,12 @@ const ProductCard: React.FC<ProductCardProps> = ({
     setImgSrc(imgUrl || FALLBACK_IMAGE);
   }, [imgUrl]);
 
-  // Modal scroll/focus logic
   const toggleModal = (open: boolean) => {
     if (open) {
       setScrollPosition(window.scrollY);
       document.body.style.cssText = `position: fixed; top: -${window.scrollY}px; width: 100%;`;
       setShowModal(true);
-      setTimeout(() => modalImageRef.current?.focus?.(), 50); // focus modal img for a11y
+      setTimeout(() => modalImageRef.current?.focus?.(), 50);
     } else {
       document.body.style.cssText = "";
       window.scrollTo(0, scrollPosition);
@@ -51,31 +57,30 @@ const ProductCard: React.FC<ProductCardProps> = ({
     }
   };
 
-  // ESC closes modal
   useEffect(() => {
     if (!showModal) return;
-    const handleKeyDown = (e: KeyboardEvent) => {
+    const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") toggleModal(false);
     };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
   }, [showModal]);
 
-  // Product view analytics
   const handleCardClick = () => {
     trackEvent("product_view", {
       product_name: name,
       brand,
       isAmazonFallback,
       isTrending,
+      retailer: "Amazon",
+      asin,
+      source,
+      id,
+      slug,
     });
   };
 
-  // Badges array DRY'd
-  const badges = [
-    isTrending && { text: "Trending", className: "ax-badge-trending" },
-    isAmazonFallback && { text: "Amazon", className: "ax-badge-amazon" },
-  ].filter(Boolean) as { text: string; className: string }[];
+  const hasInternalPage = Boolean(id && slug);
 
   return (
     <>
@@ -83,23 +88,12 @@ const ProductCard: React.FC<ProductCardProps> = ({
         className="ax-product-card"
         tabIndex={0}
         role="group"
-        aria-label={`Product card: ${name} by ${brand}`}
+        aria-label={`Product card: ${name}${brand ? ` by ${brand}` : ""}`}
         onClick={handleCardClick}
         onKeyDown={(e: ReactKeyboardEvent<HTMLDivElement>) => {
           if (e.key === "Enter" || e.key === " ") handleCardClick();
         }}
       >
-        {/* Badges */}
-        {badges.length > 0 && (
-          <div className="ax-product-card-badges">
-            {badges.map((badge) => (
-              <span key={badge.text} className={`ax-badge ${badge.className}`}>
-                {badge.text}
-              </span>
-            ))}
-          </div>
-        )}
-
         {/* Image with modal/fallback */}
         <div
           className="ax-product-card-image-wrapper"
@@ -120,32 +114,35 @@ const ProductCard: React.FC<ProductCardProps> = ({
         >
           <img
             src={imgSrc}
-            alt={
-              imgSrc === FALLBACK_IMAGE ? "No product image available" : name
-            }
+            alt={imgSrc === FALLBACK_IMAGE ? "No product image available" : name}
             className="ax-product-card-image"
             loading="lazy"
+            decoding="async"
             draggable={false}
             onError={() => setImgSrc(FALLBACK_IMAGE)}
           />
         </div>
+
         {/* Product info */}
         <div className="ax-product-card-info">
           <div className="ax-product-card-info-top">
-            <Link to={`/products/${slug}`}>
+            {hasInternalPage ? (
+              <Link to={`/products/${slug}`}>
+                <h3 className="ax-product-card-name">{name}</h3>
+              </Link>
+            ) : (
               <h3 className="ax-product-card-name">{name}</h3>
-            </Link>
-            <p className="ax-product-card-brand">{brand}</p>
+            )}
+            {brand && <p className="ax-product-card-brand">{brand}</p>}
             <p className="ax-product-card-price">
               {price != null ? `$${price.toFixed(2)}` : "N/A"}
             </p>
           </div>
+
           <div className="ax-product-card-cta-row">
             {onToggleSave && (
               <button
-                className={`ax-product-card-save-button${
-                  isSaved ? " unsave" : ""
-                }`}
+                className={`ax-product-card-save-button${isSaved ? " unsave" : ""}`}
                 onClick={(e) => {
                   e.stopPropagation();
                   onToggleSave();
@@ -156,10 +153,11 @@ const ProductCard: React.FC<ProductCardProps> = ({
                 {isSaving ? "Saving..." : isSaved ? "Unsave" : "Save"}
               </button>
             )}
+
             <a
               href={affiliateLink}
               target="_blank"
-              rel="noopener noreferrer"
+              rel="sponsored nofollow noopener noreferrer"
               className="ax-product-card-button"
               aria-label="View product on Amazon"
               onClick={(e) => {
@@ -169,16 +167,17 @@ const ProductCard: React.FC<ProductCardProps> = ({
                   product_name: name,
                   brand,
                   affiliateLink,
-                  isAmazonFallback,
+                  retailer: "Amazon",
+                  asin,
+                  source,
                   isTrending,
                 });
-
               }}
-              tabIndex={0}
             >
               View on Amazon
             </a>
           </div>
+
         </div>
       </div>
 

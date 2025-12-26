@@ -4,78 +4,49 @@
     <!-- Essential Metadata -->
     <meta charset="utf-8" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, viewport-fit=cover"
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#A23C20" />
-    <meta
-      name="description"
-      content="AthleteXpert is the ultimate athletic platform for finding personalized sports gear, reading expert blogs, and connecting with your community."
-    />
-    <meta
-      name="keywords"
-      content="sports gear, athletes, personalized fitness, workout equipment, athlete community"
-    />
+    <meta name="description" content="AthleteXpert is the ultimate athletic platform for finding personalized sports gear, reading expert blogs, and connecting with your community." />
+    <meta name="keywords" content="sports gear, athletes, personalized fitness, workout equipment, athlete community" />
+    <meta name="color-scheme" content="light dark" />
     <title>AthleteXpert</title>
 
-    <!-- Canonical URL -->
+    <!-- Canonical -->
     <link rel="canonical" href="https://www.athletexpert.org/" />
-    <!-- <a href="https://www.flaticon.com/free-icons/weightlifting" title="weightlifting icons">Weightlifting icons created by Prosymbols Premium - Flaticon</a> -->
-    
-    <!-- Pinterest verification-->
-    <meta name="p:domain_verify" content="92bac72e91e456b6a48f35ee5525815b"/>
 
-    <!-- Open Graph for Social Sharing -->
+    <!-- Pinterest verification -->
+    <meta name="p:domain_verify" content="92bac72e91e456b6a48f35ee5525815b" />
+
+    <!-- Open Graph -->
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="AthleteXpert" />
     <meta property="og:title" content="AthleteXpert - Find Your Edge" />
-    <meta
-      property="og:description"
-      content="Compare gear, explore expert blogs, and get personalized fitness recommendations at AthleteXpert."
-    />
+    <meta property="og:description" content="Compare gear, explore expert blogs, and get personalized fitness recommendations at AthleteXpert." />
     <meta property="og:image" content="%PUBLIC_URL%/favicon.png" />
     <meta property="og:url" content="https://www.athletexpert.org" />
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="AthleteXpert - Gear Finder" />
-    <meta
-      name="twitter:description"
-      content="Your personal assistant for athletic gear and community."
-    />
+    <meta name="twitter:description" content="Your personal assistant for athletic gear and community." />
     <meta name="twitter:image" content="%PUBLIC_URL%/favicon.png" />
 
-    <!-- Preconnect & Preload -->
+    <!-- Resource Hints -->
+    <link rel="dns-prefetch" href="https://api.athletexpert.org" />
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
     <link rel="preconnect" href="https://api.athletexpert.org" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
-    <link
-      rel="preload"
-      as="video"
-      href="/video/New-Hero-Video.webm"
-      type="video/webm"
-      fetchpriority="high"
-    />
-    <link
-      rel="preload"
-      as="video"
-      href="/video/Hero-Video-MP4.mp4"
-      type="video/mp4"
-      fetchpriority="high"
-    />
-    <link
-      rel="preload"
-      as="image"
-      href="/images/hero-poster.png"
-      fetchpriority="high"
-    />
+    <!-- Preload hero media (keep only if truly above-the-fold and used early) -->
+    <link rel="preload" as="video" href="/video/New-Hero-Video.webm" type="video/webm" fetchpriority="high" />
+    <link rel="preload" as="video" href="/video/Hero-Video-MP4.mp4" type="video/mp4" fetchpriority="high" />
+    <link rel="preload" as="image" href="/images/hero-poster.png" fetchpriority="high" />
 
-    <!-- Favicon & Manifest -->
+    <!-- Icons & Manifest -->
     <link rel="icon" href="%PUBLIC_URL%/favicon.png" />
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/favicon.png" />
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-
-    
 
     <!-- Fonts (Great Vibes) -->
     <link
@@ -95,43 +66,40 @@
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
-      integrity="sha512-..."
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     />
+    <!-- If you want SRI, replace with the real hash:
+    integrity="sha512-<actual-hash>" -->
 
     <!-- Google Analytics -->
-    <script
-      async
-      src="https://www.googletagmanager.com/gtag/js?id=G-MDEBHQKJDK"
-    ></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-MDEBHQKJDK"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
-      function gtag() {
-        dataLayer.push(arguments);
-      }
+      function gtag(){ dataLayer.push(arguments); }
       gtag("js", new Date());
       gtag("config", "G-MDEBHQKJDK");
     </script>
 
-<script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": "AthleteXpert",
-    "alternateName": "Athlete Xpert",
-    "url": "https://www.athletexpert.org"
-  }
-  </script>
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    "name": "AthleteXpert",
-    "url": "https://www.athletexpert.org",
-    "logo": "https://www.athletexpert.org/favicon.png"
-  }
-  </script>
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "AthleteXpert",
+        "alternateName": "Athlete Xpert",
+        "url": "https://www.athletexpert.org"
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "AthleteXpert",
+        "url": "https://www.athletexpert.org",
+        "logo": "https://www.athletexpert.org/favicon.png"
+      }
+    </script>
   </head>
 
   <body>

@@ -148,16 +148,16 @@ a:-webkit-any-link {
     transition: transform 0.4s cubic-bezier(0.25, 1.3, 0.5, 1.05), opacity 0.25s ease-in;
   }
 
-  .nav-links.mobile-menu-closing {
-    visibility: visible;
-    opacity: 0;
-    transform: translateY(-100%);
-    pointer-events: none;
-    align-items: end;
-    background: black;
-    padding-bottom: 1rem;
-    transition: transform 0.5s ease-in, opacity 0.3s ease-in;
-  }
+.nav-links.mobile-menu-closing {
+  visibility: visible; /* Stay visible while animating out */
+  opacity: 0;
+  transform: translateY(-100%);
+  pointer-events: none;
+  align-items: end;
+  background: black;
+  padding-bottom: 1rem;
+  transition: transform 0.4s cubic-bezier(0.5, -0.1, 0.25, 0.9), opacity 0.25s ease-out;
+}
 
   .mobile-search {
     margin: 15px auto 0;

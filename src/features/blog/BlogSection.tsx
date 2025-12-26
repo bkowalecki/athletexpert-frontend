@@ -10,7 +10,6 @@ import { fetchSavedBlogIds, toggleSaveBlog as toggleSaveBlogApi } from "../../ap
 import "../../styles/BlogSection.css";
 
 const LatestBlogsSection: React.FC = () => {
-  // 1. Blogs
   const { data: posts, isLoading, isError } = useQuery<BlogPost[], Error>({
     queryKey: ["latestBlogs"],
     queryFn: () => fetchLatestBlogs(3),
@@ -18,8 +17,7 @@ const LatestBlogsSection: React.FC = () => {
     retry: 1,
   });
 
-  // 2. Saved blog IDs (for user save/unsave)
-  const { user, isSessionChecked } = useUserContext();
+  const { user } = useUserContext();
   const [savedBlogIds, setSavedBlogIds] = useState<number[]>([]);
 
   useEffect(() => {
@@ -32,7 +30,6 @@ const LatestBlogsSection: React.FC = () => {
       .catch(() => setSavedBlogIds([]));
   }, [user]);
 
-  // 3. Save/unsave blog logic
   const toggleSaveBlog = useCallback(
     async (blogId: number) => {
       if (!user) return toast.warn("Log in to save blogs!");
@@ -50,12 +47,9 @@ const LatestBlogsSection: React.FC = () => {
     [user, savedBlogIds]
   );
 
-  // 4. Session check (if you want to HIDE this section until session/user is loaded)
-  if (!isSessionChecked) return null;
   if (isLoading) return <div className="loading">Loading latest blogs...</div>;
   if (isError || !posts) return <div className="error">Error loading blogs. Try again later.</div>;
 
-  // 5. Render
   return (
     <section className="latest-blog-section-container">
       <motion.div
@@ -65,9 +59,8 @@ const LatestBlogsSection: React.FC = () => {
         viewport={{ once: true }}
         className="latest-blog-section-content"
       >
-        <h2 className="latest-blog-heading">
-          Latest
-        </h2>
+        <h2 className="latest-blog-heading">Latest</h2>
+
         <div className="latest-blog-grid">
           {posts.slice(0, 3).map((post) => (
             <BlogCard

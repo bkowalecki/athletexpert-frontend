@@ -3,6 +3,7 @@ import { useUserContext } from "../../context/UserContext";
 import { useNavigate } from "react-router-dom";
 import { blogTemplates } from "../../data/blogTemplates";
 import { toast } from "react-toastify";
+import DOMPurify from "dompurify";
 import "../../styles/NewBlogPost.css";
 import {
   fetchAllBlogs,
@@ -13,7 +14,6 @@ import {
 import { searchProducts } from "../../api/product";
 import { BlogPost, BlogPostForm } from "../../types/blogs";
 
-// Replace with your real product search type!
 interface Product {
   id: number;
   name: string;
@@ -43,37 +43,35 @@ const NewBlogPost: React.FC = () => {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [showBlogs, setShowBlogs] = useState(false);
 
-  // Product search for embed
   const [productSearch, setProductSearch] = useState("");
   const [productResults, setProductResults] = useState<Product[]>([]);
-  const productTimeout = useRef<NodeJS.Timeout>();
+  const productTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Focus on title at mount for speed
   const titleRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
     titleRef.current?.focus();
   }, []);
 
-  // Blog draft load/save
   useEffect(() => {
     const saved = localStorage.getItem("blog-draft");
     if (saved) setFormData(JSON.parse(saved));
   }, []);
+
   useEffect(() => {
     localStorage.setItem("blog-draft", JSON.stringify(formData));
   }, [formData]);
 
-  // Fetch blogs on mount
   useEffect(() => {
     fetchAllBlogs()
       .then((data) => setBlogs(data || []))
       .catch(() => {});
   }, []);
 
-  // ======== Product Search (auto debounce, uses your /api/product) ==========
   useEffect(() => {
     if (productSearch.length < 2) return setProductResults([]);
+
     if (productTimeout.current) clearTimeout(productTimeout.current);
+
     productTimeout.current = setTimeout(async () => {
       try {
         const results = await searchProducts(productSearch);
@@ -82,13 +80,13 @@ const NewBlogPost: React.FC = () => {
         setProductResults([]);
       }
     }, 400);
-    // eslint-disable-next-line
+
+    return () => {
+      if (productTimeout.current) clearTimeout(productTimeout.current);
+    };
   }, [productSearch]);
 
-  // ======== Handlers =============
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
@@ -136,7 +134,6 @@ const NewBlogPost: React.FC = () => {
     }
   };
 
-  // ======== Insert product embed ==========
   const insertProductEmbed = (product: Product) => {
     const embed = `
 <div class="ax-product-embed">
@@ -156,28 +153,6 @@ const NewBlogPost: React.FC = () => {
     setProductSearch("");
   };
 
-  // ======== AI Draft Writer (Optional) ==========
-  // const generateAIBlog = async () => {
-  //   toast.info("Drafting with AI...");
-  //   try {
-      
-  //     const res = await fetch("/api/ai/generate-blog", {
-  //       method: "POST",
-  //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify({
-  //         title: formData.title,
-  //         summary: formData.summary,
-  //         sport: formData.sport,
-  //       }),
-  //     });
-  //     const data = await res.json();
-  //     setFormData((prev) => ({ ...prev, content: data.content }));
-  //   } catch {
-  //     toast.error("AI drafting failed.");
-  //   }
-  // };
-
-  // ======== Submit ==========
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -198,7 +173,6 @@ const NewBlogPost: React.FC = () => {
     }
   };
 
-  // ======== UI ==========
   if (user?.role !== "admin") {
     return (
       <div className="admin-lockout">
@@ -208,6 +182,8 @@ const NewBlogPost: React.FC = () => {
       </div>
     );
   }
+
+  const sanitizedPreview = DOMPurify.sanitize(formData.content || "");
 
   return (
     <div className="new-blog-container">
@@ -232,11 +208,7 @@ const NewBlogPost: React.FC = () => {
 
         {formData.imageUrl && (
           <div className="image-preview-wrapper">
-            <img
-              src={formData.imageUrl}
-              alt="Header Preview"
-              className="image-preview"
-            />
+            <img src={formData.imageUrl} alt="Header Preview" className="image-preview" />
           </div>
         )}
 
@@ -248,7 +220,6 @@ const NewBlogPost: React.FC = () => {
         />
         <p className="char-count">Characters: {formData.summary.length}/160</p>
 
-        {/* ===== TAGS ===== */}
         <div>
           <label className="bold-label">Tags</label>
           <input
@@ -276,14 +247,8 @@ const NewBlogPost: React.FC = () => {
         </div>
 
         <label className="bold-label">Published Date</label>
-        <input
-          type="date"
-          name="publishedDate"
-          value={formData.publishedDate}
-          onChange={handleChange}
-        />
+        <input type="date" name="publishedDate" value={formData.publishedDate} onChange={handleChange} />
 
-        {/* ===== FAST PRODUCT SEARCH & EMBED ===== */}
         <div>
           <label className="bold-label">Insert Product</label>
           <input
@@ -307,21 +272,11 @@ const NewBlogPost: React.FC = () => {
                     alt={p.name}
                     width={36}
                     height={36}
-                    style={{
-                      objectFit: "cover",
-                      borderRadius: 4,
-                      marginRight: 8,
-                    }}
+                    style={{ objectFit: "cover", borderRadius: 4, marginRight: 8 }}
                   />
                   {p.name} – <span style={{ color: "#666" }}>{p.brand}</span>
                   {p.price && (
-                    <span
-                      style={{
-                        marginLeft: 8,
-                        color: "#2a6045",
-                        fontWeight: 500,
-                      }}
-                    >
+                    <span style={{ marginLeft: 8, color: "#2a6045", fontWeight: 500 }}>
                       ${p.price}
                     </span>
                   )}
@@ -331,18 +286,6 @@ const NewBlogPost: React.FC = () => {
           )}
         </div>
 
-        {/* ===== AI WRITE BUTTON ===== */}
-        {/* <div className="ai-write-bar">
-          <button
-            type="button"
-            onClick={generateAIBlog}
-            style={{ marginBottom: 8 }}
-          >
-            🪄 Draft Blog with AI (Experimental)
-          </button>
-        </div> */}
-
-        {/* ===== TEMPLATES & CONTENT ===== */}
         <div>
           <label className="bold-label">Blog HTML Content</label>
           <div className="template-buttons">
@@ -361,6 +304,7 @@ const NewBlogPost: React.FC = () => {
               </button>
             ))}
           </div>
+
           <textarea
             name="content"
             value={formData.content}
@@ -369,9 +313,7 @@ const NewBlogPost: React.FC = () => {
             className="blog-html-input"
             rows={12}
           />
-          <p className="word-count">
-            Word Count: {formData.content.trim().split(/\s+/).length}
-          </p>
+          <p className="word-count">Word Count: {formData.content.trim().split(/\s+/).length}</p>
         </div>
 
         <div className="live-preview">
@@ -379,15 +321,13 @@ const NewBlogPost: React.FC = () => {
           <div className="preview-box">
             <div
               className="blog-post-content"
-              dangerouslySetInnerHTML={{ __html: formData.content }}
+              dangerouslySetInnerHTML={{ __html: sanitizedPreview }}
             />
           </div>
         </div>
 
         <div className="button-group">
-          <button type="submit">
-            {editingId ? "Update Blog" : "Publish Blog"}
-          </button>
+          <button type="submit">{editingId ? "Update Blog" : "Publish Blog"}</button>
           {editingId && (
             <button
               type="button"
@@ -409,6 +349,7 @@ const NewBlogPost: React.FC = () => {
             {showBlogs ? "Hide" : "Show"} Existing Blog Posts
           </button>
         </h3>
+
         {showBlogs &&
           blogs.map((b) => (
             <div key={b.id} className="blog-admin-row">
@@ -417,10 +358,7 @@ const NewBlogPost: React.FC = () => {
               </span>
               <div>
                 <button onClick={() => handleEdit(b)}>Edit</button>
-                <button
-                  onClick={() => handleDelete(b.id!)}
-                  className="delete-btn"
-                >
+                <button onClick={() => handleDelete(b.id!)} className="delete-btn">
                   Delete
                 </button>
               </div>

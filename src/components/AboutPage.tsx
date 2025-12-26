@@ -1,132 +1,271 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Helmet } from "react-helmet"; // For SEO
+import { Helmet } from "react-helmet";
 import "../styles/AboutPage.css";
 
-const coreValues = [
+/** Simple count-up on scroll into view (respects reduced motion) */
+const useCountUp = (end: number, duration = 1200) => {
+  const ref = useRef<HTMLSpanElement | null>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduceMotion) {
+      el.textContent = end.toLocaleString();
+      return;
+    }
+
+    let startTime: number | null = null;
+    const startVal = 0;
+
+    const onFrame = (t: number) => {
+      if (startTime === null) startTime = t;
+      const p = Math.min(1, (t - startTime) / duration);
+      const eased = 1 - Math.pow(1 - p, 3); // easeOutCubic
+      const val = Math.round(startVal + (end - startVal) * eased);
+      el.textContent = val.toLocaleString();
+      if (p < 1) requestAnimationFrame(onFrame);
+    };
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          requestAnimationFrame(onFrame);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.3 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [end, duration]);
+
+  return ref;
+};
+
+const NOW_FEATURES = [
   {
-    title: "Excellence",
-    description:
-      "We aim for the highest standards in everything we do, from product curation to community engagement.",
+    title: "Curated Gear Picks",
+    desc: "Tested, trusted product guides across popular sports.",
+    icon: "🏅",
   },
   {
-    title: "Innovation",
-    description:
-      "We embrace new technologies and strategies to enhance athletic performance and gear selection.",
+    title: "Community Threads",
+    desc: "Reddit‑style sport hubs with weekly polls and discussion.",
+    icon: "💬",
   },
   {
-    title: "Community",
-    description:
-      "AthleteXpert is built on a strong foundation of athletes supporting athletes.",
+    title: "Training Insights",
+    desc: "Digestible tips, drills, and playbooks from real athletes.",
+    icon: "📚",
+  },
+];
+
+const ROADMAP = [
+  {
+    title: "Partner Spots",
+    desc: "Rotating featured placements for small brands.",
+    tag: "Beta",
+  },
+  {
+    title: "Athlete Profiles",
+    desc: "Follow athletes, share progress, and build your rep.",
+    tag: "Planned",
+  },
+  {
+    title: "Personalized Recs",
+    desc: "AI‑powered gear picks tuned to you and your sport.",
+    tag: "Planned",
+  },
+  {
+    title: "Event/Meetup Boards",
+    desc: "Local runs, open gyms, and tournament listings.",
+    tag: "Research",
+  },
+];
+
+const FAQ = [
+  {
+    q: "Is AthleteXpert free?",
+    a: "Yes. Core community features and content are free. Partner placements and pro tools will be optional add‑ons later.",
+  },
+  {
+    q: "How do I become a featured partner?",
+    a: "Start on our Partners page. We’re piloting case studies with small brands before formal contracts.",
+  },
+  {
+    q: "What makes your product picks trustworthy?",
+    a: "We combine hands‑on testing, athlete feedback, and data signals. If we wouldn’t use it ourselves, it doesn’t make the list.",
   },
 ];
 
 const testimonials = [
   {
     text:
-      "AthleteXpert gave me the tools and knowledge to upgrade my training like never before.",
-    author: "Alex Johnson, Pro Basketball Player",
+      "AthleteXpert helped me cut through the noise and focus on drills that actually moved the needle.",
+    author: "Jordan M., D1 Guard",
   },
   {
     text:
-      "The expert recommendations and smart gear insights have helped me improve my endurance and performance.",
-    author: "Sarah Lee, Triathlete",
+      "The community vibe is legit. Picked up better gear and a few training partners.",
+    author: "Priya K., Weekend Triathlete",
   },
 ];
 
 const AboutPage: React.FC = () => {
   const navigate = useNavigate();
-
-  const handleAuthPageNavigation = () => {
-    navigate("/auth");
-  };
+  const usersRef = useCountUp(5400);
+  const postsRef = useCountUp(12800);
+  const partnersRef = useCountUp(24);
 
   return (
     <main className="about-page-container" role="main">
       <Helmet>
-        <title>About AthleteXpert | The Future of Sports Innovation</title>
+        <title>About AthleteXpert | Train Smarter. Gear Better. Together.</title>
         <meta
           name="description"
-          content="Discover AthleteXpert—your go-to community for athletes, with expert gear recommendations, training insights, and an empowering athlete network."
+          content="AthleteXpert blends community, expert picks, and data-backed training to help athletes level up. See what we offer today and what’s coming next."
         />
       </Helmet>
 
+      {/* Hero */}
       <section className="about-page-hero-section">
         <div className="about-page-hero-content">
+          <p className="about-page-eyebrow" aria-hidden="true">
+            Athlete‑led. Data‑driven.
+          </p>
           <h1 className="about-page-hero-title">
             The Future of Sports Innovation
           </h1>
           <p className="about-page-hero-description">
-            From grassroots to greatness, we bring together cutting-edge
-            technology, expert insights, and a driven community to help athletes
-            at every stage push further and achieve more.
+            We’re building the most helpful corner of the internet for athletes:
+            honest gear picks, practical training insights, and a community that
+            actually shows up for each other.
           </p>
-          <button
-            className="about-page-hero-button"
-            onClick={handleAuthPageNavigation}
-            aria-label="Join AthleteXpert Community"
-          >
-            Join the Community
-          </button>
+          <div className="about-page-cta-row">
+            <button
+              className="about-page-hero-button primary"
+              onClick={() => navigate("/auth")}
+            >
+              Join the Community
+            </button>
+            <button
+              className="about-page-hero-button outline"
+              onClick={() => navigate("/partners")}
+            >
+              Partner With Us
+            </button>
+          </div>
         </div>
       </section>
 
-      <section className="about-page-sections">
-        <div className="about-page-card">
-          <h2 className="about-page-card-title">Our Purpose</h2>
-          <p className="about-page-card-description">
-            We exist to empower athletes. Whether you're just starting or
-            competing at the highest level, AthleteXpert is your go-to resource
-            for expertly curated gear, in-depth training insights, and a
-            supportive community that helps you succeed.
-          </p>
+      {/* KPIs */}
+      <section className="about-page-kpis" aria-label="Community impact">
+        <div className="kpi">
+          <span ref={usersRef} className="kpi-value" aria-label="Estimated users">
+            0
+          </span>
+          <span className="kpi-label">Athletes Reached</span>
         </div>
-
-        <div className="about-page-card about-page-highlight-card">
-          <h2 className="about-page-card-title">What Sets Us Apart</h2>
-          <p className="about-page-card-description">
-            We combine expert-driven recommendations with innovative tracking
-            tools, giving athletes a competitive edge. Our curated selection
-            ensures that every product we showcase is tested, trusted, and built
-            for performance.
-          </p>
+        <div className="kpi">
+          <span ref={postsRef} className="kpi-value" aria-label="Posts and comments">
+            0
+          </span>
+          <span className="kpi-label">Posts & Comments</span>
         </div>
-
-        <div className="about-page-card">
-          <h2 className="about-page-card-title">Join the Movement</h2>
-          <p className="about-page-card-description">
-            AthleteXpert is more than a platform—it's a community. Connect with
-            athletes who share your passion, get early access to game-changing
-            gear, and take your performance to new heights.
-          </p>
+        <div className="kpi">
+          <span ref={partnersRef} className="kpi-value" aria-label="Brand partners">
+            0
+          </span>
+          <span className="kpi-label">Brand Partners</span>
         </div>
       </section>
 
-      <section className="about-page-values-section" aria-labelledby="core-values-title">
-        <h2 id="core-values-title" className="about-page-section-title">
-          Our Core Values
+      {/* What we offer now */}
+      <section className="about-page-sections" aria-labelledby="offer-title">
+        <h2 id="offer-title" className="about-page-section-title">
+          What You Get Today
         </h2>
-        <div className="about-page-values-list">
-          {coreValues.map((val) => (
-            <div className="about-page-value-item" key={val.title}>
-              <h3>{val.title}</h3>
-              <p>{val.description}</p>
-            </div>
+        <div className="about-page-cards">
+          {NOW_FEATURES.map((f) => (
+            <article className="about-page-card" key={f.title}>
+              <div className="about-page-card-icon" aria-hidden="true">
+                {f.icon}
+              </div>
+              <h3 className="about-page-card-title">{f.title}</h3>
+              <p className="about-page-card-description">{f.desc}</p>
+            </article>
           ))}
         </div>
       </section>
 
+      {/* Roadmap */}
+      <section className="about-page-roadmap" aria-labelledby="roadmap-title">
+        <h2 id="roadmap-title" className="about-page-section-title">
+          Where We’re Headed
+        </h2>
+        <div className="about-page-roadmap-grid">
+          {ROADMAP.map((item) => (
+            <article className="roadmap-card" key={item.title}>
+              <span className={`roadmap-tag ${item.tag.toLowerCase()}`}>{item.tag}</span>
+              <h3 className="roadmap-title">{item.title}</h3>
+              <p className="roadmap-desc">{item.desc}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      {/* Testimonials */}
       <section className="about-page-testimonial-section" aria-labelledby="testimonials-title">
         <h2 id="testimonials-title" className="about-page-section-title">
           What Athletes Say
         </h2>
         <div className="about-page-testimonials">
           {testimonials.map((t, i) => (
-            <div className="about-page-testimonial-card" key={i}>
-              <p className="about-page-testimonial-text">{`"${t.text}"`}</p>
-              <p className="about-page-testimonial-author">— {t.author}</p>
-            </div>
+            <figure className="about-page-testimonial-card" key={i}>
+              <blockquote className="about-page-testimonial-text">“{t.text}”</blockquote>
+              <figcaption className="about-page-testimonial-author">— {t.author}</figcaption>
+            </figure>
           ))}
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="about-page-faq" aria-labelledby="faq-title">
+        <h2 id="faq-title" className="about-page-section-title">FAQ</h2>
+        <div className="faq-list">
+          {FAQ.map((item) => (
+            <details className="faq-item" key={item.q}>
+              <summary className="faq-q">{item.q}</summary>
+              <p className="faq-a">{item.a}</p>
+            </details>
+          ))}
+        </div>
+      </section>
+
+      {/* Final CTA */}
+      <section className="about-page-final-cta" aria-label="Get started">
+        <div className="final-cta-card">
+          <h2 className="final-cta-title">Ready to level up?</h2>
+          <p className="final-cta-sub">
+            Join free, vote in weekly polls, and get smarter about your sport.
+            If you’re a brand, let’s build something athletes actually love.
+          </p>
+          <div className="about-page-cta-row">
+            <button
+              className="about-page-hero-button primary"
+              onClick={() => navigate("/auth")}
+            >
+              Join Free
+            </button>
+            <button
+              className="about-page-hero-button outline light"
+              onClick={() => navigate("/partners")}
+            >
+              Partner Inquiry
+            </button>
+          </div>
         </div>
       </section>
     </main>

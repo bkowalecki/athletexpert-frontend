@@ -4,6 +4,7 @@ import sportsData from "../../data/sports.json";
 import "../../styles/SportPage.css";
 import ProductCard from "../products/ProductCard";
 import BlogCard from "../blog/BlogCard";
+import SportWeeklyPoll from "../community/SportWeeklyPoll";
 import { BlogPost } from "../../types/blogs";
 import { fetchBlogsByTag } from "../../api/blog";
 import { fetchProductsBySport } from "../../api/product";
@@ -108,6 +109,8 @@ const SportPage: React.FC = () => {
   return (
     <div className="sport-page">
       <div className="sport-page-title">{currentSport.title}</div>
+
+      <SportWeeklyPoll sportSlug={slug!} />
 
       {/* Recommended Gear Section */}
       <section className="sport-page-section">
