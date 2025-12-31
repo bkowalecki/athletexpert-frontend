@@ -9,6 +9,11 @@ const CSRF_COOKIE_NAME = "XSRF-TOKEN";
 const CSRF_HEADER_NAME = "X-XSRF-TOKEN";
 const REQUEST_TIMEOUT_MS = 15_000;
 
+// Endpoints that commonly 401/403 during normal boot (should NOT hard-redirect)
+const NO_REDIRECT_PATHS = new Set([
+  "/users/session", // bootstrapping check
+]);
+
 // --- Safe cookie reader ---
 function getCookie(name: string): string | null {
   if (typeof document === "undefined") return null;
@@ -16,11 +21,29 @@ function getCookie(name: string): string | null {
   const cookies = document.cookie.split("; ");
   for (const cookie of cookies) {
     const [key, value] = cookie.split("=");
-    if (key === name) {
-      return decodeURIComponent(value);
-    }
+    if (key === name) return decodeURIComponent(value);
   }
   return null;
+}
+
+function shouldRedirectToAuth(error: AxiosError): boolean {
+  const status = error.response?.status;
+  if (status !== 401 && status !== 403) return false;
+
+  const url = error.config?.url ?? "";
+  // If this is a session bootstrap call, don't redirect.
+  // Axios config.url may be relative; we match suffix.
+  for (const p of NO_REDIRECT_PATHS) {
+    if (url.endsWith(p) || url.includes(p)) return false;
+  }
+
+  // Avoid redirect loops if already on auth page
+  if (typeof window !== "undefined") {
+    const path = window.location.pathname;
+    if (path === "/auth") return false;
+  }
+
+  return true;
 }
 
 // --- Axios instance ---
@@ -52,13 +75,10 @@ api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
 api.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
-    const status = error.response?.status;
-
-    if (status === 401) {
+    if (shouldRedirectToAuth(error)) {
       // Clear any cached auth artifacts
       sessionStorage.removeItem("ax_id_token");
 
-      // Hard redirect keeps behavior consistent outside React tree
       if (typeof window !== "undefined") {
         window.location.assign("/auth");
       }
