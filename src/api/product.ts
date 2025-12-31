@@ -7,20 +7,26 @@ import type { Product } from "../types/products";
 type ID = number | string;
 type ReqOpts = { signal?: AbortSignal };
 
-// Centralize admin opts
-const ADMIN_OPTS = { withCredentials: true } as const;
-
 // Useful constants
 const TRENDING_DEFAULT_LIMIT = 3;
 const TRENDING_MAX_LIMIT = 6;
 
+const asIdParam = (id: ID) => encodeURIComponent(String(id));
+const asSlugParam = (slug: string) => encodeURIComponent(slug);
+
+const clampLimit = (limit: number) => {
+  const n = Number.isFinite(limit) ? Math.floor(limit) : TRENDING_DEFAULT_LIMIT;
+  return Math.max(1, Math.min(TRENDING_MAX_LIMIT, n));
+};
+
 /**
- * NOTE: If your Product type currently requires `id: number`,
+ * NOTE:
+ * If your Product type currently requires `id: number`,
  * consider making it optional: `id?: number`
  * because /trending-live items may be live (not stored) and have no DB id.
  */
 
-// Fetch all products (optionally paginated/filterable if your backend supports)
+// Fetch all products
 export const fetchProducts = async (opts?: ReqOpts): Promise<Product[]> => {
   const { data } = await api.get<Product[]>("/products", { signal: opts?.signal });
   return Array.isArray(data) ? data : [];
@@ -28,7 +34,7 @@ export const fetchProducts = async (opts?: ReqOpts): Promise<Product[]> => {
 
 // Fetch a single product by id (or stringified id)
 export const fetchProductById = async (id: ID, opts?: ReqOpts): Promise<Product> => {
-  const { data } = await api.get<Product>(`/products/${encodeURIComponent(String(id))}`, {
+  const { data } = await api.get<Product>(`/products/${asIdParam(id)}`, {
     signal: opts?.signal,
   });
   return data;
@@ -42,7 +48,7 @@ export const fetchFeaturedProducts = async (opts?: ReqOpts): Promise<Product[]> 
 
 // Fetch related products for a given product
 export const fetchRelatedProducts = async (productId: ID, opts?: ReqOpts): Promise<Product[]> => {
-  const { data } = await api.get<Product[]>(`/products/${encodeURIComponent(String(productId))}/related`, {
+  const { data } = await api.get<Product[]>(`/products/${asIdParam(productId)}/related`, {
     signal: opts?.signal,
   });
   return Array.isArray(data) ? data : [];
@@ -66,18 +72,20 @@ export const bulkFetchProducts = async (ids: ID[], opts?: ReqOpts): Promise<Prod
 };
 
 // Create new product (admin)
-export const createProduct = async (product: Omit<Product, "id">) => {
-  return api.post("/products/admin", product, ADMIN_OPTS);
+export const createProduct = async (product: Omit<Product, "id">): Promise<Product> => {
+  const { data } = await api.post<Product>("/products/admin", product);
+  return data;
 };
 
 // Update existing product (admin)
-export const updateProduct = async (id: ID, product: Partial<Product>) => {
-  return api.put(`/products/admin/${encodeURIComponent(String(id))}`, product, ADMIN_OPTS);
+export const updateProduct = async (id: ID, product: Partial<Product>): Promise<Product> => {
+  const { data } = await api.put<Product>(`/products/admin/${asIdParam(id)}`, product);
+  return data;
 };
 
 // Delete product (admin)
-export const deleteProduct = async (id: ID) => {
-  return api.delete(`/products/admin/${encodeURIComponent(String(id))}`, ADMIN_OPTS);
+export const deleteProduct = async (id: ID): Promise<void> => {
+  await api.delete(`/products/admin/${asIdParam(id)}`);
 };
 
 /**
@@ -90,7 +98,7 @@ export const fetchTrendingLiveProducts = async (
   limit: number = TRENDING_DEFAULT_LIMIT,
   opts?: ReqOpts
 ): Promise<Product[]> => {
-  const clamped = Math.max(1, Math.min(TRENDING_MAX_LIMIT, limit | 0));
+  const clamped = clampLimit(limit);
   const { data } = await api.get<Product[]>("/products/trending-live", {
     params: { sport: sport?.trim() || undefined, limit: clamped },
     signal: opts?.signal,
@@ -100,8 +108,7 @@ export const fetchTrendingLiveProducts = async (
 
 /**
  * Back-compat alias: previously hit /products/trending (DB).
- * Now we default to the live endpoint. If you still want the DB version,
- * keep a second function like `fetchTrendingFromDb` that calls /products/trending.
+ * Now defaults to the live endpoint.
  */
 export const fetchTrendingProducts = async (opts?: ReqOpts): Promise<Product[]> => {
   const { data } = await api.get<Product[]>("/products/trending-live", {
@@ -111,13 +118,13 @@ export const fetchTrendingProducts = async (opts?: ReqOpts): Promise<Product[]> 
   return Array.isArray(data) ? data : [];
 };
 
-// Optionally: DB-backed trending only (kept in case you ever need it)
+// DB-backed trending (kept in case you ever need it)
 export const fetchTrendingFromDb = async (opts?: ReqOpts): Promise<Product[]> => {
   const { data } = await api.get<Product[]>("/products/trending", { signal: opts?.signal });
   return Array.isArray(data) ? data : [];
 };
 
-// Optionally: Fetch products by sport (DB-backed)
+// Fetch products by sport (DB-backed)
 export const fetchProductsBySport = async (sport: string, opts?: ReqOpts): Promise<Product[]> => {
   const s = sport.trim();
   const { data } = await api.get<Product[]>("/products/by-sport", {
@@ -130,10 +137,10 @@ export const fetchProductsBySport = async (sport: string, opts?: ReqOpts): Promi
 /**
  * Fetch by slug.
  * If your backend uses the same /products/:param route for both id and slug,
- * make sure your server disambiguates numeric slugs appropriately.
+ * ensure server disambiguation (e.g., numeric slugs).
  */
 export async function fetchProductBySlug(slug: string, opts?: ReqOpts): Promise<Product> {
-  const { data } = await api.get<Product>(`/products/${encodeURIComponent(slug)}`, {
+  const { data } = await api.get<Product>(`/products/${asSlugParam(slug)}`, {
     signal: opts?.signal,
   });
   return data;

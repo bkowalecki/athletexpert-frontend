@@ -1,9 +1,10 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
+import { toast } from "react-toastify";
+
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { register } from "./serviceWorkerRegistration";
-import { toast } from "react-toastify";
 import "./styles/index.css";
 
 const rootEl = document.getElementById("root");
@@ -13,7 +14,7 @@ if (!rootEl) {
   throw new Error('Root element "#root" not found.');
 }
 
-const root = ReactDOM.createRoot(rootEl as HTMLElement);
+const root = ReactDOM.createRoot(rootEl);
 
 root.render(
   <React.StrictMode>
@@ -21,22 +22,33 @@ root.render(
   </React.StrictMode>
 );
 
-// Measure performance
+// Measure performance (pass a callback to log/send metrics if desired)
+// e.g. reportWebVitals(console.log);
 reportWebVitals();
 
 // Register service worker
 register({
   onUpdate: (registration) => {
-    if (registration?.waiting) {
-      toast.info("A new version is available! Click here to update.", {
-        position: "bottom-center",
-        autoClose: false,
-        closeOnClick: true,
-        onClick: () => {
-          registration.waiting?.postMessage({ type: "SKIP_WAITING" });
+    const waitingSW = registration?.waiting;
+    if (!waitingSW) return;
+
+    // Prevent duplicate "update available" toasts if onUpdate fires multiple times
+    const TOAST_ID = "sw-update-available";
+
+    toast.info("A new version is available! Click here to update.", {
+      toastId: TOAST_ID,
+      position: "bottom-center",
+      autoClose: false,
+      closeOnClick: true,
+      onClick: () => {
+        // Ask the waiting SW to activate immediately
+        waitingSW.postMessage({ type: "SKIP_WAITING" });
+
+        // Reload shortly after; avoids edge cases where reload happens before control swaps
+        setTimeout(() => {
           window.location.reload();
-        },
-      });
-    }
+        }, 150);
+      },
+    });
   },
 });

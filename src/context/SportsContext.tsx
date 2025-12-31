@@ -6,7 +6,7 @@ import React, {
 } from "react";
 import sportsData from "../data/sports.json";
 
-interface Sport {
+export interface Sport {
   title: string;
   backgroundImage: string;
   extra_data: {
@@ -18,7 +18,7 @@ interface Sport {
 }
 
 interface SportsContextType {
-  sports: Sport[];
+  sports: readonly Sport[];
 }
 
 const SportsContext = createContext<SportsContextType | undefined>(undefined);
@@ -26,15 +26,26 @@ const SportsContext = createContext<SportsContextType | undefined>(undefined);
 // Robust custom hook
 export function useSports(): SportsContextType {
   const context = useContext(SportsContext);
-  if (!context) throw new Error("useSports must be used within a SportsProvider");
+  if (!context) {
+    throw new Error("useSports must be used within a SportsProvider");
+  }
   return context;
 }
 
+// Static, immutable sports list (module-level, loaded once)
+const SPORTS: readonly Sport[] = Object.freeze(
+  sportsData as Sport[]
+);
+
 export const SportsProvider: React.FC<PropsWithChildren> = ({ children }) => {
-  // No need for useState since sports never changes (immutable)
-  const sports = useMemo(() => sportsData as Sport[], []);
-  const value = useMemo(() => ({ sports }), [sports]);
+  const value = useMemo(
+    () => ({ sports: SPORTS }),
+    []
+  );
+
   return (
-    <SportsContext.Provider value={value}>{children}</SportsContext.Provider>
+    <SportsContext.Provider value={value}>
+      {children}
+    </SportsContext.Provider>
   );
 };

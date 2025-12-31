@@ -6,39 +6,67 @@ import "../styles/AboutPage.css";
 /** Simple count-up on scroll into view (respects reduced motion) */
 const useCountUp = (end: number, duration = 1200) => {
   const ref = useRef<HTMLSpanElement | null>(null);
+
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
 
-    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    // Guard for non-browser/test environments
+    if (typeof window === "undefined") {
+      el.textContent = String(end);
+      return;
+    }
+
+    const formatter = new Intl.NumberFormat(undefined);
+
+    const reduceMotion =
+      window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false;
+
     if (reduceMotion) {
-      el.textContent = end.toLocaleString();
+      el.textContent = formatter.format(end);
+      return;
+    }
+
+    // If IntersectionObserver isn't available, just set final value (no regression risk)
+    if (typeof window.IntersectionObserver === "undefined") {
+      el.textContent = formatter.format(end);
       return;
     }
 
     let startTime: number | null = null;
-    const startVal = 0;
+    let rafId: number | null = null;
+    let started = false;
 
     const onFrame = (t: number) => {
       if (startTime === null) startTime = t;
       const p = Math.min(1, (t - startTime) / duration);
       const eased = 1 - Math.pow(1 - p, 3); // easeOutCubic
-      const val = Math.round(startVal + (end - startVal) * eased);
-      el.textContent = val.toLocaleString();
-      if (p < 1) requestAnimationFrame(onFrame);
+      const val = Math.round(end * eased);
+      el.textContent = formatter.format(val);
+
+      if (p < 1) {
+        rafId = window.requestAnimationFrame(onFrame);
+      }
     };
 
     const observer = new IntersectionObserver(
       (entries) => {
+        if (started) return;
         if (entries.some((e) => e.isIntersecting)) {
-          requestAnimationFrame(onFrame);
+          started = true;
+          rafId = window.requestAnimationFrame(onFrame);
           observer.disconnect();
         }
       },
       { threshold: 0.3 }
     );
+
     observer.observe(el);
-    return () => observer.disconnect();
+
+    return () => {
+      observer.disconnect();
+      if (rafId !== null) window.cancelAnimationFrame(rafId);
+    };
   }, [end, duration]);
 
   return ref;
@@ -52,7 +80,7 @@ const NOW_FEATURES = [
   },
   {
     title: "Community Threads",
-    desc: "Reddit‑style sport hubs with weekly polls and discussion.",
+    desc: "Reddit-style sport hubs with weekly polls and discussion.",
     icon: "💬",
   },
   {
@@ -60,7 +88,7 @@ const NOW_FEATURES = [
     desc: "Digestible tips, drills, and playbooks from real athletes.",
     icon: "📚",
   },
-];
+] as const;
 
 const ROADMAP = [
   {
@@ -75,7 +103,7 @@ const ROADMAP = [
   },
   {
     title: "Personalized Recs",
-    desc: "AI‑powered gear picks tuned to you and your sport.",
+    desc: "AI-powered gear picks tuned to you and your sport.",
     tag: "Planned",
   },
   {
@@ -83,12 +111,12 @@ const ROADMAP = [
     desc: "Local runs, open gyms, and tournament listings.",
     tag: "Research",
   },
-];
+] as const;
 
 const FAQ = [
   {
     q: "Is AthleteXpert free?",
-    a: "Yes. Core community features and content are free. Partner placements and pro tools will be optional add‑ons later.",
+    a: "Yes. Core community features and content are free. Partner placements and pro tools will be optional add-ons later.",
   },
   {
     q: "How do I become a featured partner?",
@@ -96,9 +124,9 @@ const FAQ = [
   },
   {
     q: "What makes your product picks trustworthy?",
-    a: "We combine hands‑on testing, athlete feedback, and data signals. If we wouldn’t use it ourselves, it doesn’t make the list.",
+    a: "We combine hands-on testing, athlete feedback, and data signals. If we wouldn’t use it ourselves, it doesn’t make the list.",
   },
-];
+] as const;
 
 const testimonials = [
   {
@@ -111,7 +139,7 @@ const testimonials = [
       "The community vibe is legit. Picked up better gear and a few training partners.",
     author: "Priya K., Weekend Triathlete",
   },
-];
+] as const;
 
 const AboutPage: React.FC = () => {
   const navigate = useNavigate();
@@ -133,7 +161,7 @@ const AboutPage: React.FC = () => {
       <section className="about-page-hero-section">
         <div className="about-page-hero-content">
           <p className="about-page-eyebrow" aria-hidden="true">
-            Athlete‑led. Data‑driven.
+            Athlete-led. Data-driven.
           </p>
           <h1 className="about-page-hero-title">
             The Future of Sports Innovation
@@ -145,12 +173,14 @@ const AboutPage: React.FC = () => {
           </p>
           <div className="about-page-cta-row">
             <button
+              type="button"
               className="about-page-hero-button primary"
               onClick={() => navigate("/auth")}
             >
               Join the Community
             </button>
             <button
+              type="button"
               className="about-page-hero-button outline"
               onClick={() => navigate("/partners")}
             >
@@ -208,7 +238,9 @@ const AboutPage: React.FC = () => {
         <div className="about-page-roadmap-grid">
           {ROADMAP.map((item) => (
             <article className="roadmap-card" key={item.title}>
-              <span className={`roadmap-tag ${item.tag.toLowerCase()}`}>{item.tag}</span>
+              <span className={`roadmap-tag ${item.tag.toLowerCase()}`}>
+                {item.tag}
+              </span>
               <h3 className="roadmap-title">{item.title}</h3>
               <p className="roadmap-desc">{item.desc}</p>
             </article>
@@ -217,15 +249,22 @@ const AboutPage: React.FC = () => {
       </section>
 
       {/* Testimonials */}
-      <section className="about-page-testimonial-section" aria-labelledby="testimonials-title">
+      <section
+        className="about-page-testimonial-section"
+        aria-labelledby="testimonials-title"
+      >
         <h2 id="testimonials-title" className="about-page-section-title">
           What Athletes Say
         </h2>
         <div className="about-page-testimonials">
           {testimonials.map((t, i) => (
             <figure className="about-page-testimonial-card" key={i}>
-              <blockquote className="about-page-testimonial-text">“{t.text}”</blockquote>
-              <figcaption className="about-page-testimonial-author">— {t.author}</figcaption>
+              <blockquote className="about-page-testimonial-text">
+                “{t.text}”
+              </blockquote>
+              <figcaption className="about-page-testimonial-author">
+                — {t.author}
+              </figcaption>
             </figure>
           ))}
         </div>
@@ -233,7 +272,9 @@ const AboutPage: React.FC = () => {
 
       {/* FAQ */}
       <section className="about-page-faq" aria-labelledby="faq-title">
-        <h2 id="faq-title" className="about-page-section-title">FAQ</h2>
+        <h2 id="faq-title" className="about-page-section-title">
+          FAQ
+        </h2>
         <div className="faq-list">
           {FAQ.map((item) => (
             <details className="faq-item" key={item.q}>
@@ -254,12 +295,14 @@ const AboutPage: React.FC = () => {
           </p>
           <div className="about-page-cta-row">
             <button
+              type="button"
               className="about-page-hero-button primary"
               onClick={() => navigate("/auth")}
             >
               Join Free
             </button>
             <button
+              type="button"
               className="about-page-hero-button outline light"
               onClick={() => navigate("/partners")}
             >

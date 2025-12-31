@@ -1,11 +1,23 @@
-import React, { useEffect, useState, useCallback, useRef, useMemo } from "react";
+import React, {
+  useEffect,
+  useState,
+  useCallback,
+  useRef,
+  useMemo,
+} from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Helmet } from "react-helmet";
-import { useUserContext } from "../../context/UserContext";
 import { toast } from "react-toastify";
+
+import { useUserContext } from "../../context/UserContext";
 import { BlogPost } from "../../types/blogs";
 import { trackEvent } from "../../util/analytics";
-import { fetchBlogs, fetchSavedBlogIds, toggleSaveBlogApi } from "../../api/blog";
+import { fetchBlogs } from "../../api/blog";
+import {
+  fetchSavedBlogIds,
+  toggleSaveBlog as toggleSaveBlogApi,
+} from "../../api/user";
+
 import BlogCard from "./BlogCard";
 import "../../styles/BlogPage.css";
 
@@ -25,103 +37,101 @@ const SPORTS = [
 const PAGE_SIZE = 9;
 
 const BlogPage: React.FC = () => {
+  const { user } = useUserContext();
+
   const [inputQuery, setInputQuery] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedSport, setSelectedSport] = useState("");
   const [currentPage, setCurrentPage] = useState(0);
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [hasMorePosts, setHasMorePosts] = useState(true);
-  const [savedBlogIds, setSavedBlogIds] = useState<number[]>([]);
-  const { user } = useUserContext();
 
-  const origin = typeof window !== "undefined" ? window.location.origin : "https://www.athletexpert.org";
+  const origin =
+    typeof window !== "undefined"
+      ? window.location.origin
+      : "https://www.athletexpert.org";
   const canonicalUrl = `${origin}/blog`;
 
-  const { data, isLoading, isFetching, error } = useQuery<BlogPost[], Error>({
-    queryKey: ["posts", searchQuery, currentPage, selectedSport],
+  // ---- BLOG POSTS ----
+  const {
+    data: blogData,
+    isLoading,
+    isFetching,
+    error,
+  } = useQuery<BlogPost[], Error>({
+    queryKey: ["blogs", { searchQuery, selectedSport, page: currentPage }],
     queryFn: () => fetchBlogs(searchQuery, currentPage, selectedSport),
     enabled: searchQuery.length < 100,
     staleTime: 5_000,
     refetchOnWindowFocus: false,
   });
 
-  useEffect(() => {
-    let cancelled = false;
-    if (!user) {
-      setSavedBlogIds([]);
-      return;
-    }
-    fetchSavedBlogIds()
-      .then((ids) => {
-        if (!cancelled) setSavedBlogIds(ids);
-      })
-      .catch((err) => {
-        if (!cancelled) setSavedBlogIds([]);
-        console.error("❌ Error fetching saved blogs:", err);
-      });
+  // ---- SAVED BLOG IDS ----
+  const { data: savedBlogIds = [] } = useQuery<number[]>({
+    queryKey: ["savedBlogs", user?.username],
+    queryFn: fetchSavedBlogIds,
+    enabled: !!user,
+    staleTime: 60_000,
+  });
 
-    return () => {
-      cancelled = true;
-    };
-  }, [user]);
-
+  // ---- MERGE PAGINATED RESULTS ----
   useEffect(() => {
-    if (error && currentPage === 0) toast.error("❌ Error fetching blog posts.");
-  }, [error, currentPage]);
-
-  useEffect(() => {
-    if (!data) return;
+    if (!blogData) return;
 
     setPosts((prev) => {
-      if (currentPage === 0) return data;
+      if (currentPage === 0) return blogData;
 
       const seen = new Set(prev.map((p) => p.id));
-      const merged = [...prev, ...data.filter((p) => !seen.has(p.id))];
-      return merged;
+      return [...prev, ...blogData.filter((p) => !seen.has(p.id))];
     });
 
-    setHasMorePosts((data?.length ?? 0) >= PAGE_SIZE);
-  }, [data, currentPage]);
+    setHasMorePosts(blogData.length >= PAGE_SIZE);
+  }, [blogData, currentPage]);
 
+  // ---- ERROR HANDLING ----
+  useEffect(() => {
+    if (error && currentPage === 0) {
+      toast.error("❌ Error fetching blog posts.");
+    }
+  }, [error, currentPage]);
+
+  // ---- INFINITE SCROLL ----
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    if (!loadMoreRef.current) return;
-    if (!hasMorePosts) return;
+    if (!loadMoreRef.current || !hasMorePosts) return;
 
-    const el = loadMoreRef.current;
     const observer = new IntersectionObserver(
-      (entries) => {
-        const first = entries[0];
-        if (first.isIntersecting && !isFetching) {
-          setCurrentPage((prev) => prev + 1);
+      ([entry]) => {
+        if (entry.isIntersecting && !isFetching) {
+          setCurrentPage((p) => p + 1);
         }
       },
       { rootMargin: "400px 0px" }
     );
 
-    observer.observe(el);
-    return () => observer.unobserve(el);
-  }, [isFetching, hasMorePosts]);
+    observer.observe(loadMoreRef.current);
+    return () => observer.disconnect();
+  }, [hasMorePosts, isFetching]);
 
-  const toggleSaveBlog = useCallback(
+  // ---- SAVE / UNSAVE ----
+  const handleToggleSaveBlog = useCallback(
     async (blogId: number) => {
       if (!user) return toast.warn("Log in to save blogs!");
+
       const isSaved = savedBlogIds.includes(blogId);
 
       try {
         await toggleSaveBlogApi(blogId, isSaved);
-        setSavedBlogIds((prev) =>
-          isSaved ? prev.filter((id) => id !== blogId) : [...prev, blogId]
-        );
         toast.success(isSaved ? "Removed!" : "Saved!");
       } catch {
-        toast.error("Couldn't save blog :/ Please try again later.");
+        toast.error("Couldn't save blog. Please try again.");
       }
     },
     [savedBlogIds, user]
   );
 
+  // ---- SEARCH ----
   const handleSearchSubmit = (e?: React.FormEvent) => {
     e?.preventDefault();
     const q = inputQuery.trim();
@@ -138,17 +148,19 @@ const BlogPage: React.FC = () => {
     const sport = e.target.value;
 
     setSelectedSport(sport);
+    setSearchQuery(inputQuery.trim());
     setCurrentPage(0);
     setPosts([]);
     setHasMorePosts(true);
-    setSearchQuery(inputQuery.trim());
   };
 
   const handleLoadMoreClick = useCallback(() => {
-    if (!isFetching && hasMorePosts) setCurrentPage((p) => p + 1);
+    if (!isFetching && hasMorePosts) {
+      setCurrentPage((p) => p + 1);
+    }
   }, [hasMorePosts, isFetching]);
 
-  // ✅ JSON-LD for blog index + list of visible posts
+  // ---- SEO JSON-LD ----
   const jsonLd = useMemo(() => {
     const itemList = posts.slice(0, 25).map((p, idx) => ({
       "@type": "ListItem",
@@ -162,8 +174,6 @@ const BlogPage: React.FC = () => {
       "@type": "CollectionPage",
       name: "AthleteXpert Blog",
       url: canonicalUrl,
-      description:
-        "Expert gear reviews, deals, and buying guides for pickleball, golf, running, and more.",
       mainEntity: {
         "@type": "ItemList",
         itemListElement: itemList,
@@ -179,24 +189,7 @@ const BlogPage: React.FC = () => {
           name="description"
           content="Expert gear reviews, deals, and buying guides for pickleball, golf, running, and more."
         />
-
         <link rel="canonical" href={canonicalUrl} />
-
-        <meta property="og:type" content="website" />
-        <meta property="og:title" content="AthleteXpert Blog" />
-        <meta
-          property="og:description"
-          content="Expert gear reviews, deals, and buying guides for pickleball, golf, running, and more."
-        />
-        <meta property="og:url" content={canonicalUrl} />
-
-        <meta name="twitter:card" content="summary" />
-        <meta name="twitter:title" content="AthleteXpert Blog" />
-        <meta
-          name="twitter:description"
-          content="Expert gear reviews, deals, and buying guides for pickleball, golf, running, and more."
-        />
-
         <script type="application/ld+json">{jsonLd}</script>
       </Helmet>
 
@@ -216,6 +209,7 @@ const BlogPage: React.FC = () => {
           aria-label="Search blog posts"
           maxLength={100}
         />
+
         <select
           value={selectedSport}
           onChange={handleSportChange}
@@ -228,12 +222,13 @@ const BlogPage: React.FC = () => {
             </option>
           ))}
         </select>
+
         <button type="submit" className="blog-search-button">
           Search
         </button>
       </form>
 
-      <div className="blog-post-list" aria-busy={isLoading || isFetching ? "true" : "false"}>
+      <div className="blog-post-list">
         {isLoading && posts.length === 0 ? (
           Array.from({ length: PAGE_SIZE }).map((_, i) => (
             <div key={i} className="blog-post-item skeleton-loader" />
@@ -242,33 +237,23 @@ const BlogPage: React.FC = () => {
           posts.map((post) => (
             <BlogCard
               key={post.id}
-              id={post.id}
-              title={post.title}
-              author={post.author}
-              slug={post.slug}
-              imageUrl={post.imageUrl}
-              publishedDate={post.publishedDate}
-              summary={post.summary}
+              {...post}
               variant="list"
               isSaved={savedBlogIds.includes(post.id)}
-              onSave={() => toggleSaveBlog(post.id)}
-              onUnsave={() => toggleSaveBlog(post.id)}
+              onSave={() => handleToggleSaveBlog(post.id)}
+              onUnsave={() => handleToggleSaveBlog(post.id)}
             />
           ))
         ) : (
-          <div className="no-posts-message">No blog posts match your search.</div>
+          <div className="no-posts-message">No blog posts found.</div>
         )}
       </div>
 
-      {/* Infinite scroll sentinel */}
       <div ref={loadMoreRef} />
 
-      {/* ✅ Fallback control (good for UX + crawlers + “no scroll” scenarios) */}
       {hasMorePosts && !isFetching && posts.length > 0 && (
-        <div style={{ display: "flex", justifyContent: "center", marginTop: 16 }}>
-          <button type="button" className="blog-search-button" onClick={handleLoadMoreClick}>
-            Load more
-          </button>
+        <div style={{ textAlign: "center", marginTop: 16 }}>
+          <button onClick={handleLoadMoreClick}>Load more</button>
         </div>
       )}
 

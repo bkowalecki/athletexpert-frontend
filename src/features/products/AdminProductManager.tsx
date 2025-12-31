@@ -11,10 +11,18 @@ import {
 import "../../styles/NewProduct.css";
 import type { Product } from "../../types/products";
 
-const emptyProduct: Omit<Product, "id"> = {
+/**
+ * Admin-only form type:
+ * sports is ALWAYS an array here (even if Product.sports is optional elsewhere)
+ */
+type ProductForm = Omit<Product, "id" | "sports"> & {
+  sports: string[];
+};
+
+const emptyProduct: ProductForm = {
   name: "",
   brand: "",
-  price: 0,
+  price: null,
   imgUrl: "",
   affiliateLink: "",
   sports: [],
@@ -23,31 +31,41 @@ const emptyProduct: Omit<Product, "id"> = {
   slug: "",
 };
 
+const toFormProduct = (p: Product): ProductForm => ({
+  ...p,
+  price: typeof p.price === "number" ? p.price : null,
+  sports: Array.isArray(p.sports) ? p.sports : [],
+});
+
 const AdminProductManager: React.FC = () => {
   const { user } = useUserContext();
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
 
   const [products, setProducts] = useState<Product[]>([]);
-  const [formData, setFormData] = useState<Omit<Product, "id">>(emptyProduct);
+  const [formData, setFormData] = useState<ProductForm>(emptyProduct);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
+
   const [sportInput, setSportInput] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+
   const [filter, setFilter] = useState("");
   const [sortOption, setSortOption] = useState("recent");
 
+  // Guard admin access
   useEffect(() => {
-    if (user?.role !== "admin") navigate("/");
+    if (user && user.role !== "admin") {
+      navigate("/", { replace: true });
+    }
   }, [user, navigate]);
 
-  // Fetch all products
   const loadProducts = useCallback(async () => {
     setLoading(true);
     try {
       const data = await fetchProducts();
-      setProducts(data);
+      setProducts(Array.isArray(data) ? data : []);
     } catch {
       setError("Error loading products.");
     } finally {
@@ -60,16 +78,14 @@ const AdminProductManager: React.FC = () => {
   }, [loadProducts]);
 
   useEffect(() => {
-    if (error || success) {
-      const timeout = setTimeout(() => {
-        setError(null);
-        setSuccess(null);
-      }, 2000);
-      return () => clearTimeout(timeout);
-    }
+    if (!error && !success) return;
+    const t = setTimeout(() => {
+      setError(null);
+      setSuccess(null);
+    }, 2500);
+    return () => clearTimeout(t);
   }, [error, success]);
 
-  // Search products
   const handleSearchSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!filter.trim()) return loadProducts();
@@ -77,7 +93,7 @@ const AdminProductManager: React.FC = () => {
     setLoading(true);
     try {
       const data = await searchProducts(filter.trim());
-      setProducts(data);
+      setProducts(Array.isArray(data) ? data : []);
     } catch {
       setError("Error searching products.");
     } finally {
@@ -85,35 +101,34 @@ const AdminProductManager: React.FC = () => {
     }
   };
 
-  // Handle form field changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: name === "price" ? Number(value.replace(/[^\d.]/g, "")) : value,
+      [name]:
+        name === "price"
+          ? value === ""
+            ? null
+            : Number(value.replace(/[^\d.]/g, ""))
+          : value,
     }));
   };
 
-  // Handle sports input
   const handleSportKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && sportInput.trim()) {
       e.preventDefault();
       const newSport = sportInput.trim();
-      if (!(formData.sports ?? []).includes(newSport)) {
+      if (!formData.sports.includes(newSport)) {
         setFormData((prev) => ({
           ...prev,
-          sports: [...(prev.sports ?? []), newSport],
+          sports: [...prev.sports, newSport],
         }));
       }
       setSportInput("");
-    } else if (
-      e.key === "Backspace" &&
-      !sportInput &&
-      (formData.sports ?? []).length
-    ) {
+    } else if (e.key === "Backspace" && !sportInput && formData.sports.length) {
       setFormData((prev) => ({
         ...prev,
-        sports: (prev.sports ?? []).slice(0, -1),
+        sports: prev.sports.slice(0, -1),
       }));
     }
   };
@@ -121,54 +136,58 @@ const AdminProductManager: React.FC = () => {
   const removeSport = (sportToRemove: string) => {
     setFormData((prev) => ({
       ...prev,
-      sports: (prev.sports ?? []).filter((s) => s !== sportToRemove),
+      sports: prev.sports.filter((s) => s !== sportToRemove),
     }));
   };
 
-  // Submit form for create/update
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (loading) return;
+
+    if (!formData.name.trim() || !formData.brand.trim()) {
+      setError("Name and brand are required.");
+      return;
+    }
+
+    if (formData.price != null && formData.price < 0) {
+      setError("Price must be positive.");
+      return;
+    }
+
+    const payload: Omit<Product, "id"> = {
+      ...formData,
+      sports: formData.sports.length ? formData.sports : undefined,
+    };
+
     try {
-      if (!formData.name.trim() || !formData.brand.trim()) {
-        setError("Name and brand are required.");
-        return;
-      }
-      if (formData.price < 0) {
-        setError("Price must be positive.");
-        return;
-      }
+      setLoading(true);
       if (editingId) {
-        await updateProduct(editingId, formData);
+        await updateProduct(editingId, payload);
         setSuccess("Product updated!");
       } else {
-        await createProduct(formData);
+        await createProduct(payload);
         setSuccess("Product created!");
       }
+
       setFormData(emptyProduct);
       setEditingId(null);
-      loadProducts();
+      await loadProducts();
       inputRef.current?.focus();
     } catch {
       setError("Error saving product.");
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Edit mode
   const handleEdit = (product: Product) => {
     if (!window.confirm(`Edit "${product.name}"?`)) return;
-    // Strip id for form, just in case
-    const { id, ...rest } = product;
-    setFormData({
-      ...rest,
-      price: Number(product.price),
-      sports: rest.sports ?? [],
-    });
-    setEditingId(product.id ?? null);
+    setFormData(toFormProduct(product));
+    setEditingId(product.id);
     window.scrollTo({ top: 0, behavior: "smooth" });
     setTimeout(() => inputRef.current?.focus(), 100);
   };
 
-  // Delete
   const handleDelete = async (id: number) => {
     if (!window.confirm("Delete this product?")) return;
     try {
@@ -191,14 +210,15 @@ const AdminProductManager: React.FC = () => {
       );
     })
     .sort((a, b) => {
-      if (sortOption === "priceAsc") return a.price - b.price;
-      if (sortOption === "priceDesc") return b.price - a.price;
-      return (b.id || 0) - (a.id || 0);
+      if (sortOption === "priceAsc") return (a.price ?? 0) - (b.price ?? 0);
+      if (sortOption === "priceDesc") return (b.price ?? 0) - (a.price ?? 0);
+      return b.id - a.id;
     });
 
   return (
     <div className="new-product-container" style={{ maxWidth: "100%", padding: "2rem" }}>
       <h2>{editingId ? "Edit Product" : "Add New Product"}</h2>
+
       {error && <p className="error-message">{error}</p>}
       {success && <p className="success-message">{success}</p>}
 
@@ -210,31 +230,16 @@ const AdminProductManager: React.FC = () => {
               ref={i === 0 ? inputRef : undefined}
               name={field}
               type={field === "price" ? "number" : "text"}
-              value={formData[field as keyof typeof formData] as any}
+              value={(formData as any)[field] ?? ""}
               onChange={handleChange}
               placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
               min={field === "price" ? 0 : undefined}
               step={field === "price" ? "0.01" : undefined}
               required={field !== "affiliateLink" && field !== "asin"}
               autoComplete="off"
-              style={field === "price" ? { maxWidth: 100 } : {}}
+              style={field === "price" ? { maxWidth: 120 } : {}}
             />
           )
-        )}
-
-        {formData.imgUrl && (
-          <img
-            src={formData.imgUrl}
-            alt="Preview"
-            style={{
-              maxHeight: "140px",
-              marginBottom: "0.5rem",
-              borderRadius: "6px",
-              background: "#fff",
-              padding: "0.5rem",
-              objectFit: "contain",
-            }}
-          />
         )}
 
         <input
@@ -244,8 +249,9 @@ const AdminProductManager: React.FC = () => {
           onKeyDown={handleSportKeyDown}
           placeholder="Add sports (Enter to confirm, Backspace to remove last)"
         />
+
         <div className="tag-preview">
-          {(formData.sports ?? []).map((sport) => (
+          {formData.sports.map((sport) => (
             <span key={sport} className="tag-chip">
               {sport}
               <button type="button" onClick={() => removeSport(sport)}>
@@ -255,10 +261,15 @@ const AdminProductManager: React.FC = () => {
           ))}
         </div>
 
-        <button type="submit">{editingId ? "Update Product" : "Create Product"}</button>
+        <button type="submit" disabled={loading}>
+          {editingId ? "Update Product" : "Create Product"}
+        </button>
       </form>
 
-      <form onSubmit={handleSearchSubmit} style={{ display: "flex", gap: "1rem", margin: "1rem 0" }}>
+      <form
+        onSubmit={handleSearchSubmit}
+        style={{ display: "flex", gap: "1rem", margin: "1rem 0" }}
+      >
         <input
           type="text"
           placeholder="Search by name, brand, sport, or ASIN"
@@ -283,7 +294,9 @@ const AdminProductManager: React.FC = () => {
             <div key={p.id} className="product-item">
               <img src={p.imgUrl} alt={p.name} />
               <div>
-                <strong>{p.name}</strong> – ${p.price.toFixed(2)} <br />
+                <strong>{p.name}</strong>{" "}
+                {typeof p.price === "number" && `– $${p.price.toFixed(2)}`}
+                <br />
                 <small>{p.brand}</small>
                 {p.asin && <p>ASIN: {p.asin}</p>}
                 <div>
@@ -295,7 +308,7 @@ const AdminProductManager: React.FC = () => {
                 </div>
               </div>
               <button onClick={() => handleEdit(p)}>✏️ Edit</button>
-              <button onClick={() => handleDelete(p.id!)}>🗑 Delete</button>
+              <button onClick={() => handleDelete(p.id)}>🗑 Delete</button>
             </div>
           ))
         )}
@@ -304,4 +317,4 @@ const AdminProductManager: React.FC = () => {
   );
 };
 
-export default AdminProductManager;
+export default React.memo(AdminProductManager);

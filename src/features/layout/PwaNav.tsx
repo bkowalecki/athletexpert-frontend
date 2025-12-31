@@ -1,45 +1,83 @@
-import React, { useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import React, { useEffect, useState, useCallback } from "react";
+import { NavLink, useLocation } from "react-router-dom";
 import "../../styles/PwaNav.css";
 
+interface NavItem {
+  path: string;
+  label: string;
+  icon: string;
+}
+
+const NAV_ITEMS: NavItem[] = [
+  { path: "/", label: "Home", icon: "🏠" },
+  { path: "/community", label: "Community", icon: "👥" },
+  { path: "/products", label: "Products", icon: "🛍️" },
+  { path: "/blog", label: "Blog", icon: "📝" },
+  { path: "/profile", label: "Profile", icon: "👤" },
+];
+
+const MOBILE_BREAKPOINT = 768;
+
 const PwaNav: React.FC = () => {
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
-  const { pathname } = useLocation();
+  const location = useLocation();
+  const [isMobile, setIsMobile] = useState(false);
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  // --- Hook MUST be before any early return ---
+  const isActive = useCallback(
+    (path: string) =>
+      path === "/"
+        ? location.pathname === "/"
+        : location.pathname.startsWith(path),
+    [location.pathname]
+  );
 
   useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth <= 768);
+    const update = () => {
+      setIsMobile(window.innerWidth <= MOBILE_BREAKPOINT);
     };
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+
+    update();
+    window.addEventListener("resize", update);
+    setIsHydrated(true);
+
+    return () => window.removeEventListener("resize", update);
   }, []);
 
-  if (!isMobile) return null;
+  const isStandalone =
+    typeof window !== "undefined" &&
+    (window.matchMedia("(display-mode: standalone)").matches ||
+      // iOS Safari
+      (navigator as any).standalone);
 
-  const getClassName = (path: string) =>
-    pathname === path || pathname.startsWith(path) ? "active" : "";
+  const shouldShow = isHydrated && isMobile && isStandalone;
+  if (!shouldShow) return null;
 
   return (
-    <nav className="pwa-nav">
-      <Link to="/" className={getClassName("/")}>
-        <i className="fas fa-home" />
-      </Link>
-      <Link to="/blog" className={getClassName("/blog")}>
-        <i className="fas fa-newspaper" />
-      </Link>
-      <div className="pwa-nav-center-button-wrapper">
-        <Link to="/search" className={`search-button ${getClassName("/search")}`}>
-          <i className="fas fa-search" />
-        </Link>
-      </div>
-      <Link to="/products" className={getClassName("/products")}>
-        <i className="fas fa-box-open" />
-      </Link>
-      <Link to="/profile" className={getClassName("/profile") || getClassName("/auth")}>
-        <i className="fas fa-user" />
-      </Link>
+    <nav
+      className="pwa-nav"
+      role="navigation"
+      aria-label="Primary mobile navigation"
+    >
+      {NAV_ITEMS.map((item) => {
+        const active = isActive(item.path);
+
+        return (
+          <NavLink
+            key={item.path}
+            to={item.path}
+            className={`pwa-nav-item ${active ? "active" : ""}`}
+            aria-current={active ? "page" : undefined}
+          >
+            <span className="pwa-nav-icon" aria-hidden="true">
+              {item.icon}
+            </span>
+            <span className="pwa-nav-label">{item.label}</span>
+          </NavLink>
+        );
+      })}
     </nav>
   );
 };
 
-export default PwaNav;
+export default React.memo(PwaNav);

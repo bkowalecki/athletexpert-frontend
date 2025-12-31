@@ -4,19 +4,22 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { useUserContext } from "../../context/UserContext";
 import { loginWithAuth0Token } from "../../util/authUtils";
 import { trackEvent } from "../../util/analytics";
-import { toast } from "react-toastify"; 
-import { loginUser, registerUser } from "../../api/user"; // <-- add this
+import { toast } from "react-toastify";
+import { loginUser, registerUser } from "../../api/user";
 import "../../styles/AuthPage.css";
+
+const AUTH0_SCOPE = "openid profile email";
 
 const AuthPage: React.FC = () => {
   const navigate = useNavigate();
   const { setUser, user, isSessionChecked } = useUserContext();
+
   const {
-    getAccessTokenSilently,
     isAuthenticated,
     loginWithPopup,
     getIdTokenClaims,
     user: auth0User,
+    isLoading: auth0IsLoading,
   } = useAuth0();
 
   const [isLogin, setIsLogin] = useState(true);
@@ -28,13 +31,19 @@ const AuthPage: React.FC = () => {
   });
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Prevent repeated background SSO attempts
   const hasAttemptedSSO = useRef(false);
 
+  // If session already exists, bounce to profile
   useEffect(() => {
     if (isSessionChecked && user) navigate("/profile", { replace: true });
   }, [isSessionChecked, user, navigate]);
 
+  // If Auth0 is already authenticated (e.g. returning user) but our backend session/user isn't set, attempt SSO once.
   useEffect(() => {
+    if (auth0IsLoading) return;
+
     if (
       isSessionChecked &&
       isAuthenticated &&
@@ -45,8 +54,10 @@ const AuthPage: React.FC = () => {
       hasAttemptedSSO.current = true;
       handleSSO();
     }
-  }, [isSessionChecked, isAuthenticated, auth0User, user]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [auth0IsLoading, isSessionChecked, isAuthenticated, auth0User, user]);
 
+  // Session expired message from backend/interceptor
   useEffect(() => {
     const expired = sessionStorage.getItem("sessionExpired");
     if (expired) {
@@ -57,10 +68,14 @@ const AuthPage: React.FC = () => {
 
   const handleSSO = async () => {
     try {
-      const accessToken = await getAccessTokenSilently();
-      await loginWithAuth0Token({ token: accessToken, setUser, navigate });
+      // Use ID token (consistent with AuthCallback + Google SSO)
+      const idToken = (await getIdTokenClaims())?.__raw;
+      if (!idToken) throw new Error("No ID Token claims received.");
+
+      await loginWithAuth0Token({ token: idToken, setUser, navigate });
     } catch (err) {
-      console.error("Error during Auth0 login:", err);
+      console.error("Error during Auth0 SSO:", err);
+      // Don’t hard error the page; user can still log in manually
     }
   };
 
@@ -71,41 +86,57 @@ const AuthPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
+
     setIsSubmitting(true);
     setError(null);
-  
-    if (!isLogin && formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match.");
+
+    const email = formData.email.trim();
+    const username = formData.username.trim();
+    const password = formData.password;
+
+    if (!email) {
+      setError("Email is required.");
       setIsSubmitting(false);
       return;
     }
-  
-    try {
-      let userData;
-      if (isLogin) {
-        userData = await loginUser({
-          email: formData.email,
-          password: formData.password,
-        });
-      } else {
-        userData = await registerUser({
-          username: formData.username,
-          email: formData.email,
-          password: formData.password,
-        });
+
+    if (!isLogin) {
+      if (!username) {
+        setError("Username is required.");
+        setIsSubmitting(false);
+        return;
       }
-      setUser(userData);
-      trackEvent("login_success", { method: isLogin ? "email" : "register" });
-  
+      if (password !== formData.confirmPassword) {
+        setError("Passwords do not match.");
+        setIsSubmitting(false);
+        return;
+      }
+    }
+
+    try {
+      let userData: any;
+
       if (isLogin) {
+        userData = await loginUser({ email, password });
+        trackEvent("login_success", { method: "email" });
         navigate("/profile", { replace: true });
       } else {
-        navigate(userData.isActive ? "/profile" : "/account-setup", {
+        userData = await registerUser({ username, email, password });
+        trackEvent("login_success", { method: "register" });
+
+        navigate(userData?.isActive ? "/profile" : "/account-setup", {
           replace: true,
         });
       }
+
+      setUser(userData);
     } catch (err: any) {
-      setError(err?.response?.data?.message || err.message || "Something went wrong. Try again.");
+      setError(
+        err?.response?.data?.message ||
+          err?.message ||
+          "Something went wrong. Try again."
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -116,7 +147,7 @@ const AuthPage: React.FC = () => {
       await loginWithPopup({
         authorizationParams: {
           audience: process.env.REACT_APP_AUTH0_AUDIENCE,
-          scope: "openid profile email",
+          scope: AUTH0_SCOPE,
           connection: "google-oauth2",
         },
       });
@@ -126,6 +157,7 @@ const AuthPage: React.FC = () => {
 
       trackEvent("login_success", { method: "google" });
       trackEvent("user_signup", { method: "google", email: auth0User?.email });
+
       await loginWithAuth0Token({ token: idToken, setUser, navigate });
     } catch (err) {
       console.error("Google SSO Error:", err);
@@ -151,8 +183,10 @@ const AuthPage: React.FC = () => {
               value={formData.username}
               onChange={handleChange}
               required
+              autoComplete="username"
             />
           )}
+
           <input
             type="email"
             name="email"
@@ -161,7 +195,9 @@ const AuthPage: React.FC = () => {
             value={formData.email}
             onChange={handleChange}
             required
+            autoComplete="email"
           />
+
           <input
             type="password"
             name="password"
@@ -170,7 +206,9 @@ const AuthPage: React.FC = () => {
             value={formData.password}
             onChange={handleChange}
             required
+            autoComplete={isLogin ? "current-password" : "new-password"}
           />
+
           {!isLogin && (
             <input
               type="password"
@@ -180,8 +218,10 @@ const AuthPage: React.FC = () => {
               value={formData.confirmPassword}
               onChange={handleChange}
               required
+              autoComplete="new-password"
             />
           )}
+
           <button type="submit" disabled={isSubmitting}>
             {isSubmitting ? "Processing..." : isLogin ? "Login" : "Register"}
           </button>
@@ -196,6 +236,7 @@ const AuthPage: React.FC = () => {
           onClick={handleGoogleLogin}
           disabled={isSubmitting}
           aria-label="Sign in with Google"
+          type="button"
         >
           <div className="gsi-material-button-content-wrapper">
             <div className="gsi-material-button-icon">
@@ -223,30 +264,22 @@ const AuthPage: React.FC = () => {
                 />
               </svg>
             </div>
-            <span className="gsi-material-button-contents">
-              Sign in with Google
-            </span>
+            <span className="gsi-material-button-contents">Sign in with Google</span>
           </div>
         </button>
 
         <p className="toggle-auth">
           {isLogin ? (
             <>
-              Don't have an account?{" "}
-              <span
-                className="toggle-auth-link"
-                onClick={() => setIsLogin(false)}
-              >
+              Don&apos;t have an account?{" "}
+              <span className="toggle-auth-link" onClick={() => setIsLogin(false)}>
                 Register here
               </span>
             </>
           ) : (
             <>
               Already have an account?{" "}
-              <span
-                className="toggle-auth-link"
-                onClick={() => setIsLogin(true)}
-              >
+              <span className="toggle-auth-link" onClick={() => setIsLogin(true)}>
                 Login
               </span>
             </>

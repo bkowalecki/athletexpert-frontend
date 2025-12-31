@@ -11,7 +11,7 @@ import type { Product } from "../../types/products";
 import type { BlogPost } from "../../types/blogs";
 import { useSavedProducts } from "../../hooks/useSavedProducts";
 import "../../styles/Globals.css";
-import "../../styles/ProfilePage.css"; // replace with the new CSS below
+import "../../styles/ProfilePage.css";
 import api from "../../api/axios";
 
 interface Profile {
@@ -24,8 +24,8 @@ interface Profile {
   savedProductIds?: number[];
   location?: string | null;
   authProvider?: "auth0" | "local" | string;
-  isPublic?: boolean; // optional for backwards compatibility
-  publicSlug?: string; // slug for public profile URL
+  isPublic?: boolean;
+  publicSlug?: string;
 }
 
 type TabKey = "overview" | "blogs" | "products";
@@ -48,7 +48,6 @@ const ProfilePage: React.FC = () => {
   const { logout: auth0Logout } = useAuth0();
   const { savedProductIds, toggleSaveProduct } = useSavedProducts();
 
-  // ===== Helpers =====
   const initials = useMemo(() => {
     const f = profile?.firstName?.[0] ?? "";
     const l = profile?.lastName?.[0] ?? "";
@@ -82,10 +81,21 @@ const ProfilePage: React.FC = () => {
   const blogCount = savedBlogs.length;
   const productCount = savedProducts.length;
 
-  // ===== Data Fetching =====
+  const formatShortDate = (iso?: string) =>
+    iso
+      ? new Date(iso).toLocaleDateString(undefined, {
+          month: "short",
+          day: "numeric",
+        })
+      : "";
+
+  // ---------- Saved Blogs ----------
   const fetchSavedBlogs = useCallback(
     async (ids: number[], signal?: AbortSignal) => {
-      if (!ids?.length) return setSavedBlogs([]);
+      if (!ids?.length) {
+        setSavedBlogs([]);
+        return;
+      }
       try {
         const { data } = await api.post(
           "/blog/bulk-fetch",
@@ -102,26 +112,32 @@ const ProfilePage: React.FC = () => {
     []
   );
 
+  // ---------- Activity types ----------
   type ActivityItem =
     | { type: "blog_save"; label: string; href: string; date: string }
     | { type: "product_save"; label: string; href: string; date: string }
     | { type: "comment"; label: string; href: string; date: string }
     | { type: "vote"; label: string; href: string; date: string };
 
-  const formatShortDate = (iso?: string) =>
-    iso
-      ? new Date(iso).toLocaleDateString(undefined, {
-          month: "short",
-          day: "numeric",
-        })
-      : "";
+  const blogSaved = (b: BlogPost): ActivityItem => ({
+    type: "blog_save",
+    label: `Saved blog: ${b.title}`,
+    href: `/blog/${b.slug}`,
+    date: b.publishedDate ?? new Date().toISOString(),
+  });
 
-  // --- 1) Activity Streak (client-only heatmap) ---
+  const productSaved = (p: Product): ActivityItem => ({
+    type: "product_save",
+    label: `Saved product: ${p.brand} ${p.name}`,
+    href: `/product/${p.slug}`,
+    date: new Date().toISOString(),
+  });
+
+  // ---------- Small UI helpers ----------
   const StreakGrid: React.FC<{ days?: number; data?: number[] }> = ({
     days = 35,
     data,
   }) => {
-    // simple seeded demo data if none passed
     const vals =
       data ?? Array.from({ length: days }, (_, i) => ((i * 7) % 23) % 5);
     return (
@@ -133,20 +149,6 @@ const ProfilePage: React.FC = () => {
     );
   };
 
-  const blogSaved = (b: BlogPost): ActivityItem => ({
-    type: "blog_save",
-    label: `Saved blog: ${b.title}`,
-    href: `/blog/${b.slug}`,
-    date: b.publishedDate ?? new Date().toISOString(),
-  });
-  const productSaved = (p: Product): ActivityItem => ({
-    type: "product_save",
-    label: `Saved product: ${p.brand} ${p.name}`,
-    href: `/product/${p.slug}`,
-    date: new Date().toISOString(),
-  });
-
-  // --- 2) Achievements / Badges ---
   type Badge = { id: string; label: string; icon: string; earnedAt?: string };
   const BadgesRow: React.FC<{ badges: Badge[] }> = ({ badges }) => {
     if (!badges.length)
@@ -170,7 +172,6 @@ const ProfilePage: React.FC = () => {
     );
   };
 
-  // --- 3) Recent Activity ---
   const ActivityList: React.FC<{
     items: ActivityItem[];
     onNavigate: (href: string) => void;
@@ -203,7 +204,6 @@ const ProfilePage: React.FC = () => {
     );
   };
 
-  // --- 4) Profile Checklist (drives completeness) ---
   const Checklist: React.FC<{
     items: { id: string; label: string; done: boolean; onClick?: () => void }[];
   }> = ({ items }) => (
@@ -225,7 +225,6 @@ const ProfilePage: React.FC = () => {
     </ul>
   );
 
-  // --- 5) Privacy toggle (client → API later) ---
   const PrivacyToggle: React.FC<{
     isPublic: boolean;
     onChange: (v: boolean) => void;
@@ -264,12 +263,15 @@ const ProfilePage: React.FC = () => {
     );
   };
 
+  // ---------- Load Profile ----------
   const loadProfile = useCallback(
     async (signal?: AbortSignal) => {
       setIsLoading(true);
       setError(null);
+
       try {
         const { data } = await api.get("/users/profile", { signal });
+
         setProfile(data);
         setAvatarSrc(data?.profilePictureUrl || DEFAULT_AVATAR);
 
@@ -296,21 +298,26 @@ const ProfilePage: React.FC = () => {
 
   useEffect(() => {
     if (!isSessionChecked) return;
+
     if (!user) {
       navigate("/auth", { replace: true });
       return;
     }
+
     const controller = new AbortController();
     loadProfile(controller.signal);
     return () => controller.abort();
   }, [isSessionChecked, user, loadProfile, navigate]);
 
+  // ---------- Load Saved Products (from hook ids) ----------
   useEffect(() => {
     const controller = new AbortController();
+
     if (!savedProductIds?.length) {
       setSavedProducts([]);
       return;
     }
+
     (async () => {
       try {
         const { data } = await api.post(
@@ -325,22 +332,28 @@ const ProfilePage: React.FC = () => {
         setSavedProducts([]);
       }
     })();
+
     return () => controller.abort();
   }, [savedProductIds]);
 
   const toggleSaveBlog = useCallback(
     async (blogId: number) => {
       if (!user) return toast.warn("Please log in to manage blogs.");
-      const isSaved = (profile?.savedBlogIds ?? []).includes(blogId);
+
+      const currentIds = profile?.savedBlogIds ?? [];
+      const isSaved = currentIds.includes(blogId);
+
       try {
         await api({
           method: isSaved ? "DELETE" : "POST",
           url: `/users/saved-blogs/${blogId}`,
           withCredentials: true,
         });
+
         const nextIds = isSaved
-          ? (profile?.savedBlogIds ?? []).filter((id) => id !== blogId)
-          : [...(profile?.savedBlogIds ?? []), blogId];
+          ? currentIds.filter((id) => id !== blogId)
+          : [...currentIds, blogId];
+
         setProfile((prev) =>
           prev ? { ...prev, savedBlogIds: nextIds } : prev
         );
@@ -350,7 +363,7 @@ const ProfilePage: React.FC = () => {
         toast.error("Error updating saved blogs.");
       }
     },
-    [user, profile?.savedBlogIds, fetchSavedBlogs]
+    [user, profile, fetchSavedBlogs]
   );
 
   const handleSignOut = useCallback(async () => {
@@ -358,8 +371,10 @@ const ProfilePage: React.FC = () => {
       sessionStorage.removeItem("ax_id_token");
       sessionStorage.removeItem("ax_token_time");
       sessionStorage.setItem("justLoggedOut", "true");
+
       await api.post("/users/logout").catch(() => {});
       setUser(null);
+
       const provider = (user as any)?.authProvider;
       if (provider === "auth0") {
         auth0Logout({
@@ -373,7 +388,6 @@ const ProfilePage: React.FC = () => {
     }
   }, [setUser, user, auth0Logout]);
 
-  // ===== UI states =====
   if (isLoading) {
     return (
       <div className="profile-frame loading">
@@ -421,6 +435,9 @@ const ProfilePage: React.FC = () => {
     );
   }
 
+  const getStableProductKey = (p: Product, idx: number) =>
+    String(p.id ?? p.asin ?? p.slug ?? `${p.name}-${idx}`);
+
   return (
     <div className="profile-frame">
       <Helmet>
@@ -431,11 +448,9 @@ const ProfilePage: React.FC = () => {
         />
       </Helmet>
 
-      {/* Animated ribbon backdrop */}
       <div className="ribbon" aria-hidden="true" />
 
       <div className="shell">
-        {/* Left Rail: profile card */}
         <aside className="left-rail" aria-label="Profile summary">
           <div className="card glass profile-card">
             <div className="avatar-wrap">
@@ -456,6 +471,7 @@ const ProfilePage: React.FC = () => {
             <h1 className="display-name">
               {profile.firstName} {profile.lastName}
             </h1>
+
             {profile.location && (
               <div className="muted">📍 {formatLocation(profile.location)}</div>
             )}
@@ -505,9 +521,7 @@ const ProfilePage: React.FC = () => {
           </div>
         </aside>
 
-        {/* Main Rail */}
         <main className="main-rail">
-          {/* Segmented tabs */}
           <nav className="tabs" aria-label="Profile sections">
             {(
               [
@@ -527,17 +541,16 @@ const ProfilePage: React.FC = () => {
             ))}
           </nav>
 
-          {/* Overview */}
           {activeTab === "overview" && (
             <>
               <section className="card glass">
                 <h2 className="section-title">At a Glance</h2>
-                {/* Privacy toggle (persist later) */}
+
                 <PrivacyToggle
                   isPublic={Boolean(profile?.isPublic)}
-                  onChange={(next) => {
-                    setProfile((p) => (p ? { ...p, isPublic: next } : p));
-                  }}
+                  onChange={(next) =>
+                    setProfile((p) => (p ? { ...p, isPublic: next } : p))
+                  }
                   publicUrl={
                     profile?.publicSlug
                       ? `${window.location.origin}/u/${profile.publicSlug}`
@@ -545,7 +558,6 @@ const ProfilePage: React.FC = () => {
                   }
                 />
 
-                {/* Streak + badges */}
                 <div className="overview-grid">
                   <div>
                     <div className="subtle-title">Activity Streak</div>
@@ -553,21 +565,7 @@ const ProfilePage: React.FC = () => {
                   </div>
                   <div>
                     <div className="subtle-title">Achievements</div>
-                    <BadgesRow
-                      badges={[
-                        // stub badges; pass real ones when your API is ready
-                        ...(profile?.sports?.length
-                          ? [
-                              {
-                                id: "sport",
-                                label: "Multi‑Sport",
-                                icon: "🏅",
-                                earnedAt: new Date().toISOString(),
-                              },
-                            ]
-                          : []),
-                      ]}
-                    />
+                    <BadgesRow badges={[]} />
                   </div>
                 </div>
               </section>
@@ -644,12 +642,12 @@ const ProfilePage: React.FC = () => {
             </>
           )}
 
-          {/* Blogs */}
           {activeTab === "blogs" && (
             <section aria-labelledby="blogs-heading" className="card glass">
               <h2 id="blogs-heading" className="section-title">
                 My Blogs
               </h2>
+
               {savedBlogs.length > 0 ? (
                 <div className="grid">
                   {savedBlogs.map((blog) => (
@@ -684,18 +682,18 @@ const ProfilePage: React.FC = () => {
             </section>
           )}
 
-          {/* Products */}
           {activeTab === "products" && (
             <section aria-labelledby="products-heading" className="card glass">
               <h2 id="products-heading" className="section-title">
                 Saved Products
               </h2>
+
               {savedProducts.length > 0 ? (
                 <div className="grid">
                   {savedProducts.map((product) => (
                     <ProductCard
+                      key={String(product.id)}
                       id={product.id}
-                      key={product.id}
                       name={product.name}
                       brand={product.brand}
                       price={product.price}
@@ -723,7 +721,6 @@ const ProfilePage: React.FC = () => {
         </main>
       </div>
 
-      {/* Modal */}
       {activeSport && (
         <SportStatsModal
           sport={activeSport}

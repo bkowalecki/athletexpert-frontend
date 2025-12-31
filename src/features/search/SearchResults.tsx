@@ -9,17 +9,16 @@ import { useSavedProducts } from "../../hooks/useSavedProducts";
 import { fetchSearchIntent } from "../../util/aiSearchIntent";
 import { trackEvent } from "../../util/analytics";
 
-// Use your API helpers!
 import { searchProducts } from "../../api/product";
 import { searchBlogs } from "../../api/blog";
 import type { Product } from "../../types/products";
 import type { BlogPost } from "../../types/blogs";
 
-// --- Types ---
 interface Sport {
   title: string;
   backgroundImage: string;
 }
+
 const staticPages: { name: string; path: string }[] = [
   { name: "About", path: "/about" },
   { name: "Terms of Service", path: "/terms" },
@@ -35,12 +34,16 @@ const trendingSearches = [
   "sports headphones",
 ];
 
-const sportsData: Sport[] = Array.isArray(sportsDataRaw)
-  ? (sportsDataRaw as Sport[])
-  : [];
+const sportsData: Sport[] = Array.isArray(sportsDataRaw) ? (sportsDataRaw as Sport[]) : [];
+
+const toSlug = (s: string) =>
+  s
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, "-")
+    .replace(/[^\w-]+/g, "");
 
 const SearchResults: React.FC = () => {
-  // State
   const [products, setProducts] = useState<Product[]>([]);
   const [blogs, setBlogs] = useState<BlogPost[]>([]);
   const [fixedQuery, setFixedQuery] = useState<string>("");
@@ -50,20 +53,15 @@ const SearchResults: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Hooks/utilities
   const { savedProductIds, toggleSaveProduct } = useSavedProducts();
   const location = useLocation();
   const navigate = useNavigate();
 
-  // In-memory cache for session
   const intentCacheRef = useRef<Record<string, any>>({});
   const resultsCacheRef = useRef<Record<string, { products: Product[]; blogs: BlogPost[] }>>({});
 
-  // Parse query from URL (?query=...)
-  const searchQuery: string =
-    new URLSearchParams(location.search).get("query")?.trim() ?? "";
+  const searchQuery: string = new URLSearchParams(location.search).get("query")?.trim() ?? "";
 
-  // Core search/effect logic
   useEffect(() => {
     let cancelled = false;
 
@@ -79,11 +77,11 @@ const SearchResults: React.FC = () => {
         setError(null);
         return;
       }
+
       setLoading(true);
       setError(null);
 
       try {
-        // AI intent (cached for the session)
         let ai;
         if (intentCacheRef.current[searchQuery]) {
           ai = intentCacheRef.current[searchQuery];
@@ -96,9 +94,16 @@ const SearchResults: React.FC = () => {
         setFixedQuery(ai.fixedQuery || searchQuery);
         setAiIntent(ai.intent || []);
         setAiPages(ai.suggestedPages || []);
-        setIsGibberish(ai.isGibberish || false);
+        setIsGibberish(Boolean(ai.isGibberish));
 
-        // "Did You Mean" logic: if correction, only show suggestion until accepted
+        trackEvent("search_view", {
+          query: searchQuery,
+          fixedQuery: ai.fixedQuery,
+          intent: ai.intent,
+          isGibberish: ai.isGibberish,
+        });
+
+        // If corrected query differs, show "Did you mean" only until user clicks it
         if (
           ai.fixedQuery &&
           ai.fixedQuery.toLowerCase().trim() !== searchQuery.toLowerCase().trim() &&
@@ -110,25 +115,27 @@ const SearchResults: React.FC = () => {
           return;
         }
 
-        // Fetch results (cached per query)
-        let prodData: Product[] = [];
-        let blogData: BlogPost[] = [];
         const cacheKey = searchQuery;
         if (resultsCacheRef.current[cacheKey]) {
-          prodData = resultsCacheRef.current[cacheKey].products;
-          blogData = resultsCacheRef.current[cacheKey].blogs;
-        } else {
-          if (ai.intent?.includes("product")) {
-            prodData = await searchProducts(searchQuery);
-          }
-          if (ai.intent?.includes("blog")) {
-            blogData = await searchBlogs(searchQuery);
-          }
-          resultsCacheRef.current[cacheKey] = {
-            products: prodData,
-            blogs: blogData,
-          };
+          const cached = resultsCacheRef.current[cacheKey];
+          setProducts(cached.products);
+          setBlogs(cached.blogs);
+          setLoading(false);
+          return;
         }
+
+        let prodData: Product[] = [];
+        let blogData: BlogPost[] = [];
+
+        // only call endpoints if intent says so (keeps search fast)
+        if (ai.intent?.includes("product")) {
+          prodData = await searchProducts(searchQuery);
+        }
+        if (ai.intent?.includes("blog")) {
+          blogData = await searchBlogs(searchQuery);
+        }
+
+        resultsCacheRef.current[cacheKey] = { products: prodData, blogs: blogData };
 
         if (cancelled) return;
         setProducts(prodData);
@@ -136,9 +143,7 @@ const SearchResults: React.FC = () => {
         setLoading(false);
       } catch (err: any) {
         if (cancelled) return;
-        setError(
-          err?.message || "Failed to load search results. Please try again."
-        );
+        setError(err?.message || "Failed to load search results. Please try again.");
         setLoading(false);
       }
     }
@@ -147,17 +152,16 @@ const SearchResults: React.FC = () => {
     return () => {
       cancelled = true;
     };
-  }, [searchQuery, navigate]);
-
-  // ----------- SPORT & STATIC PAGE SEARCH LOGIC -----------
+  }, [searchQuery]);
 
   function getRelevantSports(query: string): Sport[] {
     if (!query) return [];
     const words = query.toLowerCase().split(/\s+/);
-    return sportsData.filter(sport =>
-      words.some(word => sport.title.toLowerCase().includes(word))
+    return sportsData.filter((sport) =>
+      words.some((word) => sport.title.toLowerCase().includes(word))
     );
   }
+
   const matchingSports: Sport[] = useMemo(
     () => getRelevantSports(fixedQuery || searchQuery),
     [fixedQuery, searchQuery]
@@ -166,9 +170,7 @@ const SearchResults: React.FC = () => {
   const matchingStaticPages: { name: string; path: string }[] = useMemo(
     () =>
       fixedQuery
-        ? staticPages.filter((page) =>
-            page.name.toLowerCase().includes(fixedQuery.toLowerCase())
-          )
+        ? staticPages.filter((page) => page.name.toLowerCase().includes(fixedQuery.toLowerCase()))
         : [],
     [fixedQuery]
   );
@@ -179,14 +181,11 @@ const SearchResults: React.FC = () => {
     matchingSports.length > 0 ||
     matchingStaticPages.length > 0;
 
-  // "Did you mean" display condition (stateless, based on current data)
   const shouldShowDidYouMean =
     fixedQuery &&
     searchQuery &&
     fixedQuery.toLowerCase().trim() !== searchQuery.toLowerCase().trim() &&
     !isGibberish;
-
-  // ----------- RENDER LOGIC -----------
 
   if (!searchQuery) {
     return (
@@ -203,10 +202,7 @@ const SearchResults: React.FC = () => {
   }
 
   if (loading) return <LoadingScreen />;
-  if (error)
-    return (
-      <ErrorScreen message={error} onRetry={() => window.location.reload()} />
-    );
+  if (error) return <ErrorScreen message={error} onRetry={() => window.location.reload()} />;
 
   if (isGibberish) {
     return (
@@ -215,7 +211,24 @@ const SearchResults: React.FC = () => {
         <p className="search-results-page-no-results-text">
           We couldn’t recognize that search. Here’s what’s trending:
         </p>
-        {/* Optionally show TrendingProducts, TrendingBlogs */}
+        <div className="search-results-page-suggestions-block">
+          <ul className="search-results-page-trending-list">
+            {trendingSearches.map((term) => (
+              <li
+                key={term}
+                className="search-results-page-trending-item"
+                tabIndex={0}
+                role="button"
+                onClick={() => navigate(`/search?query=${encodeURIComponent(term)}`)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") navigate(`/search?query=${encodeURIComponent(term)}`);
+                }}
+              >
+                {term}
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
     );
   }
@@ -243,13 +256,8 @@ const SearchResults: React.FC = () => {
   if (shouldShowDidYouMean) {
     return (
       <div className="search-results-page-container">
-        <h1 className="search-results-page-title">
-          Results for: "{searchQuery}"
-        </h1>
-        <div
-          className="search-results-page-didyoumean"
-          style={{ textAlign: "center", marginBottom: "1rem" }}
-        >
+        <h1 className="search-results-page-title">Results for: "{searchQuery}"</h1>
+        <div className="search-results-page-didyoumean" style={{ textAlign: "center", marginBottom: "1rem" }}>
           Did you mean{" "}
           <span
             className="didyoumean-link"
@@ -266,9 +274,7 @@ const SearchResults: React.FC = () => {
               navigate(`/search?query=${encodeURIComponent(fixedQuery)}`);
             }}
             onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                navigate(`/search?query=${encodeURIComponent(fixedQuery)}`);
-              }
+              if (e.key === "Enter") navigate(`/search?query=${encodeURIComponent(fixedQuery)}`);
             }}
           >
             {fixedQuery}
@@ -279,17 +285,13 @@ const SearchResults: React.FC = () => {
     );
   }
 
-  if (!loading && !hasAnyResults) {
+  if (!hasAnyResults) {
     return (
       <div className="search-results-page-container">
-        <h1 className="search-results-page-title">
-          Results for: "{searchQuery}"
-        </h1>
+        <h1 className="search-results-page-title">Results for: "{searchQuery}"</h1>
         <div className="search-results-page-no-results" style={{ textAlign: "center" }}>
           <div style={{ fontSize: 64, marginBottom: 16, opacity: 0.85 }}>🧐</div>
-          <h2 style={{ fontWeight: 800, color: "#fff", marginBottom: 8 }}>
-            No results found
-          </h2>
+          <h2 style={{ fontWeight: 800, color: "#fff", marginBottom: 8 }}>No results found</h2>
           <p className="search-results-page-no-results-text" style={{ marginBottom: 22 }}>
             We couldn't find anything for <b>{searchQuery}</b>.<br />
             Try a different search or explore trending topics:
@@ -302,25 +304,9 @@ const SearchResults: React.FC = () => {
                   className="search-results-page-trending-item"
                   tabIndex={0}
                   role="button"
-                  onClick={() =>
-                    navigate(`/search?query=${encodeURIComponent(term)}`)
-                  }
+                  onClick={() => navigate(`/search?query=${encodeURIComponent(term)}`)}
                   onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      navigate(`/search?query=${encodeURIComponent(term)}`);
-                    }
-                  }}
-                  style={{
-                    display: "inline-block",
-                    margin: "0 0.4em 0.8em 0",
-                    padding: "0.35em 0.8em",
-                    background: "#181818",
-                    borderRadius: 14,
-                    color: "#fff",
-                    fontWeight: 500,
-                    border: "1.5px solid #A23C20",
-                    cursor: "pointer",
-                    transition: "background 0.18s, color 0.18s, border 0.15s"
+                    if (e.key === "Enter") navigate(`/search?query=${encodeURIComponent(term)}`);
                   }}
                 >
                   {term}
@@ -347,7 +333,7 @@ const SearchResults: React.FC = () => {
               color: "#fff",
               borderRadius: 12,
               textDecoration: "none",
-              fontWeight: 600
+              fontWeight: 600,
             }}
           >
             Return to Homepage
@@ -357,12 +343,9 @@ const SearchResults: React.FC = () => {
     );
   }
 
-  // Main results
   return (
     <div className="search-results-page-container">
-      <h1 className="search-results-page-title">
-        Results for: "{searchQuery}"
-      </h1>
+      <h1 className="search-results-page-title">Results for: "{searchQuery}"</h1>
       <div className="search-results-page-grid">
         {matchingSports.length > 0 && (
           <section className="search-results-page-section">
@@ -372,19 +355,17 @@ const SearchResults: React.FC = () => {
                 <li
                   key={sport.title}
                   className="search-results-page-item"
-                  onClick={() =>
-                    navigate(`/community/${sport.title.toLowerCase()}`)
-                  }
+                  onClick={() => navigate(`/community/${toSlug(sport.title)}`)}
                   aria-label={`Visit ${sport.title} community page`}
                 >
                   <img
                     src={sport.backgroundImage}
                     alt={sport.title}
                     className="search-results-page-image"
+                    loading="lazy"
+                    decoding="async"
                   />
-                  <h4 className="search-results-page-item-title">
-                    {sport.title}
-                  </h4>
+                  <h4 className="search-results-page-item-title">{sport.title}</h4>
                 </li>
               ))}
             </ul>
@@ -428,20 +409,16 @@ const SearchResults: React.FC = () => {
                     src={blog.imageUrl}
                     alt={blog.title}
                     loading="lazy"
+                    decoding="async"
                     width="300"
                     height="180"
                     className="search-results-page-image"
                   />
-                  <h4 className="search-results-page-item-title">
-                    {blog.title}
-                  </h4>
+                  <h4 className="search-results-page-item-title">{blog.title}</h4>
                   <p className="search-results-page-item-meta">
-                    By {blog.author} on{" "}
-                    {new Date(blog.publishedDate).toLocaleDateString()}
+                    By {blog.author} on {new Date(blog.publishedDate).toLocaleDateString()}
                   </p>
-                  <p className="search-results-page-item-summary">
-                    {blog.summary}
-                  </p>
+                  <p className="search-results-page-item-summary">{blog.summary}</p>
                 </li>
               ))}
             </ul>
@@ -452,19 +429,11 @@ const SearchResults: React.FC = () => {
           <section className="search-results-page-section">
             <h3 className="search-results-page-section-title">Pages</h3>
             <ul className="search-results-page-list">
-              {matchingStaticPages.map(
-                (page: { name: string; path: string }) => (
-                  <li
-                    key={page.name}
-                    className="search-results-page-item"
-                    onClick={() => navigate(page.path)}
-                  >
-                    <div className="search-results-page-item-title">
-                      {page.name}
-                    </div>
-                  </li>
-                )
-              )}
+              {matchingStaticPages.map((page) => (
+                <li key={page.name} className="search-results-page-item" onClick={() => navigate(page.path)}>
+                  <div className="search-results-page-item-title">{page.name}</div>
+                </li>
+              ))}
             </ul>
           </section>
         )}

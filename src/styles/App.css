@@ -1,6 +1,10 @@
 /* === App.css === */
 /* Purpose: App layout + persistent global sections like main/footer */
 
+html, body, #root {
+  height: 100%;
+}
+
 html {
   overflow-y: scroll;
 }
@@ -33,7 +37,7 @@ main {
   width: 100%;
   background-color: #000;
   box-sizing: border-box;
-  min-height: 100vh;
+  min-height: 0; /* important in flex layouts */
 }
 
 footer {

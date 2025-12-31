@@ -1,54 +1,75 @@
-import React, { useEffect, useCallback, useState } from "react";
+import React, { useCallback, useMemo } from "react";
 import { motion } from "framer-motion";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import BlogCard from "./BlogCard";
 import { useUserContext } from "../../context/UserContext";
 import { toast } from "react-toastify";
-import { BlogPost } from "../../types/blogs";
+import type { BlogPost } from "../../types/blogs";
 import { fetchLatestBlogs } from "../../api/blog";
-import { fetchSavedBlogIds, toggleSaveBlog as toggleSaveBlogApi } from "../../api/user";
+import {
+  fetchSavedBlogIds,
+  toggleSaveBlog as toggleSaveBlogApi,
+} from "../../api/user";
 import "../../styles/BlogSection.css";
 
+const LATEST_BLOG_LIMIT = 3;
+
 const LatestBlogsSection: React.FC = () => {
-  const { data: posts, isLoading, isError } = useQuery<BlogPost[], Error>({
-    queryKey: ["latestBlogs"],
-    queryFn: () => fetchLatestBlogs(3),
-    staleTime: 5000,
+  const queryClient = useQueryClient();
+  const { user } = useUserContext();
+
+  const {
+    data: posts,
+    isLoading,
+    isError,
+  } = useQuery<BlogPost[], Error>({
+    queryKey: ["latestBlogs", LATEST_BLOG_LIMIT],
+    queryFn: () => fetchLatestBlogs(LATEST_BLOG_LIMIT),
+    staleTime: 5_000,
     retry: 1,
   });
 
-  const { user } = useUserContext();
-  const [savedBlogIds, setSavedBlogIds] = useState<number[]>([]);
+  const userKey = user?.username ?? "guest";
 
-  useEffect(() => {
-    if (!user) {
-      setSavedBlogIds([]);
-      return;
-    }
-    fetchSavedBlogIds()
-      .then(setSavedBlogIds)
-      .catch(() => setSavedBlogIds([]));
-  }, [user]);
+  const { data: savedBlogIds = [] } = useQuery<number[]>({
+    queryKey: ["savedBlogs", userKey],
+    queryFn: fetchSavedBlogIds,
+    enabled: !!user,
+    staleTime: 60_000,
+  });
+
+  const savedSet = useMemo(() => new Set(savedBlogIds), [savedBlogIds]);
 
   const toggleSaveBlog = useCallback(
     async (blogId: number) => {
-      if (!user) return toast.warn("Log in to save blogs!");
-      const isSaved = savedBlogIds.includes(blogId);
+      if (!user) {
+        toast.warn("Log in to save blogs!");
+        return;
+      }
+
+      const isSaved = savedSet.has(blogId);
+      const queryKey = ["savedBlogs", userKey] as const;
+
+      // Optimistic update
+      const prev = queryClient.getQueryData<number[]>(queryKey) ?? [];
+      const next = isSaved ? prev.filter((id) => id !== blogId) : [...prev, blogId];
+      queryClient.setQueryData<number[]>(queryKey, next);
+
       try {
         await toggleSaveBlogApi(blogId, isSaved);
-        setSavedBlogIds((prev) =>
-          isSaved ? prev.filter((id) => id !== blogId) : [...prev, blogId]
-        );
         toast.success(isSaved ? "Blog removed!" : "Blog saved!");
       } catch {
+        // Rollback
+        queryClient.setQueryData<number[]>(queryKey, prev);
         toast.error("Error saving blog.");
       }
     },
-    [user, savedBlogIds]
+    [user, savedSet, queryClient, userKey]
   );
 
   if (isLoading) return <div className="loading">Loading latest blogs...</div>;
-  if (isError || !posts) return <div className="error">Error loading blogs. Try again later.</div>;
+  if (isError || !posts)
+    return <div className="error">Error loading blogs. Try again later.</div>;
 
   return (
     <section className="latest-blog-section-container">
@@ -62,7 +83,7 @@ const LatestBlogsSection: React.FC = () => {
         <h2 className="latest-blog-heading">Latest</h2>
 
         <div className="latest-blog-grid">
-          {posts.slice(0, 3).map((post) => (
+          {posts.slice(0, LATEST_BLOG_LIMIT).map((post) => (
             <BlogCard
               key={post.id}
               id={post.id}
@@ -73,7 +94,7 @@ const LatestBlogsSection: React.FC = () => {
               publishedDate={post.publishedDate}
               summary={post.summary}
               variant="latest"
-              isSaved={savedBlogIds.includes(post.id)}
+              isSaved={savedSet.has(post.id)}
               onSave={() => toggleSaveBlog(post.id)}
               onUnsave={() => toggleSaveBlog(post.id)}
             />

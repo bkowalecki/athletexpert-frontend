@@ -3,13 +3,35 @@ import type { Poll } from "features/community/SportWeeklyPoll";
 
 const STORAGE_KEY = "ax:polls";
 
-// Seed one example per week per sport if none exists
-function seedIfMissing(sportSlug: string, weekKey: string): Poll | null {
-  const store = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}") as Record<string, Poll>;
+/**
+ * Safe localStorage access
+ */
+function readStore(): Record<string, Poll> {
+  if (typeof window === "undefined") return {};
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+  } catch {
+    return {};
+  }
+}
+
+function writeStore(store: Record<string, Poll>) {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
+}
+
+/**
+ * Seed a poll if missing
+ */
+function seedIfMissing(
+  sportSlug: string,
+  weekKey: string
+): Poll {
+  const store = readStore();
   const id = `${sportSlug}:${weekKey}`;
+
   if (store[id]) return store[id];
 
-  // Example seed — customize per sport if you want
   const seeded: Poll = {
     id: Date.now(),
     sportSlug,
@@ -22,31 +44,50 @@ function seedIfMissing(sportSlug: string, weekKey: string): Poll | null {
       { id: 4, text: "Recovery/Mobility", votes: 0 },
     ],
   };
+
   store[id] = seeded;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
+  writeStore(store);
   return seeded;
 }
 
-export async function fetchWeeklyPollForSport(sportSlug: string, weekKey: string): Promise<Poll | null> {
-  // Simulate network latency
+/**
+ * Fetch weekly poll (mocked)
+ */
+export async function fetchWeeklyPollForSport(
+  sportSlug: string,
+  weekKey: string
+): Promise<Poll> {
   await new Promise((r) => setTimeout(r, 150));
-  const store = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}") as Record<string, Poll>;
+
+  const store = readStore();
   const id = `${sportSlug}:${weekKey}`;
+
   return store[id] ?? seedIfMissing(sportSlug, weekKey);
 }
 
-export async function votePollOption(pollId: number, optionId: number): Promise<{ ok: true }> {
+/**
+ * Vote on a poll option (mocked)
+ */
+export async function votePollOption(
+  pollId: number,
+  optionId: number
+): Promise<{ ok: true }> {
   await new Promise((r) => setTimeout(r, 100));
-  const store = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}") as Record<string, Poll>;
+
+  const store = readStore();
+
   for (const key of Object.keys(store)) {
     if (store[key].id === pollId) {
       store[key] = {
         ...store[key],
-        options: store[key].options.map((o) => (o.id === optionId ? { ...o, votes: o.votes + 1 } : o)),
+        options: store[key].options.map((o) =>
+          o.id === optionId ? { ...o, votes: o.votes + 1 } : o
+        ),
       };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
+      writeStore(store);
       break;
     }
   }
+
   return { ok: true };
 }

@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useCallback } from "react";
-import { useAuth0 } from "@auth0/auth0-react";
 import { useUserContext } from "../../context/UserContext";
 import { useNavigate } from "react-router-dom";
 import { trackEvent } from "../../util/analytics";
@@ -10,7 +9,7 @@ interface HeroSectionProps {
 }
 
 const HeroSection: React.FC<HeroSectionProps> = ({ openQuiz }) => {
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
   const { user, isSessionChecked } = useUserContext();
   const navigate = useNavigate();
 
@@ -19,34 +18,38 @@ const HeroSection: React.FC<HeroSectionProps> = ({ openQuiz }) => {
     navigate(user ? "/profile" : "/auth");
   }, [isSessionChecked, navigate, user]);
 
+  /**
+   * Reliable autoplay handling (Safari / iOS / mobile-safe)
+   * This logic is intentionally verbose — do NOT simplify.
+   */
   useEffect(() => {
     const video = videoRef.current;
+    if (!video) return;
 
-    if (video) {
-      video.muted = true;
-      video.setAttribute("muted", ""); // Important for Safari
-      video.setAttribute("playsInline", "true");
-      video.setAttribute("autoplay", "");
-      video.setAttribute("preload", "auto");
+    video.muted = true;
+    video.setAttribute("muted", "");
+    video.setAttribute("playsInline", "true");
+    video.setAttribute("autoplay", "");
+    video.setAttribute("preload", "auto");
 
-      const tryPlay = () => {
-        video
-          .play()
-          .catch(() => {
-            const attemptPlay = () => {
-              video.play().catch((err) =>
-                console.error("Video failed to autoplay after user gesture:", err)
-              );
-              document.removeEventListener("click", attemptPlay);
-              document.removeEventListener("touchstart", attemptPlay);
-            };
-            document.addEventListener("click", attemptPlay, { once: true });
-            document.addEventListener("touchstart", attemptPlay, { once: true });
-          });
-      };
+    const tryPlay = () => {
+      video.play().catch(() => {
+        const attemptPlay = () => {
+          video
+            .play()
+            .catch((err) =>
+              console.error("Video failed to autoplay after user gesture:", err)
+            );
+          document.removeEventListener("click", attemptPlay);
+          document.removeEventListener("touchstart", attemptPlay);
+        };
 
-      tryPlay();
-    }
+        document.addEventListener("click", attemptPlay, { once: true });
+        document.addEventListener("touchstart", attemptPlay, { once: true });
+      });
+    };
+
+    tryPlay();
   }, []);
 
   return (
@@ -68,6 +71,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ openQuiz }) => {
 
       <div className="hero-content">
         <h1>Where Athletes Find Their Edge.</h1>
+
         <div className="cta-buttons">
           <button
             className="cta-btn"
@@ -78,6 +82,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ openQuiz }) => {
           >
             Get Your Gear
           </button>
+
           <button
             className="cta-btn cta-btn-secondary"
             onClick={handleProfileClick}
@@ -91,4 +96,4 @@ const HeroSection: React.FC<HeroSectionProps> = ({ openQuiz }) => {
   );
 };
 
-export default HeroSection;
+export default React.memo(HeroSection);

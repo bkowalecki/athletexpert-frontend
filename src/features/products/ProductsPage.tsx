@@ -6,10 +6,7 @@ import React, {
   useCallback,
   useDeferredValue,
 } from "react";
-import {
-  useQuery,
-  keepPreviousData, // v5 way to keep prior data
-} from "@tanstack/react-query";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Helmet } from "react-helmet";
@@ -36,10 +33,8 @@ function cleanTitle(raw?: string): string {
   if (!raw) return "";
   let s = raw;
   s = s.replace(/\([^)]*\)/g, "").replace(/\[[^\]]*]/g, "");
-  s = s
-    .replace(/[|•]+/g, " ")
-    .replace(/\s{2,}/g, " ")
-    .trim();
+  s = s.replace(/[|•]+/g, " ").replace(/\s{2,}/g, " ").trim();
+
   const trimPhrases = [
     /with .+$/i,
     /compatible with .+$/i,
@@ -48,6 +43,7 @@ function cleanTitle(raw?: string): string {
     /gift.*$/i,
   ];
   for (const rx of trimPhrases) s = s.replace(rx, "").trim();
+
   const MAX = 60;
   if (s.length > MAX) {
     const cut = s.lastIndexOf(" ", MAX);
@@ -84,10 +80,7 @@ const BUDGET_BUCKETS = [
 const RETAILERS = ["Amazon", "Dick's Sporting Goods", "Other"];
 
 const sanitizeQuery = (q: string) =>
-  q
-    .replace(/[^a-zA-Z0-9\s-]/g, "")
-    .trim()
-    .slice(0, 40);
+  q.replace(/[^a-zA-Z0-9\s-]/g, "").trim().slice(0, 40);
 
 const FilterSelect = ({
   label,
@@ -134,7 +127,7 @@ const ProductsPage: React.FC = () => {
   const urlBudgetKey = searchParams.get("budget");
   const initialBudgetIdxRaw = urlBudgetKey
     ? BUDGET_BUCKETS.findIndex((b) => b.key === urlBudgetKey)
-    : -1; // <- numeric sentinel, not null
+    : -1;
 
   const [budgetIdx, setBudgetIdx] = useState<number | null>(
     initialBudgetIdxRaw >= 0 ? initialBudgetIdxRaw : null
@@ -216,11 +209,10 @@ const ProductsPage: React.FC = () => {
   // Facet options
   const allBrands = useMemo(
     () =>
-      [
-        ...new Set(baseList.map((p) => p.brand).filter(Boolean) as string[]),
-      ].sort(),
+      [...new Set(baseList.map((p) => p.brand).filter(Boolean) as string[])].sort(),
     [baseList]
   );
+
   const allSports = useMemo(
     () => [...new Set(baseList.flatMap((p) => p.sports ?? []))].sort(),
     [baseList]
@@ -270,7 +262,7 @@ const ProductsPage: React.FC = () => {
     [sortedProducts, visibleCount]
   );
 
-  // ——— URL sync helpers ———
+  // ——— URL sync helper ———
   const setParam = useCallback(
     (k: string, v: string | null) => {
       const next = new URLSearchParams(searchParams.toString());
@@ -281,32 +273,23 @@ const ProductsPage: React.FC = () => {
     [searchParams, setSearchParams]
   );
 
+  // Keep URL in sync (sanitized where relevant)
   useEffect(() => {
-    setParam("q", inputQuery.trim() ? inputQuery.trim() : null);
+    const cleaned = sanitizeQuery(inputQuery);
+    setParam("q", cleaned ? cleaned : null);
   }, [inputQuery, setParam]);
 
-  useEffect(() => {
-    setParam("brand", filters.brand || null);
-  }, [filters.brand, setParam]);
-
-  useEffect(() => {
-    setParam("sport", filters.sport || null);
-  }, [filters.sport, setParam]);
-
-  useEffect(() => {
-    setParam("sort", filters.sortOption || null);
-  }, [filters.sortOption, setParam]);
+  useEffect(() => setParam("brand", filters.brand || null), [filters.brand, setParam]);
+  useEffect(() => setParam("sport", filters.sport || null), [filters.sport, setParam]);
+  useEffect(() => setParam("sort", filters.sortOption || null), [filters.sortOption, setParam]);
 
   useEffect(() => {
     const key = budgetIdx === null ? null : BUDGET_BUCKETS[budgetIdx].key;
     setParam("budget", key);
   }, [budgetIdx, setParam]);
 
-  useEffect(() => {
-    setParam("retailer", retailer || null);
-  }, [retailer, setParam]);
+  useEffect(() => setParam("retailer", retailer || null), [retailer, setParam]);
 
-  // Handlers
   const handleFilterChange = useCallback(
     (key: keyof Filters, value: string) => {
       setFilters((prev) => ({
@@ -319,8 +302,16 @@ const ProductsPage: React.FC = () => {
     []
   );
 
+  const handleClearSearch = useCallback(() => {
+    setInputQuery("");
+    setSearchResults(null);
+    setVisibleCount(16);
+    refetch();
+  }, [refetch]);
+
   const handleSearchSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (!canProceed()) {
       toast.error("You're searching too fast! Please wait a minute.");
       return;
@@ -350,13 +341,6 @@ const ProductsPage: React.FC = () => {
     }
   };
 
-  const handleClearSearch = () => {
-    setInputQuery("");
-    setSearchResults(null);
-    setVisibleCount(16);
-    refetch();
-  };
-
   const clearAllFilters = () => {
     setFilters({ brand: "", sport: "", sortOption: "" });
     setBudgetIdx(null);
@@ -373,7 +357,8 @@ const ProductsPage: React.FC = () => {
 
   // Infinite scroll
   useEffect(() => {
-    let debounceTimeout: NodeJS.Timeout | null = null;
+    let debounceTimeout: ReturnType<typeof setTimeout> | null = null;
+
     const cb: IntersectionObserverCallback = (entries) => {
       const [entry] = entries;
       if (entry.isIntersecting && !debounceTimeout) {
@@ -383,34 +368,40 @@ const ProductsPage: React.FC = () => {
         }, 300);
       }
     };
+
     const observer = new IntersectionObserver(cb, {
       root: null,
       rootMargin: "1200px 0px",
       threshold: 0,
     });
+
     const node = sentinelRef.current;
     if (node) observer.observe(node);
+
     return () => {
       if (debounceTimeout) clearTimeout(debounceTimeout);
       observer.disconnect();
     };
   }, [loadMore]);
 
-  // Active filter chips (for quick removal)
+  // Active filter chips (quick removal)
   const activeChips = useMemo(() => {
     const chips: { key: string; label: string; onClear: () => void }[] = [];
+
     if (filters.brand)
       chips.push({
         key: "brand",
         label: `Brand: ${filters.brand}`,
         onClear: () => handleFilterChange("brand", ""),
       });
+
     if (filters.sport)
       chips.push({
         key: "sport",
         label: `Sport: ${filters.sport}`,
         onClear: () => handleFilterChange("sport", ""),
       });
+
     if (filters.sortOption)
       chips.push({
         key: "sort",
@@ -420,6 +411,7 @@ const ProductsPage: React.FC = () => {
             : "Sort: $ High → Low",
         onClear: () => handleFilterChange("sortOption", ""),
       });
+
     if (budgetIdx !== null) {
       chips.push({
         key: "budget",
@@ -427,6 +419,7 @@ const ProductsPage: React.FC = () => {
         onClear: () => setBudgetIdx(null),
       });
     }
+
     if (retailer) {
       chips.push({
         key: "retailer",
@@ -434,6 +427,7 @@ const ProductsPage: React.FC = () => {
         onClear: () => setRetailer(""),
       });
     }
+
     if (inputQuery.trim()) {
       chips.push({
         key: "q",
@@ -441,8 +435,12 @@ const ProductsPage: React.FC = () => {
         onClear: handleClearSearch,
       });
     }
+
     return chips;
-  }, [filters, budgetIdx, retailer, inputQuery, handleFilterChange]);
+  }, [filters, budgetIdx, retailer, inputQuery, handleFilterChange, handleClearSearch]);
+
+  const canSearch =
+    sanitizeQuery(inputQuery).length >= 3 && !isSearching;
 
   return (
     <div className="products-page">
@@ -473,13 +471,10 @@ const ProductsPage: React.FC = () => {
             className="search-bar"
             aria-label="Search products"
           />
-          <button
-            className="search-btn"
-            type="submit"
-            disabled={isSearching || deferredQuery.trim().length < 3}
-          >
+          <button className="search-btn" type="submit" disabled={!canSearch}>
             {isSearching ? "Searching..." : "Search"}
           </button>
+
           {searchResults !== null && (
             <button
               className="clear-search-btn"
@@ -498,12 +493,14 @@ const ProductsPage: React.FC = () => {
             onChange={(val) => handleFilterChange("brand", val)}
             options={allBrands}
           />
+
           <FilterSelect
             label="Sport"
             value={filters.sport}
             onChange={(val) => handleFilterChange("sport", val)}
             options={allSports}
           />
+
           <label className="sr-only">
             Sort
             <select
@@ -539,15 +536,14 @@ const ProductsPage: React.FC = () => {
                 key={b.key}
                 type="button"
                 className={`chip ${budgetIdx === idx ? "chip--active" : ""}`}
-                onClick={() =>
-                  setBudgetIdx((prev) => (prev === idx ? null : idx))
-                }
+                onClick={() => setBudgetIdx((prev) => (prev === idx ? null : idx))}
                 aria-pressed={budgetIdx === idx}
               >
                 {b.label}
               </button>
             ))}
           </div>
+
           <div className="retailer-select">
             <label className="sr-only" htmlFor="retailerSelect">
               Retailer
@@ -586,16 +582,12 @@ const ProductsPage: React.FC = () => {
         )}
       </div>
 
-      {(isLoading || isSearching) && (
-        <ProductGridSkeleton count={visibleCount} />
-      )}
+      {(isLoading || isSearching) && <ProductGridSkeleton count={visibleCount} />}
 
       {error && (
         <div className="products-error-container">
           <h2>😵 Oops! Something went wrong.</h2>
-          <p>
-            We couldn't load the products right now. Please try again later.
-          </p>
+          <p>We couldn't load the products right now. Please try again later.</p>
           <button className="return-home-btn" onClick={() => navigate("/")}>
             Return Home
           </button>
@@ -618,25 +610,30 @@ const ProductsPage: React.FC = () => {
         <div className="product-grid" aria-live="polite">
           {visibleProducts.length > 0 ? (
             visibleProducts.map((product, idx) => {
-              const key = product.id ?? `amazon-${idx}-${product.name}`;
+              const key =
+                product.asin ??
+                (typeof product.id === "number" ? String(product.id) : undefined) ??
+                product.slug ??
+                `${product.name}-${idx}`;
+
               return (
                 <ProductCard
-                  id={key}
                   key={key}
+                  id={product.id} // keep numeric id for save/toggle + analytics
                   name={getCleanTitle(product)}
                   brand={product.brand}
                   price={product.price}
                   imgUrl={product.imgUrl}
                   slug={product.slug}
                   affiliateLink={product.affiliateLink}
-                  isSaved={!!product.id && savedIdSet.has(Number(product.id))}
+                  isSaved={typeof product.id === "number" && savedIdSet.has(product.id)}
                   onToggleSave={
-                    product.id
-                      ? getToggleHandler(Number(product.id))
+                    typeof product.id === "number"
+                      ? getToggleHandler(product.id)
                       : undefined
                   }
                   isAmazonFallback={product.isAmazonFallback}
-                  isTrending={product.isTrending}
+                  isTrending={Boolean((product as any).isTrending ?? product.trending)}
                   rating={product.rating}
                   numReviews={product.numReviews}
                   source={product.source}
@@ -658,13 +655,7 @@ const ProductsPage: React.FC = () => {
       </ErrorBoundary>
 
       {visibleProducts.length < sortedProducts.length && (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            margin: "16px 0",
-          }}
-        >
+        <div style={{ display: "flex", justifyContent: "center", margin: "16px 0" }}>
           <button className="load-more-btn" type="button" onClick={loadMore}>
             Load more
           </button>

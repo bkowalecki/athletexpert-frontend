@@ -36,10 +36,49 @@ const TermsAndConditionsPage = React.lazy(
 const PrivacyPolicy = React.lazy(() => import("./features/legal/PrivacyPolicy"));
 const NotFoundPage = React.lazy(() => import("./components/four0fourPage"));
 
-type RouteDef = { path: string; element: React.ReactElement };
+type RouteDef = Readonly<{ path: string; element: React.ReactElement }>;
 
+const QuizModal: React.FC<{ isOpen: boolean; closeModal: () => void }> = React.memo(
+  ({ isOpen, closeModal }) => {
+    if (!isOpen) return null;
+
+    // Keep a modal-specific fallback so the page doesn't "blank" when the quiz chunk loads
+    return (
+      <Suspense fallback={<LoadingScreen />}>
+        <Quiz isOpen={isOpen} closeModal={closeModal} />
+      </Suspense>
+    );
+  }
+);
+QuizModal.displayName = "QuizModal";
+
+const HomeRoute: React.FC<{
+  openQuiz: () => void;
+  isQuizModalOpen: boolean;
+  closeQuiz: () => void;
+}> = React.memo(({ openQuiz, isQuizModalOpen, closeQuiz }) => {
+  return (
+    <>
+      <HeroSection openQuiz={openQuiz} />
+      <FeaturedProductList />
+      <TrendingProductList />
+      <BlogSection />
+      <QuizModal isOpen={isQuizModalOpen} closeModal={closeQuiz} />
+    </>
+  );
+});
+HomeRoute.displayName = "HomeRoute";
+
+// Route groups (kept at module scope to avoid recreating arrays each render)
 const authRoutes: RouteDef[] = [
-  { path: "/profile", element: <RequireAuth><ProfilePage /></RequireAuth> },
+  {
+    path: "/profile",
+    element: (
+      <RequireAuth>
+        <ProfilePage />
+      </RequireAuth>
+    ),
+  },
   // keeping public as-is (matches your prior behavior)
   { path: "/settings", element: <AccountSettings /> },
   { path: "/account-setup", element: <OnboardingPage /> },
@@ -50,7 +89,14 @@ const authRoutes: RouteDef[] = [
 const productRoutes: RouteDef[] = [
   { path: "/products", element: <ProductsPage /> },
   { path: "/products/:slug", element: <ProductDetail /> },
-  { path: "/admin/products", element: <RequireAuth><AdminProductManager /></RequireAuth> },
+  {
+    path: "/admin/products",
+    element: (
+      <RequireAuth>
+        <AdminProductManager />
+      </RequireAuth>
+    ),
+  },
 ];
 
 const blogRoutes: RouteDef[] = [
@@ -73,18 +119,6 @@ const miscRoutes: RouteDef[] = [
   { path: "*", element: <NotFoundPage /> },
 ];
 
-const QuizModal: React.FC<{ isOpen: boolean; closeModal: () => void }> = React.memo(
-  ({ isOpen, closeModal }) => {
-    if (!isOpen) return null;
-    return (
-      <Suspense fallback={<LoadingScreen />}>
-        <Quiz isOpen={isOpen} closeModal={closeModal} />
-      </Suspense>
-    );
-  }
-);
-QuizModal.displayName = "QuizModal";
-
 const AppRoutes: React.FC = () => {
   const { isSessionChecked } = useUserContext();
   const [isQuizModalOpen, setQuizModalOpen] = useState(false);
@@ -92,42 +126,44 @@ const AppRoutes: React.FC = () => {
   const openQuiz = useCallback(() => setQuizModalOpen(true), []);
   const closeQuiz = useCallback(() => setQuizModalOpen(false), []);
 
-  if (!isSessionChecked) return <LoadingScreen />;
-
   return (
     <main className="page-content" id="main-content">
-      <Suspense fallback={<LoadingScreen />}>
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <>
-                <HeroSection openQuiz={openQuiz} />
-                <FeaturedProductList />
-                <TrendingProductList />
-                <BlogSection />
-                <QuizModal isOpen={isQuizModalOpen} closeModal={closeQuiz} />
-              </>
-            }
-          />
+      {/* IMPORTANT: keep main mounted even during initial session check
+          so the footer doesn't jump to the top while LoadingScreen overlays */}
+      {!isSessionChecked ? (
+        <LoadingScreen />
+      ) : (
+        <Suspense fallback={<LoadingScreen />}>
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <HomeRoute
+                  openQuiz={openQuiz}
+                  isQuizModalOpen={isQuizModalOpen}
+                  closeQuiz={closeQuiz}
+                />
+              }
+            />
 
-          {authRoutes.map(({ path, element }) => (
-            <Route key={path} path={path} element={element} />
-          ))}
-          {productRoutes.map(({ path, element }) => (
-            <Route key={path} path={path} element={element} />
-          ))}
-          {blogRoutes.map(({ path, element }) => (
-            <Route key={path} path={path} element={element} />
-          ))}
-          {communityRoutes.map(({ path, element }) => (
-            <Route key={path} path={path} element={element} />
-          ))}
-          {miscRoutes.map(({ path, element }) => (
-            <Route key={path} path={path} element={element} />
-          ))}
-        </Routes>
-      </Suspense>
+            {authRoutes.map(({ path, element }) => (
+              <Route key={path} path={path} element={element} />
+            ))}
+            {productRoutes.map(({ path, element }) => (
+              <Route key={path} path={path} element={element} />
+            ))}
+            {blogRoutes.map(({ path, element }) => (
+              <Route key={path} path={path} element={element} />
+            ))}
+            {communityRoutes.map(({ path, element }) => (
+              <Route key={path} path={path} element={element} />
+            ))}
+            {miscRoutes.map(({ path, element }) => (
+              <Route key={path} path={path} element={element} />
+            ))}
+          </Routes>
+        </Suspense>
+      )}
     </main>
   );
 };

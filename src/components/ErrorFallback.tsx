@@ -1,11 +1,22 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 
 interface ErrorFallbackProps {
   error: Error | { message: string } | string;
   resetErrorBoundary: () => void;
 }
 
-const ErrorFallback: React.FC<ErrorFallbackProps> = ({ error, resetErrorBoundary }) => {
+function getErrorMessage(error: ErrorFallbackProps["error"]): string {
+  if (typeof error === "string") return error;
+  if (error && typeof error === "object" && "message" in error) {
+    return String(error.message);
+  }
+  return "An unknown error occurred.";
+}
+
+const ErrorFallback: React.FC<ErrorFallbackProps> = ({
+  error,
+  resetErrorBoundary,
+}) => {
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   // Accessibility: focus the button on mount
@@ -13,13 +24,7 @@ const ErrorFallback: React.FC<ErrorFallbackProps> = ({ error, resetErrorBoundary
     buttonRef.current?.focus();
   }, []);
 
-  // Defensive error handling
-  const errorMessage =
-    typeof error === "string"
-      ? error
-      : error && "message" in error
-      ? error.message
-      : "An unknown error occurred.";
+  const errorMessage = useMemo(() => getErrorMessage(error), [error]);
 
   return (
     <div
@@ -32,10 +37,17 @@ const ErrorFallback: React.FC<ErrorFallbackProps> = ({ error, resetErrorBoundary
       <h2 id="error-fallback-title" className="error-fallback-title">
         Something went wrong.
       </h2>
-      <p id="error-fallback-desc" className="error-fallback-message">
+
+      <p
+        id="error-fallback-desc"
+        className="error-fallback-message"
+        aria-live="assertive"
+      >
         {errorMessage}
       </p>
+
       <button
+        type="button"
         ref={buttonRef}
         onClick={resetErrorBoundary}
         className="error-fallback-button"

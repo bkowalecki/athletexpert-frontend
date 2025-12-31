@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useCallback,
+} from "react";
 import { useUserContext } from "../../context/UserContext";
 import { useNavigate } from "react-router-dom";
 import { blogTemplates } from "../../data/blogTemplates";
@@ -12,16 +18,20 @@ import {
   deleteBlog as deleteBlogApi,
 } from "../../api/blog";
 import { searchProducts } from "../../api/product";
-import { BlogPost, BlogPostForm } from "../../types/blogs";
+import type { BlogPost, BlogPostForm } from "../../types/blogs";
 
 interface Product {
   id: number;
   name: string;
   brand: string;
-  price: number | string;
+  price: number | string | null;
   imgUrl: string;
   affiliateLink: string;
 }
+
+type BlogTemplate = { name: string; html: string };
+
+const DRAFT_KEY = "blog-draft";
 
 const emptyFormData: BlogPostForm = {
   title: "",
@@ -34,69 +44,197 @@ const emptyFormData: BlogPostForm = {
   publishedDate: new Date().toISOString().slice(0, 10),
 };
 
+function safeJsonParse<T>(value: string | null): T | null {
+  if (!value) return null;
+  try {
+    return JSON.parse(value) as T;
+  } catch {
+    return null;
+  }
+}
+
+const normalizeTag = (tag: string) =>
+  tag.trim().replace(/\s+/g, "-").toLowerCase();
+
 const NewBlogPost: React.FC = () => {
   const { user } = useUserContext();
   const navigate = useNavigate();
+
   const [formData, setFormData] = useState<BlogPostForm>(emptyFormData);
   const [tagInput, setTagInput] = useState("");
   const [blogs, setBlogs] = useState<BlogPost[]>([]);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [showBlogs, setShowBlogs] = useState(false);
+  const [blogFilter, setBlogFilter] = useState("");
 
   const [productSearch, setProductSearch] = useState("");
   const [productResults, setProductResults] = useState<Product[]>([]);
   const productTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const titleRef = useRef<HTMLInputElement>(null);
+  const contentRef = useRef<HTMLTextAreaElement>(null);
+
+  const [lastSavedAt, setLastSavedAt] = useState<number | null>(null);
+  const draftSaveTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const hasMountedRef = useRef(false);
+
+  /* ------------------ derived state ------------------ */
+
+  const sanitizedPreview = useMemo(
+    () => DOMPurify.sanitize(formData.content || ""),
+    [formData.content]
+  );
+
+  const wordCount = useMemo(() => {
+    const txt = (formData.content || "").trim();
+    return txt ? txt.split(/\s+/).filter(Boolean).length : 0;
+  }, [formData.content]);
+
+  const filteredBlogs = useMemo(() => {
+    const q = blogFilter.trim().toLowerCase();
+    if (!q) return blogs;
+    return blogs.filter((b) =>
+      `${b.title} ${b.author} ${(b.tags || []).join(" ")} ${b.sport || ""}`
+        .toLowerCase()
+        .includes(q)
+    );
+  }, [blogs, blogFilter]);
+
+  const lastSavedLabel = useMemo(() => {
+    if (!lastSavedAt) return "Not saved yet";
+    return `Saved ${new Date(lastSavedAt).toLocaleTimeString([], {
+      hour: "numeric",
+      minute: "2-digit",
+    })}`;
+  }, [lastSavedAt]);
+
+  /* ------------------ effects ------------------ */
+
   useEffect(() => {
     titleRef.current?.focus();
   }, []);
 
   useEffect(() => {
-    const saved = localStorage.getItem("blog-draft");
-    if (saved) setFormData(JSON.parse(saved));
+    const saved = safeJsonParse<BlogPostForm>(localStorage.getItem(DRAFT_KEY));
+    if (saved) {
+      setFormData({ ...emptyFormData, ...saved });
+      setLastSavedAt(Date.now());
+    }
+    hasMountedRef.current = true;
   }, []);
 
   useEffect(() => {
-    localStorage.setItem("blog-draft", JSON.stringify(formData));
+    if (!hasMountedRef.current) return;
+
+    if (draftSaveTimeout.current) {
+      clearTimeout(draftSaveTimeout.current);
+      draftSaveTimeout.current = null;
+    }
+
+    draftSaveTimeout.current = setTimeout(() => {
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(formData));
+      setLastSavedAt(Date.now());
+    }, 450);
+
+    return () => {
+      if (draftSaveTimeout.current) {
+        clearTimeout(draftSaveTimeout.current);
+        draftSaveTimeout.current = null;
+      }
+    };
   }, [formData]);
 
   useEffect(() => {
+    let alive = true;
     fetchAllBlogs()
-      .then((data) => setBlogs(data || []))
+      .then((data) => alive && setBlogs(data || []))
       .catch(() => {});
+    return () => {
+      alive = false;
+    };
   }, []);
 
   useEffect(() => {
-    if (productSearch.length < 2) return setProductResults([]);
+    if (productSearch.length < 2) {
+      setProductResults([]);
+      return;
+    }
 
-    if (productTimeout.current) clearTimeout(productTimeout.current);
+    if (productTimeout.current) {
+      clearTimeout(productTimeout.current);
+      productTimeout.current = null;
+    }
 
     productTimeout.current = setTimeout(async () => {
       try {
         const results = await searchProducts(productSearch);
-        setProductResults(results);
+        setProductResults(results || []);
       } catch {
         setProductResults([]);
       }
     }, 400);
 
     return () => {
-      if (productTimeout.current) clearTimeout(productTimeout.current);
+      if (productTimeout.current) {
+        clearTimeout(productTimeout.current);
+        productTimeout.current = null;
+      }
     };
   }, [productSearch]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  /* ------------------ handlers ------------------ */
+
+  const handleChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      const { name, value } = e.target;
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    },
+    []
+  );
+
+  const insertAtCursor = useCallback(
+    (text: string) => {
+      const el = contentRef.current;
+      if (!el) {
+        setFormData((p) => ({
+          ...p,
+          content: (p.content || "") + "\n" + text,
+        }));
+        return;
+      }
+
+      const start = el.selectionStart ?? 0;
+      const end = el.selectionEnd ?? 0;
+
+      const next =
+        (formData.content || "").slice(0, start) +
+        text +
+        (formData.content || "").slice(end);
+
+      setFormData((p) => ({ ...p, content: next }));
+
+      requestAnimationFrame(() => {
+        el.focus();
+        el.setSelectionRange(start + text.length, start + text.length);
+      });
+    },
+    [formData.content]
+  );
+
+  const addTag = (raw: string) => {
+    const cleaned = normalizeTag(raw);
+    if (!cleaned) return;
+    setFormData((prev) =>
+      prev.tags.includes(cleaned)
+        ? prev
+        : { ...prev, tags: [...prev.tags, cleaned] }
+    );
   };
 
   const handleTagKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" && tagInput.trim()) {
+    if ((e.key === "Enter" || e.key === ",") && tagInput.trim()) {
       e.preventDefault();
-      const tag = tagInput.trim();
-      if (!formData.tags.includes(tag)) {
-        setFormData((prev) => ({ ...prev, tags: [...prev.tags, tag] }));
-      }
+      addTag(tagInput);
       setTagInput("");
     }
   };
@@ -111,16 +249,18 @@ const NewBlogPost: React.FC = () => {
   const handleEdit = (blog: BlogPost) => {
     setEditingId(blog.id ?? null);
     setFormData({
-      title: blog.title,
-      author: blog.author,
-      imageUrl: blog.imageUrl,
-      summary: blog.summary,
+      title: blog.title || "",
+      author: blog.author || "",
+      imageUrl: blog.imageUrl || "",
+      summary: blog.summary || "",
       content: blog.content || "",
-      sport: blog.sport,
+      sport: blog.sport || "",
       tags: Array.isArray(blog.tags) ? blog.tags : [],
-      publishedDate: blog.publishedDate,
+      publishedDate:
+        blog.publishedDate || new Date().toISOString().slice(0, 10),
     });
     window.scrollTo({ top: 0, behavior: "smooth" });
+    toast.info("Loaded blog into editor.");
   };
 
   const handleDelete = async (id: number) => {
@@ -145,16 +285,45 @@ const NewBlogPost: React.FC = () => {
   </a>
 </div>
 `;
-    setFormData((prev) => ({
-      ...prev,
-      content: prev.content + "\n" + embed,
-    }));
+    insertAtCursor(embed);
     setProductResults([]);
     setProductSearch("");
+    toast.success("Inserted product embed.");
+  };
+
+  const saveDraftNow = () => {
+    localStorage.setItem(DRAFT_KEY, JSON.stringify(formData));
+    setLastSavedAt(Date.now());
+    toast.success("Draft saved.");
+  };
+
+  const clearDraft = () => {
+    if (!window.confirm("Clear the current editor + saved draft?")) return;
+    localStorage.removeItem(DRAFT_KEY);
+    setEditingId(null);
+    setFormData(emptyFormData);
+    setTagInput("");
+    setLastSavedAt(null);
+    toast.info("Draft cleared.");
+  };
+
+  const copyHtml = async () => {
+    try {
+      await navigator.clipboard.writeText(formData.content || "");
+      toast.success("HTML copied to clipboard.");
+    } catch {
+      toast.error("Could not copy. (Browser blocked clipboard)");
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!formData.title.trim() || !formData.author.trim()) {
+      toast.error("Title + author are required.");
+      return;
+    }
+
     try {
       if (editingId) {
         await updateBlog(editingId, formData);
@@ -163,8 +332,13 @@ const NewBlogPost: React.FC = () => {
         await createBlog(formData);
         toast.success("Blog created!");
       }
+
       setEditingId(null);
       setFormData(emptyFormData);
+      setTagInput("");
+      localStorage.removeItem(DRAFT_KEY);
+      setLastSavedAt(null);
+
       window.scrollTo({ top: 0, behavior: "smooth" });
       const data = await fetchAllBlogs();
       setBlogs(data || []);
@@ -172,6 +346,17 @@ const NewBlogPost: React.FC = () => {
       toast.error("Error submitting blog");
     }
   };
+
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      const isSave = (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s";
+      if (!isSave) return;
+      e.preventDefault();
+      saveDraftNow();
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [formData]);
 
   if (user?.role !== "admin") {
     return (
@@ -183,11 +368,33 @@ const NewBlogPost: React.FC = () => {
     );
   }
 
-  const sanitizedPreview = DOMPurify.sanitize(formData.content || "");
+  const typedTemplates = blogTemplates as BlogTemplate[];
 
   return (
     <div className="new-blog-container">
-      <h2>{editingId ? "Edit Blog Post" : "Create New Blog Post"}</h2>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          gap: 12,
+          alignItems: "baseline",
+        }}
+      >
+        <h2 style={{ margin: 0 }}>
+          {editingId ? "Edit Blog Post" : "Create New Blog Post"}
+        </h2>
+        <div style={{ fontSize: 12, opacity: 0.75 }}>
+          <span style={{ marginRight: 10 }}>{lastSavedLabel}</span>
+          <button
+            type="button"
+            onClick={() => navigate("/")}
+            style={{ fontSize: 12 }}
+          >
+            Exit
+          </button>
+        </div>
+      </div>
+
       <form onSubmit={handleSubmit} className="blog-form">
         {(["title", "author", "imageUrl", "sport"] as const).map((field) => (
           <input
@@ -208,7 +415,11 @@ const NewBlogPost: React.FC = () => {
 
         {formData.imageUrl && (
           <div className="image-preview-wrapper">
-            <img src={formData.imageUrl} alt="Header Preview" className="image-preview" />
+            <img
+              src={formData.imageUrl}
+              alt="Header Preview"
+              className="image-preview"
+            />
           </div>
         )}
 
@@ -216,7 +427,7 @@ const NewBlogPost: React.FC = () => {
           name="summary"
           value={formData.summary}
           onChange={handleChange}
-          placeholder="Summary"
+          placeholder="Summary (meta)"
         />
         <p className="char-count">Characters: {formData.summary.length}/160</p>
 
@@ -227,7 +438,7 @@ const NewBlogPost: React.FC = () => {
             value={tagInput}
             onChange={(e) => setTagInput(e.target.value)}
             onKeyDown={handleTagKeyDown}
-            placeholder="Type a tag and press Enter"
+            placeholder="Type a tag and press Enter (or comma)"
             autoComplete="off"
           />
           <div className="tag-preview">
@@ -247,7 +458,12 @@ const NewBlogPost: React.FC = () => {
         </div>
 
         <label className="bold-label">Published Date</label>
-        <input type="date" name="publishedDate" value={formData.publishedDate} onChange={handleChange} />
+        <input
+          type="date"
+          name="publishedDate"
+          value={formData.publishedDate}
+          onChange={handleChange}
+        />
 
         <div>
           <label className="bold-label">Insert Product</label>
@@ -272,11 +488,21 @@ const NewBlogPost: React.FC = () => {
                     alt={p.name}
                     width={36}
                     height={36}
-                    style={{ objectFit: "cover", borderRadius: 4, marginRight: 8 }}
+                    style={{
+                      objectFit: "cover",
+                      borderRadius: 4,
+                      marginRight: 8,
+                    }}
                   />
                   {p.name} – <span style={{ color: "#666" }}>{p.brand}</span>
                   {p.price && (
-                    <span style={{ marginLeft: 8, color: "#2a6045", fontWeight: 500 }}>
+                    <span
+                      style={{
+                        marginLeft: 8,
+                        color: "#2a6045",
+                        fontWeight: 500,
+                      }}
+                    >
                       ${p.price}
                     </span>
                   )}
@@ -288,32 +514,59 @@ const NewBlogPost: React.FC = () => {
 
         <div>
           <label className="bold-label">Blog HTML Content</label>
-          <div className="template-buttons">
-            {blogTemplates.map(({ name, html }) => (
-              <button
-                key={name}
-                type="button"
-                onClick={() =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    content: prev.content + "\n" + html,
-                  }))
-                }
-              >
-                Add {name}
+
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: 8,
+              alignItems: "center",
+              marginBottom: 8,
+            }}
+          >
+            <div
+              className="template-buttons"
+              style={{ display: "flex", flexWrap: "wrap", gap: 8 }}
+            >
+              {typedTemplates.map((t) => (
+                <button
+                  key={t.name}
+                  type="button"
+                  onClick={() => {
+                    insertAtCursor(`\n${t.html}\n`);
+                    toast.info(`Inserted template: ${t.name}`);
+                  }}
+                  title={`Insert ${t.name} at cursor`}
+                >
+                  Insert {t.name}
+                </button>
+              ))}
+            </div>
+
+            <div style={{ marginLeft: "auto", display: "flex", gap: 8 }}>
+              <button type="button" onClick={saveDraftNow} title="Ctrl/Cmd+S">
+                Save Draft
               </button>
-            ))}
+              <button type="button" onClick={copyHtml}>
+                Copy HTML
+              </button>
+              <button type="button" onClick={clearDraft} className="cancel-btn">
+                Clear
+              </button>
+            </div>
           </div>
 
           <textarea
+            ref={contentRef}
             name="content"
             value={formData.content}
             onChange={handleChange}
-            placeholder="Enter raw HTML content here..."
+            placeholder="Write raw HTML here. Templates + product embeds insert at the cursor."
             className="blog-html-input"
-            rows={12}
+            rows={14}
+            spellCheck={false}
           />
-          <p className="word-count">Word Count: {formData.content.trim().split(/\s+/).length}</p>
+          <p className="word-count">Word Count: {wordCount}</p>
         </div>
 
         <div className="live-preview">
@@ -327,13 +580,18 @@ const NewBlogPost: React.FC = () => {
         </div>
 
         <div className="button-group">
-          <button type="submit">{editingId ? "Update Blog" : "Publish Blog"}</button>
+          <button type="submit">
+            {editingId ? "Update Blog" : "Publish Blog"}
+          </button>
+
           {editingId && (
             <button
               type="button"
               onClick={() => {
                 setEditingId(null);
                 setFormData(emptyFormData);
+                setTagInput("");
+                toast.info("Edit cancelled.");
               }}
               className="cancel-btn"
             >
@@ -350,20 +608,37 @@ const NewBlogPost: React.FC = () => {
           </button>
         </h3>
 
-        {showBlogs &&
-          blogs.map((b) => (
-            <div key={b.id} className="blog-admin-row">
-              <span>
-                <strong>{b.title}</strong> – {b.author}
-              </span>
-              <div>
-                <button onClick={() => handleEdit(b)}>Edit</button>
-                <button onClick={() => handleDelete(b.id!)} className="delete-btn">
-                  Delete
-                </button>
+        {showBlogs && (
+          <>
+            <input
+              type="text"
+              placeholder="Filter existing posts…"
+              value={blogFilter}
+              onChange={(e) => setBlogFilter(e.target.value)}
+              style={{ margin: "10px 0", width: "100%", padding: 10 }}
+            />
+
+            {filteredBlogs.map((b) => (
+              <div key={b.id} className="blog-admin-row">
+                <span>
+                  <strong>{b.title}</strong> – {b.author}
+                </span>
+                <div>
+                  <button type="button" onClick={() => handleEdit(b)}>
+                    Edit
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleDelete(b.id!)}
+                    className="delete-btn"
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </>
+        )}
       </div>
     </div>
   );

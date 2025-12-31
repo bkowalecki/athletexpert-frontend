@@ -1,15 +1,27 @@
+import React, {
+  useRef,
+  useState,
+  ChangeEvent,
+  useEffect,
+  useCallback,
+  useMemo,
+} from "react";
 import ReactCanvasConfetti from "react-canvas-confetti";
-import { useRef } from "react";
-import React, { useState, ChangeEvent, useEffect } from "react";
 import { Helmet } from "react-helmet";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import "../../styles/OnboardingPage.css";
 import { useUserContext } from "../../context/UserContext";
 import sportsData from "../../data/sports.json";
+import api from "../../api/axios";
 
+type ConfettiInstance = {
+  confetti: (opts: Record<string, unknown>) => void;
+};
 
-const sportsOptions = sportsData.map((s) => s.title);
+const sportsOptions = Array.isArray(sportsData)
+  ? sportsData.map((s: any) => s.title).filter(Boolean)
+  : [];
 
 const favoriteColors = [
   "Red",
@@ -37,9 +49,15 @@ type FormDataType = {
   gender?: string;
 };
 
-const OnboardingPage = () => {
+const TOTAL_STEPS = 6;
+
+const OnboardingPage: React.FC = () => {
   const navigate = useNavigate();
+  const { user, isSessionChecked } = useUserContext();
+
   const [step, setStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const [formData, setFormData] = useState<FormDataType>({
     firstName: "",
     lastName: "",
@@ -48,113 +66,102 @@ const OnboardingPage = () => {
     bio: "",
   });
 
-  const confettiRef = useRef<any>(null);
+  const confettiRef = useRef<ConfettiInstance | null>(null);
 
-  const getInstance = (instance: any) => {
-    confettiRef.current = instance;
-  };
+  const progressPercentage = Math.round((step / TOTAL_STEPS) * 100);
 
-  const fireConfetti = () => {
-    if (confettiRef.current) {
-      confettiRef.current.confetti({
-        particleCount: 150,
-        spread: 90,
-        startVelocity: 45,
-        gravity: 0.9,
-        ticks: 200,
-        scalar: 1.2,
-        origin: { y: 0.6 },
-        shapes: ["circle"], // ✅ Force simple circle shapes
-      });
-    }
-  };
-
-  const totalSteps = 6;
-  const progressPercentage = Math.round((step / totalSteps) * 100);
-
-  const { user, isSessionChecked } = useUserContext();
-
+  // ---------- Auth guard ----------
   useEffect(() => {
     if (!isSessionChecked) return;
-  
-    console.log("🧠 USER FROM CONTEXT:", user);
-  
+
     if (!user) {
       toast.error("Session expired. Please log in again.");
       navigate("/auth", { replace: true });
       return;
     }
-  
+
     if (user.isActive) {
       navigate("/profile", { replace: true });
     }
   }, [user, isSessionChecked, navigate]);
-  
 
+  // ---------- Confetti ----------
+  const getInstance = useCallback((instance: ConfettiInstance | null) => {
+    confettiRef.current = instance;
+  }, []);
+
+  const fireConfetti = useCallback(() => {
+    confettiRef.current?.confetti({
+      particleCount: 150,
+      spread: 90,
+      startVelocity: 45,
+      gravity: 0.9,
+      ticks: 200,
+      scalar: 1.2,
+      origin: { y: 0.6 },
+      shapes: ["circle"],
+    });
+  }, []);
+
+  // ---------- Handlers ----------
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData((f) => ({ ...f, [name]: value }));
   };
 
-  const toggleSport = (sport: string) => {
+  const toggleSport = useCallback((sport: string) => {
     setFormData((prev) => {
-      const newSports = prev.sports.includes(sport)
-        ? prev.sports.filter((s) => s !== sport)
-        : [...prev.sports, sport];
-      return { ...prev, sports: newSports };
+      const exists = prev.sports.includes(sport);
+      return {
+        ...prev,
+        sports: exists
+          ? prev.sports.filter((s) => s !== sport)
+          : [...prev.sports, sport],
+      };
     });
-  };
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
 
     if (!formData.firstName.trim() || !formData.lastName.trim()) {
       toast.error("Please enter both your first and last name.");
       return;
     }
 
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/users/account-setup`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({
-            firstName: formData.firstName,
-            lastName: formData.lastName,
-            favoriteColor: formData.favoriteColor,
-            bio: formData.bio,
-            sports: formData.sports,
-            city: formData.city,
-            state: formData.state,
-            country: formData.country,
-            dob: formData.dob,
-            gender: formData.gender,
-          })
-          ,
-        }
-      );
+    setIsSubmitting(true);
 
-      if (response.ok) {
-        console.log("✅ Account setup complete!");
-        setTimeout(() => {
-          fireConfetti(); // 🎉 Slight delay ensures canvas and confetti instance are ready
-          toast.success(`🎉 Welcome to AthleteXpert, ${formData.firstName}!`, {
-            position: "top-center",
-          });
-          navigate("/profile");
-        }, 300); // 300ms is plenty
-      } else {
-        console.error("❌ Failed to submit onboarding form");
-      }
-    } catch (error) {
-      console.error("❌ Error submitting onboarding:", error);
+    try {
+      await api.post("/users/account-setup", {
+        firstName: formData.firstName.trim(),
+        lastName: formData.lastName.trim(),
+        favoriteColor: formData.favoriteColor,
+        bio: formData.bio.trim(),
+        sports: formData.sports,
+        city: formData.city?.trim(),
+        state: formData.state?.trim(),
+        country: formData.country?.trim(),
+        dob: formData.dob,
+        gender: formData.gender,
+      });
+
+      fireConfetti();
+      toast.success(`🎉 Welcome to AthleteXpert, ${formData.firstName}!`, {
+        position: "top-center",
+      });
+
+      setTimeout(() => navigate("/profile"), 500);
+    } catch {
+      toast.error("❌ Failed to complete onboarding. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
+  // ---------- Step Renderer ----------
   const renderStep = () => {
     switch (step) {
       case 1:
@@ -162,7 +169,6 @@ const OnboardingPage = () => {
           <div className="onboarding-step">
             <h2>What's your name?</h2>
             <input
-              type="text"
               name="firstName"
               placeholder="First Name"
               value={formData.firstName}
@@ -170,7 +176,6 @@ const OnboardingPage = () => {
               required
             />
             <input
-              type="text"
               name="lastName"
               placeholder="Last Name"
               value={formData.lastName}
@@ -183,19 +188,12 @@ const OnboardingPage = () => {
             <button
               className="onboarding-skip-btn"
               onClick={() => navigate("/profile")}
-              style={{
-                marginTop: "15px",
-                background: "transparent",
-                color: "#555",
-                border: "none",
-                cursor: "pointer",
-              }}
             >
               Skip and finish later
             </button>
           </div>
         );
-  
+
       case 2:
         return (
           <div className="onboarding-step">
@@ -209,22 +207,18 @@ const OnboardingPage = () => {
                   }`}
                   style={{ backgroundColor: color.toLowerCase() }}
                   onClick={() =>
-                    setFormData({ ...formData, favoriteColor: color })
+                    setFormData((f) => ({ ...f, favoriteColor: color }))
                   }
-                ></div>
+                />
               ))}
             </div>
             <div className="button-group">
-              <button className="onboarding-btn" onClick={() => setStep(1)}>
-                ← Back
-              </button>
-              <button className="onboarding-btn" onClick={() => setStep(3)}>
-                Next ➔
-              </button>
+              <button onClick={() => setStep(1)}>← Back</button>
+              <button onClick={() => setStep(3)}>Next ➔</button>
             </div>
           </div>
         );
-  
+
       case 3:
         return (
           <div className="onboarding-step">
@@ -243,84 +237,50 @@ const OnboardingPage = () => {
               ))}
             </div>
             <div className="button-group">
-              <button className="onboarding-btn" onClick={() => setStep(2)}>
-                ← Back
-              </button>
-              <button className="onboarding-btn" onClick={() => setStep(4)}>
-                Next ➔
-              </button>
+              <button onClick={() => setStep(2)}>← Back</button>
+              <button onClick={() => setStep(4)}>Next ➔</button>
             </div>
           </div>
         );
-  
+
       case 4:
         return (
           <div className="onboarding-step">
             <h2>Where are you located?</h2>
+            <input name="city" placeholder="City" value={formData.city || ""} onChange={handleChange} />
+            <input name="state" placeholder="State" value={formData.state || ""} onChange={handleChange} />
             <input
-              type="text"
-              name="city"
-              placeholder="City"
-              value={formData.city || ""}
-              onChange={handleChange}
-            />
-            <input
-              type="text"
-              name="state"
-              placeholder="State"
-              value={formData.state || ""}
-              onChange={handleChange}
-            />
-            <input
-              type="text"
               name="country"
               placeholder="Country"
               value={formData.country || ""}
               onChange={handleChange}
             />
             <div className="button-group">
-              <button className="onboarding-btn" onClick={() => setStep(3)}>
-                ← Back
-              </button>
-              <button className="onboarding-btn" onClick={() => setStep(5)}>
-                Next ➔
-              </button>
+              <button onClick={() => setStep(3)}>← Back</button>
+              <button onClick={() => setStep(5)}>Next ➔</button>
             </div>
           </div>
         );
-  
+
       case 5:
         return (
           <div className="onboarding-step">
             <h2>Tell us a bit more</h2>
-            <select
-              name="gender"
-              value={formData.gender || ""}
-              onChange={handleChange}
-            >
+            <select name="gender" value={formData.gender || ""} onChange={handleChange}>
               <option value="">Select your gender</option>
               <option value="Male">Male</option>
               <option value="Female">Female</option>
               <option value="Non-Binary">Non-Binary</option>
               <option value="Prefer Not to Say">Prefer Not to Say</option>
             </select>
-            <input
-              type="date"
-              name="dob"
-              value={formData.dob || ""}
-              onChange={handleChange}
-            />
+            <input type="date" name="dob" value={formData.dob || ""} onChange={handleChange} />
             <div className="button-group">
-              <button className="onboarding-btn" onClick={() => setStep(4)}>
-                ← Back
-              </button>
-              <button className="onboarding-btn" onClick={() => setStep(6)}>
-                Next ➔
-              </button>
+              <button onClick={() => setStep(4)}>← Back</button>
+              <button onClick={() => setStep(6)}>Next ➔</button>
             </div>
           </div>
         );
-  
+
       case 6:
         return (
           <div className="onboarding-step">
@@ -330,23 +290,20 @@ const OnboardingPage = () => {
               placeholder="Tell us about yourself (Optional)"
               value={formData.bio}
               onChange={handleChange}
-            ></textarea>
+            />
             <div className="button-group">
-              <button className="onboarding-btn" onClick={() => setStep(5)}>
-                ← Back
-              </button>
-              <button className="onboarding-btn" onClick={handleSubmit}>
-                Finish ✅
+              <button onClick={() => setStep(5)}>← Back</button>
+              <button className="onboarding-btn" onClick={handleSubmit} disabled={isSubmitting}>
+                {isSubmitting ? "Finishing..." : "Finish ✅"}
               </button>
             </div>
           </div>
         );
-  
+
       default:
         return null;
     }
   };
-  
 
   return (
     <div className="onboarding-container">
@@ -360,16 +317,15 @@ const OnboardingPage = () => {
 
       <div className="progress-container">
         <div className="progress-text">
-          Step {step} of {totalSteps}
+          Step {step} of {TOTAL_STEPS}
         </div>
         <div className="progress-bar-wrapper">
-          <div
-            className="progress-bar-fill"
-            style={{ width: `${progressPercentage}%` }}
-          ></div>
+          <div className="progress-bar-fill" style={{ width: `${progressPercentage}%` }} />
         </div>
       </div>
+
       {renderStep()}
+
       <ReactCanvasConfetti
         onInit={getInstance}
         style={{

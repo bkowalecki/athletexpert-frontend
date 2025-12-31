@@ -1,14 +1,18 @@
-import React, { useState, useContext, useEffect, useRef, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import "../../styles/Quiz.css";
+
 import sportsData from "../../data/sports.json";
 import quizData from "../../data/quizData.json";
+
 import ProductCard from "../products/ProductCard";
 import cleanProductTitle from "../../util/CleanProductTitle";
 import { trackEvent } from "../../util/analytics";
-import { QuizContext } from "../../context/QuizContext";
+import { useQuiz } from "../../context/QuizContext";
 import LoadingSpinner from "../../components/LoadingSpinner";
-import SportsCarousel, { Sport } from "../../components/SportsCarousel";
+import SportsCarousel from "../../components/SportsCarousel";
+
 const AMAZON_ASSOCIATE_TAG = "athletexper0b-20";
+
 const FUNNY_LOADING_TEXTS = [
   "Finding the best gear for you…",
   "Sharpening your spikes…",
@@ -24,6 +28,33 @@ const FUNNY_LOADING_TEXTS = [
 ];
 
 type SportKey = keyof typeof quizData.sportSpecific;
+
+type Answers = {
+  sport: string;
+  skillLevel: string;
+  trainingFrequency: string;
+  budget: string;
+  favoriteColor: string;
+  [key: string]: string;
+};
+
+type RecommendedProduct = {
+  id: number;
+  name: string;
+  brand: string;
+  price: number;
+  imgUrl: string;
+  slug: string;
+  affiliateLink: string;
+};
+
+const initialAnswers: Answers = {
+  sport: "",
+  skillLevel: "",
+  trainingFrequency: "",
+  budget: "",
+  favoriteColor: "",
+};
 
 const appendAffiliateTag = (url: string, tag: string) => {
   const urlObj = new URL(url);
@@ -49,219 +80,129 @@ const QuizStep: React.FC<{
             selectedOption === option ? "selected" : ""
           }`}
           onClick={() => onNext(option)}
-          tabIndex={0}
           aria-pressed={selectedOption === option}
+          type="button"
         >
           {option}
         </button>
       ))}
     </div>
+
     {showBack && (
       <div className="quiz-navigation">
-        <button className="quiz-nav-button back" onClick={onBack}>
-          <span aria-hidden="true">&#8592;</span> Back
+        <button className="quiz-nav-button back" onClick={onBack} type="button">
+          ← Back
         </button>
       </div>
     )}
   </>
 );
 
-const initialAnswers = {
-  sport: "",
-  skillLevel: "",
-  trainingFrequency: "",
-  budget: "",
-  favoriteColor: "",
-  // add more fields as needed (dynamically handled)
-};
-
 const Quiz: React.FC<{ isOpen: boolean; closeModal: () => void }> = ({
   isOpen,
   closeModal,
 }) => {
-  const { dispatch } = useContext(QuizContext);
-  const [step, setStep] = useState(0); // 0 = sport selector
+  const { dispatch } = useQuiz();
+
+  const [step, setStep] = useState(0);
   const [carouselIndex, setCarouselIndex] = useState(0);
-  const [recommendedProducts, setRecommendedProducts] = useState<any[]>([]);
+  const [recommendedProducts, setRecommendedProducts] = useState<
+    RecommendedProduct[]
+  >([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [answers, setAnswers] = useState<any>(initialAnswers);
-  const [loadingText, setLoadingText] = useState(FUNNY_LOADING_TEXTS[0]);
+  const [answers, setAnswers] = useState<Answers>(initialAnswers);
   const [loadingTextIndex, setLoadingTextIndex] = useState(0);
 
-  // Memoize main/global questions (never includes "sport")
-  const mainQuestions = useMemo(() => {
-    return quizData.questions.filter((q: any) => q.field !== "sport");
-  }, []);
+  const mainQuestions = useMemo(
+    () => quizData.questions.filter((q: any) => q.field !== "sport"),
+    []
+  );
 
-  // Memoize all questions to ask (after sport selection)
   const quizQuestions = useMemo(() => {
     if (!answers.sport) return [];
-    const sportKey = answers.sport?.toLowerCase() as SportKey | undefined;
+
+    const sportKey = answers.sport.toLowerCase() as SportKey | undefined;
     const sportQs =
-      sportKey && quizData.sportSpecific && sportKey in quizData.sportSpecific
-        ? (quizData.sportSpecific as Record<SportKey, any[]>)[sportKey] || []
+      sportKey && quizData.sportSpecific?.[sportKey]
+        ? quizData.sportSpecific[sportKey]
         : [];
-    // Remove global questions whose 'field' matches any in sportQs
+
     const sportFields = new Set(sportQs.map((q: any) => q.field));
     const globalQs = mainQuestions.filter(
       (q: any) => !sportFields.has(q.field)
     );
+
     return [...sportQs, ...globalQs];
-  }, [answers.sport, quizData, mainQuestions]);
+  }, [answers.sport, mainQuestions]);
 
-  const totalSteps = 1 + quizQuestions.length; // 1 = sport, rest = quizQuestions
-
-  // The "current" question (after sport selected)
+  const totalSteps = 1 + quizQuestions.length;
   const currentQuestion =
     step > 0 && step <= quizQuestions.length ? quizQuestions[step - 1] : null;
 
-  // Progress bar logic (starts at 0 for sport, then increments per question)
   const progress =
     step === 0
       ? 0
       : Math.min(100, Math.round((step / quizQuestions.length) * 100));
 
+  // Loading text rotation (single effect – no duplication)
   useEffect(() => {
     if (!isLoading) {
       setLoadingTextIndex(0);
       return;
     }
-    // Start at random index
+
     setLoadingTextIndex(Math.floor(Math.random() * FUNNY_LOADING_TEXTS.length));
-    // Change message every 2.2 seconds
+
     const interval = setInterval(() => {
       setLoadingTextIndex((prev) => (prev + 1) % FUNNY_LOADING_TEXTS.length);
     }, 2200);
 
     return () => clearInterval(interval);
   }, [isLoading]);
-  // Recommendation fetch
+
+  // Fetch recommendations
   useEffect(() => {
-    if (step === totalSteps) {
-      setLoadingText(
-        FUNNY_LOADING_TEXTS[
-          Math.floor(Math.random() * FUNNY_LOADING_TEXTS.length)
-        ]
-      );
-      setIsLoading(true);
-      fetch(`${process.env.REACT_APP_API_URL}/recommendations`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(answers),
+    if (step !== totalSteps) return;
+
+    setIsLoading(true);
+
+    fetch(`${process.env.REACT_APP_API_URL}/recommendations`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify(answers),
+    })
+      .then((res) => (res.ok ? res.json() : Promise.reject()))
+      .then((data: RecommendedProduct[]) => {
+        setRecommendedProducts(data);
+        setIsLoading(false);
       })
-        .then((res) => (res.ok ? res.json() : Promise.reject()))
-        .then((data) => {
-          setRecommendedProducts(data);
-          setIsLoading(false);
-        })
-        .catch(() => setIsLoading(false));
+      .catch(() => setIsLoading(false));
 
-      trackEvent("quiz_complete", answers);
+    if (answers.favoriteColor) {
+      dispatch({
+        type: "SET_FAVORITE_COLOR",
+        color: answers.favoriteColor,
+      });
     }
-    // eslint-disable-next-line
-  }, [step, answers, totalSteps]);
 
-  // Next and Back
+    trackEvent("quiz_complete", answers);
+  }, [step, totalSteps, answers, dispatch]);
+
   const handleNext = (field: string, value: string) => {
-    setAnswers((prev: any) => ({ ...prev, [field]: value }));
-    setStep((prevStep) => prevStep + 1);
+    setAnswers((prev) => ({ ...prev, [field]: value }));
+    setStep((prev) => prev + 1);
   };
 
   const handleBack = () => {
-    if (step === totalSteps) {
-      setStep(step - 1);
-      return;
-    }
-    if (step > 0) {
-      // Find field for this step and clear answer (optional)
-      const fieldToClear = quizQuestions[step - 1]?.field;
-      setAnswers((prev: any) => {
-        const updated = { ...prev };
-        if (fieldToClear) updated[fieldToClear] = "";
-        return updated;
-      });
-      setStep((prev) => prev - 1);
-    }
+    if (step > 0) setStep((prev) => prev - 1);
   };
 
-  // Carousel arrows and swipe
-  const carouselRef = useRef<HTMLDivElement | null>(null);
-  const touchStartX = useRef<number | null>(null);
-
-  const handleCarousel = (direction: "left" | "right") => {
-    setCarouselIndex((prevIndex) =>
-      direction === "left"
-        ? prevIndex === 0
-          ? sportsData.length - 1
-          : prevIndex - 1
-        : prevIndex === sportsData.length - 1
-        ? 0
-        : prevIndex + 1
-    );
-  };
-
-  // Touch event handlers for carousel swipe
+  // Scroll lock
   useEffect(() => {
-    const node = carouselRef.current;
-    if (!node) return;
-
-    const handleTouchStart = (e: TouchEvent) => {
-      touchStartX.current = e.touches[0].clientX;
-    };
-    const handleTouchEnd = (e: TouchEvent) => {
-      if (touchStartX.current === null) return;
-      const deltaX = e.changedTouches[0].clientX - touchStartX.current;
-      if (Math.abs(deltaX) > 36) {
-        if (deltaX > 0) handleCarousel("left");
-        else handleCarousel("right");
-      }
-      touchStartX.current = null;
-    };
-
-    node.addEventListener("touchstart", handleTouchStart);
-    node.addEventListener("touchend", handleTouchEnd);
-
-    return () => {
-      node.removeEventListener("touchstart", handleTouchStart);
-      node.removeEventListener("touchend", handleTouchEnd);
-    };
-  }, [carouselRef, step, carouselIndex]);
-
-  // Lock body scroll
-  useEffect(() => {
-    const body = document.body;
-    if (isOpen) body.classList.add("scroll-lock");
-    else body.classList.remove("scroll-lock");
-    return () => body.classList.remove("scroll-lock");
+    document.body.classList.toggle("scroll-lock", isOpen);
+    return () => document.body.classList.remove("scroll-lock");
   }, [isOpen]);
-
-  // Carousel keyboard nav
-  useEffect(() => {
-    if (step === 0) {
-      const handleKeyDown = (e: KeyboardEvent) => {
-        if (e.key === "ArrowLeft") handleCarousel("left");
-        if (e.key === "ArrowRight") handleCarousel("right");
-      };
-      window.addEventListener("keydown", handleKeyDown);
-      return () => window.removeEventListener("keydown", handleKeyDown);
-    }
-  }, [step]);
-
-  useEffect(() => {
-    if (!isLoading) {
-      setLoadingTextIndex(0);
-      return;
-    }
-    // Start at random index
-    setLoadingTextIndex(Math.floor(Math.random() * FUNNY_LOADING_TEXTS.length));
-    // Change message every 2.2 seconds
-    const interval = setInterval(() => {
-      setLoadingTextIndex((prev) => (prev + 1) % FUNNY_LOADING_TEXTS.length);
-    }, 2200);
-
-    return () => clearInterval(interval);
-  }, [isLoading]);
 
   if (!isOpen) return null;
 
@@ -270,40 +211,33 @@ const Quiz: React.FC<{ isOpen: boolean; closeModal: () => void }> = ({
       className="quiz-modal"
       role="dialog"
       aria-modal="true"
-      aria-label="Gear Recommendation Quiz"
       onClick={closeModal}
     >
       <div
         className="quiz-modal-content"
         onClick={(e) => e.stopPropagation()}
-        tabIndex={-1}
         role="document"
       >
         <button
           className="close-button"
           onClick={closeModal}
-          aria-label="Close quiz modal"
           type="button"
+          aria-label="Close quiz"
         >
-          <svg viewBox="0 0 24 24">
-            <path d="M18.3 5.71a1 1 0 0 0-1.42-1.42L12 9.17 7.11 4.29A1 1 0 0 0 5.7 5.71L10.58 10.6 5.7 15.48a1 1 0 0 0 1.41 1.41L12 11.99l4.89 4.89a1 1 0 0 0 1.42-1.41l-4.88-4.89 4.88-4.89Z" />
-          </svg>
+          ✕
         </button>
+
         <div className="quiz-progress-bar">
-          <div
-            className="quiz-progress"
-            style={{ width: `${progress}%` }}
-            aria-valuenow={progress}
-            aria-valuemax={100}
-            aria-valuemin={0}
-          />
+          <div className="quiz-progress" style={{ width: `${progress}%` }} />
         </div>
+
         <div className="quiz-scrollable-content">
           {isLoading ? (
-            <LoadingSpinner text={FUNNY_LOADING_TEXTS[loadingTextIndex]} />
+            <LoadingSpinner
+              text={FUNNY_LOADING_TEXTS[loadingTextIndex]}
+            />
           ) : (
             <>
-              {/* Step 0: Sport Selection Carousel */}
               {step === 0 && (
                 <>
                   <h2 className="quiz-question">
@@ -313,85 +247,43 @@ const Quiz: React.FC<{ isOpen: boolean; closeModal: () => void }> = ({
                     sports={sportsData}
                     currentIndex={carouselIndex}
                     setCurrentIndex={setCarouselIndex}
-                    onSelect={(sport) => {
-                      handleNext("sport", sport.title.toLowerCase());
-                    }}
+                    onSelect={(sport) =>
+                      handleNext("sport", sport.title.toLowerCase())
+                    }
                   />
-                  <div className="quiz-navigation">
-                    <button
-                      className="quiz-nav-button quiz-nav-next"
-                      onClick={() =>
-                        handleNext(
-                          "sport",
-                          sportsData[carouselIndex].title.toLowerCase()
-                        )
-                      }
-                      tabIndex={0}
-                      type="button"
-                    >
-                      Next <span aria-hidden="true">&#8594;</span>
-                    </button>
-                  </div>
                 </>
               )}
 
-              {/* All follow-up questions */}
               {step > 0 && step < totalSteps && currentQuestion && (
                 <QuizStep
-                  question={
-                    currentQuestion.field === "skillLevel" && answers.sport
-                      ? `What's your skill level in ${answers.sport}?`
-                      : currentQuestion.question
-                  }
+                  question={currentQuestion.question}
                   options={currentQuestion.options}
                   selectedOption={answers[currentQuestion.field]}
-                  onNext={(option) => handleNext(currentQuestion.field, option)}
+                  onNext={(option) =>
+                    handleNext(currentQuestion.field, option)
+                  }
                   onBack={handleBack}
-                  showBack={step > 0}
+                  showBack
                 />
               )}
 
-              {/* Recommendations display */}
-              {step === totalSteps && (
-                <div className="recommended-products">
-                  <h3 className="recommended-products-title">
-                    Recommended For You
-                  </h3>
-                  {recommendedProducts.length === 0 ? (
-                    <div className="recommended-empty">
-                      <span>
-                        Sorry, we couldn't find any gear this time.
-                        <br />
-                        Try changing your answers or come back soon!
-                      </span>
-                    </div>
-                  ) : (
-                    <div className="quiz-product-grid">
-                      {recommendedProducts.map((product) => (
-                        <ProductCard
-                          id={product.id}
-                          key={product.id}
-                          name={cleanProductTitle(product.name)}
-                          brand={product.brand}
-                          price={product.price}
-                          imgUrl={product.imgUrl}
-                          slug={product.slug}
-                          affiliateLink={appendAffiliateTag(
-                            product.affiliateLink,
-                            AMAZON_ASSOCIATE_TAG
-                          )}
-                        />
-                      ))}
-                    </div>
-                  )}
-                  {/* <div className="quiz-navigation">
-                    <button
-                      className="quiz-nav-button back"
-                      onClick={handleBack}
-                    >
-                      <span aria-hidden="true">&#8592;</span> Back
-                    </button>
-                  </div> */}
+              {step === totalSteps && !isLoading && (
+                <div className="quiz-product-grid">
+                  {recommendedProducts.map((product) => (
+                    <ProductCard
+                      key={product.id}
+                      id={product.id}
+                      name={cleanProductTitle(product.name)}
+                      brand={product.brand}
+                      price={product.price}
+                      imgUrl={product.imgUrl}
+                      slug={product.slug}
+                      affiliateLink={appendAffiliateTag(
+                        product.affiliateLink,
+                        AMAZON_ASSOCIATE_TAG
+                      )}
+                    />
+                  ))}
                 </div>
               )}
             </>

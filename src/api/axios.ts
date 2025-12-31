@@ -1,48 +1,70 @@
 // src/api/axios.ts
 
-import axios, { InternalAxiosRequestConfig } from "axios";
+import axios, { InternalAxiosRequestConfig, AxiosError } from "axios";
 
-// Set your base URL
-const baseURL = process.env.REACT_APP_API_URL || "http://localhost:8080";
+const baseURL = process.env.REACT_APP_API_URL ?? "http://localhost:8080";
 
-// 🔒 Grab cookie value by name (for CSRF token)
+// --- Constants (easy to change later) ---
+const CSRF_COOKIE_NAME = "XSRF-TOKEN";
+const CSRF_HEADER_NAME = "X-XSRF-TOKEN";
+const REQUEST_TIMEOUT_MS = 15_000;
+
+// --- Safe cookie reader ---
 function getCookie(name: string): string | null {
-  const match = document.cookie.match(new RegExp(`(^| )${name}=([^;]+)`));
-  return match ? decodeURIComponent(match[2]) : null;
+  if (typeof document === "undefined") return null;
+
+  const cookies = document.cookie.split("; ");
+  for (const cookie of cookies) {
+    const [key, value] = cookie.split("=");
+    if (key === name) {
+      return decodeURIComponent(value);
+    }
+  }
+  return null;
 }
 
-// ✅ Create Axios instance
+// --- Axios instance ---
 const api = axios.create({
   baseURL,
   withCredentials: true,
+  timeout: REQUEST_TIMEOUT_MS,
   headers: {
     "Content-Type": "application/json",
   },
 });
 
-// ✅ Interceptor to attach CSRF token on mutating requests
+// --- Request interceptor: attach CSRF token ---
 api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
-  const csrfToken = getCookie("XSRF-TOKEN");
   const method = config.method?.toLowerCase();
-  const needsCsrf = ["post", "put", "delete"].includes(method || "");
+  const needsCsrf = method === "post" || method === "put" || method === "delete";
 
-  if (csrfToken && needsCsrf) {
-    config.headers["X-XSRF-TOKEN"] = csrfToken;
+  if (needsCsrf) {
+    const csrfToken = getCookie(CSRF_COOKIE_NAME);
+    if (csrfToken) {
+      config.headers[CSRF_HEADER_NAME] = csrfToken;
+    }
   }
 
   return config;
 });
 
-// ✅ Global response handler (optional)
+// --- Response interceptor: global auth handling ---
 api.interceptors.response.use(
-  (res) => res,
-  (err) => {
-    if (err?.response?.status === 401) {
-      // Optional: toast or redirect
+  (response) => response,
+  (error: AxiosError) => {
+    const status = error.response?.status;
+
+    if (status === 401) {
+      // Clear any cached auth artifacts
       sessionStorage.removeItem("ax_id_token");
-      window.location.href = "/auth"; // or use navigate if inside component
+
+      // Hard redirect keeps behavior consistent outside React tree
+      if (typeof window !== "undefined") {
+        window.location.assign("/auth");
+      }
     }
-    return Promise.reject(err);
+
+    return Promise.reject(error);
   }
 );
 

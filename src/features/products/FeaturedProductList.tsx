@@ -1,6 +1,6 @@
 // src/components/products/FeaturedProductList.tsx
 
-import React from "react";
+import React, { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import ProductCard from "../products/ProductCard";
 import { useSavedProducts } from "../../hooks/useSavedProducts";
@@ -11,6 +11,11 @@ import "../../styles/FeaturedProductList.css";
 const FeaturedProductList: React.FC = () => {
   const { savedProductIds, toggleSaveProduct } = useSavedProducts();
 
+  const savedSet = useMemo(
+    () => new Set<number>(savedProductIds ?? []),
+    [savedProductIds]
+  );
+
   const {
     data: products = [],
     isLoading,
@@ -18,17 +23,24 @@ const FeaturedProductList: React.FC = () => {
   } = useQuery<Product[], Error>({
     queryKey: ["featuredProducts"],
     queryFn: fetchFeaturedProducts,
-    staleTime: 10_000,
+    staleTime: 60_000, // featured doesn't need to refresh constantly
     retry: 1,
   });
 
   return (
-    <section className="featured-products-section">
+    <section
+      className="featured-products-section"
+      aria-labelledby="featured-title"
+    >
       <div className="featured-products-container">
-        <h2 className="featured-products-heading">Featured</h2>
+        <h2 id="featured-title" className="featured-products-heading">
+          Featured
+        </h2>
 
         {isLoading && (
-          <p className="featured-products-message">Loading featured products...</p>
+          <p className="featured-products-message">
+            Loading featured products...
+          </p>
         )}
 
         {isError && (
@@ -43,27 +55,37 @@ const FeaturedProductList: React.FC = () => {
           </p>
         )}
 
-        <div className="featured-products-grid">
-          {products.map((product) => (
-            <ProductCard
-              key={product.id}
-              id={product.id}
-              name={product.name}
-              brand={product.brand}
-              price={typeof product.price === "number" ? product.price : 0}
-              imgUrl={product.imgUrl}
-              affiliateLink={product.affiliateLink}
-              slug={product.slug}
-              isSaved={!!product.id && savedProductIds.includes(product.id)}
-              onToggleSave={() => toggleSaveProduct(product.id)}
-              isAmazonFallback={product.isAmazonFallback}
-              isTrending={product.trending}
-            />
-          ))}
+        <div className="featured-products-grid" aria-live="polite">
+          {products.map((product) => {
+            const productId = product.id;
+
+            return (
+              <ProductCard
+                key={productId ?? product.asin ?? product.slug ?? product.name}
+                id={productId}
+                name={product.name}
+                brand={product.brand}
+                price={typeof product.price === "number" ? product.price : null}
+                imgUrl={product.imgUrl}
+                affiliateLink={product.affiliateLink}
+                slug={product.slug}
+                isSaved={
+                  typeof productId === "number" && savedSet.has(productId)
+                }
+                onToggleSave={
+                  typeof productId === "number"
+                    ? () => toggleSaveProduct(productId)
+                    : undefined
+                }
+                isAmazonFallback={product.isAmazonFallback}
+                isTrending={Boolean((product as any).trending)}
+              />
+            );
+          })}
         </div>
       </div>
     </section>
   );
 };
 
-export default FeaturedProductList;
+export default React.memo(FeaturedProductList);

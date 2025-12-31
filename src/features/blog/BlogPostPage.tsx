@@ -5,39 +5,51 @@ import DOMPurify from "dompurify";
 import { Helmet } from "react-helmet";
 import ShareButtons from "../../components/ShareButtons";
 import BlogCard from "./BlogCard";
-import { BlogPost } from "../../types/blogs";
+import type { BlogPost } from "../../types/blogs";
 import { fetchBlogPost, fetchRelatedBlogs } from "../../api/blog";
 import "../../styles/BlogPostPage.css";
 
 const BlogPostPage: React.FC = () => {
-  const { slug } = useParams<{ slug: string }>();
+  const { slug } = useParams<{ slug?: string }>();
   const navigate = useNavigate();
+  const hasRedirectedRef = useRef(false);
 
   const origin =
-    typeof window !== "undefined" ? window.location.origin : "https://www.athletexpert.org";
+    typeof window !== "undefined"
+      ? window.location.origin
+      : "https://www.athletexpert.org";
+
   const canonicalUrl = slug ? `${origin}/blog/${slug}` : `${origin}/blog`;
 
   const contentRef = useRef<HTMLDivElement | null>(null);
 
-  const { data: post, isLoading, isError } = useQuery<BlogPost, Error>({
+  const {
+    data: post,
+    isLoading,
+    isError,
+  } = useQuery<BlogPost, Error>({
     queryKey: ["blogPost", slug],
-    queryFn: () => fetchBlogPost(slug!),
+    queryFn: () => fetchBlogPost(slug as string),
     enabled: !!slug,
     retry: 1,
   });
 
   const { data: relatedBlogs = [] } = useQuery<BlogPost[]>({
     queryKey: ["relatedBlogs", slug],
-    queryFn: () => fetchRelatedBlogs(slug!),
+    queryFn: () => fetchRelatedBlogs(slug as string),
     enabled: !!slug,
   });
 
-  // Redirect to 404 if error or post not found
+  // Redirect to 404 (once) if error or post not found
   useEffect(() => {
-    if (isError || (!isLoading && !post)) navigate("/404", { replace: true });
+    if (hasRedirectedRef.current) return;
+    if (isError || (!isLoading && !post)) {
+      hasRedirectedRef.current = true;
+      navigate("/404", { replace: true });
+    }
   }, [isError, isLoading, post, navigate]);
 
-  // Ensure all external links open in new tab with proper rel (scoped to content)
+  // Ensure all external links open safely (scoped to content)
   useEffect(() => {
     const el = contentRef.current;
     if (!el) return;
@@ -49,20 +61,16 @@ const BlogPostPage: React.FC = () => {
     });
   }, [post?.content]);
 
-  const formattedDate = useMemo(
-    () =>
-      post?.publishedDate
-        ? new Date(post.publishedDate).toLocaleDateString(undefined, {
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-          })
-        : "",
-    [post?.publishedDate]
-  );
+  const formattedDate = useMemo(() => {
+    if (!post?.publishedDate) return "";
+    return new Date(post.publishedDate).toLocaleDateString(undefined, {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  }, [post?.publishedDate]);
 
   const sanitizedContent = useMemo(() => {
-    // Keep your behavior: render HTML, but sanitize it.
     return DOMPurify.sanitize(post?.content || "");
   }, [post?.content]);
 
@@ -85,6 +93,7 @@ const BlogPostPage: React.FC = () => {
         <link rel="canonical" href={canonicalUrl} />
 
         <meta property="og:type" content="article" />
+        <meta property="og:site_name" content="AthleteXpert" />
         <meta property="og:title" content={post.title} />
         <meta property="og:description" content={post.summary || post.title} />
         {post.imageUrl && <meta property="og:image" content={post.imageUrl} />}
@@ -100,10 +109,13 @@ const BlogPostPage: React.FC = () => {
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "Article",
+            mainEntityOfPage: canonicalUrl,
             headline: post.title,
             image: post.imageUrl ? [post.imageUrl] : undefined,
             datePublished: post.publishedDate,
-            author: post.author ? [{ "@type": "Person", name: post.author }] : undefined,
+            author: post.author
+              ? [{ "@type": "Person", name: post.author }]
+              : undefined,
             publisher: {
               "@type": "Organization",
               name: "AthleteXpert",
@@ -121,8 +133,18 @@ const BlogPostPage: React.FC = () => {
             "@context": "https://schema.org",
             "@type": "BreadcrumbList",
             itemListElement: [
-              { "@type": "ListItem", position: 1, name: "Blog", item: `${origin}/blog` },
-              { "@type": "ListItem", position: 2, name: post.title, item: canonicalUrl },
+              {
+                "@type": "ListItem",
+                position: 1,
+                name: "Blog",
+                item: `${origin}/blog`,
+              },
+              {
+                "@type": "ListItem",
+                position: 2,
+                name: post.title,
+                item: canonicalUrl,
+              },
             ],
           })}
         </script>

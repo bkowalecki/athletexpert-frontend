@@ -53,6 +53,9 @@ const BlogCard: React.FC<BlogCardProps> = ({
 
   const onKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
+      // Avoid triggering when focus is inside nested interactive elements
+      if (e.currentTarget !== e.target) return;
+
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
         handleActivate();
@@ -61,20 +64,34 @@ const BlogCard: React.FC<BlogCardProps> = ({
     [handleActivate]
   );
 
-  const formattedDate = useMemo(
-    () =>
-      publishedDate
-        ? new Date(publishedDate).toLocaleDateString(undefined, {
-            year: "numeric",
-            month: "short",
-            day: "numeric",
-          })
-        : "",
-    [publishedDate]
+  const formattedDate = useMemo(() => {
+    if (!publishedDate) return "";
+    return new Date(publishedDate).toLocaleDateString(undefined, {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  }, [publishedDate]);
+
+  const cardClass = `blog-card blog-card-${variant}`;
+  const titleId = `blog-card-title-${id}`;
+  const summaryId = summary ? `blog-card-summary-${id}` : undefined;
+
+  const handleBookmarkClick = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      e.stopPropagation();
+      isSaved ? onUnsave?.() : onSave?.();
+    },
+    [isSaved, onSave, onUnsave]
   );
 
-  const cardClass = useMemo(() => `blog-card blog-card-${variant}`, [variant]);
-  const titleId = useMemo(() => `blog-card-title-${id}`, [id]);
+  const handlePinClick = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      e.stopPropagation();
+      onPin?.();
+    },
+    [onPin]
+  );
 
   return (
     <div
@@ -84,6 +101,7 @@ const BlogCard: React.FC<BlogCardProps> = ({
       tabIndex={0}
       role="article"
       aria-labelledby={titleId}
+      aria-describedby={summaryId}
     >
       {/* Bookmark Button (always top-right) */}
       <div className="blog-card-bookmark-container">
@@ -93,10 +111,7 @@ const BlogCard: React.FC<BlogCardProps> = ({
           aria-label={isSaved ? "Unsave blog" : "Save blog"}
           aria-pressed={!!isSaved}
           onMouseDown={(e) => e.stopPropagation()}
-          onClick={(e) => {
-            e.stopPropagation();
-            isSaved ? onUnsave?.() : onSave?.();
-          }}
+          onClick={handleBookmarkClick}
         >
           <BookmarkIcon filled={!!isSaved} />
         </button>
@@ -111,10 +126,7 @@ const BlogCard: React.FC<BlogCardProps> = ({
             aria-label={isPinned ? "Unpin blog" : "Pin blog"}
             aria-pressed={!!isPinned}
             onMouseDown={(e) => e.stopPropagation()}
-            onClick={(e) => {
-              e.stopPropagation();
-              onPin?.();
-            }}
+            onClick={handlePinClick}
           >
             <PinIcon filled={!!isPinned} />
           </button>
@@ -132,12 +144,11 @@ const BlogCard: React.FC<BlogCardProps> = ({
       />
 
       <div className={`blog-card-content blog-card-content-${variant}`}>
-        {/* ✅ Visible link for crawlers + keyboard users */}
+        {/* Visible link for crawlers + keyboard users */}
         <h4 className={`blog-card-title blog-card-title-${variant}`} id={titleId}>
           <Link
             to={href}
             onClick={(e) => {
-              // Keep card click behavior intact but ensure link is also real.
               e.stopPropagation();
               trackEvent("blog_view", { blog_id: id, blog_title: title, author, slug });
             }}
@@ -155,10 +166,14 @@ const BlogCard: React.FC<BlogCardProps> = ({
           </div>
         )}
 
-        {summary && <p className="blog-card-summary">{summary}</p>}
+        {summary && (
+          <p className="blog-card-summary" id={summaryId}>
+            {summary}
+          </p>
+        )}
       </div>
     </div>
   );
 };
 
-export default BlogCard;
+export default React.memo(BlogCard);

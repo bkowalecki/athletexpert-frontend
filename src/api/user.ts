@@ -1,31 +1,39 @@
 // src/api/user.ts
 
 import api from "./axios";
-import type { UserProfile } from "../types/users";
+import type { UserProfile, UserProfileResponse } from "../types/users";
 
-// Fetch the current user session (for UserContext bootstrapping)
-export async function fetchUserSession() {
+/**
+ * Fetch the current authenticated session.
+ * Used for UserContext bootstrapping.
+ * Returns null if session is invalid/expired.
+ */
+export async function fetchUserSession(): Promise<any | null> {
   try {
-    const res = await api.get("/users/session", { withCredentials: true });
-    return res.data;
+    const { data } = await api.get("/users/session");
+    return data;
   } catch (err: any) {
-    if (err.response?.status === 401) {
-      console.warn("🕒 Session expired or invalid.");
+    if (err?.response?.status === 401) {
+      if (process.env.NODE_ENV !== "production") {
+        console.warn("🕒 Session expired or invalid.");
+      }
       return null;
     }
     throw err;
   }
 }
 
-// ---- GET USER PROFILE ----
-// Optionally type your profile if you have a type (example below).
-// interface UserProfile { ... }
-export const fetchUserProfile = async () => {
-  const { data } = await api.get(`/users/profile`, { withCredentials: true });
+/**
+ * Fetch the full user profile.
+ */
+export const fetchUserProfile = async (): Promise<UserProfileResponse> => {
+  const { data } = await api.get<UserProfileResponse>("/users/profile");
   return data;
 };
 
-// Login (email/password)
+/**
+ * Login (email/password)
+ */
 export const loginUser = async ({
   email,
   password,
@@ -33,15 +41,13 @@ export const loginUser = async ({
   email: string;
   password: string;
 }) => {
-  const { data } = await api.post(
-    "/users/login",
-    { email, password },
-    { withCredentials: true }
-  );
+  const { data } = await api.post("/users/login", { email, password });
   return data;
 };
 
-// Register
+/**
+ * Register new user
+ */
 export const registerUser = async ({
   username,
   email,
@@ -51,72 +57,67 @@ export const registerUser = async ({
   email: string;
   password: string;
 }) => {
-  const { data } = await api.post(
-    "/users/register",
-    { username, email, password },
-    { withCredentials: true }
-  );
+  const { data } = await api.post("/users/register", {
+    username,
+    email,
+    password,
+  });
   return data;
 };
 
-// ---- GET SAVED BLOG IDS ----
+/**
+ * ---- SAVED BLOGS ----
+ */
+
 export const fetchSavedBlogIds = async (): Promise<number[]> => {
-  const { data } = await api.get(`/users/profile`, { withCredentials: true });
-  // Assumes user profile returns savedBlogIds array.
-  return data.savedBlogIds || [];
+  const profile = await fetchUserProfile();
+  return profile.savedBlogIds ?? [];
 };
 
-// ---- SAVE OR UNSAVE A BLOG ----
 export const toggleSaveBlog = async (
   blogId: number,
   isSaved: boolean
 ): Promise<void> => {
-  await api({
+  await api.request({
     method: isSaved ? "DELETE" : "POST",
     url: `/users/saved-blogs/${blogId}`,
-    withCredentials: true,
   });
 };
 
-// ---- EXTRAS (if needed) ----
-// You can add more user functions here as you grow (update profile, change password, get notifications, etc).
+/**
+ * ---- SAVED PRODUCTS ----
+ */
 
-// Example: Get all saved blogs (full objects, not just IDs)
-// export const fetchSavedBlogs = async () => {
-//   const { data } = await api.get(`/users/saved-blogs`, { withCredentials: true });
-//   return data; // Array of BlogPost objects
-// };
-
-// ---- GET SAVED PRODUCT IDS ----
 export const fetchSavedProductIds = async (): Promise<number[]> => {
-  const { data } = await api.get(`/users/profile`, { withCredentials: true });
-  // Assumes user profile returns savedProductIds array.
-  return data.savedProductIds || [];
+  const profile = await fetchUserProfile();
+  return profile.savedProductIds ?? [];
 };
 
-// ---- SAVE OR UNSAVE A PRODUCT ----
 export const toggleSaveProduct = async (
   productId: number,
   isSaved: boolean
 ): Promise<void> => {
-  await api({
+  await api.request({
     method: isSaved ? "DELETE" : "POST",
     url: `/users/saved-products/${productId}`,
-    withCredentials: true,
   });
 };
 
-// ---- UPDATE PROFILE ----
+/**
+ * ---- PROFILE MANAGEMENT ----
+ */
+
 export const updateUserProfile = async (
   profile: UserProfile
 ): Promise<UserProfile> => {
-  const { data } = await api.put("/users/profile", profile, {
-    withCredentials: true,
-  });
+  const { data } = await api.put<UserProfile>("/users/profile", profile);
   return data;
 };
 
-// ---- DELETE ACCOUNT ----
+/**
+ * ---- ACCOUNT ----
+ */
+
 export const deleteUserAccount = async (): Promise<void> => {
-  await api.delete("/users/delete", { withCredentials: true });
+  await api.delete("/users/delete");
 };

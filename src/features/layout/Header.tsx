@@ -25,45 +25,51 @@ const Header: React.FC = () => {
   const menuRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
-  // --- Responsive check (safe for SSR)
+  // Responsive check (hydration-safe)
   useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth <= MOBILE_BREAKPOINT);
+    const checkMobile = () =>
+      setIsMobile(window.innerWidth <= MOBILE_BREAKPOINT);
+
     checkMobile();
     window.addEventListener("resize", checkMobile);
-    setIsHydrated(true); // Ensures client-side match
+    setIsHydrated(true);
+
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  // --- Lock body scroll on mobile menu open
+  // Lock body scroll on mobile menu
   useEffect(() => {
-    if (isMobile && menuState === "open") {
-      document.body.style.overflow = "hidden";
-    } else {
+    document.body.style.overflow =
+      isMobile && menuState === "open" ? "hidden" : "";
+    return () => {
       document.body.style.overflow = "";
-    }
-    return () => { document.body.style.overflow = ""; };
+    };
   }, [isMobile, menuState]);
 
-  // --- Outside click closes menu
+  // Outside click closes menu
   useEffect(() => {
     if (!isMobile || menuState !== "open") return;
+
     const handleOutsideClick = (e: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
         setMenuState("closing");
       }
     };
+
     document.addEventListener("mousedown", handleOutsideClick);
     return () => document.removeEventListener("mousedown", handleOutsideClick);
   }, [isMobile, menuState]);
 
   const toggleMobileMenu = () => {
-    setMenuState(prev =>
+    setMenuState((prev) =>
       prev === "open" ? "closing" : prev === "closed" ? "open" : prev
     );
   };
 
   const closeMobileMenu = useCallback(() => {
-    if (isMobile && menuState === "open") setMenuState("closing");
+    if (isMobile && menuState === "open") {
+      setMenuState("closing");
+    }
   }, [isMobile, menuState]);
 
   const handleProfileClick = useCallback(() => {
@@ -72,7 +78,6 @@ const Header: React.FC = () => {
     closeMobileMenu();
   }, [isSessionChecked, user, navigate, closeMobileMenu]);
 
-  // Don't render until hydration (avoid window mismatch on SSR)
   if (!isHydrated) return null;
 
   return (
@@ -98,6 +103,7 @@ const Header: React.FC = () => {
 
       <nav
         ref={menuRef}
+        id="main-navigation"
         className={`nav-links ${
           menuState === "open"
             ? "mobile-menu-open"
@@ -105,8 +111,7 @@ const Header: React.FC = () => {
             ? "mobile-menu-closing"
             : ""
         }`}
-        aria-label="Primary Navigation"
-        id="main-navigation"
+        aria-label="Primary navigation"
         onTransitionEnd={(e) => {
           if (e.propertyName === "transform" && menuState === "closing") {
             setMenuState("closed");
@@ -115,7 +120,10 @@ const Header: React.FC = () => {
       >
         {isMobile && (
           <div className="mobile-search">
-            <HeaderSearchBar showSubmitButton={false} onSearchComplete={closeMobileMenu} />
+            <HeaderSearchBar
+              showSubmitButton={false}
+              onSearchComplete={closeMobileMenu}
+            />
           </div>
         )}
 
@@ -135,10 +143,7 @@ const Header: React.FC = () => {
 
         <button
           className="nav-link nav-button"
-          onClick={() => {
-            trackEvent("nav_click", { section: "Profile" });
-            handleProfileClick();
-          }}
+          onClick={handleProfileClick}
           aria-label="Go to Profile"
         >
           Profile
@@ -147,17 +152,17 @@ const Header: React.FC = () => {
 
       <div
         className="hamburger-menu"
-        onClick={toggleMobileMenu}
         role="button"
+        tabIndex={0}
         aria-label="Toggle navigation menu"
         aria-controls="main-navigation"
         aria-expanded={menuState === "open"}
-        tabIndex={0} // <-- make keyboard accessible
-        onKeyDown={e => {
+        onClick={toggleMobileMenu}
+        onKeyDown={(e) => {
           if (e.key === "Enter" || e.key === " ") toggleMobileMenu();
         }}
       >
-        {[0, 1, 2].map(i => (
+        {[0, 1, 2].map((i) => (
           <div key={i} className={`bar ${menuState === "open" ? "open" : ""}`} />
         ))}
       </div>

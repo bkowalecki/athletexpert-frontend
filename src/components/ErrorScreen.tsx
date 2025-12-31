@@ -10,10 +10,20 @@ const ErrorScreen: React.FC<ErrorScreenProps> = ({
   message = "Something went wrong. Please try again.",
   onRetry,
 }) => (
-  <div className="ax-error-screen" role="alert">
+  <div
+    className="ax-error-screen"
+    role="alert"
+    aria-live="assertive"
+  >
     <p className="ax-error-message">{message}</p>
+
     {onRetry && (
-      <button onClick={onRetry} className="ax-error-retry">
+      <button
+        type="button"
+        onClick={onRetry}
+        className="ax-error-retry"
+        aria-label="Retry the failed action"
+      >
         Retry
       </button>
     )}

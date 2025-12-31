@@ -28,21 +28,35 @@ const MAX_RECENT = 8;
 
 const sportsData: Sport[] = Array.isArray(sportsDataRaw) ? sportsDataRaw : [];
 
-const getRecentSearches = (): string[] => {
+const safeParseJsonArray = (raw: string | null): string[] => {
   try {
-    return JSON.parse(localStorage.getItem(RECENT_SEARCHES_KEY) || "[]");
+    const parsed = JSON.parse(raw || "[]");
+    return Array.isArray(parsed) ? parsed.filter((x) => typeof x === "string") : [];
   } catch {
     return [];
   }
 };
+
+const getRecentSearches = (): string[] =>
+  safeParseJsonArray(localStorage.getItem(RECENT_SEARCHES_KEY));
+
 const addRecentSearch = (query: string) => {
-  let searches = getRecentSearches();
-  searches = [query, ...searches.filter((q) => q !== query)].slice(
+  const trimmed = query.trim();
+  if (!trimmed) return;
+
+  const searches = [trimmed, ...getRecentSearches().filter((q) => q !== trimmed)].slice(
     0,
     MAX_RECENT
   );
   localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(searches));
 };
+
+const toSlug = (s: string) =>
+  s
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, "-")
+    .replace(/[^\w-]+/g, "");
 
 const isCommunityValid = (query: string) =>
   sportsData.some((s) => s.title.toLowerCase() === query.trim().toLowerCase());
@@ -56,7 +70,9 @@ const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
   const [showDropdown, setShowDropdown] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const [loadingIntent, setLoadingIntent] = useState(false);
+
   const inputRef = useRef<HTMLInputElement>(null);
+  const inFlightRef = useRef(false);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -64,9 +80,11 @@ const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
   // Focus with "/" shortcut
   useEffect(() => {
     const handleSlash = (e: KeyboardEvent) => {
+      const tag = (document.activeElement as HTMLElement | null)?.tagName;
       if (
         e.key === "/" &&
-        document.activeElement?.tagName !== "INPUT" &&
+        tag !== "INPUT" &&
+        tag !== "TEXTAREA" &&
         !e.ctrlKey &&
         !e.metaKey
       ) {
@@ -98,29 +116,38 @@ const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
   }, []);
 
   // Debounced suggestions function
-  const updateSuggestions = useMemo(
-    () =>
-      debounce((query: string) => {
-        if (query.length < 2) {
-          setSuggestions([]);
-          setShowDropdown(false);
-          return;
-        }
-        const staticFiltered = sportsTerms.sportsTerms.filter((term) =>
-          term.toLowerCase().startsWith(query.toLowerCase())
-        );
-        const recent = getRecentSearches().filter((term) =>
-          term.toLowerCase().includes(query.toLowerCase())
-        );
-        const combined = [
-          ...recent,
-          ...staticFiltered.filter((t) => !recent.includes(t)),
-        ].slice(0, 10);
-        setSuggestions(combined);
-        setShowDropdown(combined.length > 0);
-      }, 250),
-    []
-  );
+  const updateSuggestions = useMemo(() => {
+    const fn = debounce((query: string) => {
+      const q = query.trim();
+      if (q.length < 2) {
+        setSuggestions([]);
+        setShowDropdown(false);
+        return;
+      }
+
+      const recentAll = getRecentSearches();
+      const recent = recentAll.filter((term) => term.toLowerCase().includes(q.toLowerCase()));
+
+      const staticFiltered = (sportsTerms as any).sportsTerms
+        ?.filter((term: string) => term.toLowerCase().startsWith(q.toLowerCase()))
+        ?? [];
+
+      const combined = [...recent, ...staticFiltered.filter((t: string) => !recent.includes(t))].slice(
+        0,
+        10
+      );
+
+      setSuggestions(combined);
+      setShowDropdown(combined.length > 0);
+    }, 250);
+
+    return fn;
+  }, []);
+
+  // cancel debounce on unmount
+  useEffect(() => {
+    return () => updateSuggestions.cancel();
+  }, [updateSuggestions]);
 
   // Suggestions on input
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -134,31 +161,35 @@ const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
   const handleNavigateAI = useCallback(
     async (query: string) => {
       const trimmedQuery = query.trim();
-      if (!trimmedQuery) return;
+      // If empty, just navigate to generic search page
+      if (!trimmedQuery) {
+        navigate(`/search?query=`);
+        trackEvent("search_submit", { query: "(empty)", search_origin: "header" });
+        onSearchComplete?.();
+        setShowDropdown(false);
+        return;
+      }
 
+      if (inFlightRef.current) return;
+      inFlightRef.current = true;
       setLoadingIntent(true);
+
       try {
         const ai = await fetchSearchIntent(trimmedQuery);
 
-        if (
-          ai.intent &&
-          ai.intent.includes("staticPage") &&
-          ai.suggestedPages?.length > 0
-        ) {
-          navigate(`/${ai.suggestedPages[0].toLowerCase()}`);
+        if (ai.intent?.includes("staticPage") && ai.suggestedPages?.length > 0) {
+          navigate(`/${String(ai.suggestedPages[0]).toLowerCase()}`);
         } else if (
           ai.intent &&
           (ai.intent.includes("community") || ai.intent.includes("sport")) &&
           ai.fixedQuery
         ) {
           if (isCommunityValid(ai.fixedQuery)) {
-            navigate(
-              `/community/${ai.fixedQuery.toLowerCase().replace(/\s+/g, "-")}`
-            );
+            navigate(`/community/${toSlug(ai.fixedQuery)}`);
           } else {
             navigate(`/search?query=${encodeURIComponent(trimmedQuery)}`);
           }
-        } else if (ai.intent && ai.intent.includes("brand") && ai.fixedQuery) {
+        } else if (ai.intent?.includes("brand") && ai.fixedQuery) {
           navigate(`/products?brand=${encodeURIComponent(ai.fixedQuery)}`);
         } else if (ai.isGibberish) {
           navigate(`/search?query=`);
@@ -167,31 +198,46 @@ const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
         }
 
         trackEvent("search_submit", {
-          query: trimmedQuery || "(empty)",
+          query: trimmedQuery,
           fixedQuery: ai.fixedQuery,
           intent: ai.intent,
           search_origin: "header",
         });
+
+        // Only persist real queries
+        if (!ai.isGibberish) addRecentSearch(trimmedQuery);
+
         onSearchComplete?.();
-      } catch (err) {
-        navigate(`/search?query=${encodeURIComponent(query.trim())}`);
+      } catch {
+        navigate(`/search?query=${encodeURIComponent(trimmedQuery)}`);
         trackEvent("search_submit", {
-          query: query.trim() || "(empty)",
+          query: trimmedQuery,
           error: true,
           search_origin: "header",
         });
-
+        addRecentSearch(trimmedQuery);
         onSearchComplete?.();
+      } finally {
+        setShowDropdown(false);
+        setLoadingIntent(false);
+        inFlightRef.current = false;
       }
-      addRecentSearch(trimmedQuery);
-      setShowDropdown(false);
-      setLoadingIntent(false);
     },
     [navigate, onSearchComplete]
   );
 
+  const recentSet = useMemo(() => new Set(getRecentSearches()), [showDropdown, suggestions.length]);
+
   // Keyboard navigation in dropdown
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    // If dropdown isn't showing yet, allow ArrowDown to open it (if we have suggestions)
+    if (!showDropdown && e.key === "ArrowDown" && suggestions.length > 0) {
+      setShowDropdown(true);
+      setHighlightedIndex(0);
+      e.preventDefault();
+      return;
+    }
+
     if (showDropdown && suggestions.length) {
       switch (e.key) {
         case "ArrowDown":
@@ -200,9 +246,7 @@ const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
           break;
         case "ArrowUp":
           e.preventDefault();
-          setHighlightedIndex((prev) =>
-            prev === 0 ? suggestions.length - 1 : prev - 1
-          );
+          setHighlightedIndex((prev) => (prev === 0 ? suggestions.length - 1 : prev - 1));
           break;
         case "Enter":
           e.preventDefault();
@@ -218,27 +262,28 @@ const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
         default:
           break;
       }
+      return;
+    }
+
+    // If dropdown isn't active, Enter should still submit normally
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleNavigateAI(searchQuery);
     }
   };
 
-  // Submit
   const handleSearchSubmit = (e: React.FormEvent | React.MouseEvent) => {
     e.preventDefault();
     handleNavigateAI(searchQuery);
   };
 
-  // For accessibility: close dropdown after a click elsewhere (blur)
+  // close dropdown after click elsewhere (blur)
   const handleInputBlur = () => {
-    setTimeout(() => setShowDropdown(false), 120); // Allow click event to process
+    setTimeout(() => setShowDropdown(false), 120);
   };
 
-  // ---- JSX ----
   return (
-    <div
-      className="search-bar-container"
-      role="search"
-      aria-label="Sitewide search"
-    >
+    <div className="search-bar-container" role="search" aria-label="Sitewide search">
       <form
         className="header-search-bar-form"
         onSubmit={handleSearchSubmit}
@@ -251,9 +296,7 @@ const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
           type="text"
           className="header-search-bar-input"
           placeholder={
-            loadingIntent
-              ? "Finding best results..."
-              : "Search products, blogs, or sports..."
+            loadingIntent ? "Finding best results..." : "Search products, blogs, or sports..."
           }
           value={searchQuery}
           onChange={handleInputChange}
@@ -263,6 +306,7 @@ const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
           disabled={loadingIntent}
           autoComplete="off"
         />
+
         {showSubmitButton && (
           <button
             type="submit"
@@ -277,26 +321,18 @@ const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
       </form>
 
       {showDropdown && suggestions.length > 0 && (
-        <ul
-          className="search-suggestions show"
-          role="listbox"
-          aria-label="Search suggestions"
-        >
+        <ul className="search-suggestions show" role="listbox" aria-label="Search suggestions">
           {suggestions.map((suggestion, index) => (
             <li
               key={suggestion}
-              className={`search-suggestion-item${
-                highlightedIndex === index ? " highlighted" : ""
-              }`}
+              className={`search-suggestion-item${highlightedIndex === index ? " highlighted" : ""}`}
               role="option"
               aria-selected={highlightedIndex === index}
               tabIndex={-1}
               onMouseEnter={() => setHighlightedIndex(index)}
               onMouseDown={() => handleNavigateAI(suggestion)}
             >
-              {getRecentSearches().includes(suggestion) && (
-                <span className="recent-label">Recent</span>
-              )}
+              {recentSet.has(suggestion) && <span className="recent-label">Recent</span>}
               {suggestion}
             </li>
           ))}

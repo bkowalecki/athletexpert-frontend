@@ -1,6 +1,6 @@
 // src/components/trending/TrendingProductList.tsx
 
-import React from "react";
+import React, { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import ProductCard from "../products/ProductCard";
 import { useSavedProducts } from "../../hooks/useSavedProducts";
@@ -8,7 +8,7 @@ import { fetchTrendingLiveProducts } from "../../api/product";
 import type { Product } from "../../types/products";
 import "../../styles/TrendingProductList.css";
 
-// 🟢 Import your skeleton
+// 🟢 Skeleton
 import ProductGridSkeleton from "./ProductGridSkeleton";
 
 type Props = {
@@ -22,7 +22,16 @@ type Props = {
 
 const TrendingProductList: React.FC<Props> = ({ sport, limit = 3, title }) => {
   const { savedProductIds, toggleSaveProduct } = useSavedProducts();
-  const noop = () => {};
+
+  const savedSet = useMemo(
+    () => new Set<number>(savedProductIds ?? []),
+    [savedProductIds]
+  );
+
+  const headingId = useMemo(() => {
+    const key = sport ? `trending-${sport}` : "trending-all";
+    return `${key}-${limit}`;
+  }, [sport, limit]);
 
   const {
     data: products = [],
@@ -36,9 +45,9 @@ const TrendingProductList: React.FC<Props> = ({ sport, limit = 3, title }) => {
   });
 
   return (
-    <section className="trending-products-section">
+    <section className="trending-products-section" aria-labelledby={headingId}>
       <div className="trending-products-container">
-        <h2 className="trending-products-heading">
+        <h2 id={headingId} className="trending-products-heading">
           {title ?? (sport ? `Trending in ${sport}` : "Trending")}
         </h2>
 
@@ -58,17 +67,16 @@ const TrendingProductList: React.FC<Props> = ({ sport, limit = 3, title }) => {
         )}
 
         {!isLoading && !isError && products.length > 0 && (
-          <div className="trending-products-grid">
+          <div className="trending-products-grid" aria-live="polite">
             {products.map((product, idx) => {
               const hasId = typeof product.id === "number";
-              const isSaved = hasId
-                ? savedProductIds.includes(product.id as number)
-                : false;
+              const productId = hasId ? (product.id as number) : null;
+              const isSaved = productId != null ? savedSet.has(productId) : false;
 
-              // choose a stable key: prefer ASIN, then DB id, then slug, then name+idx
+              // Prefer ASIN, then DB id, then slug, then name+idx
               const key =
                 product.asin ??
-                (hasId ? String(product.id) : undefined) ??
+                (productId != null ? String(productId) : undefined) ??
                 product.slug ??
                 `${product.name}-${idx}`;
 
@@ -78,12 +86,14 @@ const TrendingProductList: React.FC<Props> = ({ sport, limit = 3, title }) => {
                   id={product.id} // may be undefined for live items
                   name={product.name}
                   brand={product.brand}
-                  price={product.price}
+                  price={typeof product.price === "number" ? product.price : null}
                   imgUrl={product.imgUrl}
                   affiliateLink={product.affiliateLink}
                   slug={product.slug}
                   isSaved={isSaved}
-                  onToggleSave={hasId ? () => toggleSaveProduct(product.id as number) : noop}
+                  onToggleSave={
+                    productId != null ? () => toggleSaveProduct(productId) : undefined
+                  }
                   // visually flag these as “trending”
                   isTrending={true}
                 />
@@ -96,4 +106,4 @@ const TrendingProductList: React.FC<Props> = ({ sport, limit = 3, title }) => {
   );
 };
 
-export default TrendingProductList;
+export default React.memo(TrendingProductList);

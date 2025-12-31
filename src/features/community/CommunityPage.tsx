@@ -6,27 +6,49 @@ import "../../styles/Community.css";
 import { Helmet } from "react-helmet";
 import { trackEvent } from "../../util/analytics";
 
-interface Sport {
-  title: string;
-  backgroundImage: string;
-}
-
+/**
+ * NOTE:
+ * Member counts below are mock / placeholder values.
+ * Replace with real backend-driven counts when community features expand.
+ */
 const sportMemberCounts: Record<string, number> = {
-  Badminton: 141, Baseball: 820, Basketball: 1720, Boxing: 610, Cheerleading: 521,
-  Cricket: 810, Cycling: 740, "E-Sports": 0, Football: 1980, Golf: 993, "Ice Hockey": 668,
-  "Ice Skating": 380, MMA: 1350, Pickleball: 2081, Rugby: 450, Running: 3188,
-  Skateboarding: 630, Skiing: 520, Snowboarding: 519, Soccer: 2150, Surfing: 410,
-  Swimming: 975, Tennis: 860, Volleyball: 333, "Weight Training": 1450,
-  Wrestling: 670, Yoga: 1440,
+  Badminton: 141,
+  Baseball: 820,
+  Basketball: 1720,
+  Boxing: 610,
+  Cheerleading: 521,
+  Cricket: 810,
+  Cycling: 740,
+  "E-Sports": 0,
+  Football: 1980,
+  Golf: 993,
+  "Ice Hockey": 668,
+  "Ice Skating": 380,
+  MMA: 1350,
+  Pickleball: 2081,
+  Rugby: 450,
+  Running: 3188,
+  Skateboarding: 630,
+  Skiing: 520,
+  Snowboarding: 519,
+  Soccer: 2150,
+  Surfing: 410,
+  Swimming: 975,
+  Tennis: 860,
+  Volleyball: 333,
+  "Weight Training": 1450,
+  Wrestling: 670,
+  Yoga: 1440,
 };
 
-// Helper to slugify sport title for URL
+// Local slug helper (recommend moving to util/slug.ts later)
 const slugify = (str: string) =>
   str.toLowerCase().replace(/\s+/g, "-").replace(/[^\w\-]+/g, "");
 
-// ===================== Sport Card =====================
 interface SportCardProps {
-  sport: Sport;
+  title: string;
+  image: string;
+  slug: string;
   memberCount: number;
   className: string;
   onNavigate: (slug: string) => void;
@@ -34,50 +56,49 @@ interface SportCardProps {
 }
 
 const SportCard: React.FC<SportCardProps> = React.memo(
-  ({ sport, memberCount, className, onNavigate, isDisabled }) => {
-    // Keyboard accessibility
+  ({ title, image, slug, memberCount, className, onNavigate, isDisabled }) => {
     const handleKeyDown = (e: React.KeyboardEvent) => {
       if (!isDisabled && (e.key === "Enter" || e.key === " ")) {
-        onNavigate(slugify(sport.title));
+        onNavigate(slug);
       }
+    };
+
+    const handleClick = () => {
+      trackEvent("community_page_click", { sport: title, slug });
+      onNavigate(slug);
     };
 
     return (
       <div
         className={className}
-        onClick={
-          !isDisabled
-            ? () => {
-                trackEvent("community_page_click", {
-                  sport: sport.title,
-                  slug: slugify(sport.title),
-                });
-                onNavigate(slugify(sport.title));
-              }
-            : undefined
-        }
+        onClick={!isDisabled ? handleClick : undefined}
         tabIndex={isDisabled ? -1 : 0}
-        aria-disabled={isDisabled}
-        onKeyDown={handleKeyDown}
         role="button"
-        aria-label={`Go to ${sport.title} community page`}
-        title={isDisabled ? "Coming soon!" : `Go to ${sport.title} community`}
+        aria-disabled={isDisabled}
+        aria-label={`Go to ${title} community page`}
+        aria-describedby={isDisabled ? `${slug}-disabled` : undefined}
+        title={isDisabled ? "Coming soon!" : `Go to ${title} community`}
+        onKeyDown={handleKeyDown}
       >
         <div className="sport-card-bg">
           <img
-            src={sport.backgroundImage}
-            alt={`Background for ${sport.title}`}
+            src={image}
+            alt={`Background for ${title}`}
             className="sport-card-image"
             loading="lazy"
           />
           {isDisabled && (
-            <div className="esport-coming-soon-overlay" title="Coming soon!">
+            <div
+              className="esport-coming-soon-overlay"
+              id={`${slug}-disabled`}
+            >
               <span>Coming soon</span>
             </div>
           )}
         </div>
+
         <div className="sport-card-info">
-          <h3>{sport.title}</h3>
+          <h3>{title}</h3>
           <p className="sport-card-members">
             👥 {memberCount.toLocaleString()} members
           </p>
@@ -87,20 +108,17 @@ const SportCard: React.FC<SportCardProps> = React.memo(
   }
 );
 
-// ===================== Community Page =====================
 const Community: React.FC = () => {
   const { sports } = useSports();
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery] = useState(""); // kept for future search feature
   const navigate = useNavigate();
 
-  // Filtering sports based on search query
   const filteredSports = useMemo(() => {
     if (!searchQuery.trim()) return sports;
     const q = searchQuery.toLowerCase();
     return sports.filter((sport) => sport.title.toLowerCase().includes(q));
   }, [sports, searchQuery]);
 
-  // Memoized navigation callback
   const handleNavigation = useCallback(
     (slug: string) => {
       navigate(`/community/${slug}`);
@@ -108,10 +126,9 @@ const Community: React.FC = () => {
     [navigate]
   );
 
-  // Helper for alternating card classes (for grid background color variety)
-  const getCardClass = (sport: Sport, idx: number) => {
-    const base = "sport-card sport-card-" + (idx % 4);
-    const isEsports = sport.title.toLowerCase() === "e-sports";
+  const getCardClass = (title: string, idx: number) => {
+    const base = `sport-card sport-card-${idx % 4}`;
+    const isEsports = title.toLowerCase() === "e-sports";
     return `${base} ${isEsports ? "esport-preview-card esport-card-disabled" : ""}`;
   };
 
@@ -133,37 +150,24 @@ const Community: React.FC = () => {
 
       <h1 className="community-page-title">Community</h1>
 
-      {/* Uncomment if/when you want a search bar for sports */}
-      {/* <div className="community-search-wrapper">
-        <form
-          className="community-search-bar-form"
-          onSubmit={e => e.preventDefault()}
-        >
-          <input
-            className="community-search-bar-input"
-            type="text"
-            placeholder="Search sports…"
-            value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
-            aria-label="Search sports"
-          />
-          <button className="community-search-bar-button" type="submit">
-            <span role="img" aria-label="Search">🔍</span>
-          </button>
-        </form>
-      </div> */}
-
       <div className="sports-masonry">
-        {filteredSports.map((sport, index) => (
-          <SportCard
-            key={sport.title}
-            sport={sport}
-            memberCount={sportMemberCounts[sport.title] || 0}
-            className={getCardClass(sport, index)}
-            onNavigate={handleNavigation}
-            isDisabled={sport.title.toLowerCase() === "e-sports"}
-          />
-        ))}
+        {filteredSports.map((sport, index) => {
+          const slug = slugify(sport.title);
+          const isEsports = sport.title.toLowerCase() === "e-sports";
+
+          return (
+            <SportCard
+              key={sport.title}
+              title={sport.title}
+              image={sport.backgroundImage}
+              slug={slug}
+              memberCount={sportMemberCounts[sport.title] || 0}
+              className={getCardClass(sport.title, index)}
+              onNavigate={handleNavigation}
+              isDisabled={isEsports}
+            />
+          );
+        })}
       </div>
     </motion.div>
   );

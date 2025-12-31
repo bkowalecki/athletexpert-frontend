@@ -7,7 +7,24 @@ interface SportStatsModalProps {
   onClose: () => void;
 }
 
-const fallbackConfig = {
+interface StatItem {
+  label: string;
+  value: string | number;
+  unit?: string;
+  goal?: number;
+}
+
+interface SportStatsConfig {
+  icon: string;
+  title: string;
+  stats: StatItem[];
+  badge: string;
+  tip?: string;
+  tips?: string[];
+  funFact?: string;
+}
+
+const fallbackConfig: SportStatsConfig = {
   icon: "🏅",
   title: "All Sports",
   stats: [
@@ -20,48 +37,52 @@ const fallbackConfig = {
 };
 
 const SportStatsModal: React.FC<SportStatsModalProps> = ({ sport, onClose }) => {
-  // Pick config for this sport or fallback
-  const config = useMemo(
-    () => sportStatsMap[sport] || fallbackConfig,
+  // Resolve config safely
+  const config: SportStatsConfig = useMemo(
+    () => (sportStatsMap[sport] as SportStatsConfig) || fallbackConfig,
     [sport]
   );
 
-  // Focus trap
   const modalRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const scrollY = window.scrollY;
+
+    // Lock background scroll
     document.body.style.top = `-${scrollY}px`;
     document.body.style.position = "fixed";
     document.body.style.width = "100%";
     document.body.style.overflowY = "hidden";
 
-    // Accessibility: Trap focus, close on Escape
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
-      // Focus trap (Tab cycling)
+
       if (e.key === "Tab" && modalRef.current) {
         const focusables = modalRef.current.querySelectorAll<HTMLElement>(
           'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
         );
-        const first = focusables[0], last = focusables[focusables.length - 1];
+        if (focusables.length === 0) return;
+
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+
         if (!e.shiftKey && document.activeElement === last) {
           e.preventDefault();
           first.focus();
         }
+
         if (e.shiftKey && document.activeElement === first) {
           e.preventDefault();
           last.focus();
         }
       }
     };
+
     window.addEventListener("keydown", onKeyDown);
-    // Focus first button for a11y
+
+    // Focus first actionable element
     setTimeout(() => {
-      if (modalRef.current) {
-        const btn = modalRef.current.querySelector("button");
-        btn?.focus();
-      }
+      modalRef.current?.querySelector<HTMLElement>("button")?.focus();
     }, 150);
 
     return () => {
@@ -74,7 +95,6 @@ const SportStatsModal: React.FC<SportStatsModalProps> = ({ sport, onClose }) => 
     };
   }, [onClose]);
 
-  // Prevent accidental modal close when clicking inside modal
   const handleModalClick = (e: React.MouseEvent) => e.stopPropagation();
 
   return (
@@ -85,7 +105,11 @@ const SportStatsModal: React.FC<SportStatsModalProps> = ({ sport, onClose }) => 
       aria-label={`${config.title} stats modal`}
       onClick={onClose}
     >
-      <div className="sport-modal enhanced" ref={modalRef} onClick={handleModalClick}>
+      <div
+        className="sport-modal enhanced"
+        ref={modalRef}
+        onClick={handleModalClick}
+      >
         <button
           className="sport-modal-close"
           onClick={onClose}
@@ -93,21 +117,20 @@ const SportStatsModal: React.FC<SportStatsModalProps> = ({ sport, onClose }) => 
         >
           &times;
         </button>
+
         <div className="sport-modal-header">
           <span className="sport-modal-sporticon">{config.icon}</span>
           <h2 className="sport-modal-title">{config.title} Stats</h2>
         </div>
 
-        {/* Fun Fact / Quote */}
         {config.funFact && (
           <div className="sport-modal-funfact">
             🏆 <strong>Did you know?</strong> {config.funFact}
           </div>
         )}
 
-        {/* Stats list */}
         <ul className="sport-stats-list">
-          {config.stats.map((stat: any, i: number) => (
+          {config.stats.map((stat, i) => (
             <li key={i} className="sport-stat-row">
               <span>{stat.label}: </span>
               <strong>
@@ -117,7 +140,10 @@ const SportStatsModal: React.FC<SportStatsModalProps> = ({ sport, onClose }) => 
                       {stat.value}/{stat.goal}
                       {stat.unit && ` ${stat.unit}`}
                     </span>
-                    <span className="stat-progress-bar-wrap" aria-label={`Progress: ${stat.value}/${stat.goal}`}>
+                    <span
+                      className="stat-progress-bar-wrap"
+                      aria-label={`Progress: ${stat.value}/${stat.goal}`}
+                    >
                       <span className="stat-progress-bar-bg">
                         <span
                           className="stat-progress-bar-fg"
@@ -142,23 +168,20 @@ const SportStatsModal: React.FC<SportStatsModalProps> = ({ sport, onClose }) => 
           ))}
         </ul>
 
-        {/* Tips */}
         {config.tips && (
           <div className="sport-modal-tips">
             <h3>Pro Tips</h3>
             <ul>
-              {config.tips.map((tip: string, idx: number) => (
+              {config.tips.map((tip, idx) => (
                 <li key={idx}>💡 {tip}</li>
               ))}
             </ul>
           </div>
         )}
 
-        {/* Badge + animated spark */}
         <div className="sport-badge-row" tabIndex={0}>
           <span className="sport-badge">
             {config.badge}
-            {/* SVG spark */}
             <svg
               className="badge-spark-svg"
               width="18"
@@ -186,7 +209,6 @@ const SportStatsModal: React.FC<SportStatsModalProps> = ({ sport, onClose }) => 
           </span>
         </div>
 
-        {/* “Did You Know?” or tip */}
         {config.tip && (
           <p className="sport-modal-tip">💡 {config.tip}</p>
         )}

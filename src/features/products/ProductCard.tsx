@@ -2,6 +2,7 @@ import React, {
   useEffect,
   useState,
   useRef,
+  useCallback,
   KeyboardEvent as ReactKeyboardEvent,
   MouseEvent,
 } from "react";
@@ -12,11 +13,13 @@ import { trackEvent } from "../../util/analytics";
 
 const FALLBACK_IMAGE = "/images/product-fallback.png";
 
-const ProductCard: React.FC<ProductCardProps & {
-  asin?: string;
-  source?: string;
-  lastSyncedAt?: string;
-}> = ({
+const ProductCard: React.FC<
+  ProductCardProps & {
+    asin?: string;
+    source?: string;
+    lastSyncedAt?: string;
+  }
+> = ({
   id,
   name,
   brand,
@@ -35,8 +38,9 @@ const ProductCard: React.FC<ProductCardProps & {
 }) => {
   // Modal state & scroll mgmt
   const [showModal, setShowModal] = useState(false);
-  const [scrollPosition, setScrollPosition] = useState(0);
-  const modalImageRef = useRef<HTMLImageElement | null>(null);
+  const scrollPositionRef = useRef(0);
+  const previousBodyStyleRef = useRef<string>("");
+  const modalCloseBtnRef = useRef<HTMLButtonElement | null>(null);
 
   // Fallback image logic
   const [imgSrc, setImgSrc] = useState(imgUrl || FALLBACK_IMAGE);
@@ -44,29 +48,38 @@ const ProductCard: React.FC<ProductCardProps & {
     setImgSrc(imgUrl || FALLBACK_IMAGE);
   }, [imgUrl]);
 
-  const toggleModal = (open: boolean) => {
-    if (open) {
-      setScrollPosition(window.scrollY);
-      document.body.style.cssText = `position: fixed; top: -${window.scrollY}px; width: 100%;`;
-      setShowModal(true);
-      setTimeout(() => modalImageRef.current?.focus?.(), 50);
-    } else {
-      document.body.style.cssText = "";
-      window.scrollTo(0, scrollPosition);
-      setShowModal(false);
-    }
-  };
+  const openModal = useCallback(() => {
+    scrollPositionRef.current = window.scrollY;
+    previousBodyStyleRef.current = document.body.style.cssText;
+
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${window.scrollY}px`;
+    document.body.style.width = "100%";
+
+    setShowModal(true);
+
+    // Focus close button for accessibility
+    setTimeout(() => modalCloseBtnRef.current?.focus(), 0);
+  }, []);
+
+  const closeModal = useCallback(() => {
+    document.body.style.cssText = previousBodyStyleRef.current;
+    window.scrollTo(0, scrollPositionRef.current);
+    setShowModal(false);
+  }, []);
 
   useEffect(() => {
     if (!showModal) return;
+
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") toggleModal(false);
+      if (e.key === "Escape") closeModal();
     };
+
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [showModal]);
+  }, [showModal, closeModal]);
 
-  const handleCardClick = () => {
+  const handleCardView = () => {
     trackEvent("product_view", {
       product_name: name,
       brand,
@@ -77,6 +90,7 @@ const ProductCard: React.FC<ProductCardProps & {
       source,
       id,
       slug,
+      lastSyncedAt,
     });
   };
 
@@ -89,28 +103,28 @@ const ProductCard: React.FC<ProductCardProps & {
         tabIndex={0}
         role="group"
         aria-label={`Product card: ${name}${brand ? ` by ${brand}` : ""}`}
-        onClick={handleCardClick}
+        onClick={handleCardView}
         onKeyDown={(e: ReactKeyboardEvent<HTMLDivElement>) => {
-          if (e.key === "Enter" || e.key === " ") handleCardClick();
+          if (e.key === "Enter" || e.key === " ") handleCardView();
         }}
       >
         {/* Image with modal/fallback */}
         <div
           className="ax-product-card-image-wrapper"
           tabIndex={0}
+          role="button"
+          aria-label={`Preview image of ${name}`}
           onClick={(e: MouseEvent) => {
             e.stopPropagation();
-            toggleModal(true);
+            openModal();
           }}
           onKeyDown={(e: ReactKeyboardEvent<HTMLDivElement>) => {
             if (e.key === "Enter" || e.key === " ") {
               e.preventDefault();
               e.stopPropagation();
-              toggleModal(true);
+              openModal();
             }
           }}
-          aria-label={`Preview image of ${name}`}
-          role="button"
         >
           <img
             src={imgSrc}
@@ -133,6 +147,7 @@ const ProductCard: React.FC<ProductCardProps & {
             ) : (
               <h3 className="ax-product-card-name">{name}</h3>
             )}
+
             {brand && <p className="ax-product-card-brand">{brand}</p>}
             <p className="ax-product-card-price">
               {price != null ? `$${price.toFixed(2)}` : "N/A"}
@@ -142,7 +157,9 @@ const ProductCard: React.FC<ProductCardProps & {
           <div className="ax-product-card-cta-row">
             {onToggleSave && (
               <button
-                className={`ax-product-card-save-button${isSaved ? " unsave" : ""}`}
+                className={`ax-product-card-save-button${
+                  isSaved ? " unsave" : ""
+                }`}
                 onClick={(e) => {
                   e.stopPropagation();
                   onToggleSave();
@@ -161,7 +178,7 @@ const ProductCard: React.FC<ProductCardProps & {
               className="ax-product-card-button"
               aria-label="View product on Amazon"
               onClick={(e) => {
-                e.stopPropagation?.();
+                e.stopPropagation();
                 trackEvent("affiliate_click", {
                   product_id: id,
                   product_name: name,
@@ -177,7 +194,6 @@ const ProductCard: React.FC<ProductCardProps & {
               View on Amazon
             </a>
           </div>
-
         </div>
       </div>
 
@@ -185,28 +201,28 @@ const ProductCard: React.FC<ProductCardProps & {
       {showModal && (
         <div
           className="ax-modal-backdrop"
-          onClick={() => toggleModal(false)}
           role="dialog"
           aria-modal="true"
           aria-label={`Preview of ${name}`}
+          onClick={closeModal}
         >
           <div
             className="ax-modal-content"
             onClick={(e) => e.stopPropagation()}
           >
             <button
+              ref={modalCloseBtnRef}
               className="ax-modal-close"
-              onClick={() => toggleModal(false)}
+              onClick={closeModal}
               aria-label="Close image preview"
             >
               ×
             </button>
+
             <img
               src={imgSrc}
               alt={`Preview of ${name}`}
               className="ax-modal-image"
-              tabIndex={0}
-              ref={modalImageRef}
               onError={() => setImgSrc(FALLBACK_IMAGE)}
             />
           </div>
@@ -216,4 +232,4 @@ const ProductCard: React.FC<ProductCardProps & {
   );
 };
 
-export default ProductCard;
+export default React.memo(ProductCard);
