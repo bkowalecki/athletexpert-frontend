@@ -1,10 +1,7 @@
-// src/util/ScrollToTop.tsx
-
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 
 function prefersReducedMotion(): boolean {
-  if (typeof window === "undefined") return false;
   return window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false;
 }
 
@@ -13,7 +10,11 @@ const ScrollToTop: React.FC = () => {
 
   useEffect(() => {
     const behavior: ScrollBehavior = prefersReducedMotion() ? "auto" : "smooth";
-    window.scrollTo({ top: 0, behavior });
+
+    // Scroll the real scrolling element (most reliable)
+    const el = document.scrollingElement || document.documentElement;
+
+    el.scrollTo({ top: 0, left: 0, behavior });
   }, [pathname]);
 
   return null;

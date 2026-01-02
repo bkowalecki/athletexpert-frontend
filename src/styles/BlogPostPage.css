@@ -16,6 +16,9 @@
   --spacing-sm: 1rem;
   --spacing-md: 1.5rem;
   --spacing-lg: 2rem;
+
+  /* If your header is sticky (likely ~64px), use padding-top instead of margin-top */
+  --ax-header-offset: 4rem;
 }
 
 .blog-post-page {
@@ -23,66 +26,75 @@
   background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='1' cy='1' r='1' fill='%2355AA88' fill-opacity='0.08' /%3E%3C/svg%3E");
   background-repeat: repeat;
   background-size: 20px 20px;
-  padding: var(--spacing-lg) 0;
+
+  /* ✅ Use padding instead of margin to avoid document-flow weirdness */
+  padding: calc(var(--spacing-lg) + var(--ax-header-offset)) 0 var(--spacing-lg);
+
   color: var(--text-color);
-  font-family: 'Georgia', serif;
+  font-family: "Georgia", serif;
+
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-height: 100vh;
-  margin-top: 4rem;
+
+  /* ✅ IMPORTANT: do NOT force another viewport height inside a flex app layout */
+  min-height: auto;
+
+  /* ✅ Prevent tiny horizontal overflow that can cause "mystery" scrollbars */
+  overflow-x: hidden;
+
+  /* ✅ remove the previous margin-top: 4rem; */
 }
 
 /* Unified container */
 .blog-post-container {
   width: 100%;
   max-width: 720px;
-  padding: 0 var(--spacing-xs);
+  padding: 0 var(--spacing-sm);
   box-sizing: border-box;
 }
 
 /* 🧭 Back Link */
 .back-link-container {
   width: 100%;
-  max-width: 1200px;
-  padding: var(--spacing-sm);
-  margin-left: var(--spacing-md);
+  max-width: 720px;
+  padding: 0 var(--spacing-sm);
+  box-sizing: border-box;
+  margin-bottom: var(--spacing-sm);
   text-align: left;
 }
 
 .back-link {
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-size: var(--font-md);
   color: #000;
   text-decoration: none;
   padding: var(--spacing-xs) var(--spacing-sm);
   border: 2px solid var(--link-color);
-  border-radius: 4px;
+  border-radius: 6px;
   background: transparent;
-  transition: color 0.3s ease, transform 0.2s ease;
+  transition: color 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+  display: inline-block;
 }
 
 .back-link:hover {
-  color: #a23c20;
+  color: var(--link-color);
   border-color: var(--link-hover-color);
-  transform: translateX(-5px);
+  transform: translateX(-4px);
 }
 
 /* 📌 Header Section */
 .blog-post-header {
   text-align: left;
-  color: #ccc;
-  /* padding: var(--spacing-sm) var(--spacing-sm) 0; */
-  max-width: 1200px;
-  margin: 0 auto;
   box-sizing: border-box;
+  margin-bottom: var(--spacing-sm);
 }
 
 .blog-post-title {
   font-size: 42px;
-  font-weight: bold;
+  font-weight: 800;
   margin: 0 0 var(--spacing-xs);
-  line-height: 1.3;
+  line-height: 1.2;
   color: #000;
 }
 
@@ -92,7 +104,7 @@
   gap: var(--spacing-xs);
   font-size: 16px;
   color: #000;
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-weight: 500;
 }
 
@@ -109,55 +121,52 @@
 
 .bullet {
   font-size: 1.2rem;
-  color: #999;
+  color: #777;
 }
 
 /* 🖼 Image */
-/* Adjust image container */
 .blog-post-image-container {
   text-align: center;
-  margin: var(--spacing-md) auto;
+  margin: var(--spacing-md) 0;
   width: 100%;
-  max-width: 1200px;
-  /* padding: 0 var(--spacing-sm); */
 }
 
 .blog-post-image {
   width: 100%;
-  max-width: 100%;
   height: auto;
   aspect-ratio: 16 / 9;
   object-fit: cover;
-  border-radius: 8px;
+  border-radius: 10px;
   box-shadow: 0 4px 12px var(--shadow-color);
+  display: block;
 }
 
 /* 📝 Content Wrapper */
 .blog-post-content-wrapper {
   width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 var(--spacing-sm);
   box-sizing: border-box;
 }
 
+/* ✅ Make .blog-post-content the actual styled card */
 .blog-post-content {
   padding: var(--spacing-lg);
   font-family: "Georgia", serif;
   font-size: 20px;
   line-height: 1.85;
-  width: 100%;
-  max-width: 720px;
+  /* width: 100%; */
   background: var(--content-background);
   border-radius: 12px;
   box-shadow: 0 6px 24px rgba(0, 0, 0, 0.2);
   color: var(--text-color);
   letter-spacing: 0.1px;
+
+  /* ✅ Ensure long strings/URLs don't blow layout */
+  overflow-wrap: anywhere;
   word-break: break-word;
 }
 
 .blog-post-content p {
-  margin: 1.5rem 0;
+  margin: 1.25rem 0;
   line-height: 1.9;
   font-weight: 400;
   font-size: 1.17rem;
@@ -165,7 +174,7 @@
   margin-left: auto;
   margin-right: auto;
   text-align: left;
-  color: #000 ;
+  color: #000;
 }
 
 .blog-post-content h2,
@@ -177,26 +186,26 @@
 
 .blog-post-content h2 {
   font-size: 1.8rem;
-  margin-top: 2.5rem;
+  margin-top: 2.25rem;
   margin-bottom: 1rem;
-  font-weight: 700;
+  font-weight: 800;
   color: var(--heading-color);
   border-bottom: 2px solid var(--accent-green);
-  padding-bottom: 0.3rem;
+  padding-bottom: 0.35rem;
 }
 
 .blog-post-content h3 {
   font-size: 1.4rem;
-  margin-top: 2rem;
+  margin-top: 1.8rem;
   margin-bottom: 0.75rem;
   color: var(--link-hover-color);
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .blog-post-content a {
   color: var(--link-color);
   text-decoration: underline;
-  font-weight: 500;
+  font-weight: 600;
   transition: color 0.2s ease;
 }
 
@@ -204,13 +213,12 @@
   color: var(--link-hover-color);
 }
 
-
 /* 🧮 Product List */
 .blog-post-content ol.product-list {
   list-style: none;
   counter-reset: topItem;
   padding-left: 0;
-  margin-bottom: var(--spacing-lg);
+  margin: 0 0 var(--spacing-lg);
 }
 
 .blog-post-content ol.product-list li {
@@ -228,11 +236,11 @@
   content: "#" counter(topItem);
   position: absolute;
   top: 0.5rem;
-  left: 1.5rem;
-  font-size: 2.5rem;
+  left: 1.25rem;
+  font-size: 2.25rem;
   font-weight: 900;
   color: var(--accent-green);
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   line-height: 1;
 }
 
@@ -242,7 +250,7 @@
   color: #fff;
   font-size: 0.75rem;
   padding: 0.3rem 0.6rem;
-  border-radius: 12px;
+  border-radius: 999px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-left: 0.5rem;
@@ -258,17 +266,10 @@
 
 .blog-post-content .image-wrapper img {
   max-width: 100%;
-  max-height: 300px;
+  max-height: 320px;
   object-fit: contain;
-  border-radius: 8px;
+  border-radius: 10px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-}
-
-.blog-post-content .product-description {
-  font-size: 20px;
-  color: #333;
-  line-height: 1.7;
-  margin-top: 0.5rem;
 }
 
 /* 🖼 Global Content Images */
@@ -276,17 +277,17 @@
   display: block;
   margin: 1.5rem auto;
   width: 100%;
-  max-width: 100%;
   height: auto;
-  max-height: 300px;
+  max-height: 320px;
   object-fit: contain;
-  border-radius: 8px;
+  border-radius: 10px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
-.share-section{
-  margin: 0;
-  padding: 0;
+.share-section {
+  margin-top: var(--spacing-md);
+  padding-top: var(--spacing-sm);
+  border-top: 1px solid rgba(0, 0, 0, 0.12);
 }
 
 /* === Related Blogs === */
@@ -294,7 +295,6 @@
   padding: 2rem 1rem;
   width: 100%;
   max-width: 1200px;
-  /* border-top: 1px solid #333; */
   box-sizing: border-box;
 }
 
@@ -321,7 +321,7 @@
   flex-direction: column;
   height: 100%;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
-} 
+}
 
 .blog-card-inline:hover {
   transform: translateY(-5px);
@@ -379,33 +379,13 @@
 
 /* 📱 Responsive */
 @media (max-width: 768px) {
+  .blog-post-container,
+  .back-link-container {
+    max-width: 720px;
+    padding: 0 var(--spacing-sm);
+  }
+
   .blog-post-content {
-    max-width: 100%;
-    padding: var(--spacing-sm);
-  }
-
-  .blog-post-image {
-    max-height: none;
-    aspect-ratio: 16 / 9;
-  }
-
-  .blog-post-title {
-    font-size: var(--font-lg);
-    margin-top: var(--spacing-sm);
-  }
-
-  .related-blogs-grid {
-    grid-template-columns: 1fr;
-  }
-
-  /* .blog-card-inline-img {
-    height: 160px;
-  } */
-}
-
-@media (max-width: 480px) {
-  .blog-post-content {
-    max-width: 100%;
     padding: var(--spacing-sm);
   }
 
@@ -413,4 +393,7 @@
     font-size: 32px;
   }
 
+  .related-blogs-grid {
+    grid-template-columns: 1fr;
+  }
 }

@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AnimatePresence } from "framer-motion";
 import { ToastContainer } from "react-toastify";
 import { Auth0Provider } from "@auth0/auth0-react";
+import { ScrollRestoration } from "react-router-dom";
 
 import "./styles/App.css";
 

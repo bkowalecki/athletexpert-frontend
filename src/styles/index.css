@@ -5,32 +5,45 @@ html,
 body {
   margin: 0;
   padding: 0;
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
   background-color: #000;
   color: #fff;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
   overflow-x: hidden;
+  overflow-y: auto; /* ✅ document scrolls normally */
 }
 
-body.modal-open {
-  overflow: hidden;
-  position: fixed;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
+/* Root should not become its own scrolling surface */
+#root {
+  min-height: 100vh;
 }
 
 /* Code Elements */
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
 }
 
-/* Utility Class */
+/*
+  ✅ SAFE SCROLL LOCK
+  We allow preventing background scroll, but we NEVER make <body> position: fixed.
+  Fixed-body is a primary cause of:
+  - double scrollbars / scroll chaining
+  - scrollToTop not working
+  - weird "black void" below footer
+*/
+body.modal-open {
+  overflow: hidden;
+}
+
+/*
+  ✅ Utility class used by modals/menus/etc
+  Keep it as a simple "no-scroll" class without fixed positioning.
+*/
 .scroll-lock {
   overflow: hidden !important;
-  height: 100vh;
-  position: fixed;
-  width: 100%;
+  position: static !important;
+  height: auto !important;
+  width: auto !important;
 }

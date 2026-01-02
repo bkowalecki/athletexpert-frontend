@@ -1,45 +1,67 @@
 /* === App.css === */
-/* Purpose: App layout + persistent global sections like main/footer */
-
-html, body, #root {
-  height: 100%;
-}
+/* Goal: ONE scrollbar (document), no nested scrollers, no black void */
 
 html {
   overflow-y: scroll;
 }
 
+html,
+body {
+  height: auto;
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background-color: #000;
+}
+
+/* Root should not become a scroll container */
+#root {
+  min-height: 100vh;
+}
+
+/* App shell: NEVER scroll this container */
 .App {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+
   overflow-x: hidden;
+  overflow-y: visible; /* ✅ critical: prevents inner scrollbar */
   background-color: #000;
 }
 
+/* Main content area fills space; do NOT force another 100vh */
 .page-content {
-  min-height: 100vh;
+  flex: 1;
   display: flex;
   flex-direction: column;
+  min-height: 0; /* ✅ critical in flex layouts */
 }
 
-.loading-screen {
-  min-height: 100vh;
+/* If you use <main class="page-content">, scope styling */
+main.page-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  width: 100%;
+  background-color: #000;
+  box-sizing: border-box;
+}
+
+/* Loading */
+.loading-screen,
+.app-loading {
+  flex: 1;
+  min-height: 0;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-main {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  background-color: #000;
-  box-sizing: border-box;
-  min-height: 0; /* important in flex layouts */
-}
-
+/* Footer */
 footer {
   padding: 20px;
   background-color: #333;
@@ -48,7 +70,7 @@ footer {
   width: 100%;
 }
 
-/* BASE TOAST STYLE: black bg, white text, ORANGE border left + subtle full border */
+/* Toastify (kept) */
 .Toastify__toast,
 .ax-toast {
   background: #101014 !important;
@@ -56,24 +78,22 @@ footer {
   border-radius: 1.1rem !important;
   font-weight: 600 !important;
   font-size: 1.13rem !important;
-  border: 2.5px solid #a23c20 !important; /* thin orange border */
-  border-left: 7px solid #a23c20 !important; /* thick left accent */
+  border: 2.5px solid #a23c20 !important;
+  border-left: 7px solid #a23c20 !important;
   box-shadow: 0 4px 20px 0 #000d, 0 1.5px 8px #a23c2055 !important;
   letter-spacing: 0.015em !important;
   padding: 1.08rem 1.53rem 1.08rem 1.6rem !important;
   transition: background 0.19s, color 0.19s;
 }
 
-/* SUCCESS & ERROR: subtle orange glow, no green/red! */
 .Toastify__toast--success,
 .ax-toast-success,
 .Toastify__toast--error,
 .ax-toast-error {
-  border-left: 7px solid #ff6600 !important;  /* Use brighter orange for extra pop */
+  border-left: 7px solid #ff6600 !important;
   box-shadow: 0 0 12px 0 #ff660044, 0 4px 20px #000c !important;
 }
 
-/* INFO & WARNING: orange as well for brand consistency */
 .Toastify__toast--info,
 .ax-toast-info,
 .Toastify__toast--warning,
@@ -81,7 +101,6 @@ footer {
   border-left: 7px solid #ff6600 !important;
 }
 
-/* ICON: larger, orange, soft glow */
 .Toastify__toast-icon {
   color: #ff6600 !important;
   font-size: 1.48rem !important;
@@ -89,8 +108,6 @@ footer {
   filter: drop-shadow(0 0 4px #ff660055);
 }
 
-
-/* CLOSE BUTTON: white, hover orange */
 .Toastify__close-button {
   color: #fff !important;
   font-size: 1.45rem !important;
@@ -99,34 +116,29 @@ footer {
   border: none !important;
   transition: opacity 0.16s, color 0.17s;
 }
+
 .Toastify__close-button:hover {
   color: #ff6600 !important;
   opacity: 1 !important;
 }
 
-/* Edge touch: rounded corners, no border overlap */
 .Toastify__toast {
   box-sizing: border-box !important;
 }
 
-/* Remove default border shadow from react-toastify */
 .Toastify__toast--default {
   box-shadow: none !important;
 }
 
-
-
-
-/* Custom Scrollbar */
+/* Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
 }
-
 ::-webkit-scrollbar-thumb {
   background: #555;
   border-radius: 4px;
 }
-
 ::-webkit-scrollbar-thumb:hover {
   background: #777;
 }
+

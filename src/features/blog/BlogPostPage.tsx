@@ -76,20 +76,18 @@ const BlogPostPage: React.FC = () => {
 
   if (isLoading || !post) {
     return (
-      <div className="loading" style={{ textAlign: "center", marginTop: 100 }}>
+      <div style={{ textAlign: "center", marginTop: 100 }}>
         <h2>Loading blog...</h2>
       </div>
     );
   }
 
   return (
-    <main className="blog-post-page" role="main">
+    <section className="blog-post-page">
       <Helmet>
         <title>{post.title} - AthleteXpert</title>
         <meta name="author" content={post.author} />
         <meta name="description" content={post.summary || post.title} />
-        <meta property="article:published_time" content={post.publishedDate} />
-
         <link rel="canonical" href={canonicalUrl} />
 
         <meta property="og:type" content="article" />
@@ -98,56 +96,6 @@ const BlogPostPage: React.FC = () => {
         <meta property="og:description" content={post.summary || post.title} />
         {post.imageUrl && <meta property="og:image" content={post.imageUrl} />}
         <meta property="og:url" content={canonicalUrl} />
-
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={post.title} />
-        <meta name="twitter:description" content={post.summary || post.title} />
-        {post.imageUrl && <meta name="twitter:image" content={post.imageUrl} />}
-
-        {/* Article Schema */}
-        <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "Article",
-            mainEntityOfPage: canonicalUrl,
-            headline: post.title,
-            image: post.imageUrl ? [post.imageUrl] : undefined,
-            datePublished: post.publishedDate,
-            author: post.author
-              ? [{ "@type": "Person", name: post.author }]
-              : undefined,
-            publisher: {
-              "@type": "Organization",
-              name: "AthleteXpert",
-              logo: {
-                "@type": "ImageObject",
-                url: `${origin}/favicon.png`,
-              },
-            },
-          })}
-        </script>
-
-        {/* Breadcrumb Schema */}
-        <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "BreadcrumbList",
-            itemListElement: [
-              {
-                "@type": "ListItem",
-                position: 1,
-                name: "Blog",
-                item: `${origin}/blog`,
-              },
-              {
-                "@type": "ListItem",
-                position: 2,
-                name: post.title,
-                item: canonicalUrl,
-              },
-            ],
-          })}
-        </script>
       </Helmet>
 
       <nav className="back-link-container" aria-label="Breadcrumb">
@@ -156,16 +104,9 @@ const BlogPostPage: React.FC = () => {
         </Link>
       </nav>
 
-      <article
-        className="blog-post-container"
-        itemScope
-        itemType="https://schema.org/Article"
-        aria-labelledby="blog-title"
-      >
+      <article className="blog-post-container">
         <header className="blog-post-header">
-          <h1 id="blog-title" className="blog-post-title">
-            {post.title}
-          </h1>
+          <h1 className="blog-post-title">{post.title}</h1>
           <div className="blog-post-author-and-date">
             <address className="blog-post-author">{post.author}</address>
             <span className="bullet">•</span>
@@ -181,16 +122,20 @@ const BlogPostPage: React.FC = () => {
               className="blog-post-image"
               loading="eager"
               decoding="async"
-              fetchPriority="high"
               draggable={false}
             />
           </div>
         )}
 
-        <section className="blog-post-content blog-post-content-wrapper">
-          <div ref={contentRef} dangerouslySetInnerHTML={{ __html: sanitizedContent }} />
+        <section className="blog-post-content-wrapper">
+          <div
+            ref={contentRef}
+            className="blog-post-content"
+            dangerouslySetInnerHTML={{ __html: sanitizedContent }}
+          />
+
           <div className="share-section">
-            <h3 className="share-heading">Share this post:</h3>
+            <h3>Share this post:</h3>
             <ShareButtons title={post.title} />
           </div>
         </section>
@@ -203,20 +148,14 @@ const BlogPostPage: React.FC = () => {
             {relatedBlogs.map((blog) => (
               <BlogCard
                 key={blog.id}
-                id={blog.id}
-                title={blog.title}
-                author={blog.author}
-                slug={blog.slug}
-                imageUrl={blog.imageUrl}
-                publishedDate={blog.publishedDate}
-                summary={blog.summary}
+                {...blog}
                 variant="related"
               />
             ))}
           </div>
         </section>
       )}
-    </main>
+    </section>
   );
 };
 

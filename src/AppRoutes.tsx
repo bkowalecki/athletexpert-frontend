@@ -1,5 +1,5 @@
 import React, { Suspense, useCallback, useState } from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import { useUserContext } from "./context/UserContext";
 import RequireAuth from "./features/auth/RequireAuth";
 import LoadingScreen from "./components/LoadingScreen";
@@ -38,11 +38,12 @@ const NotFoundPage = React.lazy(() => import("./components/four0fourPage"));
 
 type RouteDef = Readonly<{ path: string; element: React.ReactElement }>;
 
+/* ===================== Quiz Modal ===================== */
+
 const QuizModal: React.FC<{ isOpen: boolean; closeModal: () => void }> = React.memo(
   ({ isOpen, closeModal }) => {
     if (!isOpen) return null;
 
-    // Keep a modal-specific fallback so the page doesn't "blank" when the quiz chunk loads
     return (
       <Suspense fallback={<LoadingScreen />}>
         <Quiz isOpen={isOpen} closeModal={closeModal} />
@@ -51,6 +52,8 @@ const QuizModal: React.FC<{ isOpen: boolean; closeModal: () => void }> = React.m
   }
 );
 QuizModal.displayName = "QuizModal";
+
+/* ===================== Home Route ===================== */
 
 const HomeRoute: React.FC<{
   openQuiz: () => void;
@@ -69,7 +72,8 @@ const HomeRoute: React.FC<{
 });
 HomeRoute.displayName = "HomeRoute";
 
-// Route groups (kept at module scope to avoid recreating arrays each render)
+/* ===================== Route Groups ===================== */
+
 const authRoutes: RouteDef[] = [
   {
     path: "/profile",
@@ -79,7 +83,6 @@ const authRoutes: RouteDef[] = [
       </RequireAuth>
     ),
   },
-  // keeping public as-is (matches your prior behavior)
   { path: "/settings", element: <AccountSettings /> },
   { path: "/account-setup", element: <OnboardingPage /> },
   { path: "/auth", element: <AuthPage /> },
@@ -119,22 +122,25 @@ const miscRoutes: RouteDef[] = [
   { path: "*", element: <NotFoundPage /> },
 ];
 
+/* ===================== AppRoutes ===================== */
+
 const AppRoutes: React.FC = () => {
   const { isSessionChecked } = useUserContext();
-  const [isQuizModalOpen, setQuizModalOpen] = useState(false);
+  const location = useLocation();
 
+  const [isQuizModalOpen, setQuizModalOpen] = useState(false);
   const openQuiz = useCallback(() => setQuizModalOpen(true), []);
   const closeQuiz = useCallback(() => setQuizModalOpen(false), []);
 
   return (
     <main className="page-content" id="main-content">
-      {/* IMPORTANT: keep main mounted even during initial session check
-          so the footer doesn't jump to the top while LoadingScreen overlays */}
+      {/* Keep main mounted to avoid footer jump during auth check */}
       {!isSessionChecked ? (
         <LoadingScreen />
       ) : (
         <Suspense fallback={<LoadingScreen />}>
-          <Routes>
+          {/* 🔑 FINAL FIX: force full remount on every navigation */}
+          <Routes location={location}>
             <Route
               path="/"
               element={

@@ -7,6 +7,7 @@ import { useSavedProducts } from "../../hooks/useSavedProducts";
 import { fetchFeaturedProducts } from "../../api/product";
 import type { Product } from "../../types/products";
 import "../../styles/FeaturedProductList.css";
+import { motion } from "framer-motion";
 
 const FeaturedProductList: React.FC = () => {
   const { savedProductIds, toggleSaveProduct } = useSavedProducts();
@@ -32,6 +33,13 @@ const FeaturedProductList: React.FC = () => {
       className="featured-products-section"
       aria-labelledby="featured-title"
     >
+            <motion.div
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        viewport={{ once: true }}
+        className="featured-products-section-content"
+      >
       <div className="featured-products-container">
         <h2 id="featured-title" className="featured-products-heading">
           Featured
@@ -84,6 +92,7 @@ const FeaturedProductList: React.FC = () => {
           })}
         </div>
       </div>
+      </motion.div>
     </section>
   );
 };
