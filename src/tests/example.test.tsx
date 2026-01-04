@@ -1,11 +1,8 @@
+import React from "react";
+import { render, screen } from "@testing-library/react";
+import App from "../App";
 
-
-///
-// import { render, screen } from '@testing-library/react';
-
-// test('renders hello world', () => {
-//   render(<div>Hello world</div>);
-//   expect(screen.getByText(/hello world/i)).toBeInTheDocument();
-// });
-
-export {};
+test("renders the app header", () => {
+  render(<App />);
+  expect(screen.getByRole("heading", { name: /athletexpert/i })).toBeInTheDocument();
+});

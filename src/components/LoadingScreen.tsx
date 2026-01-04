@@ -10,7 +10,7 @@ const LoadingScreen: React.FC = () => (
   >
     <div className="ax-loading-content">
       {/* Screen-reader friendly text */}
-      <span className="sr-only">Loading, please wait…</span>
+      <span className="sr-only">Loading, please wait...</span>
 
       {/* Visual spinner (hidden from screen readers) */}
       <div className="ax-spinner" aria-hidden="true"></div>

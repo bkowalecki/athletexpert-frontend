@@ -279,7 +279,7 @@ const NewBlogPost: React.FC = () => {
 <div class="ax-product-embed">
   <a href="${product.affiliateLink}" target="_blank" rel="noopener noreferrer">
     <img src="${product.imgUrl}" alt="${product.name}" />
-    <div><strong>${product.name}</strong> – ${product.brand}${
+    <div><strong>${product.name}</strong> - ${product.brand}${
       product.price ? ` | $${product.price}` : ""
     }</div>
   </a>
@@ -450,7 +450,7 @@ const NewBlogPost: React.FC = () => {
                   onClick={() => removeTag(tag)}
                   aria-label={`Remove ${tag}`}
                 >
-                  ×
+                  x
                 </button>
               </span>
             ))}
@@ -494,7 +494,7 @@ const NewBlogPost: React.FC = () => {
                       marginRight: 8,
                     }}
                   />
-                  {p.name} – <span style={{ color: "#666" }}>{p.brand}</span>
+                  {p.name} - <span style={{ color: "#666" }}>{p.brand}</span>
                   {p.price && (
                     <span
                       style={{
@@ -612,7 +612,7 @@ const NewBlogPost: React.FC = () => {
           <>
             <input
               type="text"
-              placeholder="Filter existing posts…"
+              placeholder="Filter existing posts..."
               value={blogFilter}
               onChange={(e) => setBlogFilter(e.target.value)}
               style={{ margin: "10px 0", width: "100%", padding: 10 }}
@@ -621,7 +621,7 @@ const NewBlogPost: React.FC = () => {
             {filteredBlogs.map((b) => (
               <div key={b.id} className="blog-admin-row">
                 <span>
-                  <strong>{b.title}</strong> – {b.author}
+                  <strong>{b.title}</strong> - {b.author}
                 </span>
                 <div>
                   <button type="button" onClick={() => handleEdit(b)}>

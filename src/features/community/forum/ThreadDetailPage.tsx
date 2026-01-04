@@ -4,9 +4,7 @@ import { useSports } from "../../../context/SportsContext";
 import { useUserContext } from "../../../context/UserContext";
 import { getThreadById } from "./mockForumData";
 import "./Forum.css";
-
-const slugify = (str: string) =>
-  str.toLowerCase().replace(/\s+/g, "-").replace(/[^\w\-]+/g, "");
+import { slugifySportName } from "../../../util/slug";
 
 const formatDate = (value: string) =>
   new Date(value).toLocaleDateString(undefined, {
@@ -26,7 +24,7 @@ const ThreadDetailPage: React.FC = () => {
 
   const currentSport = useMemo(() => {
     if (!slug) return null;
-    return sports.find((s) => slugify(s.title) === slug) ?? null;
+    return sports.find((s) => slugifySportName(s.title) === slug) ?? null;
   }, [sports, slug]);
 
   useEffect(() => {
@@ -37,7 +35,7 @@ const ThreadDetailPage: React.FC = () => {
 
   const thread = useMemo(() => {
     if (!currentSport || !threadId) return null;
-    return getThreadById(slugify(currentSport.title), threadId);
+    return getThreadById(slugifySportName(currentSport.title), threadId);
   }, [currentSport, threadId]);
 
   const [reply, setReply] = useState("");
@@ -59,7 +57,7 @@ const ThreadDetailPage: React.FC = () => {
           <p className="sport-page-text">Thread not found.</p>
           <div className="sport-page-buttons">
             <Link
-              to={`/community/${slugify(currentSport.title)}/forum`}
+              to={`/community/${slugifySportName(currentSport.title)}/forum`}
               className="sport-page-btn primary"
             >
               Back to forum
@@ -84,7 +82,7 @@ const ThreadDetailPage: React.FC = () => {
       <section className="sport-page-section">
         <div className="sport-page-buttons">
           <Link
-            to={`/community/${slugify(currentSport.title)}/forum`}
+            to={`/community/${slugifySportName(currentSport.title)}/forum`}
             className="sport-page-btn secondary"
           >
             Back to threads

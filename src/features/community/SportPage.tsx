@@ -13,10 +13,7 @@ import type { Product } from "../../types/products";
 import { fetchBlogsByTag } from "../../api/blog";
 import { fetchProductsBySport } from "../../api/product";
 import { useSports } from "../../context/SportsContext";
-
-// Utility: Slugify (recommend moving to util later)
-const slugify = (str: string) =>
-  str.toLowerCase().replace(/\s+/g, "-").replace(/[^\w\-]+/g, "");
+import { slugifySportName } from "../../util/slug";
 
 // Reusable UI
 const LoadingState: React.FC<{ message: string }> = ({ message }) => (
@@ -37,7 +34,7 @@ const SportPage: React.FC = () => {
   // Resolve current sport from context
   const currentSport = useMemo(() => {
     if (!slug) return null;
-    return sports.find((s) => slugify(s.title) === slug) ?? null;
+    return sports.find((s) => slugifySportName(s.title) === slug) ?? null;
   }, [sports, slug]);
 
   // Redirect invalid sport or E-Sports
@@ -84,7 +81,7 @@ const SportPage: React.FC = () => {
       <div className="sport-page-title">{currentSport.title}</div>
 
       {WEEKLY_POLL_ENABLED && (
-        <SportWeeklyPoll sportSlug={slugify(currentSport.title)} />
+        <SportWeeklyPoll sportSlug={slugifySportName(currentSport.title)} />
       )}
 
       {FORUM_ENABLED && (
@@ -95,7 +92,7 @@ const SportPage: React.FC = () => {
           </p>
           <div className="sport-page-buttons">
             <Link
-              to={`/community/${slugify(currentSport.title)}/forum`}
+              to={`/community/${slugifySportName(currentSport.title)}/forum`}
               className="sport-page-btn primary"
             >
               Visit Forum

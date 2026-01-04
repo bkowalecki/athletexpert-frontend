@@ -3,9 +3,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { useSports } from "../../../context/SportsContext";
 import { useUserContext } from "../../../context/UserContext";
 import "./Forum.css";
-
-const slugify = (str: string) =>
-  str.toLowerCase().replace(/\s+/g, "-").replace(/[^\w\-]+/g, "");
+import { slugifySportName } from "../../../util/slug";
 
 const NewThreadPage: React.FC = () => {
   const { sport: slug } = useParams<{ sport: string }>();
@@ -15,7 +13,7 @@ const NewThreadPage: React.FC = () => {
 
   const currentSport = useMemo(() => {
     if (!slug) return null;
-    return sports.find((s) => slugify(s.title) === slug) ?? null;
+    return sports.find((s) => slugifySportName(s.title) === slug) ?? null;
   }, [sports, slug]);
 
   useEffect(() => {
@@ -51,7 +49,7 @@ const NewThreadPage: React.FC = () => {
       <section className="sport-page-section">
         <div className="sport-page-buttons">
           <Link
-            to={`/community/${slugify(currentSport.title)}/forum`}
+            to={`/community/${slugifySportName(currentSport.title)}/forum`}
             className="sport-page-btn secondary"
           >
             Back to forum

@@ -137,7 +137,18 @@ body {
   cursor: pointer;
   border: none;
   font-weight: 700;
-  transition: background 0.3s, color 0.3s;
+  transition: background 0.3s, color 0.3s, box-shadow 0.3s, transform 0.3s;
+}
+
+.sport-page-btn:hover,
+.sport-page-btn:focus-visible {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
+}
+
+.sport-page-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
 }
 
 .sport-page-btn.primary {

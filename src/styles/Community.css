@@ -204,16 +204,16 @@
   border: 2px solid var(--accent1);
   background: linear-gradient(135deg, var(--secondary-bg), var(--primary-bg));
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-  transition: transform 0.4s, box-shadow 0.4s, border 0.25s;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
   will-change: transform;
   outline: none;
 }
 
 .sport-card:hover,
 .sport-card:focus-within {
-  transform: scale(1.03);
-  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.7);
-  border: 2.5px solid var(--accent2);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.65);
+  border-color: var(--accent2);
   z-index: 2;
 }
 

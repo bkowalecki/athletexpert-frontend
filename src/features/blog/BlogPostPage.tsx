@@ -100,7 +100,7 @@ const BlogPostPage: React.FC = () => {
 
       <nav className="back-link-container" aria-label="Breadcrumb">
         <Link to="/blog" className="back-link">
-          ← Back to Blog
+          Back to Blog
         </Link>
       </nav>
 
@@ -109,7 +109,7 @@ const BlogPostPage: React.FC = () => {
           <h1 className="blog-post-title">{post.title}</h1>
           <div className="blog-post-author-and-date">
             <address className="blog-post-author">{post.author}</address>
-            <span className="bullet">•</span>
+            <span className="bullet">|</span>
             <time dateTime={post.publishedDate}>{formattedDate}</time>
           </div>
         </header>

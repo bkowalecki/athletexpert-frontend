@@ -47,7 +47,7 @@ function cleanTitle(raw?: string): string {
   const MAX = 60;
   if (s.length > MAX) {
     const cut = s.lastIndexOf(" ", MAX);
-    s = s.slice(0, cut > 40 ? cut : MAX).trim() + "…";
+    s = s.slice(0, cut > 40 ? cut : MAX).trim() + "...";
   }
   return s;
 }
@@ -72,8 +72,8 @@ function dedupeProducts(items: Product[]): Product[] {
 
 const BUDGET_BUCKETS = [
   { label: "Under $25", key: "u25", min: 0, max: 25 },
-  { label: "$25–$50", key: "25-50", min: 25, max: 50 },
-  { label: "$50–$100", key: "50-100", min: 50, max: 100 },
+  { label: "$25-$50", key: "25-50", min: 25, max: 50 },
+  { label: "$50-$100", key: "50-100", min: 50, max: 100 },
   { label: "$100+", key: "100+", min: 100, max: Number.POSITIVE_INFINITY },
 ];
 
@@ -407,8 +407,8 @@ const ProductsPage: React.FC = () => {
         key: "sort",
         label:
           filters.sortOption === "priceLow"
-            ? "Sort: $ Low → High"
-            : "Sort: $ High → Low",
+            ? "Sort: $ Low to High"
+            : "Sort: $ High to Low",
         onClear: () => handleFilterChange("sortOption", ""),
       });
 
@@ -431,7 +431,7 @@ const ProductsPage: React.FC = () => {
     if (inputQuery.trim()) {
       chips.push({
         key: "q",
-        label: `Search: “${inputQuery.trim()}”`,
+        label: `Search: "${inputQuery.trim()}"`,
         onClear: handleClearSearch,
       });
     }
@@ -509,7 +509,7 @@ const ProductsPage: React.FC = () => {
               aria-label="Sort products"
               className="ax-select"
             >
-              <option value="">Sort by…</option>
+              <option value="">Sort by...</option>
               <option value="priceLow">Price: Low to High</option>
               <option value="priceHigh">Price: High to Low</option>
             </select>
@@ -575,7 +575,7 @@ const ProductsPage: React.FC = () => {
                 onClick={c.onClear}
                 title={`Remove ${c.label}`}
               >
-                {c.label} <span aria-hidden>×</span>
+                {c.label} <span aria-hidden>x</span>
               </button>
             ))}
           </div>
@@ -586,7 +586,7 @@ const ProductsPage: React.FC = () => {
 
       {error && (
         <div className="products-error-container">
-          <h2>😵 Oops! Something went wrong.</h2>
+          <h2>Oops! Something went wrong.</h2>
           <p>We couldn't load the products right now. Please try again later.</p>
           <button className="return-home-btn" onClick={() => navigate("/")}>
             Return Home
@@ -645,7 +645,7 @@ const ProductsPage: React.FC = () => {
             <div className="no-products-text">
               <p>No gear found.</p>
               <ul style={{ marginTop: 6 }}>
-                <li>Try broader keywords (e.g. “running shoes”)</li>
+                <li>Try broader keywords (e.g. "running shoes")</li>
                 <li>Clear a filter (brand, sport, budget, retailer)</li>
                 <li>Check trending for inspiration</li>
               </ul>

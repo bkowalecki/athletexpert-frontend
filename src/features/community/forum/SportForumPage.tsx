@@ -4,9 +4,7 @@ import { useSports } from "../../../context/SportsContext";
 import { getThreadsBySport } from "./mockForumData";
 import type { ForumThread } from "./forumTypes";
 import "./Forum.css";
-
-const slugify = (str: string) =>
-  str.toLowerCase().replace(/\s+/g, "-").replace(/[^\w\-]+/g, "");
+import { slugifySportName } from "../../../util/slug";
 
 const formatDate = (value: string) =>
   new Date(value).toLocaleDateString(undefined, {
@@ -27,7 +25,7 @@ const SportForumPage: React.FC = () => {
 
   const currentSport = useMemo(() => {
     if (!slug) return null;
-    return sports.find((s) => slugify(s.title) === slug) ?? null;
+    return sports.find((s) => slugifySportName(s.title) === slug) ?? null;
   }, [sports, slug]);
 
   useEffect(() => {
@@ -38,7 +36,7 @@ const SportForumPage: React.FC = () => {
 
   const threads = useMemo(() => {
     if (!currentSport) return [];
-    return sortByActivity(getThreadsBySport(slugify(currentSport.title)));
+    return sortByActivity(getThreadsBySport(slugifySportName(currentSport.title)));
   }, [currentSport]);
 
   if (!currentSport) {
@@ -56,13 +54,13 @@ const SportForumPage: React.FC = () => {
       <section className="sport-page-section">
         <div className="sport-page-buttons">
           <Link
-            to={`/community/${slugify(currentSport.title)}/forum/new`}
+            to={`/community/${slugifySportName(currentSport.title)}/forum/new`}
             className="sport-page-btn primary"
           >
             Start a thread
           </Link>
           <Link
-            to={`/community/${slugify(currentSport.title)}`}
+            to={`/community/${slugifySportName(currentSport.title)}`}
             className="sport-page-btn secondary"
           >
             Back to {currentSport.title}
@@ -79,7 +77,7 @@ const SportForumPage: React.FC = () => {
                 <article key={thread.id} className="forum-thread-card">
                   <div>
                     <Link
-                      to={`/community/${slugify(currentSport.title)}/forum/${thread.id}`}
+                      to={`/community/${slugifySportName(currentSport.title)}/forum/${thread.id}`}
                       className="forum-thread-title"
                     >
                       {thread.title}

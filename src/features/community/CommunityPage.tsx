@@ -5,6 +5,7 @@ import { useSports } from "../../context/SportsContext";
 import "../../styles/Community.css";
 import { Helmet } from "react-helmet";
 import { trackEvent } from "../../util/analytics";
+import { slugifySportName } from "../../util/slug";
 
 /**
  * NOTE:
@@ -40,10 +41,6 @@ const sportMemberCounts: Record<string, number> = {
   Wrestling: 670,
   Yoga: 1440,
 };
-
-// Local slug helper (recommend moving to util/slug.ts later)
-const slugify = (str: string) =>
-  str.toLowerCase().replace(/\s+/g, "-").replace(/[^\w\-]+/g, "");
 
 interface SportCardProps {
   title: string;
@@ -100,7 +97,7 @@ const SportCard: React.FC<SportCardProps> = React.memo(
         <div className="sport-card-info">
           <h3>{title}</h3>
           <p className="sport-card-members">
-            👥 {memberCount.toLocaleString()} members
+            {memberCount.toLocaleString()} members
           </p>
         </div>
       </div>
@@ -152,7 +149,7 @@ const Community: React.FC = () => {
 
       <div className="sports-masonry">
         {filteredSports.map((sport, index) => {
-          const slug = slugify(sport.title);
+          const slug = slugifySportName(sport.title);
           const isEsports = sport.title.toLowerCase() === "e-sports";
 
           return (
