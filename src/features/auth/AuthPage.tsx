@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useUserContext } from "../../context/UserContext";
 import { loginWithAuth0Token } from "../../util/authUtils";
@@ -12,6 +12,7 @@ const AUTH0_SCOPE = "openid profile email";
 
 const AuthPage: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { setUser, user, isSessionChecked } = useUserContext();
 
   const {
@@ -31,14 +32,19 @@ const AuthPage: React.FC = () => {
   });
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const loggedOut = useRef(false);
 
   // Prevent repeated background SSO attempts
   const hasAttemptedSSO = useRef(false);
 
   // If session already exists, bounce to profile
   useEffect(() => {
-    if (isSessionChecked && user) navigate("/profile", { replace: true });
-  }, [isSessionChecked, user, navigate]);
+    const params = new URLSearchParams(location.search);
+    loggedOut.current = params.get("loggedOut") === "1";
+    if (isSessionChecked && user && !loggedOut.current) {
+      navigate("/profile", { replace: true });
+    }
+  }, [isSessionChecked, user, navigate, location.search]);
 
   // If Auth0 is already authenticated (e.g. returning user) but our backend session/user isn't set, attempt SSO once.
   useEffect(() => {
@@ -49,6 +55,7 @@ const AuthPage: React.FC = () => {
       isAuthenticated &&
       auth0User &&
       !user &&
+      !loggedOut.current &&
       !hasAttemptedSSO.current
     ) {
       hasAttemptedSSO.current = true;

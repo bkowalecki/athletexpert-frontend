@@ -4,6 +4,7 @@ import { useUserContext } from "../../context/UserContext";
 import { toast } from "react-toastify";
 import { useAuth0 } from "@auth0/auth0-react";
 import { Helmet } from "react-helmet";
+import { useQueryClient } from "@tanstack/react-query";
 import SportStatsModal from "./SportStatsModal";
 import ProductCard from "../products/ProductCard";
 import BlogCard from "../blog/BlogCard";
@@ -49,6 +50,7 @@ const ProfilePage: React.FC = () => {
   const navigate = useNavigate();
   const { user, setUser, isSessionChecked } = useUserContext();
   const { logout: auth0Logout } = useAuth0();
+  const queryClient = useQueryClient();
   const { savedProductIds, toggleSaveProduct } = useSavedProducts();
 
   const initials = useMemo(() => {
@@ -376,23 +378,29 @@ const ProfilePage: React.FC = () => {
     try {
       sessionStorage.removeItem("ax_id_token");
       sessionStorage.removeItem("ax_token_time");
+      sessionStorage.removeItem("sessionExpired");
+      sessionStorage.removeItem("ax_auth_redirected");
       sessionStorage.setItem("justLoggedOut", "true");
 
-      await api.post("/users/logout").catch(() => {});
       setUser(null);
+      queryClient.clear();
+
+      await api.post("/users/logout").catch(() => {});
 
       const provider = (user as any)?.authProvider;
       if (provider === "auth0") {
         auth0Logout({
-          logoutParams: { returnTo: window.location.origin + "/" },
+          logoutParams: {
+            returnTo: `${window.location.origin}/auth?loggedOut=1`,
+          },
         });
       } else {
-        setTimeout(() => (window.location.href = "/"), 80);
+        navigate("/auth?loggedOut=1", { replace: true });
       }
     } catch {
       toast.error("Log out failed.");
     }
-  }, [setUser, user, auth0Logout]);
+  }, [setUser, user, auth0Logout, queryClient, navigate]);
 
   if (!isSessionChecked || profileStatus === "loading") {
     return (
