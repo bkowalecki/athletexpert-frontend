@@ -28,27 +28,20 @@ const MAX_RECENT = 8;
 
 const sportsData: Sport[] = Array.isArray(sportsDataRaw) ? sportsDataRaw : [];
 
+/* ===============================
+   Precomputed O(1) lookup
+================================ */
+const communitySet = new Set(sportsData.map((s) => s.title.toLowerCase()));
+
 const safeParseJsonArray = (raw: string | null): string[] => {
   try {
     const parsed = JSON.parse(raw || "[]");
-    return Array.isArray(parsed) ? parsed.filter((x) => typeof x === "string") : [];
+    return Array.isArray(parsed)
+      ? parsed.filter((x) => typeof x === "string")
+      : [];
   } catch {
     return [];
   }
-};
-
-const getRecentSearches = (): string[] =>
-  safeParseJsonArray(localStorage.getItem(RECENT_SEARCHES_KEY));
-
-const addRecentSearch = (query: string) => {
-  const trimmed = query.trim();
-  if (!trimmed) return;
-
-  const searches = [trimmed, ...getRecentSearches().filter((q) => q !== trimmed)].slice(
-    0,
-    MAX_RECENT
-  );
-  localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(searches));
 };
 
 const toSlug = (s: string) =>
@@ -57,9 +50,6 @@ const toSlug = (s: string) =>
     .toLowerCase()
     .replace(/\s+/g, "-")
     .replace(/[^\w-]+/g, "");
-
-const isCommunityValid = (query: string) =>
-  sportsData.some((s) => s.title.toLowerCase() === query.trim().toLowerCase());
 
 const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
   showSubmitButton = true,
@@ -71,13 +61,20 @@ const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const [loadingIntent, setLoadingIntent] = useState(false);
 
+  /* 🔒 Cache recent searches in state (no repeated JSON.parse) */
+  const [recentSearches, setRecentSearches] = useState<string[]>(() =>
+    safeParseJsonArray(localStorage.getItem(RECENT_SEARCHES_KEY))
+  );
+
   const inputRef = useRef<HTMLInputElement>(null);
   const inFlightRef = useRef(false);
 
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Focus with "/" shortcut
+  /* ===============================
+     Keyboard shortcut "/"
+  ================================ */
   useEffect(() => {
     const handleSlash = (e: KeyboardEvent) => {
       const tag = (document.activeElement as HTMLElement | null)?.tagName;
@@ -96,7 +93,7 @@ const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
     return () => window.removeEventListener("keydown", handleSlash);
   }, []);
 
-  // Reset search state when not on search page
+  /* Reset when leaving search page */
   useEffect(() => {
     if (!location.pathname.startsWith("/search")) {
       setSearchQuery("");
@@ -106,7 +103,7 @@ const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
     }
   }, [location.pathname]);
 
-  // Global Escape to close dropdown
+  /* Global Escape */
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
       if (e.key === "Escape") setShowDropdown(false);
@@ -115,41 +112,43 @@ const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
     return () => window.removeEventListener("keydown", handleEsc);
   }, []);
 
-  // Debounced suggestions function
-  const updateSuggestions = useMemo(() => {
-    const fn = debounce((query: string) => {
-      const q = query.trim();
-      if (q.length < 2) {
-        setSuggestions([]);
-        setShowDropdown(false);
-        return;
-      }
+  /* ===============================
+     Suggestions (debounced)
+  ================================ */
+  const updateSuggestions = useMemo(
+    () =>
+      debounce((query: string) => {
+        const q = query.trim();
+        if (q.length < 2) {
+          setSuggestions([]);
+          setShowDropdown(false);
+          return;
+        }
 
-      const recentAll = getRecentSearches();
-      const recent = recentAll.filter((term) => term.toLowerCase().includes(q.toLowerCase()));
+        const recent = recentSearches.filter((term) =>
+          term.toLowerCase().includes(q.toLowerCase())
+        );
 
-      const staticFiltered = (sportsTerms as any).sportsTerms
-        ?.filter((term: string) => term.toLowerCase().startsWith(q.toLowerCase()))
-        ?? [];
+        const staticFiltered =
+          (sportsTerms as any).sportsTerms?.filter((term: string) =>
+            term.toLowerCase().startsWith(q.toLowerCase())
+          ) ?? [];
 
-      const combined = [...recent, ...staticFiltered.filter((t: string) => !recent.includes(t))].slice(
-        0,
-        10
-      );
+        const combined = [
+          ...recent,
+          ...staticFiltered.filter((t: string) => !recent.includes(t)),
+        ].slice(0, 10);
 
-      setSuggestions(combined);
-      setShowDropdown(combined.length > 0);
-    }, 250);
+        setSuggestions(combined);
+        setShowDropdown(combined.length > 0);
+      }, 250),
+    [recentSearches]
+  );
 
-    return fn;
-  }, []);
-
-  // cancel debounce on unmount
   useEffect(() => {
     return () => updateSuggestions.cancel();
   }, [updateSuggestions]);
 
-  // Suggestions on input
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
     setSearchQuery(query);
@@ -157,14 +156,19 @@ const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
     updateSuggestions(query);
   };
 
-  // AI search intent
+  /* ===============================
+     AI Navigation
+  ================================ */
   const handleNavigateAI = useCallback(
     async (query: string) => {
       const trimmedQuery = query.trim();
-      // If empty, just navigate to generic search page
+
       if (!trimmedQuery) {
         navigate(`/search?query=`);
-        trackEvent("search_submit", { query: "(empty)", search_origin: "header" });
+        trackEvent("search_submit", {
+          query: "(empty)",
+          search_origin: "header",
+        });
         onSearchComplete?.();
         setShowDropdown(false);
         return;
@@ -177,14 +181,18 @@ const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
       try {
         const ai = await fetchSearchIntent(trimmedQuery);
 
-        if (ai.intent?.includes("staticPage") && ai.suggestedPages?.length > 0) {
-          navigate(`/${String(ai.suggestedPages[0]).toLowerCase()}`);
+        if (
+          ai.intent?.includes("staticPage") &&
+          ai.suggestedPages.length > 0 &&
+          ai.suggestedPages[0].path
+        ) {
+          navigate(ai.suggestedPages[0].path);
         } else if (
           ai.intent &&
           (ai.intent.includes("community") || ai.intent.includes("sport")) &&
           ai.fixedQuery
         ) {
-          if (isCommunityValid(ai.fixedQuery)) {
+          if (communitySet.has(ai.fixedQuery.toLowerCase())) {
             navigate(`/community/${toSlug(ai.fixedQuery)}`);
           } else {
             navigate(`/search?query=${encodeURIComponent(trimmedQuery)}`);
@@ -204,8 +212,15 @@ const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
           search_origin: "header",
         });
 
-        // Only persist real queries
-        if (!ai.isGibberish) addRecentSearch(trimmedQuery);
+        if (!ai.isGibberish) {
+          const updated = [
+            trimmedQuery,
+            ...recentSearches.filter((q) => q !== trimmedQuery),
+          ].slice(0, MAX_RECENT);
+
+          setRecentSearches(updated);
+          localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(updated));
+        }
 
         onSearchComplete?.();
       } catch {
@@ -215,7 +230,6 @@ const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
           error: true,
           search_origin: "header",
         });
-        addRecentSearch(trimmedQuery);
         onSearchComplete?.();
       } finally {
         setShowDropdown(false);
@@ -223,14 +237,15 @@ const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
         inFlightRef.current = false;
       }
     },
-    [navigate, onSearchComplete]
+    [navigate, onSearchComplete, recentSearches]
   );
 
-  const recentSet = useMemo(() => new Set(getRecentSearches()), [showDropdown, suggestions.length]);
+  const recentSet = useMemo(() => new Set(recentSearches), [recentSearches]);
 
-  // Keyboard navigation in dropdown
+  /* ===============================
+     Keyboard navigation
+  ================================ */
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    // If dropdown isn't showing yet, allow ArrowDown to open it (if we have suggestions)
     if (!showDropdown && e.key === "ArrowDown" && suggestions.length > 0) {
       setShowDropdown(true);
       setHighlightedIndex(0);
@@ -246,11 +261,13 @@ const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
           break;
         case "ArrowUp":
           e.preventDefault();
-          setHighlightedIndex((prev) => (prev === 0 ? suggestions.length - 1 : prev - 1));
+          setHighlightedIndex((prev) =>
+            prev === 0 ? suggestions.length - 1 : prev - 1
+          );
           break;
         case "Enter":
           e.preventDefault();
-          if (highlightedIndex >= 0 && highlightedIndex < suggestions.length) {
+          if (highlightedIndex >= 0) {
             handleNavigateAI(suggestions[highlightedIndex]);
           } else {
             handleNavigateAI(searchQuery);
@@ -259,13 +276,10 @@ const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
         case "Tab":
           setShowDropdown(false);
           break;
-        default:
-          break;
       }
       return;
     }
 
-    // If dropdown isn't active, Enter should still submit normally
     if (e.key === "Enter") {
       e.preventDefault();
       handleNavigateAI(searchQuery);
@@ -277,62 +291,61 @@ const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
     handleNavigateAI(searchQuery);
   };
 
-  // close dropdown after click elsewhere (blur)
   const handleInputBlur = () => {
     setTimeout(() => setShowDropdown(false), 120);
   };
 
   return (
-    <div className="search-bar-container" role="search" aria-label="Sitewide search">
+    <div className="search-bar-container" role="search">
       <form
         className="header-search-bar-form"
         onSubmit={handleSearchSubmit}
         autoComplete="off"
-        tabIndex={0}
-        aria-label="Search products, blogs, and more"
       >
         <input
           ref={inputRef}
           type="text"
           className="header-search-bar-input"
           placeholder={
-            loadingIntent ? "Finding best results..." : "Search products, blogs, or sports..."
+            loadingIntent
+              ? "Finding best results..."
+              : "Search products, blogs, or sports..."
           }
           value={searchQuery}
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
           onBlur={handleInputBlur}
-          aria-label="Sitewide search"
           disabled={loadingIntent}
-          autoComplete="off"
         />
 
         {showSubmitButton && (
           <button
             type="submit"
             className="header-search-bar-button"
-            aria-label="Submit search"
             disabled={loadingIntent}
           >
-            <i className="fas fa-search" aria-hidden="true"></i>
+            <i className="fas fa-search" aria-hidden="true" />
             <span className="sr-only">Search</span>
           </button>
         )}
       </form>
 
       {showDropdown && suggestions.length > 0 && (
-        <ul className="search-suggestions show" role="listbox" aria-label="Search suggestions">
+        <ul className="search-suggestions show" role="listbox">
           {suggestions.map((suggestion, index) => (
             <li
               key={suggestion}
-              className={`search-suggestion-item${highlightedIndex === index ? " highlighted" : ""}`}
+              className={`search-suggestion-item${
+                highlightedIndex === index ? " highlighted" : ""
+              }`}
               role="option"
               aria-selected={highlightedIndex === index}
-              tabIndex={-1}
               onMouseEnter={() => setHighlightedIndex(index)}
               onMouseDown={() => handleNavigateAI(suggestion)}
             >
-              {recentSet.has(suggestion) && <span className="recent-label">Recent</span>}
+              {recentSet.has(suggestion) && (
+                <span className="recent-label">Recent</span>
+              )}
               {suggestion}
             </li>
           ))}

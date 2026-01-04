@@ -1,4 +1,9 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, {
+  useState,
+  useEffect,
+  useMemo,
+  useCallback,
+} from "react";
 import "../../styles/Quiz.css";
 
 import sportsData from "../../data/sports.json";
@@ -136,6 +141,7 @@ const Quiz: React.FC<{ isOpen: boolean; closeModal: () => void }> = ({
   }, [answers.sport, mainQuestions]);
 
   const totalSteps = 1 + quizQuestions.length;
+
   const currentQuestion =
     step > 0 && step <= quizQuestions.length ? quizQuestions[step - 1] : null;
 
@@ -144,17 +150,21 @@ const Quiz: React.FC<{ isOpen: boolean; closeModal: () => void }> = ({
       ? 0
       : Math.min(100, Math.round((step / quizQuestions.length) * 100));
 
-  // Loading text rotation (single effect – no duplication)
+  // Loading text rotation
   useEffect(() => {
     if (!isLoading) {
       setLoadingTextIndex(0);
       return;
     }
 
-    setLoadingTextIndex(Math.floor(Math.random() * FUNNY_LOADING_TEXTS.length));
+    setLoadingTextIndex(
+      Math.floor(Math.random() * FUNNY_LOADING_TEXTS.length)
+    );
 
     const interval = setInterval(() => {
-      setLoadingTextIndex((prev) => (prev + 1) % FUNNY_LOADING_TEXTS.length);
+      setLoadingTextIndex(
+        (prev) => (prev + 1) % FUNNY_LOADING_TEXTS.length
+      );
     }, 2200);
 
     return () => clearInterval(interval);
@@ -189,14 +199,14 @@ const Quiz: React.FC<{ isOpen: boolean; closeModal: () => void }> = ({
     trackEvent("quiz_complete", answers);
   }, [step, totalSteps, answers, dispatch]);
 
-  const handleNext = (field: string, value: string) => {
+  const handleNext = useCallback((field: string, value: string) => {
     setAnswers((prev) => ({ ...prev, [field]: value }));
     setStep((prev) => prev + 1);
-  };
+  }, []);
 
-  const handleBack = () => {
+  const handleBack = useCallback(() => {
     if (step > 0) setStep((prev) => prev - 1);
-  };
+  }, [step]);
 
   // Scroll lock
   useEffect(() => {
@@ -233,9 +243,7 @@ const Quiz: React.FC<{ isOpen: boolean; closeModal: () => void }> = ({
 
         <div className="quiz-scrollable-content">
           {isLoading ? (
-            <LoadingSpinner
-              text={FUNNY_LOADING_TEXTS[loadingTextIndex]}
-            />
+            <LoadingSpinner text={FUNNY_LOADING_TEXTS[loadingTextIndex]} />
           ) : (
             <>
               {step === 0 && (

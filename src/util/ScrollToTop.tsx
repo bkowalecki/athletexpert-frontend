@@ -1,3 +1,4 @@
+// Ensures route changes reset scroll position, running after each pathname change to prevent mid-page landings during navigation.
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 

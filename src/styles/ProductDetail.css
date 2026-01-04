@@ -383,3 +383,56 @@
   .product-detail-price { font-size: 1.1rem; }
   .product-detail-affiliate-btn { font-size: 0.96rem; padding: 10px 16px; }
 }
+
+/* === Decision Card === */
+.product-decision-card {
+  background: linear-gradient(
+    180deg,
+    rgba(255,255,255,0.04),
+    rgba(255,255,255,0.02)
+  );
+  border: 1px solid var(--ax-border);
+  border-radius: var(--ax-radius-lg);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: var(--ax-shadow-sm);
+}
+
+/* Section blocks */
+.product-section {
+  margin-top: 22px;
+}
+.product-section h2 {
+  font-size: 1.05rem;
+  font-weight: 800;
+  margin-bottom: 8px;
+  color: var(--ax-text);
+}
+
+/* Improve reading flow */
+.product-detail-description {
+  line-height: 1.7;
+  color: #eaeaea;
+}
+
+/* Feature list refinement */
+.product-features-list li {
+  padding-left: 4px;
+}
+
+/* Mobile CTA emphasis */
+@media (max-width: 600px) {
+  .product-decision-card {
+    position: sticky;
+    bottom: 12px;
+    z-index: 20;
+    backdrop-filter: blur(10px);
+  }
+
+  .product-detail-affiliate-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}

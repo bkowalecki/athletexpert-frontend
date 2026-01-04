@@ -619,7 +619,7 @@ const ProductsPage: React.FC = () => {
               return (
                 <ProductCard
                   key={key}
-                  id={product.id} // keep numeric id for save/toggle + analytics
+                  id={product.id}
                   name={getCleanTitle(product)}
                   brand={product.brand}
                   price={product.price}

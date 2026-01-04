@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import "../../styles/SportPage.css";
 
@@ -28,6 +28,8 @@ const NoDataState: React.FC<{ message: string }> = ({ message }) => (
 );
 
 const SportPage: React.FC = () => {
+  const FORUM_ENABLED = false;
+  const WEEKLY_POLL_ENABLED = false;
   const { sport: slug } = useParams<{ sport: string }>();
   const navigate = useNavigate();
   const { sports } = useSports();
@@ -81,7 +83,26 @@ const SportPage: React.FC = () => {
     <div className="sport-page">
       <div className="sport-page-title">{currentSport.title}</div>
 
-      <SportWeeklyPoll sportSlug={slugify(currentSport.title)} />
+      {WEEKLY_POLL_ENABLED && (
+        <SportWeeklyPoll sportSlug={slugify(currentSport.title)} />
+      )}
+
+      {FORUM_ENABLED && (
+        <section className="sport-page-section">
+          <h2 className="sport-page-section-title">Sport Forum</h2>
+          <p className="sport-page-text">
+            Jump into the conversation with athletes who play this sport.
+          </p>
+          <div className="sport-page-buttons">
+            <Link
+              to={`/community/${slugify(currentSport.title)}/forum`}
+              className="sport-page-btn primary"
+            >
+              Visit Forum
+            </Link>
+          </div>
+        </section>
+      )}
 
       {/* Recommended Gear */}
       <section className="sport-page-section">

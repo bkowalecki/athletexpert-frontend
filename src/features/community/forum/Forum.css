@@ -1,0 +1,144 @@
+.forum-page {
+  background: var(--primary-bg);
+  color: var(--text-color);
+}
+
+.forum-header {
+  text-align: center;
+}
+
+.forum-thread-list {
+  display: grid;
+  gap: 14px;
+  margin-top: 1rem;
+}
+
+.forum-thread-card {
+  background: #1a1a1a;
+  border: 1px solid rgba(255, 111, 0, 0.25);
+  border-radius: 12px;
+  padding: 14px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.forum-thread-title {
+  color: var(--text-color);
+  font-size: 1.05rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.forum-thread-title:hover,
+.forum-thread-title:focus {
+  color: var(--accent);
+}
+
+.forum-thread-meta {
+  font-size: 0.9rem;
+  color: #c7c7c7;
+}
+
+.forum-thread-snippet {
+  margin: 0;
+  color: #dddddd;
+  font-size: 0.95rem;
+}
+
+.forum-thread-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 0.85rem;
+  color: #b0b0b0;
+}
+
+.forum-empty {
+  margin-top: 1rem;
+  color: #cfcfcf;
+}
+
+.forum-post {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 14px;
+  text-align: left;
+  background: #151515;
+}
+
+.forum-post + .forum-post {
+  margin-top: 12px;
+}
+
+.forum-post-title {
+  font-size: 1.25rem;
+  margin: 0 0 8px;
+  color: var(--text-color);
+}
+
+.forum-post-meta {
+  font-size: 0.85rem;
+  color: #c7c7c7;
+  margin-bottom: 8px;
+}
+
+.forum-post-body {
+  margin: 0;
+  color: #e6e6e6;
+  line-height: 1.5;
+}
+
+.forum-replies {
+  margin-top: 1rem;
+  display: grid;
+  gap: 10px;
+}
+
+.forum-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 1rem;
+  text-align: left;
+}
+
+.forum-input,
+.forum-textarea {
+  width: 100%;
+  background: #0f0f0f;
+  color: var(--text-color);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 1rem;
+}
+
+.forum-textarea {
+  min-height: 140px;
+  resize: vertical;
+}
+
+.forum-help {
+  font-size: 0.85rem;
+  color: #bdbdbd;
+}
+
+.forum-cta {
+  margin-top: 0.5rem;
+  color: #e2e2e2;
+}
+
+@media (min-width: 900px) {
+  .forum-thread-card {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .forum-thread-stats {
+    justify-content: flex-end;
+    min-width: 220px;
+  }
+}

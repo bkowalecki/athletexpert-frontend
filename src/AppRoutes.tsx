@@ -36,6 +36,10 @@ const TermsAndConditionsPage = React.lazy(
 const PrivacyPolicy = React.lazy(() => import("./features/legal/PrivacyPolicy"));
 const NotFoundPage = React.lazy(() => import("./components/four0fourPage"));
 
+const SportForumPage = React.lazy(() => import("./features/community/forum/SportForumPage"));
+const NewThreadPage = React.lazy(() => import("./features/community/forum/NewThreadPage"));
+const ThreadDetailPage = React.lazy(() => import("./features/community/forum/ThreadDetailPage"));
+
 type RouteDef = Readonly<{ path: string; element: React.ReactElement }>;
 
 /* ===================== Quiz Modal ===================== */
@@ -110,6 +114,9 @@ const blogRoutes: RouteDef[] = [
 
 const communityRoutes: RouteDef[] = [
   { path: "/community", element: <CommunityPage /> },
+  { path: "/community/:sport/forum/new", element: <NewThreadPage /> },
+  { path: "/community/:sport/forum/:threadId", element: <ThreadDetailPage /> },
+  { path: "/community/:sport/forum", element: <SportForumPage /> },
   { path: "/community/:sport", element: <SportPage /> },
 ];
 

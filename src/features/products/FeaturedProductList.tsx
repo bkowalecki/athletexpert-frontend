@@ -33,65 +33,69 @@ const FeaturedProductList: React.FC = () => {
       className="featured-products-section"
       aria-labelledby="featured-title"
     >
-            <motion.div
+      <motion.div
         initial={{ opacity: 0, y: 40 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
         viewport={{ once: true }}
         className="featured-products-section-content"
       >
-      <div className="featured-products-container">
-        <h2 id="featured-title" className="featured-products-heading">
-          Featured
-        </h2>
+        <div className="featured-products-container">
+          <h2 id="featured-title" className="featured-products-heading">
+            Featured
+          </h2>
 
-        {isLoading && (
-          <p className="featured-products-message">
-            Loading featured products...
-          </p>
-        )}
+          {isLoading && (
+            <p className="featured-products-message">
+              Loading featured products...
+            </p>
+          )}
 
-        {isError && (
-          <p className="featured-products-message error">
-            Unable to load featured products. Please try again later.
-          </p>
-        )}
+          {isError && (
+            <p className="featured-products-message error">
+              Unable to load featured products. Please try again later.
+            </p>
+          )}
 
-        {!isLoading && !isError && products.length === 0 && (
-          <p className="featured-products-message">
-            No featured products available right now.
-          </p>
-        )}
+          {!isLoading && !isError && products.length === 0 && (
+            <p className="featured-products-message">
+              No featured products available right now.
+            </p>
+          )}
 
-        <div className="featured-products-grid" aria-live="polite">
-          {products.map((product) => {
-            const productId = product.id;
+          <div className="featured-products-grid" aria-live="polite">
+            {products.map((product) => {
+              const productId = product.id;
 
-            return (
-              <ProductCard
-                key={productId ?? product.asin ?? product.slug ?? product.name}
-                id={productId}
-                name={product.name}
-                brand={product.brand}
-                price={typeof product.price === "number" ? product.price : null}
-                imgUrl={product.imgUrl}
-                affiliateLink={product.affiliateLink}
-                slug={product.slug}
-                isSaved={
-                  typeof productId === "number" && savedSet.has(productId)
-                }
-                onToggleSave={
-                  typeof productId === "number"
-                    ? () => toggleSaveProduct(productId)
-                    : undefined
-                }
-                isAmazonFallback={product.isAmazonFallback}
-                isTrending={Boolean((product as any).trending)}
-              />
-            );
-          })}
+              return (
+                <ProductCard
+                  key={
+                    productId ?? product.asin ?? product.slug ?? product.name
+                  }
+                  id={productId}
+                  name={product.name}
+                  brand={product.brand}
+                  price={
+                    typeof product.price === "number" ? product.price : null
+                  }
+                  imgUrl={product.imgUrl}
+                  affiliateLink={product.affiliateLink}
+                  slug={product.slug}
+                  isSaved={
+                    typeof productId === "number" && savedSet.has(productId)
+                  }
+                  onToggleSave={
+                    typeof productId === "number"
+                      ? () => toggleSaveProduct(productId)
+                      : undefined
+                  }
+                  isAmazonFallback={product.isAmazonFallback}
+                  isTrending={Boolean((product as any).trending)}
+                />
+              );
+            })}
+          </div>
         </div>
-      </div>
       </motion.div>
     </section>
   );
