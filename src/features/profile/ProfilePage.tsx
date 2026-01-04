@@ -42,6 +42,9 @@ const ProfilePage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<TabKey>("overview");
   const [avatarSrc, setAvatarSrc] = useState<string>(DEFAULT_AVATAR);
   const [error, setError] = useState<string | null>(null);
+  const [profileStatus, setProfileStatus] = useState<
+    "idle" | "loading" | "loaded" | "error"
+  >("idle");
 
   const navigate = useNavigate();
   const { user, setUser, isSessionChecked } = useUserContext();
@@ -268,6 +271,7 @@ const ProfilePage: React.FC = () => {
     async (signal?: AbortSignal) => {
       setIsLoading(true);
       setError(null);
+      setProfileStatus("loading");
 
       try {
         const { data } = await api.get("/users/profile", { signal });
@@ -280,6 +284,7 @@ const ProfilePage: React.FC = () => {
         } else {
           setSavedBlogs([]);
         }
+        setProfileStatus("loaded");
       } catch (err: any) {
         if (err?.name === "CanceledError" || err?.code === "ERR_CANCELED")
           return;
@@ -289,6 +294,7 @@ const ProfilePage: React.FC = () => {
           return;
         }
         setError("Failed to load profile. Please try again.");
+        setProfileStatus("error");
       } finally {
         setIsLoading(false);
       }
@@ -388,7 +394,7 @@ const ProfilePage: React.FC = () => {
     }
   }, [setUser, user, auth0Logout]);
 
-  if (isLoading) {
+  if (!isSessionChecked || profileStatus === "loading") {
     return (
       <div className="profile-frame loading">
         <div className="ribbon" aria-hidden="true" />
@@ -414,7 +420,7 @@ const ProfilePage: React.FC = () => {
 
   if (!user) return null;
 
-  if (error || !profile) {
+  if (profileStatus === "error" && isSessionChecked) {
     return (
       <div className="profile-error-wrap">
         <div className="card glass error">
@@ -434,6 +440,8 @@ const ProfilePage: React.FC = () => {
       </div>
     );
   }
+
+  if (!profile) return null;
 
   const getStableProductKey = (p: Product, idx: number) =>
     String(p.id ?? p.asin ?? p.slug ?? `${p.name}-${idx}`);

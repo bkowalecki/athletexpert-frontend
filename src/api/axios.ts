@@ -8,10 +8,12 @@ const baseURL = process.env.REACT_APP_API_URL ?? "http://localhost:8080";
 const CSRF_COOKIE_NAME = "XSRF-TOKEN";
 const CSRF_HEADER_NAME = "X-XSRF-TOKEN";
 const REQUEST_TIMEOUT_MS = 15_000;
+const AUTH_REDIRECT_GUARD_KEY = "ax_auth_redirected";
 
 // Endpoints that commonly 401/403 during normal boot (should NOT hard-redirect)
 const NO_REDIRECT_PATHS = new Set([
   "/users/session", // bootstrapping check
+  "/auth/callback",
 ]);
 
 // --- Safe cookie reader ---
@@ -41,6 +43,7 @@ function shouldRedirectToAuth(error: AxiosError): boolean {
   if (typeof window !== "undefined") {
     const path = window.location.pathname;
     if (path === "/auth") return false;
+    if (sessionStorage.getItem(AUTH_REDIRECT_GUARD_KEY)) return false;
   }
 
   return true;
@@ -80,6 +83,7 @@ api.interceptors.response.use(
       sessionStorage.removeItem("ax_id_token");
 
       if (typeof window !== "undefined") {
+        sessionStorage.setItem(AUTH_REDIRECT_GUARD_KEY, "1");
         window.location.assign("/auth");
       }
     }

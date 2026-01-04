@@ -18,6 +18,7 @@ import {
   deleteBlog as deleteBlogApi,
 } from "../../api/blog";
 import { searchProducts } from "../../api/product";
+import { safeUrl } from "../../util/safeUrl";
 import type { BlogPost, BlogPostForm } from "../../types/blogs";
 
 interface Product {
@@ -275,10 +276,12 @@ const NewBlogPost: React.FC = () => {
   };
 
   const insertProductEmbed = (product: Product) => {
+    const safeAffiliateLink = safeUrl(product.affiliateLink) ?? "#";
+    const safeImgUrl = safeUrl(product.imgUrl) ?? "";
     const embed = `
 <div class="ax-product-embed">
-  <a href="${product.affiliateLink}" target="_blank" rel="noopener noreferrer">
-    <img src="${product.imgUrl}" alt="${product.name}" />
+  <a href="${safeAffiliateLink}" target="_blank" rel="noopener noreferrer">
+    <img src="${safeImgUrl}" alt="${product.name}" />
     <div><strong>${product.name}</strong> - ${product.brand}${
       product.price ? ` | $${product.price}` : ""
     }</div>

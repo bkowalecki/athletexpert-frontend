@@ -7,7 +7,7 @@ import type { BlogPost, BlogPostForm } from "../types/blogs";
  * Fetch a blog post by slug
  */
 export const fetchBlogPost = async (slug: string): Promise<BlogPost> => {
-  const { data } = await api.get<BlogPost>(`/blog/slug/${slug}`);
+  const { data } = await api.get<BlogPost>(`/blog/slug/${encodeURIComponent(slug)}`);
   return data;
 };
 
@@ -15,7 +15,7 @@ export const fetchBlogPost = async (slug: string): Promise<BlogPost> => {
  * Fetch related blogs by slug
  */
 export const fetchRelatedBlogs = async (slug: string): Promise<BlogPost[]> => {
-  const { data } = await api.get<BlogPost[]>(`/blog/related/${slug}`);
+  const { data } = await api.get<BlogPost[]>(`/blog/related/${encodeURIComponent(slug)}`);
   return Array.isArray(data) ? data : [];
 };
 

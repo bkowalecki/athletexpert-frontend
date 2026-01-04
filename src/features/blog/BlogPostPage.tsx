@@ -7,6 +7,7 @@ import ShareButtons from "../../components/ShareButtons";
 import BlogCard from "./BlogCard";
 import type { BlogPost } from "../../types/blogs";
 import { fetchBlogPost, fetchRelatedBlogs } from "../../api/blog";
+import { safeUrl } from "../../util/safeUrl";
 import "../../styles/BlogPostPage.css";
 
 const BlogPostPage: React.FC = () => {
@@ -58,6 +59,9 @@ const BlogPostPage: React.FC = () => {
     links.forEach((link) => {
       link.setAttribute("target", "_blank");
       link.setAttribute("rel", "noopener noreferrer");
+      if (!safeUrl(link.getAttribute("href"))) {
+        link.setAttribute("href", "#");
+      }
     });
   }, [post?.content]);
 
@@ -73,6 +77,8 @@ const BlogPostPage: React.FC = () => {
   const sanitizedContent = useMemo(() => {
     return DOMPurify.sanitize(post?.content || "");
   }, [post?.content]);
+
+  const safeImageUrl = useMemo(() => safeUrl(post?.imageUrl), [post?.imageUrl]);
 
   if (isLoading || !post) {
     return (
@@ -94,7 +100,7 @@ const BlogPostPage: React.FC = () => {
         <meta property="og:site_name" content="AthleteXpert" />
         <meta property="og:title" content={post.title} />
         <meta property="og:description" content={post.summary || post.title} />
-        {post.imageUrl && <meta property="og:image" content={post.imageUrl} />}
+        {safeImageUrl && <meta property="og:image" content={safeImageUrl} />}
         <meta property="og:url" content={canonicalUrl} />
       </Helmet>
 
@@ -114,10 +120,10 @@ const BlogPostPage: React.FC = () => {
           </div>
         </header>
 
-        {post.imageUrl && (
+        {safeImageUrl && (
           <div className="blog-post-image-container">
             <img
-              src={post.imageUrl}
+              src={safeImageUrl}
               alt={`Image for ${post.title}`}
               className="blog-post-image"
               loading="eager"

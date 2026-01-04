@@ -10,6 +10,7 @@ import { Link } from "react-router-dom";
 import type { ProductCardProps } from "../../types/products";
 import "../../styles/ProductCard.css";
 import { trackEvent } from "../../util/analytics";
+import { safeUrl } from "../../util/safeUrl";
 
 const FALLBACK_IMAGE = "/images/product-fallback.png";
 
@@ -43,9 +44,9 @@ const ProductCard: React.FC<
   const modalCloseBtnRef = useRef<HTMLButtonElement | null>(null);
 
   // Fallback image logic
-  const [imgSrc, setImgSrc] = useState(imgUrl || FALLBACK_IMAGE);
+  const [imgSrc, setImgSrc] = useState(safeUrl(imgUrl) || FALLBACK_IMAGE);
   useEffect(() => {
-    setImgSrc(imgUrl || FALLBACK_IMAGE);
+    setImgSrc(safeUrl(imgUrl) || FALLBACK_IMAGE);
   }, [imgUrl]);
 
   const openModal = useCallback(() => {
@@ -95,6 +96,8 @@ const ProductCard: React.FC<
   };
 
   const hasInternalPage = Boolean(id && slug);
+
+  const safeAffiliateLink = safeUrl(affiliateLink);
 
   return (
     <>
@@ -172,12 +175,18 @@ const ProductCard: React.FC<
             )}
 
             <a
-              href={affiliateLink}
+              href={safeAffiliateLink}
               target="_blank"
               rel="sponsored nofollow noopener noreferrer"
               className="ax-product-card-button"
               aria-label="View product on Amazon"
+              aria-disabled={!safeAffiliateLink}
               onClick={(e) => {
+                if (!safeAffiliateLink) {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  return;
+                }
                 e.stopPropagation();
                 trackEvent("affiliate_click", {
                   product_id: id,
