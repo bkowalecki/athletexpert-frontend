@@ -70,14 +70,14 @@ const SportPage: React.FC = () => {
 
   if (!currentSport) {
     return (
-      <div className="sport-page">
+      <div className="sport-page ax-page">
         <h2 className="sport-page-not-found">Loading...</h2>
       </div>
     );
   }
 
   return (
-    <div className="sport-page">
+    <div className="sport-page ax-page">
       <div className="sport-page-title">{currentSport.title}</div>
 
       {WEEKLY_POLL_ENABLED && (

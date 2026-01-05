@@ -89,7 +89,7 @@ const BlogPostPage: React.FC = () => {
   }
 
   return (
-    <section className="blog-post-page">
+    <section className="blog-post-page ax-page">
       <Helmet>
         <title>{post.title} - AthleteXpert</title>
         <meta name="author" content={post.author} />

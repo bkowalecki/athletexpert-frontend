@@ -165,6 +165,10 @@ const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
 
       if (!trimmedQuery) {
         navigate(`/search?query=`);
+        trackEvent("search", {
+          search_term: "(empty)",
+          source: "header",
+        });
         trackEvent("search_submit", {
           query: "(empty)",
           search_origin: "header",
@@ -205,6 +209,11 @@ const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
           navigate(`/search?query=${encodeURIComponent(trimmedQuery)}`);
         }
 
+        trackEvent("search", {
+          search_term: trimmedQuery,
+          source: "header",
+          intent: ai.intent,
+        });
         trackEvent("search_submit", {
           query: trimmedQuery,
           fixedQuery: ai.fixedQuery,
@@ -225,6 +234,11 @@ const HeaderSearchBar: React.FC<HeaderSearchBarProps> = ({
         onSearchComplete?.();
       } catch {
         navigate(`/search?query=${encodeURIComponent(trimmedQuery)}`);
+        trackEvent("search", {
+          search_term: trimmedQuery,
+          source: "header",
+          error: true,
+        });
         trackEvent("search_submit", {
           query: trimmedQuery,
           error: true,

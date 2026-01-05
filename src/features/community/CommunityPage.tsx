@@ -131,7 +131,7 @@ const Community: React.FC = () => {
 
   return (
     <motion.div
-      className="community-page"
+      className="community-page ax-page"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}

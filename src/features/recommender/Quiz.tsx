@@ -277,7 +277,7 @@ const Quiz: React.FC<{ isOpen: boolean; closeModal: () => void }> = ({
 
               {step === totalSteps && !isLoading && (
                 <div className="quiz-product-grid">
-                  {recommendedProducts.map((product) => (
+                  {recommendedProducts.map((product, idx) => (
                     <ProductCard
                       key={product.id}
                       id={product.id}
@@ -290,6 +290,17 @@ const Quiz: React.FC<{ isOpen: boolean; closeModal: () => void }> = ({
                         product.affiliateLink,
                         AMAZON_ASSOCIATE_TAG
                       )}
+                      listIndex={idx}
+                      sourcePage="quiz"
+                      onCardClick={() =>
+                        trackEvent("recommendation_click", {
+                          item_id: product.id,
+                          item_name: product.name,
+                          item_brand: product.brand,
+                          index: idx,
+                          source_page: "quiz",
+                        })
+                      }
                     />
                   ))}
                 </div>

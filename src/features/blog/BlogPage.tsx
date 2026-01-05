@@ -182,7 +182,7 @@ const BlogPage: React.FC = () => {
   }, [posts, origin, canonicalUrl]);
 
   return (
-    <div className="blog-page-container">
+    <div className="blog-page-container ax-page">
       <Helmet>
         <title>AthleteXpert | Blog</title>
         <meta

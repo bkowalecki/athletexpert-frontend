@@ -110,4 +110,11 @@ export interface ProductCardProps {
   lastSyncedAt?: string;
 
   asin?: string;
+
+  imageLoading?: "lazy" | "eager";
+  fetchPriority?: "auto" | "high" | "low";
+
+  listIndex?: number;
+  sourcePage?: string;
+  onCardClick?: () => void;
 }

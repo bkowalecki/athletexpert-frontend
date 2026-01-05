@@ -123,6 +123,7 @@ const ProductsPage: React.FC = () => {
   const [searchResults, setSearchResults] = useState<Product[] | null>(null);
   const [isSearching, setIsSearching] = useState(false);
   const [visibleCount, setVisibleCount] = useState(16);
+  const listImpressionRef = useRef(false);
 
   const urlBudgetKey = searchParams.get("budget");
   const initialBudgetIdxRaw = urlBudgetKey
@@ -182,7 +183,9 @@ const ProductsPage: React.FC = () => {
   } = useQuery<Product[], Error, Product[]>({
     queryKey: ["products"],
     queryFn: fetchProducts,
-    staleTime: 60_000,
+    staleTime: 300_000,
+    gcTime: 1_800_000,
+    refetchOnWindowFocus: false,
     placeholderData: keepPreviousData,
     select: (items: Product[] | undefined): Product[] =>
       dedupeProducts(items ?? []),
@@ -244,22 +247,27 @@ const ProductsPage: React.FC = () => {
     return budgetFiltered.filter((p) => p.retailer === retailer);
   }, [budgetFiltered, retailer]);
 
-  // Local sort
-  const sortedProducts = useMemo(() => {
-    if (!filters.sortOption) return retailerFiltered;
-    const arr = [...retailerFiltered];
-    if (filters.sortOption === "priceLow") {
-      arr.sort((a, b) => (a.price ?? Infinity) - (b.price ?? Infinity));
-    } else if (filters.sortOption === "priceHigh") {
-      arr.sort((a, b) => (b.price ?? -Infinity) - (a.price ?? -Infinity));
-    }
-    return arr;
-  }, [retailerFiltered, filters.sortOption]);
+  useEffect(() => {
+    if (listImpressionRef.current) return;
+    if (isLoading || isSearching) return;
+    if (!retailerFiltered.length) return;
+
+    listImpressionRef.current = true;
+    if (Math.random() > 0.2) return;
+
+    const listName = searchResults !== null ? "products_search" : "products";
+    trackEvent("view_item_list", {
+      item_list_name: listName,
+      item_list_id: listName,
+      items_count: retailerFiltered.length,
+      source_page: searchResults !== null ? "search" : "products",
+    });
+  }, [isLoading, isSearching, retailerFiltered.length, searchResults]);
 
   // Slice
   const visibleProducts = useMemo(
-    () => sortedProducts.slice(0, visibleCount),
-    [sortedProducts, visibleCount]
+    () => retailerFiltered.slice(0, visibleCount),
+    [retailerFiltered, visibleCount]
   );
 
   // ——— URL sync helper ———
@@ -443,7 +451,7 @@ const ProductsPage: React.FC = () => {
     sanitizeQuery(inputQuery).length >= 3 && !isSearching;
 
   return (
-    <div className="products-page">
+    <div className="products-page ax-page">
       <Helmet>
         <title>AthleteXpert | Gear</title>
         <meta
@@ -603,7 +611,7 @@ const ProductsPage: React.FC = () => {
       >
         <div className="results-row">
           <p className="results-count">
-            Showing {visibleProducts.length} of {sortedProducts.length} results
+            Showing {visibleProducts.length} of {retailerFiltered.length} results
           </p>
         </div>
 
@@ -615,6 +623,8 @@ const ProductsPage: React.FC = () => {
                 (typeof product.id === "number" ? String(product.id) : undefined) ??
                 product.slug ??
                 `${product.name}-${idx}`;
+
+              const isAboveFold = idx < 6;
 
               return (
                 <ProductCard
@@ -638,10 +648,14 @@ const ProductsPage: React.FC = () => {
                   numReviews={product.numReviews}
                   source={product.source}
                   lastSyncedAt={product.lastSyncedAt}
+                  imageLoading={isAboveFold ? "eager" : "lazy"}
+                  fetchPriority={isAboveFold ? "high" : "auto"}
+                  listIndex={idx}
+                  sourcePage="products"
                 />
               );
             })
-          ) : (
+          ) : !isLoading && !isSearching ? (
             <div className="no-products-text">
               <p>No gear found.</p>
               <ul style={{ marginTop: 6 }}>
@@ -650,11 +664,11 @@ const ProductsPage: React.FC = () => {
                 <li>Check trending for inspiration</li>
               </ul>
             </div>
-          )}
+          ) : null}
         </div>
       </ErrorBoundary>
 
-      {visibleProducts.length < sortedProducts.length && (
+      {visibleProducts.length < retailerFiltered.length && (
         <div style={{ display: "flex", justifyContent: "center", margin: "16px 0" }}>
           <button className="load-more-btn" type="button" onClick={loadMore}>
             Load more

@@ -134,6 +134,19 @@
   transition: width 0.42s cubic-bezier(.22,.77,.6,1.01);
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .quiz-modal,
+  .quiz-modal.closing,
+  .quiz-modal-content {
+    animation: none !important;
+  }
+
+  .quiz-option,
+  .quiz-progress {
+    transition-duration: 0.01ms !important;
+  }
+}
+
 /* =========================
    QUESTIONS / TITLES
 ========================= */

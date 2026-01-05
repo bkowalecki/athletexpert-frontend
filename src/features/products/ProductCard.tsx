@@ -9,7 +9,7 @@ import React, {
 import { Link } from "react-router-dom";
 import type { ProductCardProps } from "../../types/products";
 import "../../styles/ProductCard.css";
-import { trackEvent } from "../../util/analytics";
+import { trackEvent, trackOutboundClick } from "../../util/analytics";
 import { safeUrl } from "../../util/safeUrl";
 
 const FALLBACK_IMAGE = "/images/product-fallback.png";
@@ -36,6 +36,11 @@ const ProductCard: React.FC<
   asin,
   source,
   lastSyncedAt,
+  imageLoading = "lazy",
+  fetchPriority = "auto",
+  listIndex,
+  sourcePage,
+  onCardClick,
 }) => {
   // Modal state & scroll mgmt
   const [showModal, setShowModal] = useState(false);
@@ -81,18 +86,20 @@ const ProductCard: React.FC<
   }, [showModal, closeModal]);
 
   const handleCardView = () => {
-    trackEvent("product_view", {
-      product_name: name,
-      brand,
-      isAmazonFallback,
-      isTrending,
-      retailer: "Amazon",
+    trackEvent("select_item", {
+      item_id: id,
+      item_name: name,
+      item_brand: brand,
+      index: listIndex,
+      source_page: sourcePage,
+      is_amazon_fallback: isAmazonFallback,
+      is_trending: isTrending,
       asin,
       source,
-      id,
       slug,
-      lastSyncedAt,
+      last_synced_at: lastSyncedAt,
     });
+    onCardClick?.();
   };
 
   const hasInternalPage = Boolean(id && slug);
@@ -133,7 +140,8 @@ const ProductCard: React.FC<
             src={imgSrc}
             alt={imgSrc === FALLBACK_IMAGE ? "No product image available" : name}
             className="ax-product-card-image"
-            loading="lazy"
+            loading={imageLoading}
+            fetchPriority={fetchPriority}
             decoding="async"
             draggable={false}
             onError={() => setImgSrc(FALLBACK_IMAGE)}
@@ -188,15 +196,14 @@ const ProductCard: React.FC<
                   return;
                 }
                 e.stopPropagation();
-                trackEvent("affiliate_click", {
-                  product_id: id,
-                  product_name: name,
-                  brand,
-                  affiliateLink,
-                  retailer: "Amazon",
+                trackOutboundClick(safeAffiliateLink, {
+                  item_id: id,
+                  item_name: name,
+                  item_brand: brand,
+                  source_page: sourcePage,
                   asin,
                   source,
-                  isTrending,
+                  is_trending: isTrending,
                 });
               }}
             >

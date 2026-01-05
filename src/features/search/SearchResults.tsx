@@ -96,6 +96,11 @@ const SearchResults: React.FC = () => {
         setAiPages(ai.suggestedPages || []);
         setIsGibberish(Boolean(ai.isGibberish));
 
+        trackEvent("search", {
+          search_term: searchQuery,
+          source: "results",
+        });
+
         trackEvent("search_view", {
           query: searchQuery,
           fixedQuery: ai.fixedQuery,
@@ -376,7 +381,7 @@ const SearchResults: React.FC = () => {
           <section className="search-results-page-section">
             <h3 className="search-results-page-section-title">Products</h3>
             <div className="search-results-page-list">
-              {products.map((product: Product) => (
+              {products.map((product: Product, idx: number) => (
                 <ProductCard
                   id={product.id}
                   key={product.id}
@@ -388,6 +393,8 @@ const SearchResults: React.FC = () => {
                   affiliateLink={product.affiliateLink}
                   isSaved={savedProductIds.includes(product.id)}
                   onToggleSave={() => toggleSaveProduct(product.id)}
+                  listIndex={idx}
+                  sourcePage="search"
                 />
               ))}
             </div>

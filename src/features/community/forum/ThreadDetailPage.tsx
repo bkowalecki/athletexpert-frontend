@@ -5,6 +5,7 @@ import { useUserContext } from "../../../context/UserContext";
 import { getThreadById } from "./mockForumData";
 import "./Forum.css";
 import { slugifySportName } from "../../../util/slug";
+import { trackEvent } from "../../../util/analytics";
 
 const formatDate = (value: string) =>
   new Date(value).toLocaleDateString(undefined, {
@@ -41,6 +42,16 @@ const ThreadDetailPage: React.FC = () => {
   const [reply, setReply] = useState("");
   const [submitStatus, setSubmitStatus] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (!currentSport || !thread) return;
+    trackEvent("view_item", {
+      item_id: thread.id,
+      item_name: thread.title,
+      sport: currentSport.title,
+      source_page: "community_forum",
+    });
+  }, [currentSport, thread]);
+
   if (!currentSport) {
     return (
       <div className="sport-page forum-page">
@@ -72,6 +83,11 @@ const ThreadDetailPage: React.FC = () => {
     event.preventDefault();
     if (!user) return;
     setSubmitStatus("Reply captured locally (mock only). Real posting will come in Phase 2.");
+    trackEvent("reply_post", {
+      thread_id: thread.id,
+      sport: currentSport.title,
+      source_page: "community_forum",
+    });
     setReply("");
   };
 

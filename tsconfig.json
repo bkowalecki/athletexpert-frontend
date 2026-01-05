@@ -13,12 +13,12 @@
     "jsx": "react-jsx",
     "allowSyntheticDefaultImports": true,
     "noFallthroughCasesInSwitch": true,
-    "baseUrl": "src",  // ✅ Fix: Set base directory
+    "baseUrl": "src",
     "paths": {
-      "@/*": ["*"]  // ✅ Now works for '@/context/UserContext'
+      "@/*": ["*"]
     },
     "noEmit": true
   },
-  "include": ["src", "setupTests.ts"],
-  "exclude": ["node_modules", "dist", "src/**/*.test.tsx", "src/tests/**"]
+  "include": ["src", "src/tests/setupTests.ts"],
+  "exclude": ["node_modules", "dist", "src/**/*.test.tsx"]
 }

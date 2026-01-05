@@ -173,6 +173,22 @@
   100% { filter: brightness(1.32); }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .sport-modal-overlay,
+  .sport-modal-overlay.enhanced,
+  .sport-modal,
+  .sport-modal.enhanced,
+  .stat-progress-bar-fg {
+    animation: none !important;
+  }
+
+  .sport-modal-close,
+  .sport-stat-row,
+  .sport-modal-sporticon {
+    transition-duration: 0.01ms !important;
+  }
+}
+
 /* --- Tips Section --- */
 .sport-modal-tips {
   margin: 0.7rem 0 1.05rem 0;

@@ -1,10 +1,11 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useSports } from "../../../context/SportsContext";
 import { getThreadsBySport } from "./mockForumData";
 import type { ForumThread } from "./forumTypes";
 import "./Forum.css";
 import { slugifySportName } from "../../../util/slug";
+import { trackEvent } from "../../../util/analytics";
 
 const formatDate = (value: string) =>
   new Date(value).toLocaleDateString(undefined, {
@@ -22,6 +23,7 @@ const SportForumPage: React.FC = () => {
   const { sport: slug } = useParams<{ sport: string }>();
   const navigate = useNavigate();
   const { sports } = useSports();
+  const listTrackedRef = useRef(false);
 
   const currentSport = useMemo(() => {
     if (!slug) return null;
@@ -38,6 +40,20 @@ const SportForumPage: React.FC = () => {
     if (!currentSport) return [];
     return sortByActivity(getThreadsBySport(slugifySportName(currentSport.title)));
   }, [currentSport]);
+
+  useEffect(() => {
+    if (listTrackedRef.current) return;
+    if (!currentSport) return;
+
+    listTrackedRef.current = true;
+    trackEvent("view_item_list", {
+      item_list_name: "forum_threads",
+      item_list_id: `forum_${slugifySportName(currentSport.title)}`,
+      items_count: threads.length,
+      sport: currentSport.title,
+      source_page: "community_forum",
+    });
+  }, [currentSport, threads.length]);
 
   if (!currentSport) {
     return (

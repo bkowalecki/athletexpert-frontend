@@ -61,7 +61,10 @@ a:-webkit-any-link {
   border: none;
   border-radius: 30px;
   text-decoration: none;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition:
+    background-color var(--ax-transition-base) var(--ax-ease),
+    color var(--ax-transition-base) var(--ax-ease),
+    border-color var(--ax-transition-base) var(--ax-ease);
   cursor: pointer;
 }
 
@@ -198,7 +201,7 @@ body.modal-open {
   /* z-index: 999; */
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.25s ease;
+  transition: opacity var(--ax-transition-fast) var(--ax-ease);
 }
 
 .menu-backdrop.active {

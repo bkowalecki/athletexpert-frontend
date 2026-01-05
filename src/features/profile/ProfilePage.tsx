@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import { useAuth0 } from "@auth0/auth0-react";
 import { Helmet } from "react-helmet";
 import { useQueryClient } from "@tanstack/react-query";
+import { trackEvent } from "../../util/analytics";
 import SportStatsModal from "./SportStatsModal";
 import ProductCard from "../products/ProductCard";
 import BlogCard from "../blog/BlogCard";
@@ -388,6 +389,7 @@ const ProfilePage: React.FC = () => {
       await api.post("/users/logout").catch(() => {});
 
       const provider = (user as any)?.authProvider;
+      trackEvent("logout", { method: provider ?? "unknown", source_page: "profile" });
       if (provider === "auth0") {
         auth0Logout({
           logoutParams: {
@@ -404,7 +406,7 @@ const ProfilePage: React.FC = () => {
 
   if (!isSessionChecked || profileStatus === "loading") {
     return (
-      <div className="profile-frame loading">
+      <div className="profile-frame loading ax-page">
         <div className="ribbon" aria-hidden="true" />
         <div className="shell">
           <div className="left-rail">
@@ -455,7 +457,7 @@ const ProfilePage: React.FC = () => {
     String(p.id ?? p.asin ?? p.slug ?? `${p.name}-${idx}`);
 
   return (
-    <div className="profile-frame">
+    <div className="profile-frame ax-page">
       <Helmet>
         <title>AthleteXpert | My Profile</title>
         <meta

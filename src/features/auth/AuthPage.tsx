@@ -126,11 +126,11 @@ const AuthPage: React.FC = () => {
 
       if (isLogin) {
         userData = await loginUser({ email, password });
-        trackEvent("login_success", { method: "email" });
+        trackEvent("login", { method: "email" });
         navigate("/profile", { replace: true });
       } else {
         userData = await registerUser({ username, email, password });
-        trackEvent("login_success", { method: "register" });
+        trackEvent("sign_up", { method: "register" });
 
         navigate(userData?.isActive ? "/profile" : "/account-setup", {
           replace: true,
@@ -162,8 +162,8 @@ const AuthPage: React.FC = () => {
       const idToken = (await getIdTokenClaims())?.__raw;
       if (!idToken) throw new Error("No ID Token claims received.");
 
-      trackEvent("login_success", { method: "google" });
-      trackEvent("user_signup", { method: "google", email: auth0User?.email });
+      trackEvent("login", { method: "google" });
+      trackEvent("sign_up", { method: "google" });
 
       await loginWithAuth0Token({ token: idToken, setUser, navigate });
     } catch (err) {
@@ -175,7 +175,7 @@ const AuthPage: React.FC = () => {
   if (!isSessionChecked) return <div className="auth-loading" />;
 
   return (
-    <div className="auth-page-wrapper">
+    <div className="auth-page-wrapper ax-page">
       <div className="auth-container">
         <h2>{isLogin ? "Welcome Back!" : "Create an Account"}</h2>
         {error && <p className="error-message">{error}</p>}

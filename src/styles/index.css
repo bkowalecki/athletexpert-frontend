@@ -1,6 +1,12 @@
 /* === index.css === */
 /* Purpose: Base styles and utility classes */
 
+:root {
+  --ax-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ax-transition-fast: 160ms;
+  --ax-transition-base: 240ms;
+}
+
 html,
 body {
   margin: 0;
@@ -18,6 +24,21 @@ body {
 /* Root should not become its own scrolling surface */
 #root {
   min-height: 100vh;
+}
+
+.ax-page {
+  animation: ax-page-fade var(--ax-transition-base) var(--ax-ease) both;
+}
+
+@keyframes ax-page-fade {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Code Elements */
@@ -46,4 +67,14 @@ body.modal-open {
   position: static !important;
   height: auto !important;
   width: auto !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

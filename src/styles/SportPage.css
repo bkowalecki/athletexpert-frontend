@@ -137,7 +137,11 @@ body {
   cursor: pointer;
   border: none;
   font-weight: 700;
-  transition: background 0.3s, color 0.3s, box-shadow 0.3s, transform 0.3s;
+  transition:
+    background var(--ax-transition-base) var(--ax-ease),
+    color var(--ax-transition-base) var(--ax-ease),
+    box-shadow var(--ax-transition-base) var(--ax-ease),
+    transform var(--ax-transition-fast) var(--ax-ease);
 }
 
 .sport-page-btn:hover,

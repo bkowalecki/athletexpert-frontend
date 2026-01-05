@@ -4,6 +4,7 @@ import { useSports } from "../../../context/SportsContext";
 import { useUserContext } from "../../../context/UserContext";
 import "./Forum.css";
 import { slugifySportName } from "../../../util/slug";
+import { trackEvent } from "../../../util/analytics";
 
 const NewThreadPage: React.FC = () => {
   const { sport: slug } = useParams<{ sport: string }>();
@@ -38,6 +39,10 @@ const NewThreadPage: React.FC = () => {
     event.preventDefault();
     if (!user) return;
     setSubmitStatus("Thread captured locally (mock only). Real posting will come in Phase 2.");
+    trackEvent("thread_create", {
+      sport: currentSport.title,
+      source_page: "community_forum",
+    });
     setTitle("");
     setBody("");
   };

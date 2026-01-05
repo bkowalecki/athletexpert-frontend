@@ -8,7 +8,7 @@ import {
   FaUpRightFromSquare,
 } from "react-icons/fa6";
 import "../../styles/ProductDetail.css";
-import { trackEvent } from "../../util/analytics";
+import { trackEvent, trackOutboundClick } from "../../util/analytics";
 import type { Product } from "../../types/products";
 import ProductCard from "../products/ProductCard";
 import { fetchProductBySlug, fetchRelatedProducts } from "../../api/product";
@@ -67,15 +67,16 @@ const ProductDetail: React.FC = () => {
         setProduct(data);
         setActiveImageIdx(0);
 
-        trackEvent("product_detail_view", {
-          product_id: data.id,
-          product_name: data.name,
-          brand: data.brand,
-          retailer: data.retailer,
+        trackEvent("view_item", {
+          item_id: data.id,
+          item_name: data.name,
+          item_brand: data.brand,
+          item_category: data.retailer,
           price: data.price,
-          sports: data.sports,
+          sport: data.sports?.[0],
           asin: data.asin,
-          trending: !!data.trending,
+          is_trending: !!data.trending,
+          source_page: "product_detail",
         });
 
         loadRelatedProducts(data.id);
@@ -161,13 +162,13 @@ const ProductDetail: React.FC = () => {
   };
 
   const handleAffiliateClick = () => {
-    trackEvent("affiliate_click", {
-      product_id: product.id,
-      product_name: product.name,
-      brand: product.brand,
-      retailer: product.retailer,
+    trackOutboundClick(product.affiliateLink, {
+      item_id: product.id,
+      item_name: product.name,
+      item_brand: product.brand,
+      item_category: product.retailer,
       asin: product.asin,
-      from: "product_detail",
+      source_page: "product_detail",
     });
   };
 

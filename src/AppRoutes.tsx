@@ -1,8 +1,9 @@
-import React, { Suspense, useCallback, useState } from "react";
+import React, { Suspense, useCallback, useEffect, useState } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { useUserContext } from "./context/UserContext";
 import RequireAuth from "./features/auth/RequireAuth";
 import LoadingScreen from "./components/LoadingScreen";
+import { trackPageView } from "./util/analytics";
 
 // Instant-load homepage sections
 import HeroSection from "./features/layout/HeroSection";
@@ -138,6 +139,10 @@ const AppRoutes: React.FC = () => {
   const [isQuizModalOpen, setQuizModalOpen] = useState(false);
   const openQuiz = useCallback(() => setQuizModalOpen(true), []);
   const closeQuiz = useCallback(() => setQuizModalOpen(false), []);
+
+  useEffect(() => {
+    trackPageView(location.pathname + location.search, document.title);
+  }, [location.pathname, location.search]);
 
   return (
     <main className="page-content" id="main-content">
